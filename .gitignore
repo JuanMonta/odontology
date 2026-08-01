@@ -1,0 +1,36 @@
+# ---------- Frontend Angular ----------
+/frontend-angular-12/node_modules/
+/frontend-angular-12/dist/
+/frontend-angular-12/tmp/
+/frontend-angular-12/.angular/
+/frontend-angular-12/coverage/
+/frontend-angular-12/.env
+/frontend-angular-12/.env.*
+!/frontend-angular-12/.env.example
+
+# ---------- Backend Spring Boot ----------
+/spring_backend/target/
+/spring_backend/src/test/
+/spring_backend/.mvn/
+/spring_backend/logs/
+
+# ---------- Logs ----------
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---------- IDE / Editor ----------
+.idea/
+*.iml
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+Desktop.ini
