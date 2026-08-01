@@ -13,6 +13,7 @@
 /spring_backend/src/test/
 /spring_backend/.mvn/
 /spring_backend/logs/
+/spring_backend/src/main/resources/application-local.yaml
 
 # ---------- Logs ----------
 **/logs/
