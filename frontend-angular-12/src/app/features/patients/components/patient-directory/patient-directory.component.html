@@ -1,0 +1,41 @@
+<div class="dir">
+  <div class="dir-head" role="row">
+    <span class="col col-id" role="columnheader">HC</span>
+    <span class="col col-name" role="columnheader">PACIENTE</span>
+    <span class="col col-tx" role="columnheader">TRATAMIENTO</span>
+    <span class="col col-visit" role="columnheader">ÚLTIMA VISITA</span>
+    <span class="col col-status" role="columnheader">ESTADO</span>
+    <span class="col col-debt" role="columnheader">DEUDA</span>
+  </div>
+
+  <div class="dir-list">
+    <ng-container *ngIf="patients.length; else empty">
+      <div
+        *ngFor="let p of patients; trackBy: trackById"
+        class="dir-row"
+        [class.is-selected]="p.id === selectedId"
+        role="button"
+        tabindex="0"
+        (click)="select.emit(p)"
+        (keydown.enter)="select.emit(p)"
+      >
+        <span class="col col-id">{{ p.id }}</span>
+        <span class="col col-name">{{ p.name }}</span>
+        <span class="col col-tx">{{ p.treatment }}</span>
+        <span class="col col-visit">{{ p.lastVisit }}</span>
+        <span class="col col-status">
+          <span class="lamp" [class.lamp--on]="p.status === 'active'" aria-hidden="true"></span>
+          <span class="status-text">{{ p.status === 'active' ? 'ACTIVO' : 'INACTIVO' }}</span>
+        </span>
+        <span class="col col-debt" [class.debt--due]="p.debt > 0">{{ fmtMoney(p.debt) }}</span>
+      </div>
+    </ng-container>
+    <ng-template #empty>
+      <div class="dir-empty">
+        <span class="dir-empty-lamp" aria-hidden="true"></span>
+        <span>SIN COINCIDENCIAS</span>
+        <span class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</span>
+      </div>
+    </ng-template>
+  </div>
+</div>
