@@ -1,0 +1,90 @@
+<div class="page treatments">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-left">
+        <h2 class="page-title">CATÁLOGO DE TRATAMIENTOS</h2>
+        <span class="page-sub">OPERACIÓN · TARIFARIO · {{ (treatments$ | async)?.length ?? 0 }} ITEMS</span>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn-amber" type="button" (click)="startCreate()">
+          <span class="btn-plus" aria-hidden="true"></span>
+          NUEVO TRATAMIENTO
+        </button>
+      </div>
+    </div>
+    <div class="page-toolbar">
+      <label class="search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="BUSCAR TRATAMIENTO · NOMBRE / CÓDIGO / CATEGORÍA"
+          aria-label="Buscar tratamiento"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </label>
+      <div class="filter">
+        <span class="filter-label">CATEGORÍA</span>
+        <select
+          class="filter-select"
+          aria-label="Filtrar por categoría"
+          (change)="onCategory($any($event.target).value)"
+        >
+          <option value="all">TODAS</option>
+          <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <section class="directory" aria-label="Catálogo de tratamientos">
+      <app-treatment-directory
+        [treatments]="(treatments$ | async) ?? []"
+        [selectedId]="selected?.id ?? null"
+        (select)="onSelect($event)"
+      ></app-treatment-directory>
+    </section>
+
+    <aside class="detail" aria-label="Ficha de tratamiento">
+      <div class="treat-head" *ngIf="selected && !creating">
+        <div class="treat-head-main">
+          <span class="treat-code">{{ selected.code }}</span>
+          <h3 class="treat-name">{{ selected.name }}</h3>
+        </div>
+        <div class="treat-stat" aria-label="Pacientes con este tratamiento">
+          <span class="treat-stat-num">{{ selected.usage }}</span>
+          <span class="treat-stat-lbl">EN PACIENTES</span>
+        </div>
+        <button class="treat-close" type="button" aria-label="Cerrar ficha" (click)="onClosePanel()">
+          <span class="treat-close-x" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div class="treat-head" *ngIf="creating">
+        <div class="treat-head-main">
+          <span class="treat-code">NUEVO</span>
+          <h3 class="treat-name">REGISTRO DE TRATAMIENTO</h3>
+        </div>
+        <button class="treat-close" type="button" aria-label="Cancelar registro" (click)="cancelCreate()">
+          <span class="treat-close-x" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div class="treat-body" *ngIf="selected || creating">
+        <app-treatment-form
+          [treatment]="selected"
+          [creating]="creating"
+          (submit)="onSaved($event)"
+          (cancel)="cancelCreate()"
+        ></app-treatment-form>
+      </div>
+
+      <div class="detail-empty" *ngIf="!selected && !creating">
+        <span class="dir-empty-lamp" aria-hidden="true"></span>
+        <p>SELECCIONA UN TRATAMIENTO</p>
+        <p class="dir-empty-hint">O CREA UNO NUEVO DESDE EL BOTÓN AMBAR</p>
+      </div>
+    </aside>
+  </div>
+</div>

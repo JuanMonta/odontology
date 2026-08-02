@@ -1,0 +1,37 @@
+:host {
+  display: inline-flex;
+}
+
+.flap-text {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.flap-cell-wrap {
+  --flap-cell-w: 0.82em;
+  --flap-cell-h: 1.14em;
+}
+
+.flap-gap {
+  width: 0.34em;
+}
+
+:host([size='sm']) .flap-cell-wrap {
+  --flap-cell-w: 0.72em;
+  --flap-cell-h: 1em;
+}
+
+:host([size='sm']) .flap-text {
+  font-size: 0.86em;
+}
+
+:host([size='lg']) .flap-cell-wrap {
+  --flap-cell-w: 1.1em;
+  --flap-cell-h: 1.55em;
+}
+
+:host([size='lg']) .flap-text {
+  font-size: 1.6em;
+  letter-spacing: 0.04em;
+}

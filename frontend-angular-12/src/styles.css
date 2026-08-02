@@ -1,1 +1,137 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================
+   SAS Odontología — Tablero de Embarque (split-flap concourse)
+   Global tokens. Componentes heredan estos valores.
+   ============================================================ */
+
+:root {
+  /* Board — matte black flap faces */
+  --flap-black: #0b0d0f;
+  --flap-black-2: #14171b;
+  --flap-raised: #1c2026;
+  --flap-ink: #f1f3f5;
+  --flap-dim: #868e97;
+  --flap-seam: rgba(0, 0, 0, 0.72);
+
+  /* Brushed steel chrome */
+  --steel-950: #191d21;
+  --steel-900: #20252a;
+  --steel-800: #272d34;
+  --steel-700: #31383f;
+  --steel-600: #454d56;
+  --steel-500: #626b76;
+  --steel-400: #7f8893;
+  --steel-300: #a8b0b8;
+  --steel-200: #d2d6db;
+  --steel-100: #e9ebee;
+  --steel-brushed: linear-gradient(
+    105deg,
+    #d9dce0 0%,
+    #b6bcc3 18%,
+    #dde0e4 34%,
+    #aab1b9 52%,
+    #d3d7dc 68%,
+    #9ea6af 84%,
+    #cfd4d9 100%
+  );
+  --steel-brushed-dark: linear-gradient(
+    105deg,
+    #3a4149 0%,
+    #2a3037 22%,
+    #3d444c 40%,
+    #242a30 60%,
+    #383f47 78%,
+    #1f252b 100%
+  );
+
+  /* Signals */
+  --amber: #ffb020;
+  --amber-soft: rgba(255, 176, 32, 0.16);
+  --amber-line: rgba(255, 176, 32, 0.45);
+  --red-dim: #cf5a54;
+  --red-dim-soft: rgba(207, 90, 84, 0.12);
+  --green: #56b57f;
+
+  /* Type */
+  --font-flap: 'Oswald', 'Arial Narrow', 'Segoe UI', sans-serif;
+  --font-ui: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  /* Shape */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --flip-ease: cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--steel-200);
+  background: var(--steel-950);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--amber);
+  color: var(--flap-black);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--steel-600);
+  border-radius: 6px;
+  border: 2px solid var(--steel-900);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.001ms !important;
+  }
+}

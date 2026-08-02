@@ -1,0 +1,72 @@
+<form class="form" (ngSubmit)="onSubmit()" novalidate>
+  <div class="form-grid">
+    <label class="field field--full">
+      <span class="field-label">NOMBRE COMPLETO *</span>
+      <input class="field-input" type="text" [(ngModel)]="name" name="name" placeholder="NOMBRE Y APELLIDO" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span class="field-label">EDAD</span>
+      <input class="field-input" type="number" min="0" max="120" [(ngModel)]="age" name="age" />
+    </label>
+
+    <label class="field">
+      <span class="field-label">CUMPLEAÑOS (DD/MM)</span>
+      <input class="field-input" type="text" [(ngModel)]="birthday" name="birthday" placeholder="12/08" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span class="field-label">TELÉFONO</span>
+      <input class="field-input" type="tel" [(ngModel)]="phone" name="phone" placeholder="999 000 000" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span class="field-label">EMAIL</span>
+      <input class="field-input" type="email" [(ngModel)]="email" name="email" placeholder="paciente@correo.com" autocomplete="off" />
+    </label>
+
+    <label class="field field--full">
+      <span class="field-label">DIRECCIÓN</span>
+      <input class="field-input" type="text" [(ngModel)]="address" name="address" placeholder="AV. / JR. Y NÚMERO" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span class="field-label">ALERGIAS</span>
+      <input class="field-input" type="text" [(ngModel)]="allergies" name="allergies" placeholder="NINGUNA" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span class="field-label">TRATAMIENTO</span>
+      <input class="field-input" type="text" [(ngModel)]="treatment" name="treatment" placeholder="LIMPIEZA" autocomplete="off" />
+    </label>
+
+    <div class="field">
+      <span class="field-label">ESTADO</span>
+      <div class="seg" role="radiogroup" aria-label="Estado del paciente">
+        <button
+          class="seg-btn"
+          [class.is-active]="status === 'active'"
+          type="button"
+          role="radio"
+          [attr.aria-checked]="status === 'active'"
+          (click)="status = 'active'"
+        >ACTIVO</button>
+        <button
+          class="seg-btn"
+          [class.is-active]="status === 'inactive'"
+          type="button"
+          role="radio"
+          [attr.aria-checked]="status === 'inactive'"
+          (click)="status = 'inactive'"
+        >INACTIVO</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="form-error" *ngIf="error" role="alert">EL NOMBRE DEL PACIENTE ES OBLIGATORIO</p>
+
+  <div class="form-actions">
+    <button class="btn-amber" type="submit">GUARDAR PACIENTE</button>
+    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+  </div>
+</form>

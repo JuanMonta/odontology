@@ -1,0 +1,210 @@
+<div class="panel">
+  <!-- Creando paciente -->
+  <ng-container *ngIf="creating">
+    <div class="panel-head">
+      <div class="panel-head-info">
+        <span class="panel-kicker">NUEVO REGISTRO</span>
+        <span class="panel-title">ALTA DE PACIENTE</span>
+      </div>
+      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="cancel.emit()">
+        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <path d="M3 3l10 10"></path>
+          <path d="M13 3L3 13"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-scroll">
+      <app-patient-form [patient]="null" (submit)="onCreate($event)" (cancel)="cancel.emit()"></app-patient-form>
+    </div>
+  </ng-container>
+
+  <!-- Sin selección -->
+  <ng-container *ngIf="!creating && !patient">
+    <div class="panel-empty">
+      <span class="panel-empty-mark" aria-hidden="true"><span class="panel-empty-cell">+</span></span>
+      <span class="panel-empty-title">SELECCIONA UN PACIENTE</span>
+      <span class="panel-empty-hint">ABRE UNA FILA DEL DIRECTORIO PARA VER SU FICHA</span>
+    </div>
+  </ng-container>
+
+  <!-- Paciente seleccionado -->
+  <ng-container *ngIf="!creating && patient">
+    <div class="panel-head">
+      <div class="panel-id">
+        <span class="avatar" aria-hidden="true">{{ initials(patient.name) }}</span>
+        <div class="panel-head-info">
+          <span class="panel-id-hc">{{ patient.id }}</span>
+          <span class="panel-title">{{ patient.name }}</span>
+        </div>
+      </div>
+      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="close.emit()">
+        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <path d="M3 3l10 10"></path>
+          <path d="M13 3L3 13"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="panel-tabs" role="tablist">
+      <button
+        *ngFor="let t of tabs"
+        class="panel-tab"
+        [class.is-active]="tab === t.id"
+        type="button"
+        role="tab"
+        [attr.aria-selected]="tab === t.id"
+        (click)="selectTab(t.id)"
+      >{{ t.label }}</button>
+    </div>
+
+    <div class="panel-scroll">
+      <ng-container *ngIf="detail$ | async as detail">
+        <!-- FICHA -->
+        <div class="tab-pane" *ngIf="tab === 'ficha'">
+          <ng-container *ngIf="!editMode; else editForm">
+            <div class="ficha-grid">
+              <div class="ficha-row">
+                <span class="ficha-label">EDAD</span>
+                <span class="ficha-value">{{ patient.age }} AÑOS</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">CUMPLEAÑOS</span>
+                <span class="ficha-value">{{ patient.birthday }}</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">TELÉFONO</span>
+                <span class="ficha-value">{{ patient.phone }}</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">EMAIL</span>
+                <span class="ficha-value ficha-value--long">{{ patient.email }}</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">DIRECCIÓN</span>
+                <span class="ficha-value ficha-value--long">{{ patient.address }}</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">ALERGIAS</span>
+                <span class="ficha-value" [class.is-warn]="patient.allergies !== 'NINGUNA'">{{ patient.allergies }}</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">TRATAMIENTO</span>
+                <span class="ficha-value">{{ patient.treatment }}</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">ÚLTIMA VISITA</span>
+                <span class="ficha-value">{{ patient.lastVisit }}</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">ESTADO</span>
+                <span class="ficha-value ficha-value--status">
+                  <span class="lamp" [class.lamp--on]="patient.status === 'active'" aria-hidden="true"></span>
+                  {{ patient.status === 'active' ? 'ACTIVO' : 'INACTIVO' }}
+                </span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">DEUDA</span>
+                <span class="ficha-value" [class.is-due]="balance(detail.account) > 0">{{ fmtMoney(balance(detail.account)) }}</span>
+              </div>
+            </div>
+            <button class="btn-ghost-wide" type="button" (click)="editMode = true">
+              <svg class="icon-edit" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true">
+                <path d="M2.5 13.5h3.2L13 6.2a2.3 2.3 0 0 0 0-3.3 2.3 2.3 0 0 0-3.3 0L2.5 10.2v3.3z"></path>
+              </svg>
+              EDITAR PACIENTE
+            </button>
+          </ng-container>
+          <ng-template #editForm>
+            <app-patient-form [patient]="patient" (submit)="onEdit($event)" (cancel)="editMode = false"></app-patient-form>
+          </ng-template>
+        </div>
+
+        <!-- HISTORIAL -->
+        <div class="tab-pane" *ngIf="tab === 'historial'">
+          <ng-container *ngIf="detail.appointments.length; else noHistory">
+            <div
+              *ngFor="let h of detail.appointments"
+              class="hist-row"
+            >
+              <span class="hist-date">
+                <span class="hist-date-day">{{ h.date }}</span>
+                <span class="hist-date-time">{{ h.time }}</span>
+              </span>
+              <span class="hist-main">
+                <span class="hist-tx">{{ h.treatment }}</span>
+                <span class="hist-dentist">{{ h.dentist }}</span>
+              </span>
+              <span class="hist-status" [class]="statusClass(h.status)">
+                <span class="lamp" aria-hidden="true"></span>
+                {{ statusLabel(h.status) }}
+              </span>
+            </div>
+          </ng-container>
+          <ng-template #noHistory>
+            <div class="pane-empty">SIN CITAS REGISTRADAS</div>
+          </ng-template>
+        </div>
+
+        <!-- CUENTAS -->
+        <div class="tab-pane" *ngIf="tab === 'cuentas'">
+          <div class="balance-card">
+            <span class="balance-label">SALDO PENDIENTE</span>
+            <span class="balance-value" [class.is-paid]="balance(detail.account) <= 0">
+              {{ fmtMoney(balance(detail.account)) }}
+            </span>
+            <span class="balance-hint" *ngIf="balance(detail.account) <= 0">CUENTA AL DÍA</span>
+            <span class="balance-hint" *ngIf="balance(detail.account) > 0">PAGOS ACEPTADOS: EFECTIVO / TARJETA</span>
+          </div>
+
+          <button class="btn-amber-wide" type="button" (click)="abonoOpen = !abonoOpen">
+            REGISTRAR ABONO
+          </button>
+
+          <div class="abono" *ngIf="abonoOpen">
+            <label class="abono-field">
+              <span class="abono-label">MONTO (S/)</span>
+              <input
+                class="abono-input"
+                type="number"
+                min="1"
+                step="10"
+                [(ngModel)]="abonoAmount"
+                (keydown.enter)="confirmAbono()"
+                aria-label="Monto del abono"
+              />
+            </label>
+            <div class="abono-actions">
+              <button class="btn-amber" type="button" (click)="confirmAbono()">CONFIRMAR</button>
+              <button class="btn-ghost-sm" type="button" (click)="abonoOpen = false">CANCELAR</button>
+            </div>
+          </div>
+
+          <div class="ledger">
+            <ng-container *ngIf="detail.account.length; else noLedger">
+              <div
+                *ngFor="let e of detail.account"
+                class="ledger-row"
+              >
+                <span class="ledger-date">
+                  <span class="ledger-date-day">{{ e.date }}</span>
+                  <span class="ledger-date-concept">{{ e.concept }}</span>
+                </span>
+                <span class="ledger-amount" [class.ledger-amount--pay]="e.type === 'payment'">
+                  {{ e.type === 'payment' ? '- ' : '+ ' }}{{ fmtMoney(e.amount) }}
+                </span>
+              </div>
+            </ng-container>
+            <ng-template #noLedger>
+              <div class="pane-empty">SIN MOVIMIENTOS</div>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- ODONTOGRAMA -->
+        <div class="tab-pane" *ngIf="tab === 'odonto'">
+          <app-odontogram [teeth]="detail.teeth" (change)="onToothChange($event)"></app-odontogram>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+</div>

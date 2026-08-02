@@ -1,0 +1,64 @@
+<form class="form" (ngSubmit)="onSubmit()" novalidate>
+  <div class="form-code" *ngIf="treatment">
+    <span class="form-code-lbl">CÓDIGO</span>
+    <span class="form-code-val">{{ treatment.code }}</span>
+  </div>
+
+  <div class="form-grid">
+    <label class="field field--full">
+      <span class="field-label">NOMBRE DEL TRATAMIENTO *</span>
+      <input class="field-input" type="text" [(ngModel)]="name" name="name" placeholder="LIMPIEZA Y PROFILAXIS" autocomplete="off" />
+    </label>
+
+    <label class="field field--full">
+      <span class="field-label">CATEGORÍA</span>
+      <select class="field-select" [(ngModel)]="category" name="category" aria-label="Categoría del tratamiento">
+        <option *ngFor="let c of categories" [ngValue]="c">{{ c }}</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="field-label">DURACIÓN (MIN)</span>
+      <input class="field-input" type="number" min="5" max="480" [(ngModel)]="durationMin" name="durationMin" />
+    </label>
+
+    <label class="field">
+      <span class="field-label">PRECIO (S/)</span>
+      <input class="field-input" type="number" min="0" [(ngModel)]="price" name="price" />
+    </label>
+
+    <label class="field field--full">
+      <span class="field-label">DESCRIPCIÓN</span>
+      <textarea class="field-input field-textarea" rows="3" [(ngModel)]="description" name="description" placeholder="DETALLE CLÍNICO DEL TRATAMIENTO" autocomplete="off"></textarea>
+    </label>
+
+    <div class="field field--full">
+      <span class="field-label">ESTADO</span>
+      <div class="seg" role="radiogroup" aria-label="Estado del tratamiento">
+        <button
+          class="seg-btn"
+          [class.is-active]="active"
+          type="button"
+          role="radio"
+          [attr.aria-checked]="active"
+          (click)="active = true"
+        >ACTIVO</button>
+        <button
+          class="seg-btn"
+          [class.is-active]="!active"
+          type="button"
+          role="radio"
+          [attr.aria-checked]="!active"
+          (click)="active = false"
+        >INACTIVO</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="form-error" *ngIf="error" role="alert">EL NOMBRE DEL TRATAMIENTO ES OBLIGATORIO</p>
+
+  <div class="form-actions">
+    <button class="btn-amber" type="submit">{{ creating ? 'CREAR TRATAMIENTO' : 'GUARDAR CAMBIOS' }}</button>
+    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+  </div>
+</form>

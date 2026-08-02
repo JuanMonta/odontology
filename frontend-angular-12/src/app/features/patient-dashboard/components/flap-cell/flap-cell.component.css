@@ -1,0 +1,120 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+}
+
+.flap-cell {
+  position: relative;
+  width: var(--flap-cell-w, 0.82em);
+  height: var(--flap-cell-h, 1.14em);
+  margin: 0 0.045em;
+  perspective: 320px;
+  border-radius: 3px;
+  font-family: var(--font-flap);
+  font-weight: 500;
+  font-size: 1em;
+  line-height: 1;
+  color: var(--flap-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  transform: translateZ(0);
+}
+
+/* Static visible halves — current char, split by the seam */
+.half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1c2128 0%, #151a20 52%, #101419 100%);
+}
+
+.half-top { top: 0; border-radius: 3px 3px 0 0; }
+.half-bottom { bottom: 0; border-radius: 0 0 3px 3px; }
+
+.half .plate {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 200%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.half-top .plate { top: 0; }
+.half-bottom .plate { bottom: 0; }
+
+/* The split-flap hinge seam */
+.seam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  z-index: 3;
+  background: var(--flap-seam);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Animated overlay flaps, hidden at rest */
+.overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  z-index: 2;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.overlay .plate {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 200%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-top .plate { top: 0; }
+.overlay-bottom .plate { bottom: 0; }
+
+.overlay-top {
+  top: 0;
+  background: linear-gradient(180deg, #232932 0%, #1b2129 55%, #141920 100%);
+  transform: rotateX(90deg);
+  transform-origin: bottom;
+  border-radius: 3px 3px 0 0;
+}
+
+.overlay-bottom {
+  bottom: 0;
+  background: linear-gradient(180deg, #1a2027 0%, #13181d 55%, #0e1216 100%);
+  transform: rotateX(-90deg);
+  transform-origin: top;
+  border-radius: 0 0 3px 3px;
+}
+
+/* Flip choreography: top folds forward, bottom folds up behind */
+.flap-cell.flipping .overlay-top {
+  animation: flap-down 0.15s var(--flip-ease) var(--flip-delay, 0ms) forwards;
+}
+
+.flap-cell.flipping .overlay-bottom {
+  animation: flap-up 0.17s var(--ease-out) calc(var(--flip-delay, 0ms) + 0.14s) forwards;
+}
+
+@keyframes flap-down {
+  0%   { transform: rotateX(0deg); }
+  100% { transform: rotateX(-88deg); }
+}
+
+@keyframes flap-up {
+  0%   { transform: rotateX(92deg); }
+  100% { transform: rotateX(0deg); }
+}

@@ -1,0 +1,25 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+}
+
+.clock {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-flap);
+  color: var(--flap-ink);
+  line-height: 1;
+  transform: translateZ(0);
+}
+
+.colon {
+  font-size: 1.55em;
+  font-weight: 400;
+  margin: 0 0.12em;
+  color: var(--flap-dim);
+  opacity: 0.9;
+}
+
+.seconds app-flap-text {
+  --flap-ink: #ffb020;
+}

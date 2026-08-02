@@ -1,0 +1,176 @@
+:host {
+  display: block;
+}
+
+.odonto {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.odonto-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.tooth {
+  cursor: pointer;
+}
+
+.tooth:focus-visible {
+  outline: none;
+}
+
+.tooth:focus-visible rect {
+  stroke: var(--amber);
+  stroke-width: 2;
+}
+
+.tooth rect {
+  stroke-width: 1;
+  transition: stroke 0.15s var(--ease-out), fill 0.15s var(--ease-out);
+}
+
+.tooth:hover rect {
+  stroke: var(--amber);
+}
+
+/* States */
+.tooth--healthy rect {
+  fill: #1c2128;
+  stroke: rgba(255, 255, 255, 0.12);
+}
+
+.tooth--caries rect {
+  fill: var(--amber);
+  stroke: var(--amber);
+}
+
+.tooth--treatment rect {
+  fill: #2a3037;
+  stroke: rgba(255, 176, 32, 0.55);
+}
+
+.tooth--missing rect {
+  fill: transparent;
+  stroke: var(--steel-600);
+  stroke-dasharray: 3 2;
+}
+
+.crown {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.tooth--healthy .crown,
+.tooth--caries .crown {
+  stroke: var(--flap-ink);
+}
+
+.tooth--caries .crown {
+  stroke: var(--flap-black);
+}
+
+.tooth--treatment .crown {
+  stroke: var(--amber);
+}
+
+.slash {
+  stroke: var(--steel-500);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.num {
+  font-family: var(--font-flap);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.tooth--healthy .num {
+  fill: var(--steel-300);
+}
+
+.tooth--caries .num {
+  fill: var(--flap-black);
+}
+
+.tooth--treatment .num {
+  fill: var(--amber);
+}
+
+.tooth--missing .num {
+  fill: var(--steel-500);
+}
+
+/* Legend */
+.odonto-legend {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  background: var(--flap-black-2);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-sm);
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.swatch--healthy {
+  background: #1c2128;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.swatch--caries {
+  background: var(--amber);
+}
+
+.swatch--treatment {
+  background: #2a3037;
+  border: 1px solid rgba(255, 176, 32, 0.55);
+}
+
+.swatch--missing {
+  background: transparent;
+  border: 1px dashed var(--steel-500);
+}
+
+.legend-label {
+  font-family: var(--font-flap);
+  font-size: 0.6em;
+  letter-spacing: 0.12em;
+  color: var(--steel-400);
+  flex: 1;
+  white-space: nowrap;
+}
+
+.legend-count {
+  font-family: var(--font-flap);
+  font-weight: 500;
+  font-size: 0.72em;
+  color: var(--flap-ink);
+}
+
+.odonto-hint {
+  font-family: var(--font-flap);
+  font-size: 0.6em;
+  letter-spacing: 0.18em;
+  color: var(--steel-500);
+  text-align: center;
+}

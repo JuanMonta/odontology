@@ -1,0 +1,32 @@
+<aside class="panel" aria-label="Pacientes en espera">
+  <header class="panel-head">
+    <div>
+      <h2 class="panel-title">EN ESPERA</h2>
+      <span class="panel-sub">SALA DE ESPERA · HOY</span>
+    </div>
+    <span class="panel-count" [class.has-items]="waiting.length > 0">
+      {{ waiting.length }}
+    </span>
+  </header>
+
+  <div class="panel-list">
+    <div
+      *ngFor="let p of waiting; trackBy: trackById"
+      class="ticket"
+    >
+      <span class="ticket-number">{{ p.ticket }}</span>
+      <div class="ticket-body">
+        <span class="ticket-name">{{ p.patient }}</span>
+        <span class="ticket-meta">{{ p.reason }}</span>
+      </div>
+      <span class="ticket-time">{{ p.arrivedAt }}</span>
+    </div>
+  </div>
+
+  <button class="call-btn" (click)="callNext.emit()" [disabled]="waiting.length === 0">
+    <svg class="call-btn-icon" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+      <path d="M2 1.2a1 1 0 0 1 1.52-.86l7.3 4.8a1 1 0 0 1 0 1.72l-7.3 4.8A1 1 0 0 1 2 10.8V1.2z" fill="currentColor"/>
+    </svg>
+    LLAMAR SIGUIENTE
+  </button>
+</aside>

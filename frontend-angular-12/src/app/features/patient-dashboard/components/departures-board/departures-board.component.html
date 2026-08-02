@@ -1,0 +1,53 @@
+<section class="board" aria-label="Agenda de salidas del día">
+  <header class="board-head">
+    <div class="board-title">
+      <h2 class="board-kicker">AGENDA DE HOY</h2>
+      <span class="board-date">MARTES 04 · CONSULTORIOS</span>
+    </div>
+    <app-flap-clock></app-flap-clock>
+  </header>
+
+  <div class="board-columns" aria-hidden="true">
+    <span class="col col-time">HORA</span>
+    <span class="col col-patient">PACIENTE</span>
+    <span class="col col-treatment">TRATAMIENTO</span>
+    <span class="col col-chair">CONSULTORIO</span>
+    <span class="col col-status">ESTADO</span>
+  </div>
+
+  <div class="board-rows" role="table" aria-label="Citas del día">
+    <div
+      *ngFor="let a of appointments; trackBy: trackById"
+      class="row"
+      [class.row--live]="a.status === 'boarding'"
+      [class.row--delayed]="a.status === 'delayed'"
+      [class.row--cancelled]="a.status === 'cancelled'"
+      [class.row--done]="a.status === 'done'"
+      role="row"
+    >
+      <div class="col col-time" role="cell">
+        <app-flap-text [value]="a.time" size="sm"></app-flap-text>
+      </div>
+      <div class="col col-patient" role="cell">
+        <app-flap-text [value]="a.patient" size="sm"></app-flap-text>
+      </div>
+      <div class="col col-treatment" role="cell">
+        <app-flap-text [value]="a.treatment" size="sm"></app-flap-text>
+      </div>
+      <div class="col col-chair" role="cell">
+        <app-flap-text [value]="a.consultorio" size="sm"></app-flap-text>
+      </div>
+      <div class="col col-status" role="cell">
+        <span class="status" [class.status--live]="a.status === 'boarding'">
+          <span class="lamp" [attr.data-status]="a.status"></span>
+          <span class="status-label">{{ statusLabel(a.status) }}</span>
+        </span>
+        <button
+          *ngIf="a.status === 'boarding'"
+          class="done-btn"
+          (click)="markDone.emit(a.id)"
+        >ATENDER</button>
+      </div>
+    </div>
+  </div>
+</section>

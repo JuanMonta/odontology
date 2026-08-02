@@ -1,0 +1,104 @@
+<div class="page patients">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-left">
+        <h2 class="page-title">DIRECTORIO DE PACIENTES</h2>
+        <span class="page-sub">REGISTRO CLÍNICO · {{ (patients$ | async)?.length ?? 0 }} RESULTADOS</span>
+      </div>
+      <div class="page-head-actions">
+        <div class="alert-wrap">
+          <button
+            class="btn-alert"
+            type="button"
+            [attr.aria-expanded]="alertsOpen"
+            (click)="toggleAlerts()"
+          >
+            <span class="alert-lamp" aria-hidden="true"></span>
+            ALERTAS
+            <span class="alert-badge" *ngIf="(pending$ | async)">{{ pending$ | async }}</span>
+          </button>
+          <div class="alerts-pop" *ngIf="alertsOpen">
+            <div class="alerts-pop-head">
+              <span class="alerts-pop-title">ALERTAS Y RECORDATORIOS</span>
+              <span class="alerts-pop-count">{{ (pending$ | async) }} PENDIENTES</span>
+            </div>
+            <div class="alerts-pop-list">
+              <ng-container *ngIf="(alerts$ | async)?.length; else alertsEmpty">
+                <button
+                  *ngFor="let a of alerts$ | async"
+                  class="alert-row"
+                  [class.alert-row--handled]="a.handled"
+                  type="button"
+                  (click)="onAlertPatient(a.patientId)"
+                >
+                  <span class="alert-type-lamp" [class.alert-type-lamp--done]="a.handled" aria-hidden="true"></span>
+                  <span class="alert-label">{{ a.label }}</span>
+                  <span
+                    class="alert-done"
+                    *ngIf="!a.handled"
+                    role="button"
+                    tabindex="0"
+                    (click)="onAlertHandled(a.id); $event.stopPropagation()"
+                    (keydown.enter)="onAlertHandled(a.id); $event.stopPropagation()"
+                  >LISTO</span>
+                  <span class="alert-done-done" *ngIf="a.handled">RESUELTA</span>
+                </button>
+              </ng-container>
+              <ng-template #alertsEmpty>
+                <div class="alerts-empty">SIN ALERTAS PENDIENTES</div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+        <button class="btn-amber" type="button" (click)="startCreate()">
+          <span class="btn-plus" aria-hidden="true"></span>
+          NUEVO PACIENTE
+        </button>
+      </div>
+    </div>
+    <div class="page-toolbar">
+      <label class="search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="BUSCAR PACIENTE · NOMBRE / HC / TRATAMIENTO"
+          aria-label="Buscar paciente"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </label>
+      <div class="filter">
+        <span class="filter-label">ESTADO</span>
+        <select
+          class="filter-select"
+          aria-label="Filtrar por estado"
+          (change)="onFilter($any($event.target).value)"
+        >
+          <option value="all">TODOS</option>
+          <option value="active">ACTIVOS</option>
+          <option value="inactive">INACTIVOS</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <section class="directory" aria-label="Directorio de pacientes">
+      <app-patient-directory
+        [patients]="(patients$ | async) ?? []"
+        [selectedId]="selected?.id ?? null"
+        (select)="onSelect($event)"
+      ></app-patient-directory>
+    </section>
+
+    <aside class="detail" aria-label="Ficha de paciente">
+      <app-patient-panel
+        [patient]="selected"
+        [creating]="creating"
+        (close)="onClosePanel()"
+        (cancel)="cancelCreate()"
+        (saved)="onSaved($event)"
+      ></app-patient-panel>
+    </aside>
+  </div>
+</div>

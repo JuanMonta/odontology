@@ -1,0 +1,34 @@
+<div class="page">
+  <div class="page-grid">
+    <div class="page-main">
+      <section class="overview" aria-label="Resumen del día">
+        <div class="stat">
+          <span class="stat-value">{{ (totals$ | async)?.total ?? 0 }}</span>
+          <span class="stat-label">CITAS</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ (totals$ | async)?.waiting ?? 0 }}</span>
+          <span class="stat-label">EN ESPERA</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ (totals$ | async)?.delayed ?? 0 }}</span>
+          <span class="stat-label">RETRASO</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ (totals$ | async)?.done ?? 0 }}</span>
+          <span class="stat-label">ATENDIDAS</span>
+        </div>
+      </section>
+
+      <app-departures-board
+        [appointments]="(appointments$ | async) ?? []"
+        (markDone)="onMarkDone($event)"
+      ></app-departures-board>
+    </div>
+
+    <app-waiting-panel
+      [waiting]="(waiting$ | async) ?? []"
+      (callNext)="onCallNext()"
+    ></app-waiting-panel>
+  </div>
+</div>
