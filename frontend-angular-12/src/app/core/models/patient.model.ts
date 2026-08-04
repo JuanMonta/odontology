@@ -1,5 +1,17 @@
 export type PatientStatus = 'active' | 'inactive';
-export type ToothStatus = 'healthy' | 'caries' | 'treatment' | 'missing';
+export type ToothCondition =
+  | 'caries'
+  | 'obturado'
+  | 'endodoncia'
+  | 'corona'
+  | 'extraccion'
+  | 'sellante-necesario'
+  | 'sellante-realizado'
+  | 'protesis-fija'
+  | 'protesis-removible'
+  | 'protesis-total'
+  | 'perdida-por-caries'
+  | 'perdida-otra-causa';
 export type PatientAlertType = 'birthday' | 'debt' | 'followup';
 
 export interface Patient {
@@ -35,9 +47,20 @@ export interface AccountEntry {
   method?: string;       // EFECTIVO / TARJETA
 }
 
+export type ToothFaceName = 'oclusal' | 'mesial' | 'distal' | 'vestibular' | 'lingual';
+export type ToothFaceCondition = 'caries' | 'obturado';
+
+export interface ToothFace {
+  face: ToothFaceName;
+  condition: ToothFaceCondition;
+}
+
 export interface Tooth {
   number: number;        // FDI, ej. 18
-  status: ToothStatus;
+  conditions: ToothCondition[];      // condiciones de diente completo
+  faces?: ToothFace[];              // caries / obturado por cara (5 zonas)
+  movilidad?: string;               // 'X' | '1' | '2' | '3' (solo permanentes)
+  recesion?: string;                // 'X' | '1' | '2' | '3' (solo permanentes)
 }
 
 export interface PatientAlert {

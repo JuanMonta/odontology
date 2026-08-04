@@ -1,50 +1,667 @@
 <div class="odonto">
-  <svg
-    class="odonto-svg"
-    viewBox="0 0 470 176"
-    role="img"
-    aria-label="Odontograma, 32 piezas dentales"
+  <!-- impeccable-variants-start 6dc3a806 -->
+  <div
+    data-impeccable-variants="6dc3a806"
+    data-impeccable-variant-count="2"
+    style="display: contents"
   >
-    <g
-      *ngFor="let tv of top"
-      [class]="'tooth ' + stateClass(tv.tooth.status)"
-      role="button"
-      tabindex="0"
-      [attr.aria-label]="ariaLabel(tv)"
-      (click)="cycle(tv)"
-      (keydown.enter)="cycle(tv)"
-    >
-      <rect [attr.x]="tv.x" [attr.y]="tv.y" width="26" height="34" rx="3"></rect>
-      <path *ngIf="tv.tooth.status !== 'missing'" class="crown" [attr.d]="crownD(tv)"></path>
-      <line *ngIf="tv.tooth.status === 'missing'" class="slash" [attr.x1]="tv.x + 6" [attr.y1]="tv.y + 6" [attr.x2]="tv.x + 20" [attr.y2]="tv.y + 28"></line>
-      <line *ngIf="tv.tooth.status === 'missing'" class="slash" [attr.x1]="tv.x + 20" [attr.y1]="tv.y + 6" [attr.x2]="tv.x + 6" [attr.y2]="tv.y + 28"></line>
-      <text [attr.x]="tv.cx" [attr.y]="tv.y + 24" class="num">{{ tv.tooth.number }}</text>
-    </g>
+    <!-- Original -->
+    <div data-impeccable-variant="original">
+      <svg
+        class="odonto-svg"
+        viewBox="0 0 1000 480"
+        role="img"
+        aria-label="Odontograma Formulario 033: 32 piezas permanentes y 20 deciduas"
+      >
+        <defs>
+          <g
+            id="s-caries"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="8"
+            ></circle>
+            <circle
+              cx="12"
+              cy="12"
+              r="2.4"
+              fill="currentColor"
+              stroke="none"
+            ></circle>
+          </g>
+          <g
+            id="s-obturado"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="8"
+            ></circle>
+          </g>
+          <g
+            id="s-endodoncia"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 4 L20 20 H4 Z"></path>
+          </g>
+          <g
+            id="s-corona"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect
+              x="6.5"
+              y="6.5"
+              width="11"
+              height="11"
+            ></rect>
+          </g>
+          <g
+            id="s-extraccion"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M6 6 L18 18 M18 6 L6 18"></path>
+          </g>
+          <g
+            id="s-sellante-necesario"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 5 V19 M5 12 H19 M7.3 7.3 L16.7 16.7 M16.7 7.3 L7.3 16.7"></path>
+          </g>
+          <g
+            id="s-sellante-realizado"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 5 V19 M5 12 H19 M7.3 7.3 L16.7 16.7 M16.7 7.3 L7.3 16.7"></path>
+          </g>
+          <g
+            id="s-protesis-fija"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect
+              x="3.5"
+              y="8"
+              width="7"
+              height="8"
+            ></rect>
+            <rect
+              x="13.5"
+              y="8"
+              width="7"
+              height="8"
+            ></rect>
+          </g>
+          <g
+            id="s-protesis-removible"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M3 12 H21"
+              stroke-dasharray="2.5 2"
+            ></path>
+          </g>
+          <g
+            id="s-protesis-total"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 9.5 H21 M3 14.5 H21"></path>
+          </g>
+          <g
+            id="s-perdida-por-caries"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M6 6 L18 18 M18 6 L6 18"></path>
+          </g>
+          <g
+            id="s-perdida-otra-causa"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="8.5"
+            ></circle>
+            <path d="M6.5 6.5 L17.5 17.5 M17.5 6.5 L6.5 17.5"></path>
+          </g>
+        </defs>
 
-    <g
-      *ngFor="let tv of bottom"
-      [class]="'tooth ' + stateClass(tv.tooth.status)"
-      role="button"
-      tabindex="0"
-      [attr.aria-label]="ariaLabel(tv)"
-      (click)="cycle(tv)"
-      (keydown.enter)="cycle(tv)"
-    >
-      <rect [attr.x]="tv.x" [attr.y]="tv.y" width="26" height="34" rx="3"></rect>
-      <path *ngIf="tv.tooth.status !== 'missing'" class="crown" [attr.d]="crownD(tv)"></path>
-      <line *ngIf="tv.tooth.status === 'missing'" class="slash" [attr.x1]="tv.x + 6" [attr.y1]="tv.y + 6" [attr.x2]="tv.x + 20" [attr.y2]="tv.y + 28"></line>
-      <line *ngIf="tv.tooth.status === 'missing'" class="slash" [attr.x1]="tv.x + 20" [attr.y1]="tv.y + 6" [attr.x2]="tv.x + 6" [attr.y2]="tv.y + 28"></line>
-      <text [attr.x]="tv.cx" [attr.y]="tv.y + 24" class="num">{{ tv.tooth.number }}</text>
-    </g>
-  </svg>
+        <!-- ==================== SUPERIOR ==================== -->
+        <!-- RECESIÓN superior -->
+        <text
+          x="10"
+          y="18"
+          class="odo-label"
+        >RECESIÓN</text>
+        <g
+          *ngFor="let tv of topPerm"
+          role="button"
+          tabindex="0"
+          [class.perio--off]="isMissing(tv)"
+          [attr.aria-label]="'Recesión pieza ' + tv.number"
+          (click)="clickPerio(tv, 'recesion')"
+          (keydown.enter)="clickPerio(tv, 'recesion')"
+        >
+          <rect
+            [attr.x]="tv.x"
+            [attr.y]="perioBoxY('recesion', 'top')"
+            width="35"
+            height="18"
+            class="perio-box"
+          ></rect>
+          <text
+            [attr.x]="tv.x + 17.5"
+            [attr.y]="perioBoxY('recesion', 'top') + 13"
+            class="perio-val"
+          >{{ perioValue(tv, 'recesion') }}</text>
+        </g>
 
-  <div class="odonto-legend" aria-hidden="true">
-    <div *ngFor="let c of counts()" class="legend-item">
-      <span class="swatch" [class]="'swatch--' + c.status"></span>
-      <span class="legend-label">{{ statusLabel(c.status) }}</span>
-      <span class="legend-count">{{ c.count }}</span>
+        <!-- MOVILIDAD superior -->
+        <text
+          x="10"
+          y="52"
+          class="odo-label"
+        >MOVILIDAD</text>
+        <g
+          *ngFor="let tv of topPerm"
+          role="button"
+          tabindex="0"
+          [class.perio--off]="isMissing(tv)"
+          [attr.aria-label]="'Movilidad pieza ' + tv.number"
+          (click)="clickPerio(tv, 'movilidad')"
+          (keydown.enter)="clickPerio(tv, 'movilidad')"
+        >
+          <rect
+            [attr.x]="tv.x"
+            [attr.y]="perioBoxY('movilidad', 'top')"
+            width="35"
+            height="18"
+            class="perio-box"
+          ></rect>
+          <text
+            [attr.x]="tv.x + 17.5"
+            [attr.y]="perioBoxY('movilidad', 'top') + 13"
+            class="perio-val"
+          >{{ perioValue(tv, 'movilidad') }}</text>
+        </g>
+
+        <!-- VESTIBULAR superior (números) -->
+        <text
+          x="10"
+          y="120"
+          class="odo-label"
+        >VESTIBULAR</text>
+        <text
+          *ngFor="let tv of topPerm"
+          [attr.x]="numX(tv)"
+          [attr.y]="90"
+          class="num"
+        >{{ tv.number }}</text>
+
+        <!-- VESTIBULAR superior (dientes) -->
+        <ng-container *ngFor="let tv of topPerm">
+          <ng-container *ngTemplateOutlet="tooth; context: { $implicit: tv }"></ng-container>
+        </ng-container>
+
+        <!-- ==================== LINGUAL ==================== -->
+        <text
+          x="10"
+          y="215"
+          class="odo-label"
+        >LINGUAL</text>
+        <text
+          *ngFor="let tv of topDec"
+          [attr.x]="numX(tv)"
+          [attr.y]="175"
+          class="num"
+        >{{ tv.number }}</text>
+        <ng-container *ngFor="let tv of topDec">
+          <ng-container *ngTemplateOutlet="tooth; context: { $implicit: tv }"></ng-container>
+        </ng-container>
+
+        <text
+          *ngFor="let tv of botDec"
+          [attr.x]="numX(tv)"
+          [attr.y]="295"
+          class="num"
+        >{{ tv.number }}</text>
+        <ng-container *ngFor="let tv of botDec">
+          <ng-container *ngTemplateOutlet="tooth; context: { $implicit: tv }"></ng-container>
+        </ng-container>
+
+        <!-- ==================== INFERIOR ==================== -->
+        <text
+          x="10"
+          y="350"
+          class="odo-label"
+        >VESTIBULAR</text>
+        <ng-container *ngFor="let tv of botPerm">
+          <ng-container *ngTemplateOutlet="tooth; context: { $implicit: tv }"></ng-container>
+        </ng-container>
+        <text
+          *ngFor="let tv of botPerm"
+          [attr.x]="numX(tv)"
+          [attr.y]="385"
+          class="num"
+        >{{ tv.number }}</text>
+
+        <!-- MOVILIDAD inferior -->
+        <text
+          x="10"
+          y="418"
+          class="odo-label"
+        >MOVILIDAD</text>
+        <g
+          *ngFor="let tv of botPerm"
+          role="button"
+          tabindex="0"
+          [class.perio--off]="isMissing(tv)"
+          [attr.aria-label]="'Movilidad pieza ' + tv.number"
+          (click)="clickPerio(tv, 'movilidad')"
+          (keydown.enter)="clickPerio(tv, 'movilidad')"
+        >
+          <rect
+            [attr.x]="tv.x"
+            [attr.y]="perioBoxY('movilidad', 'bottom')"
+            width="35"
+            height="18"
+            class="perio-box"
+          ></rect>
+          <text
+            [attr.x]="tv.x + 17.5"
+            [attr.y]="perioBoxY('movilidad', 'bottom') + 13"
+            class="perio-val"
+          >{{ perioValue(tv, 'movilidad') }}</text>
+        </g>
+
+        <!-- RECESIÓN inferior -->
+        <text
+          x="10"
+          y="452"
+          class="odo-label"
+        >RECESIÓN</text>
+        <g
+          *ngFor="let tv of botPerm"
+          role="button"
+          tabindex="0"
+          [class.perio--off]="isMissing(tv)"
+          [attr.aria-label]="'Recesión pieza ' + tv.number"
+          (click)="clickPerio(tv, 'recesion')"
+          (keydown.enter)="clickPerio(tv, 'recesion')"
+        >
+          <rect
+            [attr.x]="tv.x"
+            [attr.y]="perioBoxY('recesion', 'bottom')"
+            width="35"
+            height="18"
+            class="perio-box"
+          ></rect>
+          <text
+            [attr.x]="tv.x + 17.5"
+            [attr.y]="perioBoxY('recesion', 'bottom') + 13"
+            class="perio-val"
+          >{{ perioValue(tv, 'recesion') }}</text>
+        </g>
+
+        <!-- Prótesis (arcadas) -->
+        <g
+          *ngFor="let s of topSpans"
+          class="span"
+          [style.color]="s.color"
+        >
+          <path
+            *ngIf="s.d"
+            [attr.d]="s.d"
+            class="span-line"
+            [class.span-line--solid]="s.c === 'protesis-total'"
+          ></path>
+          <path
+            *ngIf="s.ends"
+            [attr.d]="s.ends"
+            class="span-ends"
+          ></path>
+        </g>
+        <g
+          *ngFor="let s of botSpans"
+          class="span"
+          [style.color]="s.color"
+        >
+          <path
+            *ngIf="s.d"
+            [attr.d]="s.d"
+            class="span-line"
+            [class.span-line--solid]="s.c === 'protesis-total'"
+          ></path>
+          <path
+            *ngIf="s.ends"
+            [attr.d]="s.ends"
+            class="span-ends"
+          ></path>
+        </g>
+
+        <!-- Plantilla de pieza -->
+        <ng-template
+          #tooth
+          let-tv
+        >
+          <g
+            class="tooth"
+            [class.tooth--missing]="isMissing(tv)"
+            role="button"
+            tabindex="0"
+            [attr.aria-label]="ariaLabel(tv)"
+            (click)="clickTooth(tv)"
+            (keydown.enter)="clickTooth(tv)"
+          >
+            <ng-container *ngIf="tv.kind === 'perm'">
+              <rect
+                [attr.x]="tv.x"
+                [attr.y]="tv.y"
+                width="35"
+                height="35"
+                class="tooth-body"
+              ></rect>
+              <rect
+                [attr.x]="tv.x + 7"
+                [attr.y]="tv.y + 7"
+                width="21"
+                height="21"
+                class="tooth-inner"
+              ></rect>
+              <line
+                [attr.x1]="tv.x"
+                [attr.y1]="tv.y"
+                [attr.x2]="tv.x + 7"
+                [attr.y2]="tv.y + 7"
+                class="tooth-inner-line"
+              ></line>
+              <line
+                [attr.x1]="tv.x + 35"
+                [attr.y1]="tv.y"
+                [attr.x2]="tv.x + 28"
+                [attr.y2]="tv.y + 7"
+                class="tooth-inner-line"
+              ></line>
+              <line
+                [attr.x1]="tv.x"
+                [attr.y1]="tv.y + 35"
+                [attr.x2]="tv.x + 7"
+                [attr.y2]="tv.y + 28"
+                class="tooth-inner-line"
+              ></line>
+              <line
+                [attr.x1]="tv.x + 35"
+                [attr.y1]="tv.y + 35"
+                [attr.x2]="tv.x + 28"
+                [attr.y2]="tv.y + 28"
+                class="tooth-inner-line"
+              ></line>
+            </ng-container>
+            <ng-container *ngIf="tv.kind === 'dec'">
+              <circle
+                [attr.cx]="tv.x"
+                [attr.cy]="tv.y"
+                r="22"
+                class="tooth-body"
+              ></circle>
+              <circle
+                [attr.cx]="tv.x"
+                [attr.cy]="tv.y"
+                r="10"
+                class="tooth-inner"
+              ></circle>
+              <line
+                [attr.x1]="tv.x - 15.56"
+                [attr.y1]="tv.y - 15.56"
+                [attr.x2]="tv.x - 7.07"
+                [attr.y2]="tv.y - 7.07"
+                class="tooth-inner-line"
+              ></line>
+              <line
+                [attr.x1]="tv.x + 15.56"
+                [attr.y1]="tv.y - 15.56"
+                [attr.x2]="tv.x + 7.07"
+                [attr.y2]="tv.y - 7.07"
+                class="tooth-inner-line"
+              ></line>
+              <line
+                [attr.x1]="tv.x - 15.56"
+                [attr.y1]="tv.y + 15.56"
+                [attr.x2]="tv.x - 7.07"
+                [attr.y2]="tv.y + 7.07"
+                class="tooth-inner-line"
+              ></line>
+              <line
+                [attr.x1]="tv.x + 15.56"
+                [attr.y1]="tv.y + 15.56"
+                [attr.x2]="tv.x + 7.07"
+                [attr.y2]="tv.y + 7.07"
+                class="tooth-inner-line"
+              ></line>
+            </ng-container>
+
+            <!-- Caries / obturado por cara -->
+            <ng-container *ngFor="let o of faceOverlays(tv)">
+              <rect
+                *ngIf="o.kind === 'rect'"
+                [attr.x]="o.x"
+                [attr.y]="o.y"
+                [attr.width]="o.w"
+                [attr.height]="o.h"
+                [attr.fill]="o.color"
+                class="face-paint"
+              ></rect>
+              <path
+                *ngIf="o.kind === 'path'"
+                [attr.d]="o.d"
+                [attr.fill]="o.color"
+                class="face-paint"
+              ></path>
+              <circle
+                *ngIf="o.kind === 'circle'"
+                [attr.cx]="o.cx"
+                [attr.cy]="o.cy"
+                [attr.r]="o.r"
+                [attr.fill]="o.color"
+                class="face-paint"
+              ></circle>
+            </ng-container>
+
+            <!-- Corona -->
+            <rect
+              *ngIf="coronaRect(tv) as cr"
+              [attr.x]="cr.x"
+              [attr.y]="cr.y"
+              [attr.width]="cr.w"
+              [attr.height]="cr.h"
+              class="corona-mark"
+              [style.color]="colorOf('corona')"
+            ></rect>
+
+            <!-- Símbolos de diente completo -->
+            <g
+              *ngFor="let m of wholeMarks(tv)"
+              class="symbol"
+              [style.color]="m.color"
+            >
+              <use
+                [attr.href]="'#s-' + m.id"
+                [attr.transform]="'translate(' + m.x + ' ' + m.y + ') scale(' + m.scale + ')'"
+              ></use>
+            </g>
+          </g>
+        </ng-template>
+      </svg>
     </div>
+    <style data-impeccable-css="6dc3a806">
+      /* ritmo */
+      .odo-v1 .odo-midline {
+        stroke: rgba(255, 255, 255, 0.09);
+        stroke-width: 1;
+        stroke-dasharray: 3 4;
+        opacity: var(--p-midline, 1);
+      }
+
+      .odo-v1 .odo-sep {
+        stroke: rgba(255, 255, 255, 0.055);
+        stroke-width: 1;
+        opacity: var(--p-separators, 1);
+      }
+
+      .odo-v1 .num {
+        fill: var(--steel-300);
+        letter-spacing: 0.04em;
+      }
+
+      .odo-v1 .odo-label {
+        fill: var(--steel-400);
+      }
+
+      /* jerarquia */
+      .odo-v2 .odo-band {
+        fill: rgba(255, 255, 255, 0.02);
+        stroke: rgba(255, 255, 255, 0.045);
+        stroke-width: 1;
+        opacity: var(--p-bands, 1);
+      }
+
+      .odo-v2 .tooth-body {
+        stroke-width: var(--p-stroke, 1.5);
+      }
+
+      .odo-v2 .num {
+        font-size: 12px;
+        fill: var(--steel-200);
+      }
+
+      .odo-v2 .odo-label {
+        font-size: 10.5px;
+        fill: var(--steel-300);
+      }
+
+      .odo-v2 .perio-val {
+        font-size: 12px;
+      }
+    </style>
+  </div>
+  <!-- impeccable-variants-end 6dc3a806 -->
+
+  <div
+    class="odo-faces"
+    *ngIf="isFaceTool()"
+    role="group"
+    aria-label="Cara del diente a marcar"
+  >
+    <span class="odo-faces-label">{{ activeTool === 'caries' ? 'CARIES' : 'OBTURADO' }} EN:</span>
+    <button
+      *ngFor="let f of faces"
+      class="odo-face"
+      [class.is-on]="faceMarked(f)"
+      type="button"
+      [attr.aria-pressed]="faceMarked(f)"
+      [style.--face-c]="faceMarkColor(f) || colorOf(activeTool)"
+      (click)="facePick(f)"
+    >
+      {{ faceLabel(f) }}
+    </button>
+    <span
+      *ngIf="!faceTarget"
+      class="odo-faces-hint"
+    >CLIC EN UNA PIEZA PARA ELEGIR SU CARA</span>
   </div>
 
-  <p class="odonto-hint">CLIC EN UNA PIEZA PARA CAMBIAR SU ESTADO</p>
+  <div
+    class="odo-tools"
+    role="group"
+    aria-label="Símbolos clínicos"
+  >
+    <button
+      *ngFor="let c of order"
+      class="odo-tool"
+      [class.is-active]="isActive(c)"
+      type="button"
+      [attr.aria-pressed]="isActive(c)"
+      (click)="selectTool(c)"
+    >
+      <svg
+        class="odo-tool-ico"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        [style.color]="colorOf(c)"
+      >
+        <use [attr.href]="'#s-' + c"></use>
+      </svg>
+      <span class="odo-tool-label">{{ symbolLabel(c) }}</span>
+      <span class="odo-tool-count">{{ countFor(c) }}</span>
+    </button>
+
+    <button
+      class="odo-tool odo-tool--clear"
+      [class.is-active]="isActive('clear')"
+      type="button"
+      [attr.aria-pressed]="isActive('clear')"
+      (click)="selectTool('clear')"
+    >
+      <svg
+        class="odo-tool-ico"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="M6 6 L18 18 M18 6 L6 18"></path>
+      </svg>
+      <span class="odo-tool-label">SANO</span>
+      <span class="odo-tool-count odo-tool-count--dim">—</span>
+    </button>
+  </div>
+
+  <p class="odonto-hint">ROJO = PATOLOGÍA / NECESIDAD · AZUL = TRATAMIENTO REALIZADO</p>
 </div>

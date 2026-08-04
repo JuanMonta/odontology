@@ -75,7 +75,7 @@ export class PatientPanelComponent implements OnChanges {
 
   onToothChange(tooth: Tooth): void {
     if (this.patient) {
-      this.service.setToothState(this.patient.id, tooth.number, tooth.status);
+      this.service.updateTooth(this.patient.id, tooth);
     }
   }
 
