@@ -1,0 +1,216 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="1000" height="480">
+  <style>
+    .tooth { fill: none; stroke: black; stroke-width: 1.5; }
+    .number { font-family: Arial, sans-serif; font-size: 11px; text-anchor: middle; }
+    .label { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; }
+    .box { fill: none; stroke: black; stroke-width: 1.5; }
+  </style>
+
+  <!-- ==================== SUPERIOR ==================== -->
+  <!-- RECESIÓN Superior -->
+  <text x="10" y="18" class="label">RECESIÓN</text>
+  <rect x="120" y="3" width="35" height="18" class="box"/>
+  <rect x="165" y="3" width="35" height="18" class="box"/>
+  <rect x="210" y="3" width="35" height="18" class="box"/>
+  <rect x="255" y="3" width="35" height="18" class="box"/>
+  <rect x="300" y="3" width="35" height="18" class="box"/>
+  <rect x="345" y="3" width="35" height="18" class="box"/>
+  <rect x="390" y="3" width="35" height="18" class="box"/>
+  <rect x="435" y="3" width="35" height="18" class="box"/>
+  <rect x="530" y="3" width="35" height="18" class="box"/>
+  <rect x="575" y="3" width="35" height="18" class="box"/>
+  <rect x="620" y="3" width="35" height="18" class="box"/>
+  <rect x="665" y="3" width="35" height="18" class="box"/>
+  <rect x="710" y="3" width="35" height="18" class="box"/>
+  <rect x="755" y="3" width="35" height="18" class="box"/>
+  <rect x="800" y="3" width="35" height="18" class="box"/>
+  <rect x="845" y="3" width="35" height="18" class="box"/>
+
+  <!-- MOVILIDAD Superior -->
+  <text x="10" y="52" class="label">MOVILIDAD</text>
+  <rect x="120" y="37" width="35" height="18" class="box"/>
+  <rect x="165" y="37" width="35" height="18" class="box"/>
+  <rect x="210" y="37" width="35" height="18" class="box"/>
+  <rect x="255" y="37" width="35" height="18" class="box"/>
+  <rect x="300" y="37" width="35" height="18" class="box"/>
+  <rect x="345" y="37" width="35" height="18" class="box"/>
+  <rect x="390" y="37" width="35" height="18" class="box"/>
+  <rect x="435" y="37" width="35" height="18" class="box"/>
+  <rect x="530" y="37" width="35" height="18" class="box"/>
+  <rect x="575" y="37" width="35" height="18" class="box"/>
+  <rect x="620" y="37" width="35" height="18" class="box"/>
+  <rect x="665" y="37" width="35" height="18" class="box"/>
+  <rect x="710" y="37" width="35" height="18" class="box"/>
+  <rect x="755" y="37" width="35" height="18" class="box"/>
+  <rect x="800" y="37" width="35" height="18" class="box"/>
+  <rect x="845" y="37" width="35" height="18" class="box"/>
+
+  <!-- VESTIBULAR Superior (números) -->
+  <text x="137" y="90" class="number">18</text>
+  <text x="182" y="90" class="number">17</text>
+  <text x="227" y="90" class="number">16</text>
+  <text x="272" y="90" class="number">15</text>
+  <text x="317" y="90" class="number">14</text>
+  <text x="362" y="90" class="number">13</text>
+  <text x="407" y="90" class="number">12</text>
+  <text x="452" y="90" class="number">11</text>
+  <text x="547" y="90" class="number">21</text>
+  <text x="592" y="90" class="number">22</text>
+  <text x="637" y="90" class="number">23</text>
+  <text x="682" y="90" class="number">24</text>
+  <text x="727" y="90" class="number">25</text>
+  <text x="772" y="90" class="number">26</text>
+  <text x="817" y="90" class="number">27</text>
+  <text x="862" y="90" class="number">28</text>
+
+  <!-- VESTIBULAR Superior (dientes) -->
+  <text x="10" y="120" class="label">VESTIBULAR</text>
+
+  <g transform="translate(120,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(165,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(210,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(255,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(300,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(345,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(390,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(435,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+
+  <g transform="translate(530,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(575,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(620,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(665,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(710,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(755,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(800,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(845,95)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+
+
+  <!-- ==================== LINGUAL ==================== -->
+  <text x="10" y="215" class="label">LINGUAL</text>
+
+  <g transform="translate(170,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(230,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(290,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(350,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(410,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+
+  <g transform="translate(610,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(670,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(730,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(790,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(850,200)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+
+  <text x="170" y="175" class="number">55</text>
+  <text x="230" y="175" class="number">54</text>
+  <text x="290" y="175" class="number">53</text>
+  <text x="350" y="175" class="number">52</text>
+  <text x="410" y="175" class="number">51</text>
+  <text x="610" y="175" class="number">61</text>
+  <text x="670" y="175" class="number">62</text>
+  <text x="730" y="175" class="number">63</text>
+  <text x="790" y="175" class="number">64</text>
+  <text x="850" y="175" class="number">65</text>
+
+  <g transform="translate(170,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(230,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(290,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(350,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(410,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+
+  <g transform="translate(610,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(670,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(730,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(790,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+  <g transform="translate(850,260)"><circle r="22" class="tooth"/><circle r="10" class="tooth"/><line x1="-15.56" y1="-15.56" x2="-7.07" y2="-7.07" class="tooth"/><line x1="15.56" y1="-15.56" x2="7.07" y2="-7.07" class="tooth"/><line x1="-15.56" y1="15.56" x2="-7.07" y2="7.07" class="tooth"/><line x1="15.56" y1="15.56" x2="7.07" y2="7.07" class="tooth"/></g>
+
+  <text x="170" y="295" class="number">85</text>
+  <text x="230" y="295" class="number">84</text>
+  <text x="290" y="295" class="number">83</text>
+  <text x="350" y="295" class="number">82</text>
+  <text x="410" y="295" class="number">81</text>
+  <text x="610" y="295" class="number">71</text>
+  <text x="670" y="295" class="number">72</text>
+  <text x="730" y="295" class="number">73</text>
+  <text x="790" y="295" class="number">74</text>
+  <text x="850" y="295" class="number">75</text>
+
+
+  <!-- ==================== INFERIOR ==================== -->
+  <!-- VESTIBULAR Inferior (dientes) -->
+  <text x="10" y="350" class="label">VESTIBULAR</text>
+
+  <g transform="translate(120,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(165,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(210,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(255,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(300,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(345,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(390,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(435,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+
+  <g transform="translate(530,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(575,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(620,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(665,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(710,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(755,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(800,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+  <g transform="translate(845,330)"><rect width="35" height="35" class="tooth"/><rect x="7" y="7" width="21" height="21" class="tooth"/><line x1="0" y1="0" x2="7" y2="7" class="tooth"/><line x1="35" y1="0" x2="28" y2="7" class="tooth"/><line x1="0" y1="35" x2="7" y2="28" class="tooth"/><line x1="35" y1="35" x2="28" y2="28" class="tooth"/></g>
+
+  <!-- VESTIBULAR Inferior (números) -->
+  <text x="137" y="385" class="number">48</text>
+  <text x="182" y="385" class="number">47</text>
+  <text x="227" y="385" class="number">46</text>
+  <text x="272" y="385" class="number">45</text>
+  <text x="317" y="385" class="number">44</text>
+  <text x="362" y="385" class="number">43</text>
+  <text x="407" y="385" class="number">42</text>
+  <text x="452" y="385" class="number">41</text>
+  <text x="547" y="385" class="number">31</text>
+  <text x="592" y="385" class="number">32</text>
+  <text x="637" y="385" class="number">33</text>
+  <text x="682" y="385" class="number">34</text>
+  <text x="727" y="385" class="number">35</text>
+  <text x="772" y="385" class="number">36</text>
+  <text x="817" y="385" class="number">37</text>
+  <text x="862" y="385" class="number">38</text>
+
+  <!-- MOVILIDAD Inferior -->
+  <text x="10" y="418" class="label">MOVILIDAD</text>
+  <rect x="120" y="403" width="35" height="18" class="box"/>
+  <rect x="165" y="403" width="35" height="18" class="box"/>
+  <rect x="210" y="403" width="35" height="18" class="box"/>
+  <rect x="255" y="403" width="35" height="18" class="box"/>
+  <rect x="300" y="403" width="35" height="18" class="box"/>
+  <rect x="345" y="403" width="35" height="18" class="box"/>
+  <rect x="390" y="403" width="35" height="18" class="box"/>
+  <rect x="435" y="403" width="35" height="18" class="box"/>
+  <rect x="530" y="403" width="35" height="18" class="box"/>
+  <rect x="575" y="403" width="35" height="18" class="box"/>
+  <rect x="620" y="403" width="35" height="18" class="box"/>
+  <rect x="665" y="403" width="35" height="18" class="box"/>
+  <rect x="710" y="403" width="35" height="18" class="box"/>
+  <rect x="755" y="403" width="35" height="18" class="box"/>
+  <rect x="800" y="403" width="35" height="18" class="box"/>
+  <rect x="845" y="403" width="35" height="18" class="box"/>
+
+  <!-- RECESIÓN Inferior -->
+  <text x="10" y="452" class="label">RECESIÓN</text>
+  <rect x="120" y="437" width="35" height="18" class="box"/>
+  <rect x="165" y="437" width="35" height="18" class="box"/>
+  <rect x="210" y="437" width="35" height="18" class="box"/>
+  <rect x="255" y="437" width="35" height="18" class="box"/>
+  <rect x="300" y="437" width="35" height="18" class="box"/>
+  <rect x="345" y="437" width="35" height="18" class="box"/>
+  <rect x="390" y="437" width="35" height="18" class="box"/>
+  <rect x="435" y="437" width="35" height="18" class="box"/>
+  <rect x="530" y="437" width="35" height="18" class="box"/>
+  <rect x="575" y="437" width="35" height="18" class="box"/>
+  <rect x="620" y="437" width="35" height="18" class="box"/>
+  <rect x="665" y="437" width="35" height="18" class="box"/>
+  <rect x="710" y="437" width="35" height="18" class="box"/>
+  <rect x="755" y="437" width="35" height="18" class="box"/>
+  <rect x="800" y="437" width="35" height="18" class="box"/>
+  <rect x="845" y="437" width="35" height="18" class="box"/>
+
+</svg>
