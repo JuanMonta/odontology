@@ -9,7 +9,7 @@ import {
   PatientDetail,
   PatientDraft,
   Tooth,
-  ToothStatus
+  ToothCondition
 } from '../../../core/models/patient.model';
 
 /**
@@ -78,10 +78,10 @@ export class PatientsMockService {
     this.accountSubject.next({ ...map, [id]: [...(map[id] ?? []), entry] });
   }
 
-  setToothState(id: string, number: number, status: ToothStatus): void {
+  updateTooth(id: string, tooth: Tooth): void {
     const map = this.teethSubject.getValue();
     const teeth = (map[id] ?? this.defaultTeeth()).map(t =>
-      t.number === number ? { ...t, status } : t
+      t.number === tooth.number ? { ...t, ...tooth } : t
     );
     this.teethSubject.next({ ...map, [id]: teeth });
   }
@@ -121,7 +121,7 @@ export class PatientsMockService {
   }
 
   private defaultTeeth(): Tooth[] {
-    return this.allNumbers().map(number => ({ number, status: 'healthy' as const }));
+    return this.allNumbers().map(number => ({ number, conditions: [] as ToothCondition[] }));
   }
 
   private allNumbers(): number[] {
@@ -206,19 +206,38 @@ export class PatientsMockService {
     const teeth = this.defaultTeeth();
     const map: Record<string, Tooth[]> = {};
     map['HC-0004'] = teeth.map(t => {
-      if (t.number === 46) return { number: t.number, status: 'treatment' as const };
-      if (t.number === 47) return { number: t.number, status: 'caries' as const };
-      if (t.number === 18) return { number: t.number, status: 'missing' as const };
-      if (t.number === 36) return { number: t.number, status: 'treatment' as const };
+      if (t.number === 46) return { number: t.number, conditions: ['endodoncia'] as ToothCondition[] };
+      if (t.number === 47) return { ...t, faces: [{ face: 'oclusal', condition: 'caries' }] };
+      if (t.number === 25) {
+        return {
+          ...t,
+          faces: [
+            { face: 'mesial', condition: 'caries' },
+            { face: 'distal', condition: 'caries' }
+          ]
+        };
+      }
+      if (t.number === 18) return { number: t.number, conditions: ['perdida-por-caries'] as ToothCondition[] };
+      if (t.number === 36) {
+        return {
+          ...t,
+          conditions: ['endodoncia'] as ToothCondition[],
+          faces: [{ face: 'oclusal', condition: 'obturado' }]
+        };
+      }
+      if (t.number === 31) return { ...t, recesion: '2' };
+      if (t.number === 32) return { ...t, movilidad: '1' };
       return t;
     });
     map['HC-0001'] = teeth.map(t => {
-      if (t.number === 26 || t.number === 27) return { number: t.number, status: 'caries' as const };
-      if (t.number === 11) return { number: t.number, status: 'missing' as const };
+      if (t.number === 26 || t.number === 27) {
+        return { ...t, faces: [{ face: 'oclusal', condition: 'caries' }] };
+      }
+      if (t.number === 11) return { number: t.number, conditions: ['perdida-otra-causa'] as ToothCondition[] };
       return t;
     });
     map['HC-0007'] = teeth.map(t => {
-      if (t.number >= 14 && t.number <= 17) return { number: t.number, status: 'treatment' as const };
+      if (t.number >= 14 && t.number <= 17) return { number: t.number, conditions: ['protesis-fija'] as ToothCondition[] };
       return t;
     });
     return map;

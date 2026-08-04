@@ -1,5 +1,8 @@
 :host {
   display: block;
+  --odo-needed: #ff6b5e;
+  --odo-done: #58a6e8;
+  --odo-neutral: #e9ebee;
 }
 
 .odonto {
@@ -12,8 +15,67 @@
   width: 100%;
   height: auto;
   overflow: visible;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)),
+    var(--flap-black-2);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-sm);
 }
 
+/* ============ Rotulado (RECESIÓN / MOVILIDAD / VESTIBULAR / LINGUAL) ============ */
+.odo-label {
+  font-family: var(--font-flap);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  fill: var(--steel-400);
+  pointer-events: none;
+}
+
+/* ============ Casillas periodontales ============ */
+.perio-box {
+  fill: #1c2128;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 1;
+  transition: stroke 0.15s var(--ease-out);
+}
+
+.perio-val {
+  font-family: var(--font-flap);
+  font-size: 11px;
+  font-weight: 600;
+  text-anchor: middle;
+  fill: var(--flap-ink);
+  pointer-events: none;
+}
+
+.perio--off {
+  cursor: default;
+  pointer-events: none;
+}
+
+.perio--off .perio-box {
+  opacity: 0.28;
+}
+
+g[role='button'].perio--off {
+  opacity: 0.4;
+}
+
+g[role='button']:not(.perio--off):hover .perio-box {
+  stroke: var(--amber);
+}
+
+g[role='button']:not(.perio--off):focus-visible {
+  outline: none;
+}
+
+g[role='button']:not(.perio--off):focus-visible .perio-box {
+  stroke: var(--amber);
+  stroke-width: 2;
+}
+
+/* ============ Dientes ============ */
 .tooth {
   cursor: pointer;
 }
@@ -22,149 +84,223 @@
   outline: none;
 }
 
-.tooth:focus-visible rect {
+.tooth-body {
+  transition: stroke 0.15s var(--ease-out), fill 0.15s var(--ease-out);
+}
+
+.tooth:hover .tooth-body {
+  stroke: var(--amber);
+}
+
+.tooth:focus-visible .tooth-body {
   stroke: var(--amber);
   stroke-width: 2;
 }
 
-.tooth rect {
-  stroke-width: 1;
-  transition: stroke 0.15s var(--ease-out), fill 0.15s var(--ease-out);
-}
-
-.tooth:hover rect {
-  stroke: var(--amber);
-}
-
-/* States */
-.tooth--healthy rect {
+.tooth--present .tooth-body {
   fill: #1c2128;
-  stroke: rgba(255, 255, 255, 0.12);
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 1;
 }
 
-.tooth--caries rect {
-  fill: var(--amber);
-  stroke: var(--amber);
-}
-
-.tooth--treatment rect {
-  fill: #2a3037;
-  stroke: rgba(255, 176, 32, 0.55);
-}
-
-.tooth--missing rect {
+.tooth--missing .tooth-body {
   fill: transparent;
   stroke: var(--steel-600);
+  stroke-width: 1;
   stroke-dasharray: 3 2;
 }
 
-.crown {
+.tooth-inner {
   fill: none;
-  stroke: currentColor;
-  stroke-width: 1.4;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 1;
+}
+
+.tooth-inner-line {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 1;
   stroke-linecap: round;
 }
 
-.tooth--healthy .crown,
-.tooth--caries .crown {
-  stroke: var(--flap-ink);
-}
-
-.tooth--caries .crown {
-  stroke: var(--flap-black);
-}
-
-.tooth--treatment .crown {
-  stroke: var(--amber);
-}
-
-.slash {
-  stroke: var(--steel-500);
-  stroke-width: 1.4;
-  stroke-linecap: round;
-}
-
-.num {
-  font-family: var(--font-flap);
-  font-size: 10px;
-  letter-spacing: 0.02em;
-  text-anchor: middle;
+/* ============ Marcas por cara (caries / obturado) ============ */
+.face-paint {
+  fill-opacity: 0.55;
   pointer-events: none;
 }
 
-.tooth--healthy .num {
+/* ============ Símbolos de diente completo ============ */
+.corona-mark {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.symbol {
+  pointer-events: none;
+}
+
+/* ============ Líneas de prótesis ============ */
+.span {
+  pointer-events: none;
+}
+
+.span-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 5 3;
+}
+
+.span-line--solid {
+  stroke-dasharray: none;
+  stroke-width: 2.5;
+}
+
+.span-ends {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* ============ Números de pieza ============ */
+.num {
+  font-family: var(--font-flap);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-anchor: middle;
   fill: var(--steel-300);
+  pointer-events: none;
 }
 
-.tooth--caries .num {
-  fill: var(--flap-black);
-}
-
-.tooth--treatment .num {
-  fill: var(--amber);
-}
-
-.tooth--missing .num {
-  fill: var(--steel-500);
-}
-
-/* Legend */
-.odonto-legend {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.legend-item {
+/* ============ Selector de caras ============ */
+.odo-faces {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding: 9px 10px;
+  padding: 10px 12px;
   background: var(--flap-black-2);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: var(--radius-sm);
 }
 
-.swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  flex-shrink: 0;
+.odo-faces-label {
+  font-family: var(--font-flap);
+  font-size: 0.62em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--steel-400);
+  margin-right: 2px;
 }
 
-.swatch--healthy {
-  background: #1c2128;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-}
-
-.swatch--caries {
-  background: var(--amber);
-}
-
-.swatch--treatment {
-  background: #2a3037;
-  border: 1px solid rgba(255, 176, 32, 0.55);
-}
-
-.swatch--missing {
-  background: transparent;
-  border: 1px dashed var(--steel-500);
-}
-
-.legend-label {
+.odo-face {
+  --face-c: var(--steel-400);
   font-family: var(--font-flap);
   font-size: 0.6em;
+  letter-spacing: 0.1em;
+  padding: 5px 10px;
+  color: var(--steel-300);
+  background: var(--flap-black);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease-out), color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+}
+
+.odo-face:hover {
+  border-color: var(--face-c);
+  color: var(--face-c);
+}
+
+.odo-face.is-on {
+  border-color: var(--face-c);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--face-c);
+}
+
+.odo-face:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.35);
+}
+
+.odo-faces-hint {
+  font-family: var(--font-flap);
+  font-size: 0.56em;
+  letter-spacing: 0.16em;
+  color: var(--steel-500);
+  margin-left: auto;
+}
+
+/* ============ Paleta de herramientas ============ */
+.odo-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 8px;
+}
+
+.odo-tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px 9px;
+  background: var(--flap-black-2);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+}
+
+.odo-tool:hover {
+  border-color: rgba(255, 176, 32, 0.45);
+}
+
+.odo-tool.is-active {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.odo-tool:focus-visible {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.35);
+}
+
+.odo-tool-ico {
+  width: 18px;
+  height: 18px;
+}
+
+.odo-tool-label {
+  font-family: var(--font-flap);
+  font-size: 0.56em;
   letter-spacing: 0.12em;
   color: var(--steel-400);
-  flex: 1;
+  text-align: center;
+  line-height: 1.2;
   white-space: nowrap;
 }
 
-.legend-count {
+.odo-tool.is-active .odo-tool-label {
+  color: var(--amber);
+}
+
+.odo-tool-count {
   font-family: var(--font-flap);
   font-weight: 500;
   font-size: 0.72em;
   color: var(--flap-ink);
+}
+
+.odo-tool.is-active .odo-tool-count {
+  color: var(--amber);
+}
+
+.odo-tool-count--dim {
+  color: var(--steel-500);
 }
 
 .odonto-hint {
