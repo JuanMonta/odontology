@@ -18,12 +18,12 @@
 }
 
 :host([size='sm']) .flap-cell-wrap {
-  --flap-cell-w: 0.72em;
-  --flap-cell-h: 1em;
+  --flap-cell-w: 0.82em;
+  --flap-cell-h: 1.14em;
 }
 
 :host([size='sm']) .flap-text {
-  font-size: 0.86em;
+  font-size: 1em;
 }
 
 :host([size='lg']) .flap-cell-wrap {

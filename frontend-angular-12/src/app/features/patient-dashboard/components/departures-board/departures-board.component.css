@@ -63,15 +63,15 @@
 /* Column header strip */
 .board-columns {
   display: grid;
-  grid-template-columns: 84px minmax(150px, 1.6fr) minmax(120px, 1.1fr) 110px 150px;
+  grid-template-columns: 84px minmax(150px, 1.6fr) minmax(120px, 1.1fr) 120px 190px;
   gap: 14px;
   padding: 8px 4px 6px;
 }
 
 .col {
   font-family: var(--font-flap);
-  font-size: 0.72em;
-  font-weight: 400;
+  font-size: 0.9em;
+  font-weight: 500;
   letter-spacing: 0.18em;
   color: var(--flap-dim);
   white-space: nowrap;
@@ -85,7 +85,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 84px minmax(150px, 1.6fr) minmax(120px, 1.1fr) 110px 150px;
+  grid-template-columns: 84px minmax(150px, 1.6fr) minmax(120px, 1.1fr) 120px 190px;
   gap: 14px;
   align-items: center;
   padding: 11px 4px;
@@ -110,7 +110,7 @@
 
 .status-label {
   font-family: var(--font-flap);
-  font-size: 0.78em;
+  font-size: 0.88em;
   letter-spacing: 0.14em;
   color: var(--flap-dim);
   white-space: nowrap;
@@ -221,7 +221,7 @@
 @media (max-width: 980px) {
   .board-columns,
   .row {
-    grid-template-columns: 84px minmax(150px, 1.8fr) 110px 150px;
+    grid-template-columns: 84px minmax(150px, 1.8fr) 120px 190px;
   }
 
   .col-treatment {
@@ -236,7 +236,7 @@
 
   .board-columns,
   .row {
-    grid-template-columns: 70px minmax(120px, 1.8fr) 130px;
+    grid-template-columns: 70px minmax(120px, 1.8fr) 150px;
   }
 
   .col-treatment,
