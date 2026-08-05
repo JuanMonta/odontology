@@ -70,7 +70,7 @@
 
 .col {
   font-family: var(--font-flap);
-  font-size: 0.72em;
+  font-size: 0.82em;
   font-weight: 400;
   letter-spacing: 0.18em;
   color: var(--flap-dim);
@@ -110,7 +110,7 @@
 
 .status-label {
   font-family: var(--font-flap);
-  font-size: 0.78em;
+  font-size: 0.8em;
   letter-spacing: 0.14em;
   color: var(--flap-dim);
   white-space: nowrap;
