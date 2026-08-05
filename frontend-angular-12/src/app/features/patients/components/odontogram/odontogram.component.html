@@ -1,179 +1,12 @@
 <div class="odonto">
-  <!-- impeccable-variants-start 6dc3a806 -->
-  <div
-    data-impeccable-variants="6dc3a806"
-    data-impeccable-variant-count="2"
-    style="display: contents"
+  <div class="odonto-sprite" [innerHTML]="spriteHtml" aria-hidden="true"></div>
+  <svg
+    class="odonto-svg"
+    viewBox="0 0 1000 480"
+    role="img"
+    aria-label="Odontograma Formulario 033: 32 piezas permanentes y 20 deciduas"
   >
-    <!-- Original -->
-    <div data-impeccable-variant="original">
-      <svg
-        class="odonto-svg"
-        viewBox="0 0 1000 480"
-        role="img"
-        aria-label="Odontograma Formulario 033: 32 piezas permanentes y 20 deciduas"
-      >
-        <defs>
-          <g
-            id="s-caries"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="8"
-            ></circle>
-            <circle
-              cx="12"
-              cy="12"
-              r="2.4"
-              fill="currentColor"
-              stroke="none"
-            ></circle>
-          </g>
-          <g
-            id="s-obturado"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="8"
-            ></circle>
-          </g>
-          <g
-            id="s-endodoncia"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 4 L20 20 H4 Z"></path>
-          </g>
-          <g
-            id="s-corona"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect
-              x="6.5"
-              y="6.5"
-              width="11"
-              height="11"
-            ></rect>
-          </g>
-          <g
-            id="s-extraccion"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M6 6 L18 18 M18 6 L6 18"></path>
-          </g>
-          <g
-            id="s-sellante-necesario"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 5 V19 M5 12 H19 M7.3 7.3 L16.7 16.7 M16.7 7.3 L7.3 16.7"></path>
-          </g>
-          <g
-            id="s-sellante-realizado"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 5 V19 M5 12 H19 M7.3 7.3 L16.7 16.7 M16.7 7.3 L7.3 16.7"></path>
-          </g>
-          <g
-            id="s-protesis-fija"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect
-              x="3.5"
-              y="8"
-              width="7"
-              height="8"
-            ></rect>
-            <rect
-              x="13.5"
-              y="8"
-              width="7"
-              height="8"
-            ></rect>
-          </g>
-          <g
-            id="s-protesis-removible"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path
-              d="M3 12 H21"
-              stroke-dasharray="2.5 2"
-            ></path>
-          </g>
-          <g
-            id="s-protesis-total"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M3 9.5 H21 M3 14.5 H21"></path>
-          </g>
-          <g
-            id="s-perdida-por-caries"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M6 6 L18 18 M18 6 L6 18"></path>
-          </g>
-          <g
-            id="s-perdida-otra-causa"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="8.5"
-            ></circle>
-            <path d="M6.5 6.5 L17.5 17.5 M17.5 6.5 L6.5 17.5"></path>
-          </g>
-        </defs>
+        
 
         <!-- ==================== SUPERIOR ==================== -->
         <!-- RECESIÓN superior -->
@@ -528,72 +361,12 @@
             ></rect>
 
             <!-- Símbolos de diente completo -->
-            <g
-              *ngFor="let m of wholeMarks(tv)"
-              class="symbol"
-              [style.color]="m.color"
-            >
-              <use
-                [attr.href]="'#s-' + m.id"
-                [attr.transform]="'translate(' + m.x + ' ' + m.y + ') scale(' + m.scale + ')'"
-              ></use>
+                        <g *ngFor="let m of wholeMarks(tv)" class="symbol">
+              <use [attr.href]="'#s-' + m.id" [attr.x]="m.x" [attr.y]="m.y" [attr.width]="m.size" [attr.height]="m.size"></use>
             </g>
           </g>
         </ng-template>
       </svg>
-    </div>
-    <style data-impeccable-css="6dc3a806">
-      /* ritmo */
-      .odo-v1 .odo-midline {
-        stroke: rgba(255, 255, 255, 0.09);
-        stroke-width: 1;
-        stroke-dasharray: 3 4;
-        opacity: var(--p-midline, 1);
-      }
-
-      .odo-v1 .odo-sep {
-        stroke: rgba(255, 255, 255, 0.055);
-        stroke-width: 1;
-        opacity: var(--p-separators, 1);
-      }
-
-      .odo-v1 .num {
-        fill: var(--steel-300);
-        letter-spacing: 0.04em;
-      }
-
-      .odo-v1 .odo-label {
-        fill: var(--steel-400);
-      }
-
-      /* jerarquia */
-      .odo-v2 .odo-band {
-        fill: rgba(255, 255, 255, 0.02);
-        stroke: rgba(255, 255, 255, 0.045);
-        stroke-width: 1;
-        opacity: var(--p-bands, 1);
-      }
-
-      .odo-v2 .tooth-body {
-        stroke-width: var(--p-stroke, 1.5);
-      }
-
-      .odo-v2 .num {
-        font-size: 12px;
-        fill: var(--steel-200);
-      }
-
-      .odo-v2 .odo-label {
-        font-size: 10.5px;
-        fill: var(--steel-300);
-      }
-
-      .odo-v2 .perio-val {
-        font-size: 12px;
-      }
-    </style>
-  </div>
-  <!-- impeccable-variants-end 6dc3a806 -->
 
   <div
     class="odo-faces"
@@ -632,13 +405,8 @@
       [attr.aria-pressed]="isActive(c)"
       (click)="selectTool(c)"
     >
-      <svg
-        class="odo-tool-ico"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-        [style.color]="colorOf(c)"
-      >
-        <use [attr.href]="'#s-' + c"></use>
+            <svg class="odo-tool-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <use [attr.href]="'#s-' + c" width="24" height="24"></use>
       </svg>
       <span class="odo-tool-label">{{ symbolLabel(c) }}</span>
       <span class="odo-tool-count">{{ countFor(c) }}</span>

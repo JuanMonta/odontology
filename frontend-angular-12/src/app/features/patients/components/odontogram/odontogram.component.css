@@ -11,6 +11,10 @@
   gap: 14px;
 }
 
+.odonto-sprite {
+  display: none;
+}
+
 .odonto-svg {
   width: 100%;
   height: auto;
