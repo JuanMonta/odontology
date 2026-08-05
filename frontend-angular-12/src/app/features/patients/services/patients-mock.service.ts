@@ -11,6 +11,7 @@ import {
   Tooth,
   ToothCondition
 } from '../../../core/models/patient.model';
+import { TOOTH_NUMBERS } from '../models/odontogram.model';
 
 /**
  * FUENTE DE DATOS SINTÉTICA — reemplazar por el Facade que consulte el
@@ -79,10 +80,15 @@ export class PatientsMockService {
   }
 
   updateTooth(id: string, tooth: Tooth): void {
+    this.updateTeeth(id, [tooth]);
+  }
+
+  updateTeeth(id: string, updates: Tooth[]): void {
     const map = this.teethSubject.getValue();
-    const teeth = (map[id] ?? this.defaultTeeth()).map(t =>
-      t.number === tooth.number ? { ...t, ...tooth } : t
-    );
+    const teeth = (map[id] ?? this.defaultTeeth()).map(t => {
+      const next = updates.find(u => u.number === t.number);
+      return next ? { ...t, ...next } : t;
+    });
     this.teethSubject.next({ ...map, [id]: teeth });
   }
 
@@ -121,14 +127,7 @@ export class PatientsMockService {
   }
 
   private defaultTeeth(): Tooth[] {
-    return this.allNumbers().map(number => ({ number, conditions: [] as ToothCondition[] }));
-  }
-
-  private allNumbers(): number[] {
-    return [
-      18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28,
-      48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38
-    ];
+    return TOOTH_NUMBERS.map(number => ({ number, conditions: [] as ToothCondition[] }));
   }
 
   private buildPatients(): Patient[] {

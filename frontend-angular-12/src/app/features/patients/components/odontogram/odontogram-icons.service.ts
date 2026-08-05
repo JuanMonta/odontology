@@ -1,21 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ToothCondition } from '../../../../core/models/patient.model';
+import { SYMBOL_ORDER, SYMBOL_PREFIX } from '../../models/odontogram.model';
 
-const ICON_FILES: Record<string, string> = {
-  's-caries': 'caries.svg',
-  's-obturado': 'obturado.svg',
-  's-endodoncia': 'endodoncia.svg',
-  's-corona': 'corona.svg',
-  's-extraccion': 'extraccion-indicada.svg',
-  's-sellante-necesario': 'sellante-necesario.svg',
-  's-sellante-realizado': 'sellante-realizado.svg',
-  's-protesis-fija': 'protesis-fija.svg',
-  's-protesis-removible': 'protesis-removible.svg',
-  's-protesis-total': 'protesis-total.svg',
-  's-perdida-por-caries': 'perdida-por-caries.svg',
-  's-perdida-otra-causa': 'perdida-otra-causa.svg'
+const FILE_OVERRIDES: Partial<Record<ToothCondition, string>> = {
+  extraccion: 'extraccion-indicada.svg'
 };
+
+const ICON_FILES: Record<string, string> = {};
+for (const c of SYMBOL_ORDER) {
+  ICON_FILES[SYMBOL_PREFIX + c] = FILE_OVERRIDES[c] ?? `${c}.svg`;
+}
 
 @Injectable()
 export class OdontogramIconsService {
@@ -25,7 +21,10 @@ export class OdontogramIconsService {
 
   getSprite(): Promise<SafeHtml> {
     if (!this.sprite) {
-      this.sprite = this.buildSprite();
+      this.sprite = this.buildSprite().catch((err: unknown) => {
+        this.sprite = null;
+        throw err;
+      });
     }
     return this.sprite;
   }
@@ -38,7 +37,8 @@ export class OdontogramIconsService {
             .get(`assets/odontograma-symbols/${file}`, { responseType: 'text' })
             .toPromise();
           return this.toSymbol(id, text);
-        } catch {
+        } catch (err) {
+          console.warn(`Odontograma: no se pudo cargar el símbolo ${file}`, err);
           return '';
         }
       })

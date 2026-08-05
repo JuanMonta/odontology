@@ -73,9 +73,9 @@ export class PatientPanelComponent implements OnChanges {
     return n < 0 ? `-S/ ${abs}` : `S/ ${abs}`;
   }
 
-  onToothChange(tooth: Tooth): void {
+  onToothChange(teeth: Tooth[]): void {
     if (this.patient) {
-      this.service.updateTooth(this.patient.id, tooth);
+      this.service.updateTeeth(this.patient.id, teeth);
     }
   }
 
