@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { SafeHtml } from '@angular/platform-browser';
 import { Tooth, ToothCondition, ToothFace, ToothFaceName } from '../../../../core/models/patient.model';
+import { OdontogramIconsService } from './odontogram-icons.service';
 
 interface ToothView {
   tooth: Tooth;
@@ -27,10 +29,9 @@ interface FaceOverlay {
 
 interface WholeMark {
   id: ToothCondition;
-  color: string;
   x: number;
   y: number;
-  scale: number;
+  size: number;
 }
 
 interface Span {
@@ -130,11 +131,19 @@ export class OdontogramComponent implements OnChanges {
   activeTool: ToothCondition | 'clear' | null = null;
   faceTarget: ToothView | null = null;
 
+  spriteHtml: SafeHtml | null = null;
+
   readonly order = SYMBOL_ORDER;
   readonly faces = FACE_ORDER;
 
+  constructor(private icons: OdontogramIconsService, private cdr: ChangeDetectorRef) {}
+
   ngOnChanges(): void {
     this.build();
+    this.icons.getSprite().then(html => {
+      this.spriteHtml = html;
+      this.cdr.markForCheck();
+    });
   }
 
   selectTool(tool: ToothCondition | 'clear' | null): void {
@@ -253,8 +262,8 @@ export class OdontogramComponent implements OnChanges {
     const cy = tv.kind === 'perm' ? tv.y + CELL / 2 : tv.y;
     return conds.map(c => {
       const big = c === 'perdida-por-caries' || c === 'perdida-otra-causa';
-      const s = big ? (tv.kind === 'perm' ? 30 : 26) : tv.kind === 'perm' ? 27 : 24;
-      return { id: c, color: SYMBOLS[c].color, x: cx - s / 2, y: cy - s / 2, scale: s / 24 };
+      const size = big ? (tv.kind === 'perm' ? 30 : 26) : tv.kind === 'perm' ? 27 : 24;
+      return { id: c, x: cx - size / 2, y: cy - size / 2, size };
     });
   }
 
