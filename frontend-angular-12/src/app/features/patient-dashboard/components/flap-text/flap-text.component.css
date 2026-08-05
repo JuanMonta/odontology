@@ -35,7 +35,7 @@
 }
 
 :host([size='sm']) .flap-text {
-  font-size: 0.9em;
+  font-size: 1em;
 }
 
 :host([size='lg']) .flap-cell-wrap {

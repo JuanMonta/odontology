@@ -38,8 +38,8 @@ export class MainLayoutComponent {
     {
       label: 'OPERACIÓN',
       items: [
-        { label: 'AGENDA', title: 'AGENDA DEL DÍA', action: 'NUEVA CITA', active: true },
-        { label: 'PACIENTES', route: '/pacientes', title: 'PACIENTES', action: 'NUEVO PACIENTE', active: false },
+        { label: 'AGENDA', route: '/', title: 'AGENDA DEL DÍA', action: 'NUEVA CITA', active: true },
+        { label: 'PACIENTES', route: '/pacientes', title: 'PACIENTES', active: false },
         { label: 'HISTORIAS', active: false },
         { label: 'TRATAMIENTOS', route: '/tratamientos', title: 'TRATAMIENTOS', action: 'NUEVO TRATAMIENTO', active: false }
       ]
