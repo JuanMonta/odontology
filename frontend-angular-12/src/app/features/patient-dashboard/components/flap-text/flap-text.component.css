@@ -17,6 +17,18 @@
   width: 0.34em;
 }
 
+/* Continuous painted letters — no seams, no per-char cells */
+.flap-text--painted {
+  font-family: var(--font-flap);
+  font-weight: 500;
+  font-size: 1.1em;
+  line-height: 1;
+  color: var(--flap-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
 :host([size='sm']) .flap-cell-wrap {
   --flap-cell-w: 0.82em;
   --flap-cell-h: 1.14em;

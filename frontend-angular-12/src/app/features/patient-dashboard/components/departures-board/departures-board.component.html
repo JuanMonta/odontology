@@ -29,13 +29,13 @@
         <app-flap-text [value]="a.time" size="sm"></app-flap-text>
       </div>
       <div class="col col-patient" role="cell">
-        <app-flap-text [value]="a.patient" size="sm"></app-flap-text>
+        <app-flap-text [value]="a.patient" size="sm" [painted]="true"></app-flap-text>
       </div>
       <div class="col col-treatment" role="cell">
-        <app-flap-text [value]="a.treatment" size="sm"></app-flap-text>
+        <app-flap-text [value]="a.treatment" size="sm" [painted]="true"></app-flap-text>
       </div>
       <div class="col col-chair" role="cell">
-        <app-flap-text [value]="a.consultorio" size="sm"></app-flap-text>
+        <app-flap-text [value]="a.consultorio" size="sm" [painted]="true"></app-flap-text>
       </div>
       <div class="col col-status" role="cell">
         <span class="status" [class.status--live]="a.status === 'boarding'">
