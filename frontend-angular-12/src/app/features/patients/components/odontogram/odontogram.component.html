@@ -1,71 +1,78 @@
 <div class="odonto">
   <div class="odonto-sprite" [innerHTML]="spriteHtml" aria-hidden="true"></div>
+
+  <!-- ==================== VISTA COMPACTA ==================== -->
+  <div class="odonto-compact" [attr.aria-hidden]="expanded ? 'true' : null">
+    <div class="odonto-compact-head">
+      <button class="odo-expand" type="button" aria-label="Abrir odontograma ampliado" (click)="openExpanded()">
+        <svg class="icon-expand" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 2H2v4M10 2h4v4M6 14H2v-4M10 14h4v-4"></path>
+        </svg>
+        <span>AMPLIAR</span>
+      </button>
+      <p class="odonto-hint">ROJO = PATOLOGÍA / NECESIDAD · AZUL = TRATAMIENTO REALIZADO</p>
+    </div>
+    <ng-container *ngTemplateOutlet="odontoSvg"></ng-container>
+    <ng-container *ngTemplateOutlet="facesBar"></ng-container>
+    <ng-container *ngTemplateOutlet="toolsBar"></ng-container>
+  </div>
+
+  <!-- ==================== VISTA AMPLIADA (MODAL) ==================== -->
+  <div
+    class="odonto-modal"
+    *ngIf="expanded"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Odontograma ampliado"
+  >
+    <div class="odonto-modal-backdrop" (click)="onBackdrop($event)"></div>
+    <div
+      class="odonto-modal-panel"
+      #expandedPanel
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="odonto-modal-head">
+        <span class="odonto-modal-title">ODONTOGRAMA — VISTA AMPLIA</span>
+        <div class="odonto-modal-zoom" role="group" aria-label="Zoom del odontograma">
+          <button class="odo-zbtn" type="button" aria-label="Alejar" (click)="zoomOut()">−</button>
+          <span class="odo-zval" aria-live="polite">{{ zoomLabel }}</span>
+          <button class="odo-zbtn" type="button" aria-label="Acercar" (click)="zoomIn()">+</button>
+          <button class="odo-zbtn odo-zbtn--fit" type="button" aria-label="Ajustar al ancho" (click)="resetZoom()">AJUSTAR</button>
+        </div>
+        <button class="odo-close" type="button" aria-label="Cerrar vista ampliada" (click)="closeExpanded()">
+          <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+            <path d="M3 3l10 10"></path>
+            <path d="M13 3L3 13"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="odonto-modal-legend">ROJO = PATOLOGÍA / NECESIDAD · AZUL = TRATAMIENTO REALIZADO</div>
+      <div class="odonto-modal-stage">
+        <div class="odonto-modal-canvas" [style.width.%]="zoom * 100">
+          <ng-container *ngTemplateOutlet="odontoSvg"></ng-container>
+        </div>
+      </div>
+      <div class="odonto-modal-foot">
+        <ng-container *ngTemplateOutlet="facesBar"></ng-container>
+        <ng-container *ngTemplateOutlet="toolsBar"></ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PLANTILLAS COMPARTIDAS ==================== -->
+  <ng-template #odontoSvg>
   <svg
     class="odonto-svg"
     viewBox="0 0 1000 480"
     role="img"
     aria-label="Odontograma Formulario 033: 32 piezas permanentes y 20 deciduas"
   >
-        
-
         <!-- ==================== SUPERIOR ==================== -->
-        <!-- RECESIÓN superior -->
-        <text
-          x="10"
-          y="18"
-          class="odo-label"
-        >RECESIÓN</text>
-        <g
-          *ngFor="let tv of topPerm"
-          role="button"
-          tabindex="0"
-          [class.perio--off]="isMissing(tv)"
-          [attr.aria-label]="'Recesión pieza ' + tv.number"
-          (click)="clickPerio(tv, 'recesion')"
-          (keydown.enter)="clickPerio(tv, 'recesion')"
-        >
-          <rect
-            [attr.x]="tv.x"
-            [attr.y]="perioBoxY('recesion', 'top')"
-            width="35"
-            height="18"
-            class="perio-box"
-          ></rect>
-          <text
-            [attr.x]="tv.x + 17.5"
-            [attr.y]="perioBoxY('recesion', 'top') + 13"
-            class="perio-val"
-          >{{ perioValue(tv, 'recesion') }}</text>
-        </g>
-
-        <!-- MOVILIDAD superior -->
-        <text
-          x="10"
-          y="52"
-          class="odo-label"
-        >MOVILIDAD</text>
-        <g
-          *ngFor="let tv of topPerm"
-          role="button"
-          tabindex="0"
-          [class.perio--off]="isMissing(tv)"
-          [attr.aria-label]="'Movilidad pieza ' + tv.number"
-          (click)="clickPerio(tv, 'movilidad')"
-          (keydown.enter)="clickPerio(tv, 'movilidad')"
-        >
-          <rect
-            [attr.x]="tv.x"
-            [attr.y]="perioBoxY('movilidad', 'top')"
-            width="35"
-            height="18"
-            class="perio-box"
-          ></rect>
-          <text
-            [attr.x]="tv.x + 17.5"
-            [attr.y]="perioBoxY('movilidad', 'top') + 13"
-            class="perio-val"
-          >{{ perioValue(tv, 'movilidad') }}</text>
-        </g>
+        <!-- RECESIÓN / MOVILIDAD superior -->
+        <ng-container *ngFor="let row of perioRowsTop">
+          <ng-container *ngTemplateOutlet="perioRow; context: { $implicit: row }"></ng-container>
+        </ng-container>
 
         <!-- VESTIBULAR superior (números) -->
         <text
@@ -75,7 +82,7 @@
         >VESTIBULAR</text>
         <text
           *ngFor="let tv of topPerm"
-          [attr.x]="numX(tv)"
+          [attr.x]="tv.labelX"
           [attr.y]="90"
           class="num"
         >{{ tv.number }}</text>
@@ -93,7 +100,7 @@
         >LINGUAL</text>
         <text
           *ngFor="let tv of topDec"
-          [attr.x]="numX(tv)"
+          [attr.x]="tv.labelX"
           [attr.y]="175"
           class="num"
         >{{ tv.number }}</text>
@@ -103,7 +110,7 @@
 
         <text
           *ngFor="let tv of botDec"
-          [attr.x]="numX(tv)"
+          [attr.x]="tv.labelX"
           [attr.y]="295"
           class="num"
         >{{ tv.number }}</text>
@@ -122,116 +129,81 @@
         </ng-container>
         <text
           *ngFor="let tv of botPerm"
-          [attr.x]="numX(tv)"
+          [attr.x]="tv.labelX"
           [attr.y]="385"
           class="num"
         >{{ tv.number }}</text>
 
-        <!-- MOVILIDAD inferior -->
-        <text
-          x="10"
-          y="418"
-          class="odo-label"
-        >MOVILIDAD</text>
-        <g
-          *ngFor="let tv of botPerm"
-          role="button"
-          tabindex="0"
-          [class.perio--off]="isMissing(tv)"
-          [attr.aria-label]="'Movilidad pieza ' + tv.number"
-          (click)="clickPerio(tv, 'movilidad')"
-          (keydown.enter)="clickPerio(tv, 'movilidad')"
-        >
-          <rect
-            [attr.x]="tv.x"
-            [attr.y]="perioBoxY('movilidad', 'bottom')"
-            width="35"
-            height="18"
-            class="perio-box"
-          ></rect>
-          <text
-            [attr.x]="tv.x + 17.5"
-            [attr.y]="perioBoxY('movilidad', 'bottom') + 13"
-            class="perio-val"
-          >{{ perioValue(tv, 'movilidad') }}</text>
-        </g>
-
-        <!-- RECESIÓN inferior -->
-        <text
-          x="10"
-          y="452"
-          class="odo-label"
-        >RECESIÓN</text>
-        <g
-          *ngFor="let tv of botPerm"
-          role="button"
-          tabindex="0"
-          [class.perio--off]="isMissing(tv)"
-          [attr.aria-label]="'Recesión pieza ' + tv.number"
-          (click)="clickPerio(tv, 'recesion')"
-          (keydown.enter)="clickPerio(tv, 'recesion')"
-        >
-          <rect
-            [attr.x]="tv.x"
-            [attr.y]="perioBoxY('recesion', 'bottom')"
-            width="35"
-            height="18"
-            class="perio-box"
-          ></rect>
-          <text
-            [attr.x]="tv.x + 17.5"
-            [attr.y]="perioBoxY('recesion', 'bottom') + 13"
-            class="perio-val"
-          >{{ perioValue(tv, 'recesion') }}</text>
-        </g>
+        <!-- MOVILIDAD / RECESIÓN inferior -->
+        <ng-container *ngFor="let row of perioRowsBottom">
+          <ng-container *ngTemplateOutlet="perioRow; context: { $implicit: row }"></ng-container>
+        </ng-container>
 
         <!-- Prótesis (arcadas) -->
-        <g
-          *ngFor="let s of topSpans"
-          class="span"
-          [style.color]="s.color"
-        >
-          <path
-            *ngIf="s.d"
-            [attr.d]="s.d"
-            class="span-line"
-            [class.span-line--solid]="s.c === 'protesis-total'"
-          ></path>
-          <path
-            *ngIf="s.ends"
-            [attr.d]="s.ends"
-            class="span-ends"
-          ></path>
-        </g>
-        <g
-          *ngFor="let s of botSpans"
-          class="span"
-          [style.color]="s.color"
-        >
-          <path
-            *ngIf="s.d"
-            [attr.d]="s.d"
-            class="span-line"
-            [class.span-line--solid]="s.c === 'protesis-total'"
-          ></path>
-          <path
-            *ngIf="s.ends"
-            [attr.d]="s.ends"
-            class="span-ends"
-          ></path>
-        </g>
+        <ng-container *ngFor="let spans of spanRows">
+          <g
+            *ngFor="let s of spans"
+            class="span"
+            [style.color]="s.color"
+          >
+            <path
+              *ngIf="s.d"
+              [attr.d]="s.d"
+              class="span-line"
+              [class.span-line--solid]="s.c === 'protesis-total'"
+            ></path>
+            <path
+              *ngIf="s.ends"
+              [attr.d]="s.ends"
+              class="span-ends"
+            ></path>
+          </g>
+        </ng-container>
 
         <!-- Plantilla de pieza -->
+        <ng-template
+          #perioRow
+          let-row
+        >
+          <text
+            x="10"
+            [attr.y]="row.labelY"
+            class="odo-label"
+          >{{ row.label }}</text>
+          <g
+            *ngFor="let tv of row.views; let i = index"
+            role="button"
+            tabindex="0"
+            [class.perio--off]="tv.missing"
+            [attr.aria-label]="row.aria + ' pieza ' + tv.number"
+            (click)="clickPerio(tv, row.kind)"
+            (keydown.enter)="clickPerio(tv, row.kind)"
+          >
+            <rect
+              [attr.x]="tv.x"
+              [attr.y]="row.boxY"
+              width="35"
+              height="18"
+              class="perio-box"
+            ></rect>
+            <text
+              [attr.x]="tv.x + 17.5"
+              [attr.y]="row.boxY + 13"
+              class="perio-val"
+            >{{ row.values[i] }}</text>
+          </g>
+        </ng-template>
+
         <ng-template
           #tooth
           let-tv
         >
           <g
             class="tooth"
-            [class.tooth--missing]="isMissing(tv)"
+            [class.tooth--missing]="tv.missing"
             role="button"
             tabindex="0"
-            [attr.aria-label]="ariaLabel(tv)"
+            [attr.aria-label]="tv.ariaLabel"
             (click)="clickTooth(tv)"
             (keydown.enter)="clickTooth(tv)"
           >
@@ -322,8 +294,7 @@
               ></line>
             </ng-container>
 
-            <!-- Caries / obturado por cara -->
-            <ng-container *ngFor="let o of faceOverlays(tv)">
+            <ng-container *ngFor="let o of tv.overlays">
               <rect
                 *ngIf="o.kind === 'rect'"
                 [attr.x]="o.x"
@@ -349,9 +320,8 @@
               ></circle>
             </ng-container>
 
-            <!-- Corona -->
             <rect
-              *ngIf="coronaRect(tv) as cr"
+              *ngIf="tv.corona as cr"
               [attr.x]="cr.x"
               [attr.y]="cr.y"
               [attr.width]="cr.w"
@@ -360,76 +330,78 @@
               [style.color]="colorOf('corona')"
             ></rect>
 
-            <!-- Símbolos de diente completo -->
-                        <g *ngFor="let m of wholeMarks(tv)" class="symbol">
-              <use [attr.href]="'#s-' + m.id" [attr.x]="m.x" [attr.y]="m.y" [attr.width]="m.size" [attr.height]="m.size"></use>
+            <g *ngFor="let m of tv.marks" class="symbol">
+              <use [attr.href]="'#' + symbolPrefix + m.id" [attr.x]="m.x" [attr.y]="m.y" [attr.width]="m.size" [attr.height]="m.size"></use>
             </g>
           </g>
         </ng-template>
       </svg>
+  </ng-template>
 
-  <div
-    class="odo-faces"
-    *ngIf="isFaceTool()"
-    role="group"
-    aria-label="Cara del diente a marcar"
-  >
-    <span class="odo-faces-label">{{ activeTool === 'caries' ? 'CARIES' : 'OBTURADO' }} EN:</span>
-    <button
-      *ngFor="let f of faces"
-      class="odo-face"
-      [class.is-on]="faceMarked(f)"
-      type="button"
-      [attr.aria-pressed]="faceMarked(f)"
-      [style.--face-c]="faceMarkColor(f) || colorOf(activeTool)"
-      (click)="facePick(f)"
+  <ng-template #facesBar>
+    <div
+      class="odo-faces"
+      *ngIf="isFaceTool()"
+      role="group"
+      aria-label="Cara del diente a marcar"
     >
-      {{ faceLabel(f) }}
-    </button>
-    <span
-      *ngIf="!faceTarget"
-      class="odo-faces-hint"
-    >CLIC EN UNA PIEZA PARA ELEGIR SU CARA</span>
-  </div>
-
-  <div
-    class="odo-tools"
-    role="group"
-    aria-label="Símbolos clínicos"
-  >
-    <button
-      *ngFor="let c of order"
-      class="odo-tool"
-      [class.is-active]="isActive(c)"
-      type="button"
-      [attr.aria-pressed]="isActive(c)"
-      (click)="selectTool(c)"
-    >
-            <svg class="odo-tool-ico" viewBox="0 0 24 24" aria-hidden="true">
-        <use [attr.href]="'#s-' + c" width="24" height="24"></use>
-      </svg>
-      <span class="odo-tool-label">{{ symbolLabel(c) }}</span>
-      <span class="odo-tool-count">{{ countFor(c) }}</span>
-    </button>
-
-    <button
-      class="odo-tool odo-tool--clear"
-      [class.is-active]="isActive('clear')"
-      type="button"
-      [attr.aria-pressed]="isActive('clear')"
-      (click)="selectTool('clear')"
-    >
-      <svg
-        class="odo-tool-ico"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
+      <span class="odo-faces-label">{{ activeTool === 'caries' ? 'CARIES' : 'OBTURADO' }} EN:</span>
+      <button
+        *ngFor="let f of faces"
+        class="odo-face"
+        [class.is-on]="faceMarked(f)"
+        type="button"
+        [attr.aria-pressed]="faceMarked(f)"
+        [style.--face-c]="faceMarkColor(f) || colorOf(activeTool)"
+        (click)="pickFace(f)"
       >
-        <path d="M6 6 L18 18 M18 6 L6 18"></path>
-      </svg>
-      <span class="odo-tool-label">SANO</span>
-      <span class="odo-tool-count odo-tool-count--dim">—</span>
-    </button>
-  </div>
+        {{ faceLabels[f] }}
+      </button>
+      <span
+        *ngIf="!faceTarget"
+        class="odo-faces-hint"
+      >CLIC EN UNA PIEZA PARA ELEGIR SU CARA</span>
+    </div>
+  </ng-template>
 
-  <p class="odonto-hint">ROJO = PATOLOGÍA / NECESIDAD · AZUL = TRATAMIENTO REALIZADO</p>
+  <ng-template #toolsBar>
+    <div
+      class="odo-tools"
+      role="group"
+      aria-label="Símbolos clínicos"
+    >
+      <button
+        *ngFor="let c of order"
+        class="odo-tool"
+        [class.is-active]="isActive(c)"
+        type="button"
+        [attr.aria-pressed]="isActive(c)"
+        (click)="selectTool(c)"
+      >
+              <svg class="odo-tool-ico" viewBox="0 0 24 24" aria-hidden="true">
+          <use [attr.href]="'#' + symbolPrefix + c" width="24" height="24"></use>
+        </svg>
+        <span class="odo-tool-label">{{ symbols[c].label }}</span>
+        <span class="odo-tool-count">{{ counts[c] }}</span>
+      </button>
+
+      <button
+        class="odo-tool odo-tool--clear"
+        [class.is-active]="isActive('clear')"
+        type="button"
+        [attr.aria-pressed]="isActive('clear')"
+        (click)="selectTool('clear')"
+      >
+        <svg
+          class="odo-tool-ico"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M6 6 L18 18 M18 6 L6 18"></path>
+        </svg>
+        <span class="odo-tool-label">SANO</span>
+        <span class="odo-tool-count odo-tool-count--dim">—</span>
+      </button>
+    </div>
+  </ng-template>
 </div>

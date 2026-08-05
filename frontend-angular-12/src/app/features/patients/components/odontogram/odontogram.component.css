@@ -5,7 +5,8 @@
   --odo-neutral: #e9ebee;
 }
 
-.odonto {
+.odonto,
+.odonto-compact {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -62,10 +63,6 @@
   opacity: 0.28;
 }
 
-g[role='button'].perio--off {
-  opacity: 0.4;
-}
-
 g[role='button']:not(.perio--off):hover .perio-box {
   stroke: var(--amber);
 }
@@ -89,6 +86,9 @@ g[role='button']:not(.perio--off):focus-visible .perio-box {
 }
 
 .tooth-body {
+  fill: #1c2128;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 1;
   transition: stroke 0.15s var(--ease-out), fill 0.15s var(--ease-out);
 }
 
@@ -99,12 +99,6 @@ g[role='button']:not(.perio--off):focus-visible .perio-box {
 .tooth:focus-visible .tooth-body {
   stroke: var(--amber);
   stroke-width: 2;
-}
-
-.tooth--present .tooth-body {
-  fill: #1c2128;
-  stroke: rgba(255, 255, 255, 0.16);
-  stroke-width: 1;
 }
 
 .tooth--missing .tooth-body {
@@ -225,11 +219,6 @@ g[role='button']:not(.perio--off):focus-visible .perio-box {
   color: var(--face-c);
 }
 
-.odo-face:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.35);
-}
-
 .odo-faces-hint {
   font-family: var(--font-flap);
   font-size: 0.56em;
@@ -267,12 +256,6 @@ g[role='button']:not(.perio--off):focus-visible .perio-box {
   background: var(--amber-soft);
 }
 
-.odo-tool:focus-visible {
-  outline: none;
-  border-color: var(--amber);
-  box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.35);
-}
-
 .odo-tool-ico {
   width: 18px;
   height: 18px;
@@ -307,10 +290,241 @@ g[role='button']:not(.perio--off):focus-visible .perio-box {
   color: var(--steel-500);
 }
 
+.odonto-compact-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.odonto-compact-head .odonto-hint {
+  margin: 0;
+  text-align: left;
+}
+
+.odo-expand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  font-family: var(--font-flap);
+  font-size: 0.64em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--steel-300);
+  background: var(--flap-black-2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease-out), color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+}
+
+.odo-expand .icon-expand {
+  width: 13px;
+  height: 13px;
+}
+
+.odo-expand:hover {
+  border-color: var(--amber-line);
+  color: var(--amber);
+}
+
 .odonto-hint {
   font-family: var(--font-flap);
   font-size: 0.6em;
   letter-spacing: 0.18em;
   color: var(--steel-500);
   text-align: center;
+}
+
+/* ============ Focus de controles ============ */
+.odo-face:focus-visible,
+.odo-tool:focus-visible,
+.odo-expand:focus-visible,
+.odo-zbtn:focus-visible,
+.odo-close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.35);
+}
+
+.odo-tool:focus-visible,
+.odo-expand:focus-visible,
+.odo-zbtn:focus-visible,
+.odo-close:focus-visible {
+  border-color: var(--amber);
+}
+
+/* ============ Vista ampliada (modal) ============ */
+.odonto-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.odonto-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 8, 10, 0.78);
+  backdrop-filter: blur(3px);
+  animation: odo-backdrop-in 0.18s var(--ease-out);
+}
+
+@keyframes odo-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.odonto-modal-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(1180px, 100%);
+  max-height: calc(100vh - 48px);
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)),
+    var(--flap-black-2);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--radius-md);
+  box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  outline: none;
+  animation: odo-modal-in 0.22s var(--ease-out);
+}
+
+@keyframes odo-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.odonto-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--steel-950);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.odonto-modal-title {
+  font-family: var(--font-flap);
+  font-size: 0.78em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--steel-100);
+  text-transform: uppercase;
+}
+
+.odonto-modal-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  font-family: var(--font-flap);
+  font-size: 0.74em;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--steel-300);
+  background: var(--steel-950);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  text-align: center;
+}
+
+.odonto-modal-zoom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.odo-zbtn {
+  font-family: var(--font-flap);
+  font-size: 0.66em;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  min-width: 30px;
+  height: 28px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--steel-200);
+  background: var(--flap-black);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease-out), color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+}
+
+.odo-zbtn:hover {
+  border-color: var(--amber-line);
+  color: var(--amber);
+}
+
+.odo-zbtn--fit {
+  color: var(--steel-300);
+  letter-spacing: 0.14em;
+}
+
+.odo-zval {
+  font-family: var(--font-flap);
+  font-size: 0.72em;
+  font-weight: 500;
+  min-width: 44px;
+  text-align: center;
+  color: var(--amber);
+}
+
+.odo-close {
+  width: 32px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--steel-300);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease-out), color 0.15s var(--ease-out);
+}
+
+.odo-close:hover {
+  border-color: var(--red-dim);
+  color: var(--red-dim);
+}
+
+.odonto-modal-stage {
+  overflow: auto;
+  padding: 18px;
+}
+
+.odonto-modal-canvas {
+  margin: 0 auto;
+}
+
+.odonto-modal-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.odonto-modal-foot .odo-tools {
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
 }
