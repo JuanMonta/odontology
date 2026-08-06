@@ -7,7 +7,7 @@ import {
   UsuarioDraft,
   UsuarioStatus
 } from '../../../../core/models/usuario.model';
-import { UsuariosMockService } from '../../services/usuarios-mock.service';
+import { UsuariosHttpService } from '../../services/usuarios-http.service';
 
 type StatusFilter = UsuarioStatus | 'all';
 
@@ -29,7 +29,7 @@ export class UsuariosPageComponent implements OnInit {
   private readonly selectedId$ = new BehaviorSubject<string | null>(null);
 
   constructor(
-    private service: UsuariosMockService,
+    private service: UsuariosHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -88,9 +88,10 @@ export class UsuariosPageComponent implements OnInit {
         this.service.updateUsuario({ ...current, ...draft });
       }
     } else {
-      const created = this.service.addUsuario(draft);
-      this.selectedId = created.id;
-      this.selectedId$.next(created.id);
+      this.service.addUsuario(draft).subscribe(created => {
+        this.selectedId = created.id;
+        this.selectedId$.next(created.id);
+      });
     }
     this.creating = false;
     this.router.navigate([], { queryParams: {} });

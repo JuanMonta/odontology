@@ -7,7 +7,7 @@ import {
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { Appointment, BoardTotals, WaitingPatient } from '../../../../core/models/appointment.model';
-import { DashboardMockService } from '../../services/dashboard-mock.service';
+import { DashboardHttpService } from '../../services/dashboard-http.service';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -22,7 +22,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private readonly mock: DashboardMockService) {
+  constructor(private readonly mock: DashboardHttpService) {
     this.appointments$ = this.mock.appointments$;
     this.waiting$ = this.mock.waiting$;
     this.totals$ = this.mock.appointments$.pipe(

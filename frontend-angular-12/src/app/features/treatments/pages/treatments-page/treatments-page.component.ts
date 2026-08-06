@@ -7,7 +7,7 @@ import {
   TreatmentCategory,
   TreatmentDraft
 } from '../../../../core/models/treatment.model';
-import { TREATMENT_CATEGORIES, TreatmentsMockService } from '../../services/treatments-mock.service';
+import { TREATMENT_CATEGORIES, TreatmentsHttpService } from '../../services/treatments-http.service';
 
 type CategoryFilter = TreatmentCategory | 'all';
 
@@ -28,7 +28,7 @@ export class TreatmentsPageComponent implements OnInit {
   private readonly category$ = new BehaviorSubject<CategoryFilter>('all');
 
   constructor(
-    private service: TreatmentsMockService,
+    private service: TreatmentsHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -78,7 +78,9 @@ export class TreatmentsPageComponent implements OnInit {
     if (this.selected) {
       this.service.updateTreatment({ ...this.selected, ...draft });
     } else {
-      this.selected = this.service.addTreatment(draft);
+      this.service.addTreatment(draft).subscribe(created => {
+        this.selected = created;
+      });
     }
     this.creating = false;
     this.router.navigate([], { queryParams: {} });

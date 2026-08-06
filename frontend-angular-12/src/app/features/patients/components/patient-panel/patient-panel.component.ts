@@ -7,7 +7,7 @@ import {
   PatientDetail,
   Tooth
 } from '../../../../core/models/patient.model';
-import { PatientsMockService } from '../../services/patients-mock.service';
+import { PatientsHttpService } from '../../services/patients-http.service';
 
 type Tab = 'odonto' | 'historial' | 'ficha' | 'cuentas';
 
@@ -37,7 +37,7 @@ export class PatientPanelComponent implements OnChanges {
     { id: 'cuentas', label: 'CUENTAS' }
   ];
 
-  constructor(private service: PatientsMockService) {}
+  constructor(private service: PatientsHttpService) {}
 
   ngOnChanges(): void {
     this.editMode = false;
@@ -106,8 +106,9 @@ export class PatientPanelComponent implements OnChanges {
   }
 
   onCreate(draft: PatientDraft): void {
-    const created = this.service.addPatient(draft);
-    this.saved.emit(created);
+    this.service.addPatient(draft).subscribe(created => {
+      this.saved.emit(created);
+    });
   }
 
   onEdit(draft: PatientDraft): void {

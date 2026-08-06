@@ -5,7 +5,7 @@ import {
   UsuarioRol,
   UsuarioStatus
 } from '../../../../core/models/usuario.model';
-import { ROLES } from '../../services/usuarios-mock.service';
+import { ROLES } from '../../services/usuarios-http.service';
 
 @Component({
   selector: 'app-usuario-form',

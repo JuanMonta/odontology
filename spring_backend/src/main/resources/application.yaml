@@ -6,16 +6,18 @@ spring:
     name: crowie.dev
 
   datasource:
-    # Asegúrate de que 'odontology_db' esté creada en HeidiSQL
-    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:odontology_db}
+    # Base de datos canónica: la crea database/schema.sql (ejecutar una vez con
+    # `mysql -u root -p < database/schema.sql` desde la raíz del proyecto).
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:saas_clinica_odontologica}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
 
   jpa:
-    # 'update' creará o actualizará las tablas automáticamente según nuestras clases Java
+    # El DDL lo posee database/schema.sql (ENUM, JSON, columna generada y
+    # semillas). Hibernate NO crea ni altera tablas: 'none'.
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     # Esto imprimirá las consultas SQL en la consola, vital para debuggear el Nivel Senior
     show-sql: true
     properties:

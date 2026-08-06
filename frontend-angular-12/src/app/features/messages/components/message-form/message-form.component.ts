@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
 import { MessageDraft } from '../../../../core/models/message.model';
-import { MESSAGE_CHANNELS } from '../../services/messages-mock.service';
+import { MESSAGE_CHANNELS } from '../../services/messages-http.service';
 
 @Component({
   selector: 'app-message-form',

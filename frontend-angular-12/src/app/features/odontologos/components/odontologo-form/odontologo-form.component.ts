@@ -5,7 +5,7 @@ import {
   OdontologoStatus,
   Turno
 } from '../../../../core/models/odontologo.model';
-import { SPECIALTIES } from '../../services/odontologos-mock.service';
+import { SPECIALTIES } from '../../services/odontologos-http.service';
 
 @Component({
   selector: 'app-odontologo-form',

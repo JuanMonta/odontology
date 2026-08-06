@@ -1,0 +1,17 @@
+package api.dto;
+
+import java.time.LocalDate;
+
+public record PacienteDraftDto(
+        String name,
+        Integer age,
+        String birthday,
+        String phone,
+        String email,
+        String address,
+        String allergies,
+        String status,
+        String treatment,
+        LocalDate lastVisit,
+        LocalDate fechaNacimiento) {
+}

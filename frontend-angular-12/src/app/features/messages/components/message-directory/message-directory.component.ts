@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ClinicMessage } from '../../../../core/models/message.model';
-import { MESSAGE_CHANNELS } from '../../services/messages-mock.service';
+import { MESSAGE_CHANNELS } from '../../services/messages-http.service';
 
 @Component({
   selector: 'app-message-directory',
