@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ClinicMessage, MessageDraft } from '../../../../core/models/message.model';
-import { MessagesMockService } from '../../services/messages-mock.service';
+import { MessagesHttpService } from '../../services/messages-http.service';
 
 @Component({
   selector: 'app-message-panel',
@@ -15,7 +15,7 @@ export class MessagePanelComponent {
   @Output() cancel = new EventEmitter<void>();
   @Output() saved = new EventEmitter<MessageDraft>();
 
-  constructor(private service: MessagesMockService) {}
+  constructor(private service: MessagesHttpService) {}
 
   toggleRead(): void {
     if (!this.message) {

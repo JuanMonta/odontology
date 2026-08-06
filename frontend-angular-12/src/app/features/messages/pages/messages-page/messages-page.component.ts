@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ClinicMessage, MessageDraft } from '../../../../core/models/message.model';
-import { MessagesMockService } from '../../services/messages-mock.service';
+import { MessagesHttpService } from '../../services/messages-http.service';
 
 type StatusFilter = 'all' | 'unread' | 'urgent';
 
@@ -25,7 +25,7 @@ export class MessagesPageComponent implements OnInit {
   private readonly selectedId$ = new BehaviorSubject<string | null>(null);
 
   constructor(
-    private service: MessagesMockService,
+    private service: MessagesHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -82,10 +82,11 @@ export class MessagesPageComponent implements OnInit {
   }
 
   onSaved(draft: MessageDraft): void {
-    const created = this.service.sendMessage(draft);
-    this.creating = false;
-    this.onSelect(created);
-    this.router.navigate([], { queryParams: {} });
+    this.service.sendMessage(draft).subscribe(created => {
+      this.creating = false;
+      this.onSelect(created);
+      this.router.navigate([], { queryParams: {} });
+    });
   }
 
   cancelCreate(): void {

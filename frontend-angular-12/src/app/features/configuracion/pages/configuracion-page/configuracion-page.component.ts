@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ClinicaSettings, ConfigSection } from '../../../../core/models/clinica-settings.model';
-import { ConfiguracionMockService, CONFIG_SECTIONS } from '../../services/configuracion-mock.service';
+import { ConfiguracionHttpService, CONFIG_SECTIONS } from '../../services/configuracion-http.service';
 
 @Component({
   selector: 'app-configuracion-page',
@@ -12,14 +12,14 @@ import { ConfiguracionMockService, CONFIG_SECTIONS } from '../../services/config
 export class ConfiguracionPageComponent {
   sections = CONFIG_SECTIONS;
 
-  settings$: Observable<ClinicaSettings>;
+  settings$: Observable<ClinicaSettings | null>;
   activeSection$: Observable<ConfigSection>;
   saved$: Observable<boolean>;
 
   private readonly activeSection = new BehaviorSubject<ConfigSection>('clinica');
   private readonly savedFlag = new BehaviorSubject<boolean>(false);
 
-  constructor(private service: ConfiguracionMockService) {
+  constructor(private service: ConfiguracionHttpService) {
     this.settings$ = this.service.settings$;
     this.activeSection$ = this.activeSection.asObservable();
     this.saved$ = this.savedFlag.asObservable();

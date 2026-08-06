@@ -4,7 +4,7 @@ import {
   TreatmentCategory,
   TreatmentDraft
 } from '../../../../core/models/treatment.model';
-import { TREATMENT_CATEGORIES } from '../../services/treatments-mock.service';
+import { TREATMENT_CATEGORIES } from '../../services/treatments-http.service';
 
 @Component({
   selector: 'app-treatment-form',

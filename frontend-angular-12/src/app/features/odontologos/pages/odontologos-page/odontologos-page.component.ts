@@ -7,7 +7,7 @@ import {
   OdontologoDraft,
   OdontologoStatus
 } from '../../../../core/models/odontologo.model';
-import { OdontologosMockService } from '../../services/odontologos-mock.service';
+import { OdontologosHttpService } from '../../services/odontologos-http.service';
 
 type StatusFilter = OdontologoStatus | 'all';
 
@@ -29,7 +29,7 @@ export class OdontologosPageComponent implements OnInit {
   private readonly selectedId$ = new BehaviorSubject<string | null>(null);
 
   constructor(
-    private service: OdontologosMockService,
+    private service: OdontologosHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -88,9 +88,10 @@ export class OdontologosPageComponent implements OnInit {
         this.service.updateOdontologo({ ...current, ...draft });
       }
     } else {
-      const created = this.service.addOdontologo(draft);
-      this.selectedId = created.id;
-      this.selectedId$.next(created.id);
+      this.service.addOdontologo(draft).subscribe(created => {
+        this.selectedId = created.id;
+        this.selectedId$.next(created.id);
+      });
     }
     this.creating = false;
     this.router.navigate([], { queryParams: {} });

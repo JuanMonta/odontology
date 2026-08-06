@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Patient, PatientAlert } from '../../../../core/models/patient.model';
-import { PatientsMockService } from '../../services/patients-mock.service';
+import { PatientsHttpService } from '../../services/patients-http.service';
 
 type PatientFilter = 'all' | 'active' | 'inactive';
 
@@ -26,7 +26,7 @@ export class PatientsPageComponent implements OnInit {
   private readonly filter$ = new BehaviorSubject<PatientFilter>('all');
 
   constructor(
-    private service: PatientsMockService,
+    private service: PatientsHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {

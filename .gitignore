@@ -11,7 +11,9 @@ PRODUCT.md
 /frontend-angular-12/node_modules/
 /frontend-angular-12/dist/
 /frontend-angular-12/tests/
+/frontend-angular-12/test-results/
 /frontend-angular-12/playwright.config.ts
+/frontend-angular-12/playwright-report/
 /frontend-angular-12/tmp/
 /frontend-angular-12/.angular/
 /frontend-angular-12/coverage/
@@ -25,6 +27,9 @@ PRODUCT.md
 /spring_backend/.mvn/
 /spring_backend/logs/
 /spring_backend/src/main/resources/application-local.yaml
+
+# ---------- Tools ----------
+/database
 
 # ---------- Logs ----------
 **/logs/

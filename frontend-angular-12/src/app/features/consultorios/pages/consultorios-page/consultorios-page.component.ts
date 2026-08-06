@@ -7,7 +7,7 @@ import {
   ConsultorioDraft,
   ConsultorioStatus
 } from '../../../../core/models/consultorio.model';
-import { ConsultoriosMockService } from '../../services/consultorios-mock.service';
+import { ConsultoriosHttpService } from '../../services/consultorios-http.service';
 
 type StatusFilter = ConsultorioStatus | 'all';
 
@@ -29,7 +29,7 @@ export class ConsultoriosPageComponent implements OnInit {
   private readonly selectedId$ = new BehaviorSubject<string | null>(null);
 
   constructor(
-    private service: ConsultoriosMockService,
+    private service: ConsultoriosHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -88,9 +88,10 @@ export class ConsultoriosPageComponent implements OnInit {
         this.service.updateConsultorio({ ...current, ...draft });
       }
     } else {
-      const created = this.service.addConsultorio(draft);
-      this.selectedId = created.id;
-      this.selectedId$.next(created.id);
+      this.service.addConsultorio(draft).subscribe(created => {
+        this.selectedId = created.id;
+        this.selectedId$.next(created.id);
+      });
     }
     this.creating = false;
     this.router.navigate([], { queryParams: {} });

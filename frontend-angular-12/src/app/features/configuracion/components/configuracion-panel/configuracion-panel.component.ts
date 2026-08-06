@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ClinicaSettings, ConfigSection } from '../../../../core/models/clinica-settings.model';
-import { CONFIG_SECTIONS } from '../../services/configuracion-mock.service';
+import { CONFIG_SECTIONS } from '../../services/configuracion-http.service';
 
 export const WEEKDAYS: string[] = ['LU', 'MA', 'MI', 'JU', 'VI', 'SA'];
 
