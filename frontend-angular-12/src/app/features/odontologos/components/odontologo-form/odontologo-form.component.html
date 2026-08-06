@@ -1,0 +1,67 @@
+<form class="form" (ngSubmit)="onSubmit()" novalidate>
+  <div class="form-grid">
+    <label class="field">
+      <span class="field-label">NOMBRE *</span>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="name"
+        name="name"
+        placeholder="DR. RIVERA"
+        autocomplete="off"
+      />
+    </label>
+
+    <label class="field">
+      <span class="field-label">LICENCIA COP *</span>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="license"
+        name="license"
+        placeholder="COP 12453"
+        autocomplete="off"
+      />
+    </label>
+
+    <label class="field">
+      <span class="field-label">ESPECIALIDAD</span>
+      <select class="field-select" [(ngModel)]="specialty" name="specialty" aria-label="Especialidad">
+        <option *ngFor="let s of specialties" [ngValue]="s">{{ s }}</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="field-label">CONSULTORIO</span>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="consultorio"
+        name="consultorio"
+        placeholder="CON-001"
+        autocomplete="off"
+      />
+    </label>
+
+    <label class="field">
+      <span class="field-label">TURNO</span>
+      <select class="field-select" [(ngModel)]="turno" name="turno" aria-label="Turno">
+        <option *ngFor="let t of turnos" [ngValue]="t">{{ t }}</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="field-label">ESTADO</span>
+      <select class="field-select" [(ngModel)]="status" name="status" aria-label="Estado del odontólogo">
+        <option *ngFor="let s of statuses" [ngValue]="s">{{ s }}</option>
+      </select>
+    </label>
+  </div>
+
+  <p class="form-error" *ngIf="error" role="alert">NOMBRE Y LICENCIA SON OBLIGATORIOS</p>
+
+  <div class="form-actions">
+    <button class="btn-amber" type="submit">{{ odontologo ? 'GUARDAR CAMBIOS' : 'REGISTRAR PROFESIONAL' }}</button>
+    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+  </div>
+</form>

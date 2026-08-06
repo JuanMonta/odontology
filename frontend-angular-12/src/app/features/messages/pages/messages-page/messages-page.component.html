@@ -1,0 +1,71 @@
+<!--
+  DIRECCIÓN: TABLERO DE EMBARQUE — concourse split-flap aplicado a la bandeja
+  de mensajes del consultorio. THESIS: la bandeja se lee como un tablero de
+  llegadas; los mensajes son filas ordenadas por relevancia, y solo la lámpara
+  de lo vivo (no leído / urgente) enciende ámbar. OWN-WORLD: matte black flaps,
+  letras pintadas, acero cepillado, lámparas ámbar para lo pendiente.
+  STORY: el equipo escanea el tablero, abre un mensaje, lo resuelve y enciende
+  la lámpara verde de "leído". FIRST VIEWPORT: tablero de mensajes + panel de
+  lectura. FORM: split-flap concourse board (challenger), mismo shell de
+  PACIENTES/TRATAMIENTOS.
+-->
+<div class="page messages">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-left">
+        <h2 class="page-title">BANDEJA DE MENSAJES</h2>
+        <span class="page-sub">COMUNICACIÓN DEL CONSULTORIO · {{ (messages$ | async)?.length ?? 0 }} MENSAJES</span>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn-amber" type="button" (click)="startCreate()">
+          <span class="btn-plus" aria-hidden="true"></span>
+          NUEVO MENSAJE
+        </button>
+      </div>
+    </div>
+    <div class="page-toolbar">
+      <label class="search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="BUSCAR MENSAJE · ASUNTO / REMITENTE"
+          aria-label="Buscar mensaje"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </label>
+      <div class="filter">
+        <span class="filter-label">ESTADO</span>
+        <select
+          class="filter-select"
+          aria-label="Filtrar por estado"
+          (change)="onFilter($any($event.target).value)"
+        >
+          <option value="all">TODOS</option>
+          <option value="unread">NO LEÍDOS</option>
+          <option value="urgent">URGENTES</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <section class="directory" aria-label="Bandeja de mensajes">
+      <app-message-directory
+        [messages]="(messages$ | async) ?? []"
+        [selectedId]="selectedId"
+        (select)="onSelect($event)"
+      ></app-message-directory>
+    </section>
+
+    <aside class="detail" aria-label="Lectura de mensaje">
+      <app-message-panel
+        [message]="(selected$ | async) ?? null"
+        [creating]="creating"
+        (close)="onClosePanel()"
+        (cancel)="cancelCreate()"
+        (saved)="onSaved($event)"
+      ></app-message-panel>
+    </aside>
+  </div>
+</div>

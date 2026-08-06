@@ -1,0 +1,53 @@
+<form class="form" (ngSubmit)="onSubmit()" novalidate>
+  <div class="form-grid">
+    <label class="field">
+      <span class="field-label">PARA</span>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="to"
+        name="to"
+        placeholder="RECEPCIÓN / DRA. TORRES / PACIENTE"
+        autocomplete="off"
+      />
+    </label>
+
+    <label class="field">
+      <span class="field-label">CANAL</span>
+      <select class="field-select" [(ngModel)]="channel" name="channel" aria-label="Canal del mensaje">
+        <option *ngFor="let c of channels" [ngValue]="c.id">{{ c.label }}</option>
+      </select>
+    </label>
+
+    <label class="field field--full">
+      <span class="field-label">ASUNTO *</span>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="subject"
+        name="subject"
+        placeholder="REPROGRAMACIÓN · PAGO · CONSULTA CLÍNICA"
+        autocomplete="off"
+      />
+    </label>
+
+    <label class="field field--full">
+      <span class="field-label">MENSAJE</span>
+      <textarea
+        class="field-input field-textarea"
+        rows="6"
+        [(ngModel)]="body"
+        name="body"
+        placeholder="DETALLE DE LA COMUNICACIÓN"
+        autocomplete="off"
+      ></textarea>
+    </label>
+  </div>
+
+  <p class="form-error" *ngIf="error" role="alert">DESTINATARIO Y ASUNTO SON OBLIGATORIOS</p>
+
+  <div class="form-actions">
+    <button class="btn-amber" type="submit">ENVIAR MENSAJE</button>
+    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+  </div>
+</form>

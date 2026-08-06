@@ -1,0 +1,103 @@
+<div class="panel">
+  <!-- Creando / editando sala -->
+  <ng-container *ngIf="creating || editing">
+    <div class="panel-head">
+      <div class="panel-head-info">
+        <span class="panel-kicker">{{ creating ? 'NUEVO CONSULTORIO' : 'EDITAR SALA' }}</span>
+        <span class="panel-title">{{ creating ? 'REGISTRO DE SALA' : (consultorio?.code ?? '') }}</span>
+      </div>
+      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="closeForm()">
+        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <path d="M3 3l10 10"></path>
+          <path d="M13 3L3 13"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-scroll">
+      <app-consultorio-form
+        [consultorio]="editing ? consultorio : null"
+        (submit)="onSaved($event)"
+        (cancel)="creating ? cancel.emit() : cancelEdit()"
+      ></app-consultorio-form>
+    </div>
+  </ng-container>
+
+  <!-- Sin selección -->
+  <ng-container *ngIf="!creating && !editing && !consultorio">
+    <div class="panel-empty">
+      <span class="panel-empty-mark" aria-hidden="true"><span class="panel-empty-cell">+</span></span>
+      <span class="panel-empty-title">SELECCIONA UNA SALA</span>
+      <span class="panel-empty-hint">ABRE UNA FILA DEL MAPEO PARA VER SU FICHA</span>
+    </div>
+  </ng-container>
+
+  <!-- Sala seleccionada -->
+  <ng-container *ngIf="!creating && !editing && consultorio">
+    <div class="panel-head">
+      <div class="panel-head-info">
+        <span class="panel-kicker" [class.panel-kicker--warn]="consultorio.status === 'mantenimiento'">
+          {{ statusLabel(consultorio.status) }}
+        </span>
+        <span class="panel-title">{{ consultorio.name }}</span>
+      </div>
+      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="close.emit()">
+        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <path d="M3 3l10 10"></path>
+          <path d="M13 3L3 13"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="panel-meta">
+      <div class="meta-row">
+        <span class="meta-label">CÓDIGO</span>
+        <span class="meta-value">{{ consultorio.code }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">SILLÓN / UNIDAD</span>
+        <span class="meta-value">{{ consultorio.unit }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">ODONTÓLOGO</span>
+        <span class="meta-value">{{ consultorio.dentist }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">UBICACIÓN</span>
+        <span class="meta-value">{{ consultorio.location }}</span>
+      </div>
+    </div>
+
+    <div class="panel-scroll">
+      <div class="section">
+        <span class="section-label">EQUIPOS E INSTRUMENTAL</span>
+        <ul class="equip-list">
+          <li class="equip-item" *ngFor="let e of consultorio.equipment">
+            <span class="equip-lamp" aria-hidden="true"></span>
+            <span class="equip-name">{{ e }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <span class="section-label">ACTIVIDAD</span>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value">{{ consultorio.procedures }}</span>
+            <span class="stat-label">PROCEDIMIENTOS</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ consultorio.lastUse }}</span>
+            <span class="stat-label">ÚLTIMA ATENCIÓN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-actions">
+      <button class="btn-amber" type="button" (click)="startEdit()">EDITAR SALA</button>
+      <button class="btn-ghost" type="button" (click)="toggle.emit(consultorio!.id)">
+        {{ consultorio.status === 'mantenimiento' ? 'REACTIVAR' : 'A MANTENIMIENTO' }}
+      </button>
+    </div>
+  </ng-container>
+</div>

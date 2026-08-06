@@ -1,0 +1,45 @@
+<!--
+  DIRECCIÓN: TABLERO DE EMBARQUE — concourse split-flap aplicado a los ajustes
+  de la clínica. THESIS: la configuración se lee como la sala de control del
+  aeropuerto; cada sección es un módulo del panel de mando, y solo la lámpara
+  de la sección abierta enciende ámbar. OWN-WORLD: matte black flaps, letras
+  pintadas, acero cepillado, lámparas ámbar para la sección en servicio.
+  STORY: el administrador recorre los módulos del panel de mando, ajusta cada
+  parámetro y enciende la lámpara verde de "guardado". FIRST VIEWPORT: panel de
+  mando de secciones + formulario de la sección activa. FORM: split-flap
+  concourse board (challenger), mismo shell de TRATAMIENTOS/ODONTÓLOGOS.
+-->
+<div class="page configuracion">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-left">
+        <h2 class="page-title">CONFIGURACIÓN DE LA CLÍNICA</h2>
+        <span class="page-sub">PANEL DE MANDO · AJUSTES DEL SISTEMA</span>
+      </div>
+      <div class="page-head-actions">
+        <span class="saved-flash" *ngIf="(saved$ | async)" aria-live="polite">
+          <span class="saved-lamp" aria-hidden="true"></span>
+          CAMBIOS GUARDADOS
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <aside class="rail" aria-label="Secciones de configuración">
+      <app-configuracion-sections
+        [sections]="sections"
+        [active]="(activeSection$ | async) ?? 'clinica'"
+        (select)="onSection($event)"
+      ></app-configuracion-sections>
+    </aside>
+
+    <section class="panel-wrap" aria-label="Configuración de la sección activa">
+      <app-configuracion-panel
+        [settings]="(settings$ | async) ?? null"
+        [section]="(activeSection$ | async) ?? 'clinica'"
+        (save)="onSave($event)"
+      ></app-configuracion-panel>
+    </section>
+  </div>
+</div>
