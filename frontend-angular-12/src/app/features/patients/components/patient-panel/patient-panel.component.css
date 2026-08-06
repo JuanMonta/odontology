@@ -211,6 +211,43 @@
   color: var(--steel-500);
 }
 
+/* ============ Alerta de alergias ============ */
+.alert-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--flap-black-2);
+  border: 1px solid rgba(255, 176, 32, 0.35);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius-sm);
+}
+
+.alert-strip-lamp {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.45);
+  flex-shrink: 0;
+}
+
+.alert-strip-label {
+  font-family: var(--font-flap);
+  font-size: 0.64em;
+  letter-spacing: 0.2em;
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.alert-strip-value {
+  font-family: var(--font-ui);
+  font-size: 0.78em;
+  letter-spacing: 0.02em;
+  color: var(--flap-ink);
+  min-width: 0;
+}
+
 /* ============ Ficha ============ */
 .ficha-grid {
   display: flex;
@@ -338,7 +375,21 @@
 .hist-main {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   min-width: 0;
+}
+
+.hist-note {
+  margin-top: 8px;
+  padding: 8px 12px;
+  font-family: var(--font-ui);
+  font-size: 0.72em;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--steel-200);
+  background: var(--flap-black-2);
+  border-left: 2px solid var(--amber);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .hist-tx {

@@ -9,7 +9,7 @@ import {
 } from '../../../../core/models/patient.model';
 import { PatientsMockService } from '../../services/patients-mock.service';
 
-type Tab = 'ficha' | 'historial' | 'cuentas' | 'odonto';
+type Tab = 'odonto' | 'historial' | 'ficha' | 'cuentas';
 
 @Component({
   selector: 'app-patient-panel',
@@ -25,16 +25,16 @@ export class PatientPanelComponent implements OnChanges {
   @Output() saved = new EventEmitter<Patient>();
 
   detail$: Observable<PatientDetail> | null = null;
-  tab: Tab = 'ficha';
+  tab: Tab = 'odonto';
   editMode = false;
   abonoOpen = false;
   abonoAmount = 100;
 
   tabs: { id: Tab; label: string }[] = [
-    { id: 'ficha', label: 'FICHA' },
+    { id: 'odonto', label: 'ODONTOGRAMA' },
     { id: 'historial', label: 'HISTORIAL' },
-    { id: 'cuentas', label: 'CUENTAS' },
-    { id: 'odonto', label: 'ODONTOGRAMA' }
+    { id: 'ficha', label: 'FICHA' },
+    { id: 'cuentas', label: 'CUENTAS' }
   ];
 
   constructor(private service: PatientsMockService) {}
@@ -62,6 +62,10 @@ export class PatientPanelComponent implements OnChanges {
       .join('');
   }
 
+  hasAllergies(p: Patient): boolean {
+    return p.allergies.toUpperCase() !== 'NINGUNA';
+  }
+
   balance(entries: AccountEntry[]): number {
     const charges = entries.filter(e => e.type === 'charge').reduce((s, e) => s + e.amount, 0);
     const payments = entries.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0);
@@ -70,7 +74,7 @@ export class PatientPanelComponent implements OnChanges {
 
   fmtMoney(n: number): string {
     const abs = Math.abs(n).toLocaleString('en-US');
-    return n < 0 ? `-S/ ${abs}` : `S/ ${abs}`;
+    return n < 0 ? `-$ ${abs}` : `$ ${abs}`;
   }
 
   onToothChange(teeth: Tooth[]): void {

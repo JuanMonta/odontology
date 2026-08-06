@@ -23,7 +23,7 @@
     <div class="panel-empty">
       <span class="panel-empty-mark" aria-hidden="true"><span class="panel-empty-cell">+</span></span>
       <span class="panel-empty-title">SELECCIONA UN PACIENTE</span>
-      <span class="panel-empty-hint">ABRE UNA FILA DEL DIRECTORIO PARA VER SU FICHA</span>
+      <span class="panel-empty-hint">ABRE UNA FILA DEL DIRECTORIO PARA VER SU EXPEDIENTE</span>
     </div>
   </ng-container>
 
@@ -59,8 +59,45 @@
 
     <div class="panel-scroll">
       <ng-container *ngIf="detail$ | async as detail">
+        <!-- ODONTOGRAMA (pestaña principal) -->
+        <div class="tab-pane" *ngIf="tab === 'odonto'">
+          <app-odontogram [teeth]="detail.teeth" (change)="onToothChange($event)"></app-odontogram>
+        </div>
+
+        <!-- HISTORIAL clínico con notas -->
+        <div class="tab-pane" *ngIf="tab === 'historial'">
+          <ng-container *ngIf="detail.appointments.length; else noHistory">
+            <div
+              *ngFor="let h of detail.appointments"
+              class="hist-row"
+            >
+              <span class="hist-date">
+                <span class="hist-date-day">{{ h.date }}</span>
+                <span class="hist-date-time">{{ h.time }}</span>
+              </span>
+              <span class="hist-main">
+                <span class="hist-tx">{{ h.treatment }}</span>
+                <span class="hist-dentist">{{ h.dentist }}</span>
+                <span class="hist-note" *ngIf="h.note">{{ h.note }}</span>
+              </span>
+              <span class="hist-status" [class]="statusClass(h.status)">
+                <span class="lamp" aria-hidden="true"></span>
+                {{ statusLabel(h.status) }}
+              </span>
+            </div>
+          </ng-container>
+          <ng-template #noHistory>
+            <div class="pane-empty">SIN CITAS REGISTRADAS</div>
+          </ng-template>
+        </div>
+
         <!-- FICHA -->
         <div class="tab-pane" *ngIf="tab === 'ficha'">
+          <div class="alert-strip" *ngIf="hasAllergies(patient)">
+            <span class="alert-strip-lamp" aria-hidden="true"></span>
+            <span class="alert-strip-label">ALERGIA REGISTRADA</span>
+            <span class="alert-strip-value">{{ patient.allergies }}</span>
+          </div>
           <ng-container *ngIf="!editMode; else editForm">
             <div class="ficha-grid">
               <div class="ficha-row">
@@ -85,7 +122,7 @@
               </div>
               <div class="ficha-row">
                 <span class="ficha-label">ALERGIAS</span>
-                <span class="ficha-value" [class.is-warn]="patient.allergies !== 'NINGUNA'">{{ patient.allergies }}</span>
+                <span class="ficha-value" [class.is-warn]="hasAllergies(patient)">{{ patient.allergies }}</span>
               </div>
               <div class="ficha-row">
                 <span class="ficha-label">TRATAMIENTO</span>
@@ -102,10 +139,6 @@
                   {{ patient.status === 'active' ? 'ACTIVO' : 'INACTIVO' }}
                 </span>
               </div>
-              <div class="ficha-row">
-                <span class="ficha-label">DEUDA</span>
-                <span class="ficha-value" [class.is-due]="balance(detail.account) > 0">{{ fmtMoney(balance(detail.account)) }}</span>
-              </div>
             </div>
             <button class="btn-ghost-wide" type="button" (click)="editMode = true">
               <svg class="icon-edit" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true">
@@ -116,32 +149,6 @@
           </ng-container>
           <ng-template #editForm>
             <app-patient-form [patient]="patient" (submit)="onEdit($event)" (cancel)="editMode = false"></app-patient-form>
-          </ng-template>
-        </div>
-
-        <!-- HISTORIAL -->
-        <div class="tab-pane" *ngIf="tab === 'historial'">
-          <ng-container *ngIf="detail.appointments.length; else noHistory">
-            <div
-              *ngFor="let h of detail.appointments"
-              class="hist-row"
-            >
-              <span class="hist-date">
-                <span class="hist-date-day">{{ h.date }}</span>
-                <span class="hist-date-time">{{ h.time }}</span>
-              </span>
-              <span class="hist-main">
-                <span class="hist-tx">{{ h.treatment }}</span>
-                <span class="hist-dentist">{{ h.dentist }}</span>
-              </span>
-              <span class="hist-status" [class]="statusClass(h.status)">
-                <span class="lamp" aria-hidden="true"></span>
-                {{ statusLabel(h.status) }}
-              </span>
-            </div>
-          </ng-container>
-          <ng-template #noHistory>
-            <div class="pane-empty">SIN CITAS REGISTRADAS</div>
           </ng-template>
         </div>
 
@@ -162,7 +169,7 @@
 
           <div class="abono" *ngIf="abonoOpen">
             <label class="abono-field">
-              <span class="abono-label">MONTO (S/)</span>
+              <span class="abono-label">MONTO (USD)</span>
               <input
                 class="abono-input"
                 type="number"
@@ -198,11 +205,6 @@
               <div class="pane-empty">SIN MOVIMIENTOS</div>
             </ng-template>
           </div>
-        </div>
-
-        <!-- ODONTOGRAMA -->
-        <div class="tab-pane" *ngIf="tab === 'odonto'">
-          <app-odontogram [teeth]="detail.teeth" (change)="onToothChange($event)"></app-odontogram>
         </div>
       </ng-container>
     </div>

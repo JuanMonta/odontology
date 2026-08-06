@@ -13,7 +13,7 @@ export class PatientDirectoryComponent {
   @Output() select = new EventEmitter<Patient>();
 
   fmtMoney(n: number): string {
-    return n > 0 ? `S/ ${n.toLocaleString('en-US')}` : 'AL DÍA';
+    return n > 0 ? `$ ${n.toLocaleString('en-US')}` : 'AL DÍA';
   }
 
   trackById(_: number, p: Patient): string {

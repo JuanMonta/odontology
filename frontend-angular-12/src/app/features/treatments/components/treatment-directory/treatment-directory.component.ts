@@ -13,6 +13,6 @@ export class TreatmentDirectoryComponent {
   @Output() select = new EventEmitter<Treatment>();
 
   money(price: number): string {
-    return `S/ ${price.toLocaleString('es-PE')}`;
+    return `$ ${price.toLocaleString('en-US')}`;
   }
 }

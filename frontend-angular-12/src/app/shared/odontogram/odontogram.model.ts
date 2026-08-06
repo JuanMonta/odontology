@@ -1,4 +1,4 @@
-import { ToothCondition, ToothFaceCondition, ToothFaceName } from '../../../core/models/patient.model';
+import { ToothCondition, ToothFaceCondition, ToothFaceName } from '../../core/models/patient.model';
 
 export interface ToothSymbolMeta {
   label: string;
