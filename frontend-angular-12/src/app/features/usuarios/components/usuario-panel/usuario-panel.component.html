@@ -1,0 +1,93 @@
+<div class="panel">
+  <!-- Creando / editando cuenta -->
+  <ng-container *ngIf="creating || editing">
+    <div class="panel-head">
+      <div class="panel-head-info">
+        <span class="panel-kicker">{{ creating ? 'NUEVO USUARIO' : 'EDITAR CUENTA' }}</span>
+        <span class="panel-title">{{ creating ? 'REGISTRO DE CUENTA' : (usuario?.code ?? '') }}</span>
+      </div>
+      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="closeForm()">
+        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <path d="M3 3l10 10"></path>
+          <path d="M13 3L3 13"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-scroll">
+      <app-usuario-form
+        [usuario]="editing ? usuario : null"
+        (submit)="onSaved($event)"
+        (cancel)="creating ? cancel.emit() : cancelEdit()"
+      ></app-usuario-form>
+    </div>
+  </ng-container>
+
+  <!-- Sin selección -->
+  <ng-container *ngIf="!creating && !editing && !usuario">
+    <div class="panel-empty">
+      <span class="panel-empty-mark" aria-hidden="true"><span class="panel-empty-cell">+</span></span>
+      <span class="panel-empty-title">SELECCIONA UNA CUENTA</span>
+      <span class="panel-empty-hint">ABRE UNA FILA DEL CONTROL PARA VER SU FICHA</span>
+    </div>
+  </ng-container>
+
+  <!-- Cuenta seleccionada -->
+  <ng-container *ngIf="!creating && !editing && usuario">
+    <div class="panel-head">
+      <div class="panel-head-info">
+        <span class="panel-kicker" [class.panel-kicker--warn]="usuario.status !== 'activo'">
+          {{ statusLabel(usuario.status) }}
+        </span>
+        <span class="panel-title">{{ usuario.name }}</span>
+      </div>
+      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="close.emit()">
+        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <path d="M3 3l10 10"></path>
+          <path d="M13 3L3 13"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="panel-meta">
+      <div class="meta-row">
+        <span class="meta-label">CÓDIGO</span>
+        <span class="meta-value">{{ usuario.code }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">USUARIO</span>
+        <span class="meta-value">@{{ usuario.username }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">ROL</span>
+        <span class="meta-value">{{ usuario.role }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">TELÉFONO</span>
+        <span class="meta-value">{{ usuario.phone }}</span>
+      </div>
+    </div>
+
+    <div class="panel-scroll">
+      <div class="section">
+        <span class="section-label">ACCESO</span>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value">{{ usuario.status === 'activo' ? 'EN LÍNEA' : 'SIN ACCESO' }}</span>
+            <span class="stat-label">ESTADO ACTUAL</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value stat-value--sm">{{ usuario.lastAccess }}</span>
+            <span class="stat-label">ÚLTIMO ACCESO</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-actions">
+      <button class="btn-amber" type="button" (click)="startEdit()">EDITAR CUENTA</button>
+      <button class="btn-ghost" type="button" (click)="toggle.emit(usuario!.id)">
+        {{ usuario.status === 'activo' ? 'SUSPENDER' : 'REACTIVAR' }}
+      </button>
+    </div>
+  </ng-container>
+</div>

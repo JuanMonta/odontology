@@ -1,0 +1,19 @@
+<div class="rail-head">
+  <span class="rail-kicker">MÓDULOS</span>
+</div>
+
+<div class="rail-list">
+  <button
+    *ngFor="let s of sections"
+    class="rail-row"
+    [class.is-active]="s.id === active"
+    type="button"
+    (click)="select.emit(s.id)"
+  >
+    <span class="rail-lamp" aria-hidden="true"></span>
+    <span class="rail-row-info">
+      <span class="rail-label">{{ s.label }}</span>
+      <span class="rail-sub">{{ s.sub }}</span>
+    </span>
+  </button>
+</div>

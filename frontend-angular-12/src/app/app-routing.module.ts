@@ -23,6 +23,31 @@ const routes: Routes = [
         path: 'tratamientos',
         loadChildren: () =>
           import('./features/treatments/treatments.module').then(m => m.TreatmentsModule)
+      },
+      {
+        path: 'mensajes',
+        loadChildren: () =>
+          import('./features/messages/messages.module').then(m => m.MessagesModule)
+      },
+      {
+        path: 'consultorios',
+        loadChildren: () =>
+          import('./features/consultorios/consultorios.module').then(m => m.ConsultoriosModule)
+      },
+      {
+        path: 'odontologos',
+        loadChildren: () =>
+          import('./features/odontologos/odontologos.module').then(m => m.OdontologosModule)
+      },
+      {
+        path: 'usuarios',
+        loadChildren: () =>
+          import('./features/usuarios/usuarios.module').then(m => m.UsuariosModule)
+      },
+      {
+        path: 'configuracion',
+        loadChildren: () =>
+          import('./features/configuracion/configuracion.module').then(m => m.ConfiguracionModule)
       }
     ]
   },

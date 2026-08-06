@@ -1,0 +1,41 @@
+<div class="dir">
+  <div class="dir-head">
+    <span class="col col-code">CÓDIGO</span>
+    <span class="col col-name">PROFESIONAL</span>
+    <span class="col col-specialty">ESPECIALIDAD</span>
+    <span class="col col-consultorio">CONSULTORIO</span>
+    <span class="col col-status">ESTADO</span>
+  </div>
+
+  <div class="dir-list" *ngIf="odontologos.length; else empty">
+    <button
+      *ngFor="let o of odontologos"
+      class="dir-row"
+      [class.is-selected]="o.id === selectedId"
+      [class.is-inactive]="o.status === 'inactivo'"
+      [class.is-away]="o.status === 'ausente'"
+      type="button"
+      (click)="select.emit(o)"
+    >
+      <span class="col col-code">{{ o.code }}</span>
+      <span class="col col-name">
+        {{ o.name }}
+        <span class="col-name-license">{{ o.license }}</span>
+      </span>
+      <span class="col col-specialty">{{ o.specialty }}</span>
+      <span class="col col-consultorio">{{ o.consultorio }}</span>
+      <span class="col col-status">
+        <span class="lamp" [class.lamp--live]="o.status === 'activo'" [class.lamp--away]="o.status === 'ausente'" aria-hidden="true"></span>
+        <span class="status-text" [class.status-text--away]="o.status === 'ausente'">{{ o.status }}</span>
+      </span>
+    </button>
+  </div>
+
+  <ng-template #empty>
+    <div class="dir-empty">
+      <span class="dir-empty-lamp" aria-hidden="true"></span>
+      <p>SIN ODONTÓLOGOS</p>
+      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
+    </div>
+  </ng-template>
+</div>

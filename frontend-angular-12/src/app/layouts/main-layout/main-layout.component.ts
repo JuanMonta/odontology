@@ -48,16 +48,16 @@ export class MainLayoutComponent {
       items: [
         { label: 'FACTURACIÓN', active: false },
         { label: 'REPORTES', active: false },
-        { label: 'CONSULTORIOS', active: false },
-        { label: 'MENSAJES', active: false, badge: 3 }
+        { label: 'CONSULTORIOS', route: '/consultorios', title: 'MAPEO DE CONSULTORIOS', active: false },
+        { label: 'MENSAJES', route: '/mensajes', title: 'BANDEJA DE MENSAJES', active: false, badge: 3 }
       ]
     },
     {
       label: 'SISTEMA',
       items: [
-        { label: 'ODONTÓLOGOS', active: false },
-        { label: 'USUARIOS', active: false },
-        { label: 'CONFIGURACIÓN', active: false }
+        { label: 'ODONTÓLOGOS', route: '/odontologos', title: 'ROSTER DE ODONTÓLOGOS', active: false },
+        { label: 'USUARIOS', route: '/usuarios', title: 'CONTROL DE USUARIOS', active: false },
+        { label: 'CONFIGURACIÓN', route: '/configuracion', title: 'CONFIGURACIÓN DE LA CLÍNICA', active: false }
       ]
     }
   ];

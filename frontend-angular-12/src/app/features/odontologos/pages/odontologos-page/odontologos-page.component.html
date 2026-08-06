@@ -1,0 +1,74 @@
+<!--
+  DIRECCIÓN: TABLERO DE EMBARQUE — concourse split-flap aplicado al roster de
+  profesionales del consultorio. THESIS: los odontólogos se leen como las
+  tripulaciones de un aeropuerto; cada profesional es una tripulación con estado
+  en vivo (activo / ausente / inactivo), y solo la lámpara de quien está en
+  servicio enciende ámbar. OWN-WORLD: matte black flaps, letras pintadas, acero
+  cepillado, lámparas ámbar para lo que está en servicio.
+  STORY: el administrador escanea el roster, detecta ausencias al instante y
+  abre la ficha de cada profesional. FIRST VIEWPORT: tablero de profesionales +
+  panel de detalle. FORM: split-flap concourse board (challenger), mismo shell
+  de CONSULTORIOS/TRATAMIENTOS.
+-->
+<div class="page odontologos">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-left">
+        <h2 class="page-title">ROSTER DE ODONTÓLOGOS</h2>
+        <span class="page-sub">PERSONAL CLÍNICO · ESPECIALIDADES Y ASIGNACIONES · {{ (odontologos$ | async)?.length ?? 0 }} PROFESIONALES</span>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn-amber" type="button" (click)="startCreate()">
+          <span class="btn-plus" aria-hidden="true"></span>
+          NUEVO ODONTÓLOGO
+        </button>
+      </div>
+    </div>
+    <div class="page-toolbar">
+      <label class="search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="BUSCAR PROFESIONAL · NOMBRE / CÓDIGO / ESPECIALIDAD"
+          aria-label="Buscar odontólogo"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </label>
+      <div class="filter">
+        <span class="filter-label">ESTADO</span>
+        <select
+          class="filter-select"
+          aria-label="Filtrar por estado"
+          (change)="onFilter($any($event.target).value)"
+        >
+          <option value="all">TODOS</option>
+          <option value="activo">ACTIVOS</option>
+          <option value="ausente">AUSENTES</option>
+          <option value="inactivo">INACTIVOS</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <section class="directory" aria-label="Roster de odontólogos">
+      <app-odontologo-directory
+        [odontologos]="(odontologos$ | async) ?? []"
+        [selectedId]="selectedId"
+        (select)="onSelect($event)"
+      ></app-odontologo-directory>
+    </section>
+
+    <aside class="detail" aria-label="Ficha de odontólogo">
+      <app-odontologo-panel
+        [odontologo]="(selected$ | async) ?? null"
+        [creating]="creating"
+        (close)="onClosePanel()"
+        (cancel)="cancelCreate()"
+        (saved)="onSaved($event)"
+        (toggle)="onToggleStatus($event)"
+      ></app-odontologo-panel>
+    </aside>
+  </div>
+</div>

@@ -1,0 +1,74 @@
+<!--
+  DIRECCIÓN: TABLERO DE EMBARQUE — concourse split-flap aplicado a las salas
+  del consultorio. THESIS: los consultorios se leen como las puertas de un
+  aeropuerto; cada sala es una puerta con estado en vivo (operativo /
+  mantenimiento / inactivo), y solo la lámpara de lo que está operativo
+  enciende ámbar. OWN-WORLD: matte black flaps, letras pintadas, acero
+  cepillado, lámparas ámbar para lo que está en servicio.
+  STORY: el administrador escanea las salas, detecta mantenimiento al
+  instante y abre la ficha de equipos. FIRST VIEWPORT: tablero de salas +
+  panel de detalle. FORM: split-flap concourse board (challenger), mismo
+  shell de TRATAMIENTOS.
+-->
+<div class="page consultorios">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-left">
+        <h2 class="page-title">MAPEO DE CONSULTORIOS</h2>
+        <span class="page-sub">INFRAESTRUCTURA · SALAS Y EQUIPOS · {{ (consultorios$ | async)?.length ?? 0 }} UNIDADES</span>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn-amber" type="button" (click)="startCreate()">
+          <span class="btn-plus" aria-hidden="true"></span>
+          NUEVO CONSULTORIO
+        </button>
+      </div>
+    </div>
+    <div class="page-toolbar">
+      <label class="search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="BUSCAR SALA · NOMBRE / CÓDIGO / ODONTÓLOGO"
+          aria-label="Buscar consultorio"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </label>
+      <div class="filter">
+        <span class="filter-label">ESTADO</span>
+        <select
+          class="filter-select"
+          aria-label="Filtrar por estado"
+          (change)="onFilter($any($event.target).value)"
+        >
+          <option value="all">TODAS</option>
+          <option value="operativo">OPERATIVAS</option>
+          <option value="mantenimiento">EN MANTENIMIENTO</option>
+          <option value="inactivo">INACTIVAS</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <section class="directory" aria-label="Mapeo de consultorios">
+      <app-consultorio-directory
+        [consultorios]="(consultorios$ | async) ?? []"
+        [selectedId]="selectedId"
+        (select)="onSelect($event)"
+      ></app-consultorio-directory>
+    </section>
+
+    <aside class="detail" aria-label="Ficha de consultorio">
+      <app-consultorio-panel
+        [consultorio]="(selected$ | async) ?? null"
+        [creating]="creating"
+        (close)="onClosePanel()"
+        (cancel)="cancelCreate()"
+        (saved)="onSaved($event)"
+        (toggle)="onToggleStatus($event)"
+      ></app-consultorio-panel>
+    </aside>
+  </div>
+</div>

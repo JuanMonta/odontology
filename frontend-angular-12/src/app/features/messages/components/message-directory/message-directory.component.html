@@ -1,0 +1,37 @@
+<div class="dir">
+  <div class="dir-head">
+    <span class="col col-flag">ESTADO</span>
+    <span class="col col-subject">ASUNTO</span>
+    <span class="col col-from">REMITENTE</span>
+    <span class="col col-date">FECHA</span>
+    <span class="col col-time">HORA</span>
+  </div>
+
+  <div class="dir-list" *ngIf="messages.length; else empty">
+    <button
+      *ngFor="let m of messages"
+      class="dir-row"
+      [class.is-selected]="m.id === selectedId"
+      [class.is-unread]="m.status === 'unread'"
+      [class.is-urgent]="m.urgent"
+      type="button"
+      (click)="select.emit(m)"
+    >
+      <span class="col col-flag">
+        <span class="lamp" [class.lamp--live]="m.status === 'unread'" [class.lamp--urgent]="m.urgent" aria-hidden="true"></span>
+      </span>
+      <span class="col col-subject">{{ m.subject }}</span>
+      <span class="col col-from">{{ m.from }}</span>
+      <span class="col col-date">{{ m.date }}</span>
+      <span class="col col-time">{{ m.time }}</span>
+    </button>
+  </div>
+
+  <ng-template #empty>
+    <div class="dir-empty">
+      <span class="dir-empty-lamp" aria-hidden="true"></span>
+      <p>SIN MENSAJES</p>
+      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,38 @@
+<div class="dir">
+  <div class="dir-head">
+    <span class="col col-code">CÓDIGO</span>
+    <span class="col col-user">USUARIO</span>
+    <span class="col col-name">NOMBRE</span>
+    <span class="col col-role">ROL</span>
+    <span class="col col-status">ESTADO</span>
+  </div>
+
+  <div class="dir-list" *ngIf="usuarios.length; else empty">
+    <button
+      *ngFor="let u of usuarios"
+      class="dir-row"
+      [class.is-selected]="u.id === selectedId"
+      [class.is-inactive]="u.status === 'inactivo'"
+      [class.is-suspended]="u.status === 'suspendido'"
+      type="button"
+      (click)="select.emit(u)"
+    >
+      <span class="col col-code">{{ u.code }}</span>
+      <span class="col col-user">{{ u.username }}</span>
+      <span class="col col-name">{{ u.name }}</span>
+      <span class="col col-role">{{ u.role }}</span>
+      <span class="col col-status">
+        <span class="lamp" [class.lamp--live]="u.status === 'activo'" [class.lamp--warn]="u.status === 'suspendido'" aria-hidden="true"></span>
+        <span class="status-text" [class.status-text--warn]="u.status === 'suspendido'">{{ u.status }}</span>
+      </span>
+    </button>
+  </div>
+
+  <ng-template #empty>
+    <div class="dir-empty">
+      <span class="dir-empty-lamp" aria-hidden="true"></span>
+      <p>SIN USUARIOS</p>
+      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
+    </div>
+  </ng-template>
+</div>

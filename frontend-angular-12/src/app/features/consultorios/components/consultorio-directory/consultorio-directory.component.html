@@ -1,0 +1,40 @@
+<div class="dir">
+  <div class="dir-head">
+    <span class="col col-code">CÓDIGO</span>
+    <span class="col col-name">SALA</span>
+    <span class="col col-dentist">ODONTÓLOGO</span>
+    <span class="col col-location">UBICACIÓN</span>
+    <span class="col col-status">ESTADO</span>
+  </div>
+
+  <div class="dir-list" *ngIf="consultorios.length; else empty">
+    <button
+      *ngFor="let c of consultorios"
+      class="dir-row"
+      [class.is-selected]="c.id === selectedId"
+      [class.is-inactive]="c.status === 'inactivo'"
+      type="button"
+      (click)="select.emit(c)"
+    >
+      <span class="col col-code">{{ c.code }}</span>
+      <span class="col col-name">
+        {{ c.name }}
+        <span class="col-name-unit">{{ c.unit }}</span>
+      </span>
+      <span class="col col-dentist">{{ c.dentist }}</span>
+      <span class="col col-location">{{ c.location }}</span>
+      <span class="col col-status">
+        <span class="lamp" [class.lamp--live]="c.status === 'operativo'" [class.lamp--warn]="c.status === 'mantenimiento'" aria-hidden="true"></span>
+        <span class="status-text" [class.status-text--warn]="c.status === 'mantenimiento'">{{ c.status }}</span>
+      </span>
+    </button>
+  </div>
+
+  <ng-template #empty>
+    <div class="dir-empty">
+      <span class="dir-empty-lamp" aria-hidden="true"></span>
+      <p>SIN CONSULTORIOS</p>
+      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
+    </div>
+  </ng-template>
+</div>

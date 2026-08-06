@@ -1,13 +1,17 @@
 # ---------------- IA ------------------
+/.agents
 /.impeccable
 /.opencode
 /frontend-angular-12/.impeccable/
 frontend-angular-12/DESIGN.md
+skills-lock.json
 PRODUCT.md
 
 # ---------- Frontend Angular ----------
 /frontend-angular-12/node_modules/
 /frontend-angular-12/dist/
+/frontend-angular-12/tests/
+/frontend-angular-12/playwright.config.ts
 /frontend-angular-12/tmp/
 /frontend-angular-12/.angular/
 /frontend-angular-12/coverage/

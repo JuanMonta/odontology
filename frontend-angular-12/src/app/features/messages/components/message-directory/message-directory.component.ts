@@ -1,0 +1,19 @@
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ClinicMessage } from '../../../../core/models/message.model';
+import { MESSAGE_CHANNELS } from '../../services/messages-mock.service';
+
+@Component({
+  selector: 'app-message-directory',
+  templateUrl: './message-directory.component.html',
+  styleUrls: ['./message-directory.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class MessageDirectoryComponent {
+  @Input() messages: ClinicMessage[] = [];
+  @Input() selectedId: string | null = null;
+  @Output() select = new EventEmitter<ClinicMessage>();
+
+  channelLabel(id: string): string {
+    return MESSAGE_CHANNELS.find(c => c.id === id)?.label ?? id;
+  }
+}

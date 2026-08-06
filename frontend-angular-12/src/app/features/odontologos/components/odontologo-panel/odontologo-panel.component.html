@@ -1,0 +1,97 @@
+<div class="panel">
+  <!-- Creando / editando profesional -->
+  <ng-container *ngIf="creating || editing">
+    <div class="panel-head">
+      <div class="panel-head-info">
+        <span class="panel-kicker">{{ creating ? 'NUEVO ODONTÓLOGO' : 'EDITAR PROFESIONAL' }}</span>
+        <span class="panel-title">{{ creating ? 'REGISTRO DE PROFESIONAL' : (odontologo?.code ?? '') }}</span>
+      </div>
+      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="closeForm()">
+        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <path d="M3 3l10 10"></path>
+          <path d="M13 3L3 13"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-scroll">
+      <app-odontologo-form
+        [odontologo]="editing ? odontologo : null"
+        (submit)="onSaved($event)"
+        (cancel)="creating ? cancel.emit() : cancelEdit()"
+      ></app-odontologo-form>
+    </div>
+  </ng-container>
+
+  <!-- Sin selección -->
+  <ng-container *ngIf="!creating && !editing && !odontologo">
+    <div class="panel-empty">
+      <span class="panel-empty-mark" aria-hidden="true"><span class="panel-empty-cell">+</span></span>
+      <span class="panel-empty-title">SELECCIONA UN PROFESIONAL</span>
+      <span class="panel-empty-hint">ABRE UNA FILA DEL ROSTER PARA VER SU FICHA</span>
+    </div>
+  </ng-container>
+
+  <!-- Profesional seleccionado -->
+  <ng-container *ngIf="!creating && !editing && odontologo">
+    <div class="panel-head">
+      <div class="panel-head-info">
+        <span class="panel-kicker" [class.panel-kicker--away]="odontologo.status !== 'activo'">
+          {{ statusLabel(odontologo.status) }}
+        </span>
+        <span class="panel-title">{{ odontologo.name }}</span>
+      </div>
+      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="close.emit()">
+        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <path d="M3 3l10 10"></path>
+          <path d="M13 3L3 13"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="panel-meta">
+      <div class="meta-row">
+        <span class="meta-label">CÓDIGO</span>
+        <span class="meta-value">{{ odontologo.code }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">LICENCIA</span>
+        <span class="meta-value">{{ odontologo.license }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">ESPECIALIDAD</span>
+        <span class="meta-value">{{ odontologo.specialty }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">CONSULTORIO</span>
+        <span class="meta-value">{{ odontologo.consultorio }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">TURNO</span>
+        <span class="meta-value">{{ odontologo.turno }}</span>
+      </div>
+    </div>
+
+    <div class="panel-scroll">
+      <div class="section">
+        <span class="section-label">ACTIVIDAD</span>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value">{{ odontologo.procedures }}</span>
+            <span class="stat-label">PROCEDIMIENTOS</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ odontologo.experience }}</span>
+            <span class="stat-label">AÑOS DE EJERCICIO</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-actions">
+      <button class="btn-amber" type="button" (click)="startEdit()">EDITAR PROFESIONAL</button>
+      <button class="btn-ghost" type="button" (click)="toggle.emit(odontologo!.id)">
+        {{ odontologo.status === 'ausente' || odontologo.status === 'inactivo' ? 'MARCAR ACTIVO' : 'MARCAR AUSENTE' }}
+      </button>
+    </div>
+  </ng-container>
+</div>
