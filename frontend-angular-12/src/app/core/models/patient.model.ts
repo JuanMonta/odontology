@@ -36,6 +36,7 @@ export interface PatientAppointment {
   treatment: string;
   dentist: string;
   status: 'done' | 'cancelled' | 'scheduled' | 'no-show';
+  note?: string;         // nota clínica de la sesión (expediente)
 }
 
 export interface AccountEntry {

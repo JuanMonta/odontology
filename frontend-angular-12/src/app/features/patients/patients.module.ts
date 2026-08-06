@@ -1,25 +1,27 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 import { PatientsRoutingModule } from './patients-routing.module';
+import { OdontogramModule } from '../../shared/odontogram/odontogram.module';
+import { PatientFormModule } from '../../shared/patient-form/patient-form.module';
 import { PatientsPageComponent } from './pages/patients-page/patients-page.component';
 import { PatientDirectoryComponent } from './components/patient-directory/patient-directory.component';
 import { PatientPanelComponent } from './components/patient-panel/patient-panel.component';
-import { PatientFormComponent } from './components/patient-form/patient-form.component';
-import { OdontogramComponent } from './components/odontogram/odontogram.component';
-import { OdontogramIconsService } from './components/odontogram/odontogram-icons.service';
 
 @NgModule({
   declarations: [
     PatientsPageComponent,
     PatientDirectoryComponent,
-    PatientPanelComponent,
-    PatientFormComponent,
-    OdontogramComponent
+    PatientPanelComponent
   ],
-  imports: [CommonModule, FormsModule, HttpClientModule, PatientsRoutingModule],
-  providers: [OdontogramIconsService],
+  imports: [
+    CommonModule,
+    FormsModule,
+    PatientsRoutingModule,
+    OdontogramModule,
+    PatientFormModule
+  ],
+  providers: [],
   exports: [PatientsPageComponent]
 })
 export class PatientsModule { }

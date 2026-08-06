@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Patient, PatientDraft, PatientStatus } from '../../../../core/models/patient.model';
+import { Patient, PatientDraft, PatientStatus } from '../../core/models/patient.model';
 
 @Component({
   selector: 'app-patient-form',

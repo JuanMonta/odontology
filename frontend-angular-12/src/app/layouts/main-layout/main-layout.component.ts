@@ -40,8 +40,7 @@ export class MainLayoutComponent {
       items: [
         { label: 'AGENDA', route: '/', title: 'AGENDA DEL DÍA', action: 'NUEVA CITA', active: true },
         { label: 'PACIENTES', route: '/pacientes', title: 'PACIENTES', active: false },
-        { label: 'HISTORIAS', active: false },
-        { label: 'TRATAMIENTOS', route: '/tratamientos', title: 'TRATAMIENTOS', action: 'NUEVO TRATAMIENTO', active: false }
+        { label: 'TRATAMIENTOS', route: '/tratamientos', title: 'TRATAMIENTOS', active: false }
       ]
     },
     {

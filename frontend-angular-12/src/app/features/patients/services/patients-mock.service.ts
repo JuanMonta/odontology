@@ -11,7 +11,7 @@ import {
   Tooth,
   ToothCondition
 } from '../../../core/models/patient.model';
-import { TOOTH_NUMBERS } from '../models/odontogram.model';
+import { TOOTH_NUMBERS } from '../../../shared/odontogram/odontogram.model';
 
 /**
  * FUENTE DE DATOS SINTÉTICA — reemplazar por el Facade que consulte el
@@ -149,27 +149,27 @@ export class PatientsMockService {
   private buildAppointments(): Record<string, PatientAppointment[]> {
     return {
       'HC-0001': [
-        { id: 'h1', date: '28 JUL 2026', time: '09:00', treatment: 'ORTODONCIA', dentist: 'DR. RIVERA', status: 'done' },
-        { id: 'h2', date: '21 JUL 2026', time: '11:00', treatment: 'ORTODONCIA', dentist: 'DR. RIVERA', status: 'done' },
-        { id: 'h3', date: '14 JUL 2026', time: '09:00', treatment: 'ORTODONCIA', dentist: 'DR. RIVERA', status: 'done' }
+        { id: 'h1', date: '28 JUL 2026', time: '09:00', treatment: 'ORTODONCIA', dentist: 'DR. RIVERA', status: 'done', note: 'AJUSTE DE ARCADA SUPERIOR. CAMBIO DE LIGADURAS EN 11-13. OCLUSIÓN EN CONTROL.' },
+        { id: 'h2', date: '21 JUL 2026', time: '11:00', treatment: 'ORTODONCIA', dentist: 'DR. RIVERA', status: 'done', note: 'REACTIVACIÓN DE ARCO NITI .016. TOLERANCIA FAVORABLE, SIN DOLOR.' },
+        { id: 'h3', date: '14 JUL 2026', time: '09:00', treatment: 'ORTODONCIA', dentist: 'DR. RIVERA', status: 'done', note: 'INICIO DE TRATAMIENTO. COLOCACIÓN DE BRACKETS + ARCO DE NIVELACIÓN.' }
       ],
       'HC-0004': [
-        { id: 'h4', date: '25 JUL 2026', time: '10:00', treatment: 'CORONA', dentist: 'DRA. TORRES', status: 'done' },
-        { id: 'h5', date: '11 JUL 2026', time: '12:00', treatment: 'CORONA', dentist: 'DRA. TORRES', status: 'done' },
-        { id: 'h6', date: '05 AGO 2026', time: '09:30', treatment: 'CORONA', dentist: 'DRA. TORRES', status: 'scheduled' }
+        { id: 'h4', date: '25 JUL 2026', time: '10:00', treatment: 'CORONA', dentist: 'DRA. TORRES', status: 'done', note: 'CEMENTADO DEFINITIVO DE CORONA E-MAX EN 46. AJUSTE OCLUSAL VERIFICADO.' },
+        { id: 'h5', date: '11 JUL 2026', time: '12:00', treatment: 'CORONA', dentist: 'DRA. TORRES', status: 'done', note: 'PRUEBA DE CORONA PROVISIONAL. MARGEN ADAPTADO SIN EXPOSICIÓN.' },
+        { id: 'h6', date: '05 AGO 2026', time: '09:30', treatment: 'CORONA', dentist: 'DRA. TORRES', status: 'scheduled', note: 'CONTROL DE CORONA DEFINITIVA. EVALUAR OCLUSIÓN.' }
       ],
       'HC-0002': [
-        { id: 'h7', date: '30 JUL 2026', time: '08:30', treatment: 'ENDODONCIA', dentist: 'DR. RIVERA', status: 'done' },
-        { id: 'h8', date: '23 JUL 2026', time: '08:30', treatment: 'ENDODONCIA', dentist: 'DR. RIVERA', status: 'done' }
+        { id: 'h7', date: '30 JUL 2026', time: '08:30', treatment: 'ENDODONCIA', dentist: 'DR. RIVERA', status: 'done', note: 'OBTURACIÓN DEFINITIVA CON GUTAPERCHA. SIN SINTOMATOLOGÍA.' },
+        { id: 'h8', date: '23 JUL 2026', time: '08:30', treatment: 'ENDODONCIA', dentist: 'DR. RIVERA', status: 'done', note: 'PREPARACIÓN QUÍMICO-MECÁNICA. IRRIGACIÓN CON HIPOCLORITO AL 2.5%.' }
       ],
       'HC-0009': [
-        { id: 'h9', date: '29 JUL 2026', time: '12:15', treatment: 'ENDODONCIA', dentist: 'DRA. TORRES', status: 'done' },
-        { id: 'h10', date: '16 JUL 2026', time: '12:15', treatment: 'ENDODONCIA', dentist: 'DRA. TORRES', status: 'cancelled' },
-        { id: 'h11', date: '06 AGO 2026', time: '11:45', treatment: 'ENDODONCIA', dentist: 'DRA. TORRES', status: 'scheduled' }
+        { id: 'h9', date: '29 JUL 2026', time: '12:15', treatment: 'ENDODONCIA', dentist: 'DRA. TORRES', status: 'done', note: 'SESIÓN DE CONDUCTOS EN 36. TRABAJO A LONGITUD DE TRABAJO.' },
+        { id: 'h10', date: '16 JUL 2026', time: '12:15', treatment: 'ENDODONCIA', dentist: 'DRA. TORRES', status: 'cancelled', note: 'REPROGRAMADA POR FALTA DE ASISTENCIA.' },
+        { id: 'h11', date: '06 AGO 2026', time: '11:45', treatment: 'ENDODONCIA', dentist: 'DRA. TORRES', status: 'scheduled', note: 'OBTURACIÓN DEFINITIVA PROGRAMADA.' }
       ],
       'HC-0007': [
-        { id: 'h12', date: '27 JUL 2026', time: '11:15', treatment: 'REHABILITACIÓN', dentist: 'DR. VEGA', status: 'done' },
-        { id: 'h13', date: '10 AGO 2026', time: '10:30', treatment: 'REHABILITACIÓN', dentist: 'DR. VEGA', status: 'scheduled' }
+        { id: 'h12', date: '27 JUL 2026', time: '11:15', treatment: 'REHABILITACIÓN', dentist: 'DR. VEGA', status: 'done', note: 'TOMA DE IMPRESIÓN DEFINITIVA. TEMPLA OCLUSAL EN AJUSTE.' },
+        { id: 'h13', date: '10 AGO 2026', time: '10:30', treatment: 'REHABILITACIÓN', dentist: 'DR. VEGA', status: 'scheduled', note: 'PRUEBA DE ESTRUCTURA METÁLICA.' }
       ]
     };
   }
@@ -247,8 +247,8 @@ export class PatientsMockService {
       { id: 'a1', type: 'birthday', patientId: 'HC-0002', label: 'JOSÉ HUAMÁN cumple el 02 AGO', handled: false },
       { id: 'a2', type: 'birthday', patientId: 'HC-0007', label: 'ROSA CÁCERES cumple el 30 AGO', handled: false },
       { id: 'a3', type: 'birthday', patientId: 'HC-0010', label: 'JORGE LUNA cumple el 25 AGO', handled: false },
-      { id: 'a4', type: 'debt', patientId: 'HC-0004', label: 'CARLOS MENDOZA debe S/ 1,300', handled: false },
-      { id: 'a5', type: 'debt', patientId: 'HC-0009', label: 'ELENA VARGAS debe S/ 600', handled: false },
+      { id: 'a4', type: 'debt', patientId: 'HC-0004', label: 'CARLOS MENDOZA debe $ 1,300', handled: false },
+      { id: 'a5', type: 'debt', patientId: 'HC-0009', label: 'ELENA VARGAS debe $ 600', handled: false },
       { id: 'a6', type: 'followup', patientId: 'HC-0006', label: 'PEDRO SÁNCHEZ sin visita desde JUN', handled: true }
     ];
   }

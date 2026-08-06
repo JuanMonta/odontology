@@ -4,7 +4,7 @@ import {
   ToothFace,
   ToothFaceCondition,
   ToothFaceName
-} from '../../../../core/models/patient.model';
+} from '../../core/models/patient.model';
 import {
   DEC_BOTTOM,
   DEC_TOP,
@@ -16,7 +16,7 @@ import {
   SYMBOLS,
   SYMBOL_ORDER,
   WHOLE_EXCLUDE
-} from '../../models/odontogram.model';
+} from './odontogram.model';
 
 export interface ToothViewBase {
   tooth: Tooth;

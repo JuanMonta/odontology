@@ -370,7 +370,7 @@
 }
 
 .detail {
-  width: 460px;
+  width: 520px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -382,9 +382,9 @@
   overflow: hidden;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1240px) {
   .detail {
-    width: 400px;
+    width: 460px;
   }
 }
 

@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { ToothCondition } from '../../../../core/models/patient.model';
-import { SYMBOL_ORDER, SYMBOL_PREFIX } from '../../models/odontogram.model';
+import { ToothCondition } from '../../core/models/patient.model';
+import { SYMBOL_ORDER, SYMBOL_PREFIX } from './odontogram.model';
 
 const FILE_OVERRIDES: Partial<Record<ToothCondition, string>> = {
   extraccion: 'extraccion-indicada.svg'

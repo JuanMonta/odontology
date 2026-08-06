@@ -20,7 +20,7 @@ import {
   ToothFace,
   ToothFaceCondition,
   ToothFaceName
-} from '../../../../core/models/patient.model';
+} from '../../core/models/patient.model';
 import {
   FACE_CONDITIONS,
   FACE_LABELS,
@@ -29,7 +29,7 @@ import {
   SYMBOLS,
   SYMBOL_ORDER,
   SYMBOL_PREFIX
-} from '../../models/odontogram.model';
+} from './odontogram.model';
 import {
   buildView,
   OdontogramViewModel,

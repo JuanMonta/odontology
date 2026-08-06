@@ -3,7 +3,7 @@
     <div class="page-head-row">
       <div class="page-head-left">
         <h2 class="page-title">DIRECTORIO DE PACIENTES</h2>
-        <span class="page-sub">REGISTRO CLÍNICO · {{ (patients$ | async)?.length ?? 0 }} RESULTADOS</span>
+        <span class="page-sub">EXPEDIENTE CLÍNICO · ODONTOGRAMA + EVOLUCIÓN · {{ (patients$ | async)?.length ?? 0 }} RESULTADOS</span>
       </div>
       <div class="page-head-actions">
         <div class="alert-wrap">
@@ -77,6 +77,7 @@
           <option value="all">TODOS</option>
           <option value="active">ACTIVOS</option>
           <option value="inactive">INACTIVOS</option>
+          <option value="allergy">CON ALERGIAS</option>
         </select>
       </div>
     </div>
