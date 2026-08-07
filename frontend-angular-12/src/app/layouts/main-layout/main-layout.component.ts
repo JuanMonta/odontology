@@ -5,13 +5,11 @@ import {
   HostListener,
   ViewChild
 } from '@angular/core';
-import { Router } from '@angular/router';
 
 interface NavItem {
   label: string;
   route?: string;
   title?: string;
-  action?: string;
   active: boolean;
   badge?: number;
 }
@@ -38,7 +36,7 @@ export class MainLayoutComponent {
     {
       label: 'OPERACIÓN',
       items: [
-        { label: 'AGENDA', route: '/', title: 'AGENDA DEL DÍA', action: 'NUEVA CITA', active: true },
+        { label: 'AGENDA', route: '/', title: 'AGENDA DEL DÍA', active: true },
         { label: 'PACIENTES', route: '/pacientes', title: 'PACIENTES', active: false },
         { label: 'TRATAMIENTOS', route: '/tratamientos', title: 'TRATAMIENTOS', active: false }
       ]
@@ -71,11 +69,7 @@ export class MainLayoutComponent {
     return this.activeItem.title ?? this.activeItem.label;
   }
 
-  get activeAction(): string | undefined {
-    return this.activeItem.action;
-  }
-
-  constructor(private router: Router) {
+  constructor() {
     this.today = this.formatToday(new Date());
   }
 
@@ -95,13 +89,6 @@ export class MainLayoutComponent {
       event.preventDefault();
     }
     this.close();
-  }
-
-  onAction(): void {
-    const item = this.activeItem;
-    if (item.route) {
-      this.router.navigate([item.route], { queryParams: { nuevo: true } });
-    }
   }
 
   onLogout(): void {

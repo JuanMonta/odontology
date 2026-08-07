@@ -20,6 +20,17 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   waiting$: Observable<WaitingPatient[]>;
   totals$: Observable<BoardTotals>;
 
+  creating = false;
+  error = false;
+
+  draft = {
+    time: '',
+    patient: '',
+    treatment: '',
+    consultorio: '',
+    dentist: ''
+  };
+
   private readonly destroy$ = new Subject<void>();
 
   constructor(private readonly mock: DashboardHttpService) {
@@ -44,6 +55,36 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   onMarkDone(id: string): void {
     this.mock.markDone(id);
+  }
+
+  startCreate(): void {
+    this.creating = true;
+    this.error = false;
+  }
+
+  cancelCreate(): void {
+    this.creating = false;
+    this.error = false;
+  }
+
+  onNewAppointment(): void {
+    const { time, patient, treatment, consultorio, dentist } = this.draft;
+    if (!time.trim() || !patient.trim()) {
+      this.error = true;
+      return;
+    }
+    this.error = false;
+    this.mock.addAppointment({
+      id: `apt-${Date.now().toString(36)}`,
+      time: time.trim(),
+      patient: patient.trim().toUpperCase(),
+      treatment: (treatment.trim() || 'CONSULTA').toUpperCase(),
+      consultorio: (consultorio.trim() || 'CON 01').toUpperCase(),
+      dentist: (dentist.trim() || 'DRA. TORRES').toUpperCase(),
+      status: 'on-time'
+    });
+    this.creating = false;
+    this.draft = { time: '', patient: '', treatment: '', consultorio: '', dentist: '' };
   }
 
   private computeTotals(list: Appointment[]): BoardTotals {

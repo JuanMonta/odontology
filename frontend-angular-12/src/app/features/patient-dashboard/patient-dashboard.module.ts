@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PatientDashboardRoutingModule } from './patient-dashboard-routing.module';
 import { DashboardPageComponent } from './pages/dashboard/dashboard-page.component';
 import { DeparturesBoardComponent } from './components/departures-board/departures-board.component';
@@ -17,7 +18,7 @@ import { WaitingPanelComponent } from './components/waiting-panel/waiting-panel.
     FlapClockComponent,
     WaitingPanelComponent
   ],
-  imports: [CommonModule, PatientDashboardRoutingModule],
+  imports: [CommonModule, FormsModule, PatientDashboardRoutingModule],
   exports: [DashboardPageComponent]
 })
 export class PatientDashboardModule { }

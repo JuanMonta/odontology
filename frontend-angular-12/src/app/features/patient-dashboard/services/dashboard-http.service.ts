@@ -48,4 +48,12 @@ export class DashboardHttpService {
   markDone(id: string): void {
     this.http.patch<Appointment>(`${API_BASE}/dashboard/appointments/${id}/done`, null).subscribe(() => this.refresh());
   }
+
+  /** Registrar una nueva cita en el tablero (inserción local optimista, ordenada por hora). */
+  addAppointment(appointment: Appointment): void {
+    const list = this.appointmentsSubject.getValue();
+    this.appointmentsSubject.next(
+      [...list, appointment].sort((a, b) => a.time.localeCompare(b.time))
+    );
+  }
 }
