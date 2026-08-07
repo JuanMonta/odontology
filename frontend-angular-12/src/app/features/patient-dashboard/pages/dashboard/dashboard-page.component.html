@@ -20,50 +20,31 @@
             required
           />
         </label>
-        <label class="field">
-          <span class="field-label">PACIENTE *</span>
-          <input
-            class="field-input"
-            type="text"
-            [(ngModel)]="draft.patient"
-            name="patient"
-            placeholder="MARÍA QUISPE"
-            autocomplete="off"
-          />
-        </label>
-        <label class="field">
-          <span class="field-label">TRATAMIENTO</span>
-          <input
-            class="field-input"
-            type="text"
-            [(ngModel)]="draft.treatment"
-            name="treatment"
-            placeholder="LIMPIEZA"
-            autocomplete="off"
-          />
-        </label>
-        <label class="field">
-          <span class="field-label">CONSULTORIO</span>
-          <input
-            class="field-input"
-            type="text"
-            [(ngModel)]="draft.consultorio"
-            name="consultorio"
-            placeholder="CON 01"
-            autocomplete="off"
-          />
-        </label>
-        <label class="field">
-          <span class="field-label">ODONTÓLOGO</span>
-          <input
-            class="field-input"
-            type="text"
-            [(ngModel)]="draft.dentist"
-            name="dentist"
-            placeholder="DRA. TORRES"
-            autocomplete="off"
-          />
-        </label>
+        <app-autocomplete
+          label="PACIENTE"
+          [required]="true"
+          [options]="(patientOptions$ | async) ?? []"
+          [(value)]="draft.patient"
+          placeholder="MARÍA QUISPE"
+        ></app-autocomplete>
+        <app-autocomplete
+          label="TRATAMIENTO"
+          [options]="(treatmentOptions$ | async) ?? []"
+          [(value)]="draft.treatment"
+          placeholder="LIMPIEZA"
+        ></app-autocomplete>
+        <app-autocomplete
+          label="CONSULTORIO"
+          [options]="(consultorioOptions$ | async) ?? []"
+          [(value)]="draft.consultorio"
+          placeholder="CONSULTORIO 01"
+        ></app-autocomplete>
+        <app-autocomplete
+          label="ODONTÓLOGO"
+          [options]="(dentistOptions$ | async) ?? []"
+          [(value)]="draft.dentist"
+          placeholder="DR. RIVERA"
+        ></app-autocomplete>
       </div>
 
       <p class="form-error" *ngIf="error" role="alert">HORA Y PACIENTE SON OBLIGATORIOS</p>
