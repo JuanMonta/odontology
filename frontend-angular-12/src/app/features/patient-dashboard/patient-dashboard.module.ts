@@ -8,6 +8,7 @@ import { FlapCellComponent } from './components/flap-cell/flap-cell.component';
 import { FlapTextComponent } from './components/flap-text/flap-text.component';
 import { FlapClockComponent } from './components/flap-clock/flap-clock.component';
 import { WaitingPanelComponent } from './components/waiting-panel/waiting-panel.component';
+import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { WaitingPanelComponent } from './components/waiting-panel/waiting-panel.
     FlapCellComponent,
     FlapTextComponent,
     FlapClockComponent,
-    WaitingPanelComponent
+    WaitingPanelComponent,
+    AutocompleteComponent
   ],
   imports: [CommonModule, FormsModule, PatientDashboardRoutingModule],
   exports: [DashboardPageComponent]

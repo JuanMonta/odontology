@@ -7,6 +7,10 @@ import {
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { Appointment, BoardTotals, WaitingPatient } from '../../../../core/models/appointment.model';
+import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
+import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
+import { PatientsHttpService } from '../../../patients/services/patients-http.service';
+import { TreatmentsHttpService } from '../../../treatments/services/treatments-http.service';
 import { DashboardHttpService } from '../../services/dashboard-http.service';
 
 @Component({
@@ -19,6 +23,11 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   appointments$: Observable<Appointment[]>;
   waiting$: Observable<WaitingPatient[]>;
   totals$: Observable<BoardTotals>;
+
+  patientOptions$: Observable<string[]>;
+  treatmentOptions$: Observable<string[]>;
+  consultorioOptions$: Observable<string[]>;
+  dentistOptions$: Observable<string[]>;
 
   creating = false;
   error = false;
@@ -33,13 +42,23 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private readonly mock: DashboardHttpService) {
+  constructor(
+    private readonly mock: DashboardHttpService,
+    patients: PatientsHttpService,
+    treatments: TreatmentsHttpService,
+    consultorios: ConsultoriosHttpService,
+    odontologos: OdontologosHttpService
+  ) {
     this.appointments$ = this.mock.appointments$;
     this.waiting$ = this.mock.waiting$;
     this.totals$ = this.mock.appointments$.pipe(
       map(list => this.computeTotals(list)),
       takeUntil(this.destroy$)
     );
+    this.patientOptions$ = patients.patients$.pipe(map(list => list.map(p => p.name)));
+    this.treatmentOptions$ = treatments.treatments$.pipe(map(list => list.map(t => t.name)));
+    this.consultorioOptions$ = consultorios.consultorios$.pipe(map(list => list.map(c => c.name)));
+    this.dentistOptions$ = odontologos.odontologos$.pipe(map(list => list.map(o => o.name)));
   }
 
   ngOnInit(): void {}

@@ -1,0 +1,30 @@
+<label class="ac">
+  <span class="ac-label">{{ label }}{{ required ? ' *' : '' }}</span>
+  <div class="ac-panel">
+    <input
+      class="ac-input"
+      type="text"
+      [attr.placeholder]="placeholder"
+      [value]="value"
+      autocomplete="off"
+      spellcheck="false"
+      role="combobox"
+      aria-autocomplete="list"
+      [attr.aria-expanded]="open"
+      (input)="onInput($any($event.target).value)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown)="onKeydown($event)"
+    />
+    <ul *ngIf="open" class="ac-list" role="listbox">
+      <li
+        *ngFor="let option of suggestions; let i = index; trackBy: trackByIndex"
+        class="ac-item"
+        [class.ac-item--active]="i === activeIndex"
+        role="option"
+        [attr.aria-selected]="i === activeIndex"
+        (mousedown)="choose(option); $event.preventDefault()"
+      >{{ option }}</li>
+    </ul>
+  </div>
+</label>
