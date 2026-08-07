@@ -1,4 +1,80 @@
 <div class="page">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-actions">
+        <button class="btn-amber" type="button" (click)="startCreate()">
+          <span class="btn-plus" aria-hidden="true"></span>
+          NUEVA CITA
+        </button>
+      </div>
+    </div>
+    <form class="new-form" *ngIf="creating" (ngSubmit)="onNewAppointment()" novalidate>
+      <div class="form-grid">
+        <label class="field">
+          <span class="field-label">HORA *</span>
+          <input
+            class="field-input"
+            type="time"
+            [(ngModel)]="draft.time"
+            name="time"
+            required
+          />
+        </label>
+        <label class="field">
+          <span class="field-label">PACIENTE *</span>
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="draft.patient"
+            name="patient"
+            placeholder="MARÍA QUISPE"
+            autocomplete="off"
+          />
+        </label>
+        <label class="field">
+          <span class="field-label">TRATAMIENTO</span>
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="draft.treatment"
+            name="treatment"
+            placeholder="LIMPIEZA"
+            autocomplete="off"
+          />
+        </label>
+        <label class="field">
+          <span class="field-label">CONSULTORIO</span>
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="draft.consultorio"
+            name="consultorio"
+            placeholder="CON 01"
+            autocomplete="off"
+          />
+        </label>
+        <label class="field">
+          <span class="field-label">ODONTÓLOGO</span>
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="draft.dentist"
+            name="dentist"
+            placeholder="DRA. TORRES"
+            autocomplete="off"
+          />
+        </label>
+      </div>
+
+      <p class="form-error" *ngIf="error" role="alert">HORA Y PACIENTE SON OBLIGATORIOS</p>
+
+      <div class="form-actions">
+        <button class="btn-amber" type="submit">REGISTRAR CITA</button>
+        <button class="btn-ghost" type="button" (click)="cancelCreate()">CANCELAR</button>
+      </div>
+    </form>
+  </header>
+
   <div class="page-grid">
     <div class="page-main">
       <section class="overview" aria-label="Resumen del día">
