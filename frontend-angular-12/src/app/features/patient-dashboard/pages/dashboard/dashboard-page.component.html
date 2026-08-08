@@ -10,16 +10,11 @@
     </div>
     <form class="new-form" *ngIf="creating" (ngSubmit)="onNewAppointment()" novalidate>
       <div class="form-grid">
-        <label class="field">
-          <span class="field-label">HORA *</span>
-          <input
-            class="field-input"
-            type="time"
-            [(ngModel)]="draft.time"
-            name="time"
-            required
-          />
-        </label>
+        <app-time-picker
+          label="HORA"
+          [required]="true"
+          [(value)]="draft.time"
+        ></app-time-picker>
         <app-autocomplete
           label="PACIENTE"
           [required]="true"

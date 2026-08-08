@@ -1,0 +1,12 @@
+<div
+  class="status"
+  [class.is-online]="(status$ | async) === 'online'"
+  [class.is-offline]="(status$ | async) === 'offline'"
+  [class.is-checking]="(status$ | async) === 'checking'"
+  role="status"
+  aria-live="polite"
+  [attr.aria-label]="'Conexión con el servidor: ' + statusLabel"
+>
+  <span class="status-lamp" aria-hidden="true"></span>
+  <span class="status-label">{{ statusLabel }}</span>
+</div>

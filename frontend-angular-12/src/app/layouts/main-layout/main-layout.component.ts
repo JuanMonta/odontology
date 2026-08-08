@@ -3,8 +3,12 @@ import {
   Component,
   ElementRef,
   HostListener,
+  OnDestroy,
   ViewChild
 } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 interface NavItem {
   label: string;
@@ -32,11 +36,13 @@ export class MainLayoutComponent {
   today = '';
   open = false;
 
+  private readonly navSub: Subscription;
+
   sections: NavSection[] = [
     {
       label: 'OPERACIÓN',
       items: [
-        { label: 'AGENDA', route: '/', title: 'AGENDA DEL DÍA', active: true },
+        { label: 'AGENDA', route: '/', title: 'AGENDA DEL DÍA', active: false },
         { label: 'PACIENTES', route: '/pacientes', title: 'PACIENTES', active: false },
         { label: 'TRATAMIENTOS', route: '/tratamientos', title: 'TRATAMIENTOS', active: false }
       ]
@@ -69,8 +75,22 @@ export class MainLayoutComponent {
     return this.activeItem.title ?? this.activeItem.label;
   }
 
-  constructor() {
+  constructor(private readonly router: Router) {
     this.today = this.formatToday(new Date());
+    this.navSub = this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => this.syncActiveFromRoute());
+  }
+
+  ngOnDestroy(): void {
+    this.navSub.unsubscribe();
+  }
+
+  private syncActiveFromRoute(): void {
+    const url = this.router.url;
+    this.sections.forEach(section =>
+      section.items.forEach(item => (item.active = !!item.route && url === item.route))
+    );
   }
 
   toggle(): void {

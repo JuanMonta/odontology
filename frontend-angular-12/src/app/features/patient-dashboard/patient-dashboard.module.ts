@@ -9,6 +9,7 @@ import { FlapTextComponent } from './components/flap-text/flap-text.component';
 import { FlapClockComponent } from './components/flap-clock/flap-clock.component';
 import { WaitingPanelComponent } from './components/waiting-panel/waiting-panel.component';
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
+import { TimePickerComponent } from './components/time-picker/time-picker.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { AutocompleteComponent } from './components/autocomplete/autocomplete.co
     FlapTextComponent,
     FlapClockComponent,
     WaitingPanelComponent,
-    AutocompleteComponent
+    AutocompleteComponent,
+    TimePickerComponent
   ],
   imports: [CommonModule, FormsModule, PatientDashboardRoutingModule],
   exports: [DashboardPageComponent]

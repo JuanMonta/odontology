@@ -1,0 +1,59 @@
+<div class="tp">
+  <span class="tp-label">{{ label }}{{ required ? ' *' : '' }}</span>
+  <div class="tp-panel" [class.tp-panel--open]="open">
+    <button
+      type="button"
+      class="tp-display"
+      [attr.aria-expanded]="open"
+      [attr.aria-label]="value ? 'Hora seleccionada ' + display : 'Seleccionar hora'"
+      (click)="onOpen()"
+      (focus)="onOpen()"
+      (blur)="onBlur()"
+      (keydown)="onKeydown($event)"
+    >
+      <span class="tp-digits" [class.tp-digits--empty]="!value">
+        <span class="tp-cell">{{ display.slice(0, 2) }}</span>
+        <span class="tp-colon" aria-hidden="true">:</span>
+        <span class="tp-cell">{{ display.slice(3, 5) }}</span>
+      </span>
+      <span class="tp-chevron" aria-hidden="true"></span>
+    </button>
+
+    <div class="tp-list" *ngIf="open" role="listbox" [attr.aria-label]="'Seleccionar ' + label">
+      <div class="tp-col" [class.tp-col--active]="hoursActive">
+        <span class="tp-col-head">HORA</span>
+        <div class="tp-scroll">
+          <button
+            *ngFor="let h of hours; let i = index; trackBy: trackByIndex"
+            #itemEl
+            type="button"
+            class="tp-item"
+            [class.tp-item--cursor]="i === cursorH && hoursActive"
+            [class.tp-item--sel]="h === display.slice(0, 2)"
+            role="option"
+            [attr.aria-selected]="h === display.slice(0, 2)"
+            (mousedown)="chooseH(i); $event.preventDefault()"
+            (dblclick)="commitH(i)"
+          >{{ h }}</button>
+        </div>
+      </div>
+      <div class="tp-col" [class.tp-col--active]="minutesActive">
+        <span class="tp-col-head">MIN</span>
+        <div class="tp-scroll">
+          <button
+            *ngFor="let m of minutes; let i = index; trackBy: trackByIndex"
+            #itemEl
+            type="button"
+            class="tp-item"
+            [class.tp-item--cursor]="i === cursorM && minutesActive"
+            [class.tp-item--sel]="m === display.slice(3, 5)"
+            role="option"
+            [attr.aria-selected]="m === display.slice(3, 5)"
+            (mousedown)="chooseM(i); $event.preventDefault()"
+            (dblclick)="commitM(i)"
+          >{{ m }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
