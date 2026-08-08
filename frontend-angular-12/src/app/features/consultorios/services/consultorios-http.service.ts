@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 import { Consultorio, ConsultorioDraft } from '../../../core/models/consultorio.model';
 import { API_BASE } from '../../../core/config/api.config';
+import { BackendStatusService } from '../../../core/services/backend-status.service';
 
 /**
  * Consume el backend REST de consultorios (spring_backend → /api/v1/consultorios).
@@ -15,8 +16,12 @@ export class ConsultoriosHttpService {
 
   readonly consultorios$: Observable<Consultorio[]> = this.subjects.asObservable();
 
-  constructor(private readonly http: HttpClient) {
+  constructor(private readonly http: HttpClient, status: BackendStatusService) {
     this.refresh();
+    status.reconnected$.subscribe(() => this.refresh());
+    status.onlineTick$
+      .pipe(filter(() => this.subjects.getValue().length === 0))
+      .subscribe(() => this.refresh());
   }
 
   snapshot(): Consultorio[] {

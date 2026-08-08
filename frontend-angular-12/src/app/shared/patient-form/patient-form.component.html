@@ -2,42 +2,42 @@
   <div class="form-grid">
     <label class="field field--full">
       <span class="field-label">NOMBRE COMPLETO *</span>
-      <input class="field-input" type="text" [(ngModel)]="name" name="name" placeholder="NOMBRE Y APELLIDO" autocomplete="off" />
+      <input class="field-input" type="text" [(ngModel)]="name" name="name" placeholder="NOMBRE Y APELLIDO" autocomplete="off" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field">
       <span class="field-label">EDAD</span>
-      <input class="field-input" type="number" min="0" max="120" [(ngModel)]="age" name="age" />
+      <input class="field-input" type="number" min="0" max="120" [(ngModel)]="age" name="age" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field">
       <span class="field-label">CUMPLEAÑOS (DD/MM)</span>
-      <input class="field-input" type="text" [(ngModel)]="birthday" name="birthday" placeholder="12/08" autocomplete="off" />
+      <input class="field-input" type="text" [(ngModel)]="birthday" name="birthday" placeholder="12/08" autocomplete="off" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field">
       <span class="field-label">TELÉFONO</span>
-      <input class="field-input" type="tel" [(ngModel)]="phone" name="phone" placeholder="999 000 000" autocomplete="off" />
+      <input class="field-input" type="tel" [(ngModel)]="phone" name="phone" placeholder="999 000 000" autocomplete="off" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field">
       <span class="field-label">EMAIL</span>
-      <input class="field-input" type="email" [(ngModel)]="email" name="email" placeholder="paciente@correo.com" autocomplete="off" />
+      <input class="field-input" type="email" [(ngModel)]="email" name="email" placeholder="paciente@correo.com" autocomplete="off" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field field--full">
       <span class="field-label">DIRECCIÓN</span>
-      <input class="field-input" type="text" [(ngModel)]="address" name="address" placeholder="AV. / JR. Y NÚMERO" autocomplete="off" />
+      <input class="field-input" type="text" [(ngModel)]="address" name="address" placeholder="AV. / JR. Y NÚMERO" autocomplete="off" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field">
       <span class="field-label">ALERGIAS</span>
-      <input class="field-input" type="text" [(ngModel)]="allergies" name="allergies" placeholder="NINGUNA" autocomplete="off" />
+      <input class="field-input" type="text" [(ngModel)]="allergies" name="allergies" placeholder="NINGUNA" autocomplete="off" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field">
       <span class="field-label">TRATAMIENTO</span>
-      <input class="field-input" type="text" [(ngModel)]="treatment" name="treatment" placeholder="LIMPIEZA" autocomplete="off" />
+      <input class="field-input" type="text" [(ngModel)]="treatment" name="treatment" placeholder="LIMPIEZA" autocomplete="off" (ngModelChange)="persistDraft()" />
     </label>
 
     <div class="field">
@@ -49,7 +49,7 @@
           type="button"
           role="radio"
           [attr.aria-checked]="status === 'active'"
-          (click)="status = 'active'"
+          (click)="setStatus('active')"
         >ACTIVO</button>
         <button
           class="seg-btn"
@@ -57,7 +57,7 @@
           type="button"
           role="radio"
           [attr.aria-checked]="status === 'inactive'"
-          (click)="status = 'inactive'"
+          (click)="setStatus('inactive')"
         >INACTIVO</button>
       </div>
     </div>
@@ -67,6 +67,6 @@
 
   <div class="form-actions">
     <button class="btn-amber" type="submit">GUARDAR PACIENTE</button>
-    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+    <button class="btn-ghost" type="button" (click)="onCancel()">CANCELAR</button>
   </div>
 </form>

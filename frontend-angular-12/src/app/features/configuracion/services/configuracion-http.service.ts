@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { ClinicaSettings, ConfigSectionMeta } from '../../../core/models/clinica-settings.model';
 import { API_BASE } from '../../../core/config/api.config';
+import { BackendStatusService } from '../../../core/services/backend-status.service';
 
 export const CONFIG_SECTIONS: ConfigSectionMeta[] = [
   { id: 'clinica', label: 'DATOS DEL CONSULTORIO', sub: 'IDENTIDAD Y CONTACTO' },
@@ -20,8 +22,12 @@ export class ConfiguracionHttpService {
 
   readonly settings$: Observable<ClinicaSettings | null> = this.subjects.asObservable();
 
-  constructor(private readonly http: HttpClient) {
+  constructor(private readonly http: HttpClient, status: BackendStatusService) {
     this.refresh();
+    status.reconnected$.subscribe(() => this.refresh());
+    status.onlineTick$
+      .pipe(filter(() => this.subjects.getValue() === null))
+      .subscribe(() => this.refresh());
   }
 
   refresh(): void {

@@ -13,6 +13,22 @@ import { PatientsHttpService } from '../../../patients/services/patients-http.se
 import { TreatmentsHttpService } from '../../../treatments/services/treatments-http.service';
 import { DashboardHttpService } from '../../services/dashboard-http.service';
 
+export interface NewAppointmentDraft {
+  time: string;
+  patient: string;
+  treatment: string;
+  consultorio: string;
+  dentist: string;
+}
+
+const EMPTY_DRAFT: NewAppointmentDraft = {
+  time: '',
+  patient: '',
+  treatment: '',
+  consultorio: '',
+  dentist: ''
+};
+
 @Component({
   selector: 'app-dashboard-page',
   templateUrl: './dashboard-page.component.html',
@@ -20,6 +36,8 @@ import { DashboardHttpService } from '../../services/dashboard-http.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {
+  private static readonly DRAFT_KEY = 'saas.clinica.appointment-form.draft';
+
   appointments$: Observable<Appointment[]>;
   waiting$: Observable<WaitingPatient[]>;
   totals$: Observable<BoardTotals>;
@@ -32,13 +50,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   creating = false;
   error = false;
 
-  draft = {
-    time: '',
-    patient: '',
-    treatment: '',
-    consultorio: '',
-    dentist: ''
-  };
+  draft: NewAppointmentDraft = this.restoreDraft();
 
   private readonly destroy$ = new Subject<void>();
 
@@ -84,6 +96,12 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   cancelCreate(): void {
     this.creating = false;
     this.error = false;
+    this.clearDraft();
+  }
+
+  onValueChange(field: keyof NewAppointmentDraft, value: string): void {
+    this.draft[field] = value;
+    this.persistDraft();
   }
 
   onNewAppointment(): void {
@@ -103,7 +121,46 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
       status: 'on-time'
     });
     this.creating = false;
-    this.draft = { time: '', patient: '', treatment: '', consultorio: '', dentist: '' };
+    this.draft = { ...EMPTY_DRAFT };
+    this.clearDraft();
+  }
+
+  persistDraft(): void {
+    try {
+      localStorage.setItem(DashboardPageComponent.DRAFT_KEY, JSON.stringify(this.draft));
+    } catch {
+      // almacenamiento no disponible: el borrador simplemente no se persiste
+    }
+  }
+
+  private restoreDraft(): NewAppointmentDraft {
+    try {
+      const raw = localStorage.getItem(DashboardPageComponent.DRAFT_KEY);
+      if (!raw) {
+        return { ...EMPTY_DRAFT };
+      }
+      const saved = JSON.parse(raw);
+      if (typeof saved !== 'object' || saved === null) {
+        return { ...EMPTY_DRAFT };
+      }
+      return {
+        time: typeof saved.time === 'string' ? saved.time : '',
+        patient: typeof saved.patient === 'string' ? saved.patient : '',
+        treatment: typeof saved.treatment === 'string' ? saved.treatment : '',
+        consultorio: typeof saved.consultorio === 'string' ? saved.consultorio : '',
+        dentist: typeof saved.dentist === 'string' ? saved.dentist : ''
+      };
+    } catch {
+      return { ...EMPTY_DRAFT };
+    }
+  }
+
+  private clearDraft(): void {
+    try {
+      localStorage.removeItem(DashboardPageComponent.DRAFT_KEY);
+    } catch {
+      // almacenamiento no disponible
+    }
   }
 
   private computeTotals(list: Appointment[]): BoardTotals {

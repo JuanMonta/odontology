@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { Appointment, BoardTotals, WaitingPatient } from '../../../core/models/appointment.model';
 import { API_BASE } from '../../../core/config/api.config';
+import { BackendStatusService } from '../../../core/services/backend-status.service';
 
 /**
  * Consume el backend REST del tablero de embarque (spring_backend →
@@ -16,8 +18,12 @@ export class DashboardHttpService {
   readonly appointments$: Observable<Appointment[]> = this.appointmentsSubject.asObservable();
   readonly waiting$: Observable<WaitingPatient[]> = this.waitingSubject.asObservable();
 
-  constructor(private readonly http: HttpClient) {
+  constructor(private readonly http: HttpClient, status: BackendStatusService) {
     this.refresh();
+    status.reconnected$.subscribe(() => this.refresh());
+    status.onlineTick$
+      .pipe(filter(() => this.appointmentsSubject.getValue().length === 0))
+      .subscribe(() => this.refresh());
   }
 
   refresh(): void {

@@ -8,6 +8,7 @@ import {
   Tooth
 } from '../../../../core/models/patient.model';
 import { PatientsHttpService } from '../../services/patients-http.service';
+import { clearPatientFormDraft } from '../../../../shared/patient-form/patient-form.component';
 
 type Tab = 'odonto' | 'historial' | 'ficha' | 'cuentas';
 
@@ -109,6 +110,11 @@ export class PatientPanelComponent implements OnChanges {
     this.service.addPatient(draft).subscribe(created => {
       this.saved.emit(created);
     });
+  }
+
+  cancelCreate(): void {
+    clearPatientFormDraft();
+    this.cancel.emit();
   }
 
   onEdit(draft: PatientDraft): void {

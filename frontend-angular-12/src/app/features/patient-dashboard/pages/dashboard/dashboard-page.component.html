@@ -13,31 +13,36 @@
         <app-time-picker
           label="HORA"
           [required]="true"
-          [(value)]="draft.time"
+          [value]="draft.time"
+          (valueChange)="onValueChange('time', $event)"
         ></app-time-picker>
         <app-autocomplete
           label="PACIENTE"
           [required]="true"
           [options]="(patientOptions$ | async) ?? []"
-          [(value)]="draft.patient"
+          [value]="draft.patient"
+          (valueChange)="onValueChange('patient', $event)"
           placeholder="MARÍA QUISPE"
         ></app-autocomplete>
         <app-autocomplete
           label="TRATAMIENTO"
           [options]="(treatmentOptions$ | async) ?? []"
-          [(value)]="draft.treatment"
+          [value]="draft.treatment"
+          (valueChange)="onValueChange('treatment', $event)"
           placeholder="LIMPIEZA"
         ></app-autocomplete>
         <app-autocomplete
           label="CONSULTORIO"
           [options]="(consultorioOptions$ | async) ?? []"
-          [(value)]="draft.consultorio"
+          [value]="draft.consultorio"
+          (valueChange)="onValueChange('consultorio', $event)"
           placeholder="CONSULTORIO 01"
         ></app-autocomplete>
         <app-autocomplete
           label="ODONTÓLOGO"
           [options]="(dentistOptions$ | async) ?? []"
-          [(value)]="draft.dentist"
+          [value]="draft.dentist"
+          (valueChange)="onValueChange('dentist', $event)"
           placeholder="DR. RIVERA"
         ></app-autocomplete>
       </div>

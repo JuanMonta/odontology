@@ -1,7 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, timer } from 'rxjs';
-import { timeout, catchError, switchMap, map, distinctUntilChanged } from 'rxjs/operators';
+import {
+  timeout,
+  catchError,
+  switchMap,
+  map,
+  distinctUntilChanged,
+  pairwise,
+  filter
+} from 'rxjs/operators';
 import { API_BASE } from '../config/api.config';
 
 export type BackendStatus = 'checking' | 'online' | 'offline';
@@ -19,6 +27,23 @@ export class BackendStatusService {
   private readonly statusSubject = new BehaviorSubject<BackendStatus>('checking');
 
   readonly status$: Observable<BackendStatus> = this.statusSubject.pipe(distinctUntilChanged());
+
+  /** Emite en cada transición de conexión caída a conexión restablecida (offline → online). */
+  readonly reconnected$: Observable<void> = this.status$.pipe(
+    pairwise(),
+    filter(([prev, curr]) => prev === 'offline' && curr === 'online'),
+    map(() => undefined)
+  );
+
+  /**
+   * Emite en cada sondeo exitoso mientras hay conexión (latido periódico).
+   * Los services de datos se suscriben para refrescar automáticamente cuando
+   * el backend vuelve a estar operativo y aún no tienen datos en caché.
+   */
+  readonly onlineTick$: Observable<void> = this.statusSubject.pipe(
+    filter(status => status === 'online'),
+    map(() => undefined)
+  );
 
   get value(): BackendStatus {
     return this.statusSubject.getValue();
