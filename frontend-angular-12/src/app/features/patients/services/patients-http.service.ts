@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { filter, map, shareReplay, tap } from 'rxjs/operators';
+import { BackendStatusService } from '../../../core/services/backend-status.service';
 import {
   AccountEntry,
   Patient,
@@ -31,8 +32,12 @@ export class PatientsHttpService {
 
   readonly alerts$: Observable<PatientAlert[]> = this.alertsSubject.asObservable();
 
-  constructor(private readonly http: HttpClient) {
+  constructor(private readonly http: HttpClient, status: BackendStatusService) {
     this.refresh();
+    status.reconnected$.subscribe(() => this.refresh());
+    status.onlineTick$
+      .pipe(filter(() => this.patientsSubject.getValue().length === 0))
+      .subscribe(() => this.refresh());
   }
 
   refresh(): void {

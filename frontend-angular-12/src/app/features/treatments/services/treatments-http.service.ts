@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 import { Treatment, TreatmentCategory, TreatmentDraft } from '../../../core/models/treatment.model';
 import { API_BASE } from '../../../core/config/api.config';
+import { BackendStatusService } from '../../../core/services/backend-status.service';
 
 export const TREATMENT_CATEGORIES: TreatmentCategory[] = [
   'DIAGNÓSTICO',
@@ -28,8 +29,12 @@ export class TreatmentsHttpService {
 
   readonly treatments$: Observable<Treatment[]> = this.subjects.asObservable();
 
-  constructor(private readonly http: HttpClient) {
+  constructor(private readonly http: HttpClient, status: BackendStatusService) {
     this.refresh();
+    status.reconnected$.subscribe(() => this.refresh());
+    status.onlineTick$
+      .pipe(filter(() => this.subjects.getValue().length === 0))
+      .subscribe(() => this.refresh());
   }
 
   refresh(): void {

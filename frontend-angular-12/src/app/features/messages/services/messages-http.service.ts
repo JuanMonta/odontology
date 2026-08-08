@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { filter, map, tap } from 'rxjs/operators';
 import { ClinicMessage, MessageChannel, MessageDraft } from '../../../core/models/message.model';
 import { API_BASE } from '../../../core/config/api.config';
+import { BackendStatusService } from '../../../core/services/backend-status.service';
 
 export const MESSAGE_CHANNELS: { id: MessageChannel; label: string }[] = [
   { id: 'consulta', label: 'CONSULTA' },
@@ -25,8 +26,12 @@ export class MessagesHttpService {
     map(list => list.filter(m => m.status === 'unread').length)
   );
 
-  constructor(private readonly http: HttpClient) {
+  constructor(private readonly http: HttpClient, status: BackendStatusService) {
     this.refresh();
+    status.reconnected$.subscribe(() => this.refresh());
+    status.onlineTick$
+      .pipe(filter(() => this.subjects.getValue().length === 0))
+      .subscribe(() => this.refresh());
   }
 
   refresh(): void {

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 import { Odontologo, OdontologoDraft } from '../../../core/models/odontologo.model';
 import { API_BASE } from '../../../core/config/api.config';
+import { BackendStatusService } from '../../../core/services/backend-status.service';
 
 export const SPECIALTIES: string[] = [
   'CIRUGÍA ORAL',
@@ -24,8 +25,12 @@ export class OdontologosHttpService {
 
   readonly odontologos$: Observable<Odontologo[]> = this.subjects.asObservable();
 
-  constructor(private readonly http: HttpClient) {
+  constructor(private readonly http: HttpClient, status: BackendStatusService) {
     this.refresh();
+    status.reconnected$.subscribe(() => this.refresh());
+    status.onlineTick$
+      .pipe(filter(() => this.subjects.getValue().length === 0))
+      .subscribe(() => this.refresh());
   }
 
   snapshot(): Odontologo[] {
