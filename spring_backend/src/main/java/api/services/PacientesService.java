@@ -215,6 +215,7 @@ public class PacientesService {
                         });
 
         conditionRepository.deleteByPacienteIdAndDiente(id, tooth.number());
+        conditionRepository.flush();
         if (tooth.conditions() != null) {
             tooth.conditions().forEach(c -> conditionRepository.save(PatientToothCondition.builder()
                     .pacienteId(id)
@@ -224,6 +225,7 @@ public class PacientesService {
         }
 
         faceRepository.deleteByPacienteIdAndDiente(id, tooth.number());
+        faceRepository.flush();
         if (tooth.faces() != null) {
             tooth.faces().forEach(f -> faceRepository.save(PatientToothFace.builder()
                     .pacienteId(id)
