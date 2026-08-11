@@ -39,7 +39,6 @@ public class ConsultoriosService {
                 .codigo(codigoService.nextCodigo("CON", "CON-%03d"))
                 .nombre(draft.name())
                 .unidad(draft.unit())
-                .odontologo(draft.dentist())
                 .ubicacion(draft.location())
                 .estado(Consultorio.Estado.valueOf(draft.status()))
                 .procedimientos(0)
@@ -55,7 +54,6 @@ public class ConsultoriosService {
                 .orElseThrow(() -> new IllegalArgumentException("Consultorio no encontrado: " + dto.code()));
         consultorio.setNombre(dto.name());
         consultorio.setUnidad(dto.unit());
-        consultorio.setOdontologo(dto.dentist());
         consultorio.setUbicacion(dto.location());
         consultorio.setEstado(Consultorio.Estado.valueOf(dto.status()));
         consultorio.setProcedimientos(dto.procedures());
@@ -96,7 +94,6 @@ public class ConsultoriosService {
                 c.getCodigo(),
                 c.getNombre(),
                 c.getUnidad(),
-                c.getOdontologo(),
                 c.getUbicacion(),
                 equipment,
                 c.getEstado().name(),

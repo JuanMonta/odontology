@@ -7,7 +7,6 @@ public record ConsultorioDto(
         String code,
         String name,
         String unit,
-        String dentist,
         String location,
         List<String> equipment,
         String status,

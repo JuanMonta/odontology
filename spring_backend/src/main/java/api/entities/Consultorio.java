@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 
 /**
  * Consultorio (tabla {@code consultorios}).
- * {@code odontologo} es el nombre visible (snapshot); la relación real vive en
- * odontologos.consultorio_codigo.
+ * Datos físicos únicamente: la ocupación en un momento dado la rige la
+ * agenda (tabla {@code appointments}), no una columna fija.
  */
 @Entity
 @Table(name = "consultorios")
@@ -42,9 +42,6 @@ public class Consultorio {
 
     @Column(name = "unidad", nullable = false, length = 40)
     private String unidad;
-
-    @Column(name = "odontologo", nullable = false, length = 60)
-    private String odontologo;
 
     @Column(name = "ubicacion", nullable = false, length = 60)
     private String ubicacion;

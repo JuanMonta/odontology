@@ -1,15 +1,20 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   Consultorio,
   ConsultorioDraft,
   ConsultorioStatus
 } from '../../../../core/models/consultorio.model';
+import { Appointment } from '../../../../core/models/appointment.model';
 import { ConsultoriosHttpService } from '../../services/consultorios-http.service';
+import { DashboardHttpService } from '../../../patient-dashboard/services/dashboard-http.service';
 
 type StatusFilter = ConsultorioStatus | 'all';
+
+/** Duración por defecto de un bloque cuando la cita no informa hora_fin. */
+const SLOT_FALLBACK_MIN = 45;
 
 @Component({
   selector: 'app-consultorios-page',
@@ -27,13 +32,21 @@ export class ConsultoriosPageComponent implements OnInit {
   private readonly search$ = new BehaviorSubject<string>('');
   private readonly status$ = new BehaviorSubject<StatusFilter>('all');
   private readonly selectedId$ = new BehaviorSubject<string | null>(null);
+  private readonly now$ = timer(0, 30_000).pipe(map(() => new Date()));
 
   constructor(
     private service: ConsultoriosHttpService,
+    private dashboard: DashboardHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.consultorios$ = combineLatest([this.service.consultorios$, this.search$, this.status$]).pipe(
+    const withOccupancy$ = combineLatest([
+      this.service.consultorios$,
+      this.dashboard.appointments$,
+      this.now$
+    ]).pipe(map(([list, appointments, now]) => this.applyOccupancy(list, appointments, now)));
+
+    this.consultorios$ = combineLatest([withOccupancy$, this.search$, this.status$]).pipe(
       map(([list, q, filter]) => {
         const query = q.trim().toUpperCase();
         return list.filter(c => {
@@ -42,13 +55,13 @@ export class ConsultoriosPageComponent implements OnInit {
             !query ||
             c.name.toUpperCase().includes(query) ||
             c.code.includes(query) ||
-            c.dentist.toUpperCase().includes(query) ||
+            (c.currentDentist ?? '').toUpperCase().includes(query) ||
             c.location.toUpperCase().includes(query);
           return matchesStatus && matchesQuery;
         });
       })
     );
-    this.selected$ = combineLatest([this.service.consultorios$, this.selectedId$]).pipe(
+    this.selected$ = combineLatest([withOccupancy$, this.selectedId$]).pipe(
       map(([list, id]) => (id ? list.find(c => c.id === id) ?? null : null))
     );
   }
@@ -108,5 +121,52 @@ export class ConsultoriosPageComponent implements OnInit {
 
   onToggleStatus(id: string): void {
     this.service.toggleStatus(id);
+  }
+
+  /** Quién está en turno ahora en cada sala, derivado de la agenda del día. */
+  private applyOccupancy(list: Consultorio[], appointments: Appointment[], now: Date): Consultorio[] {
+    const occupants = new Map<string, { time: number; dentist: string }>();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+
+    for (const a of appointments) {
+      if (a.status === 'cancelled') {
+        continue;
+      }
+      const start = this.parseMinutes(a.time);
+      if (start === null) {
+        continue;
+      }
+      const end = a.horaFin ? this.parseMinutes(a.horaFin) : start + SLOT_FALLBACK_MIN;
+      if (end === null || nowMin < start || nowMin >= end) {
+        continue;
+      }
+      const key = this.roomKey(a.consultorio);
+      const prev = occupants.get(key);
+      if (!prev || start > prev.time) {
+        occupants.set(key, { time: start, dentist: a.dentist });
+      }
+    }
+
+    return list.map(c => {
+      const occupant = occupants.get(this.roomKey(c.code));
+      return { ...c, currentDentist: occupant?.dentist ?? null };
+    });
+  }
+
+  private parseMinutes(hhmm: string): number | null {
+    const [h, m] = hhmm.split(':').map(Number);
+    if (!Number.isFinite(h) || !Number.isFinite(m)) {
+      return null;
+    }
+    return h * 60 + m;
+  }
+
+  /** "CON 01", "CON-001" y "CONSULTORIO 01" colapsan a la misma clave. */
+  private roomKey(s: string): string {
+    const m = s.toUpperCase().match(/^([A-Z]+)?\D*?(\d+)$/);
+    if (!m) {
+      return s.toUpperCase().replace(/[^A-Z]/g, '');
+    }
+    return `${m[1] || 'CON'}:${Number(m[2])}`;
   }
 }

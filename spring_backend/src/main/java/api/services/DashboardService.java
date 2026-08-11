@@ -93,7 +93,8 @@ public class DashboardService {
                 a.getTratamiento(),
                 a.getConsultorio(),
                 a.getOdontologo(),
-                a.getEstado() == null ? null : ESTADO_CONVERTER.convertToDatabaseColumn(a.getEstado()));
+                a.getEstado() == null ? null : ESTADO_CONVERTER.convertToDatabaseColumn(a.getEstado()),
+                a.getHoraFin() == null ? null : FormatoUtil.hora(a.getHoraFin()));
     }
 
     private WaitingPatientDto toWaitingDto(WaitingQueue w) {

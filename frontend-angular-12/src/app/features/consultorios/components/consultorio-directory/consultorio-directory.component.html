@@ -2,7 +2,7 @@
   <div class="dir-head">
     <span class="col col-code">CÓDIGO</span>
     <span class="col col-name">SALA</span>
-    <span class="col col-dentist">ODONTÓLOGO</span>
+    <span class="col col-dentist">ODONTÓLOGO EN TURNO</span>
     <span class="col col-location">UBICACIÓN</span>
     <span class="col col-status">ESTADO</span>
   </div>
@@ -21,7 +21,10 @@
         {{ c.name }}
         <span class="col-name-unit">{{ c.unit }}</span>
       </span>
-      <span class="col col-dentist">{{ c.dentist }}</span>
+      <span class="col col-dentist" [class.col-dentist--free]="!c.currentDentist">
+        <span class="dentist-lamp" [class.dentist-lamp--live]="!!c.currentDentist" aria-hidden="true"></span>
+        {{ c.currentDentist || (c.status === 'operativo' ? 'DISPONIBLE' : '—') }}
+      </span>
       <span class="col col-location">{{ c.location }}</span>
       <span class="col col-status">
         <span class="lamp" [class.lamp--live]="c.status === 'operativo'" [class.lamp--warn]="c.status === 'mantenimiento'" aria-hidden="true"></span>

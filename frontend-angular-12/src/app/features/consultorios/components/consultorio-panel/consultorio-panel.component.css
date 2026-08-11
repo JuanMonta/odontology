@@ -109,6 +109,10 @@
   white-space: nowrap;
 }
 
+.meta-value--free {
+  color: var(--steel-400);
+}
+
 /* ============ Scroll ============ */
 .panel-scroll {
   flex: 1;

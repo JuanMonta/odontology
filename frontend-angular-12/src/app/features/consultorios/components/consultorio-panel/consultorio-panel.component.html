@@ -58,8 +58,10 @@
         <span class="meta-value">{{ consultorio.unit }}</span>
       </div>
       <div class="meta-row">
-        <span class="meta-label">ODONTÓLOGO</span>
-        <span class="meta-value">{{ consultorio.dentist }}</span>
+        <span class="meta-label">ODONTÓLOGO EN TURNO</span>
+        <span class="meta-value" [class.meta-value--free]="!consultorio.currentDentist">
+          {{ consultorio.currentDentist || (consultorio.status === 'operativo' ? 'DISPONIBLE' : '—') }}
+        </span>
       </div>
       <div class="meta-row">
         <span class="meta-label">UBICACIÓN</span>
