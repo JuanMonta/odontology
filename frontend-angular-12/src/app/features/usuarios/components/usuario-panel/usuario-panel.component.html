@@ -16,7 +16,7 @@
     <div class="panel-scroll">
       <app-usuario-form
         [usuario]="editing ? usuario : null"
-        (submit)="onSaved($event)"
+        (saved)="onSaved($event)"
         (cancel)="creating ? cancel.emit() : cancelEdit()"
       ></app-usuario-form>
     </div>

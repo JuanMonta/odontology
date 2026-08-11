@@ -75,7 +75,7 @@
         <app-treatment-form
           [treatment]="selected"
           [creating]="creating"
-          (submit)="onSaved($event)"
+          (saved)="onSaved($event)"
           (cancel)="cancelCreate()"
         ></app-treatment-form>
       </div>

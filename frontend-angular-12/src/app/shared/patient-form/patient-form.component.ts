@@ -21,7 +21,7 @@ export function clearPatientFormDraft(): void {
 })
 export class PatientFormComponent implements OnInit {
   @Input() patient: Patient | null = null;
-  @Output() submit = new EventEmitter<PatientDraft>();
+  @Output() saved = new EventEmitter<PatientDraft>();
   @Output() cancel = new EventEmitter<void>();
 
   name = '';
@@ -72,7 +72,7 @@ export class PatientFormComponent implements OnInit {
     if (!this.patient) {
       clearPatientFormDraft();
     }
-    this.submit.emit(draft);
+    this.saved.emit(draft);
   }
 
   onCancel(): void {

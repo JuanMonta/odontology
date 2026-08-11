@@ -15,7 +15,7 @@ import { ROLES } from '../../services/usuarios-http.service';
 })
 export class UsuarioFormComponent implements OnChanges {
   @Input() usuario: Usuario | null = null;
-  @Output() submit = new EventEmitter<UsuarioDraft>();
+  @Output() saved = new EventEmitter<UsuarioDraft>();
   @Output() cancel = new EventEmitter<void>();
 
   roles = ROLES;
@@ -49,6 +49,6 @@ export class UsuarioFormComponent implements OnChanges {
       role: this.role,
       status: this.status
     };
-    this.submit.emit(draft);
+    this.saved.emit(draft);
   }
 }

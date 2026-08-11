@@ -14,7 +14,7 @@
       </button>
     </div>
     <div class="panel-scroll">
-      <app-message-form (submit)="saved.emit($event)" (cancel)="cancel.emit()"></app-message-form>
+      <app-message-form (saved)="saved.emit($event)" (cancel)="cancel.emit()"></app-message-form>
     </div>
   </ng-container>
 

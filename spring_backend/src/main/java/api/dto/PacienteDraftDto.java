@@ -12,6 +12,6 @@ public record PacienteDraftDto(
         String allergies,
         String status,
         String treatment,
-        LocalDate lastVisit,
+        String lastVisit,
         LocalDate fechaNacimiento) {
 }

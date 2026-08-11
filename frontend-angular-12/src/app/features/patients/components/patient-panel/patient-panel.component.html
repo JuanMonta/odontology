@@ -14,7 +14,7 @@
       </button>
     </div>
     <div class="panel-scroll">
-      <app-patient-form [patient]="null" (submit)="onCreate($event)" (cancel)="cancel.emit()"></app-patient-form>
+      <app-patient-form [patient]="null" (saved)="onCreate($event)" (cancel)="cancel.emit()"></app-patient-form>
     </div>
   </ng-container>
 
@@ -148,7 +148,7 @@
             </button>
           </ng-container>
           <ng-template #editForm>
-            <app-patient-form [patient]="patient" (submit)="onEdit($event)" (cancel)="editMode = false"></app-patient-form>
+            <app-patient-form [patient]="patient" (saved)="onEdit($event)" (cancel)="editMode = false"></app-patient-form>
           </ng-template>
         </div>
 

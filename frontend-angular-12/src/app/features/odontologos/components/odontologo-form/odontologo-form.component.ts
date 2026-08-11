@@ -18,7 +18,7 @@ import { SPECIALTIES } from '../../services/odontologos-http.service';
 })
 export class OdontologoFormComponent implements OnChanges {
   @Input() odontologo: Odontologo | null = null;
-  @Output() submit = new EventEmitter<OdontologoDraft>();
+  @Output() saved = new EventEmitter<OdontologoDraft>();
   @Output() cancel = new EventEmitter<void>();
 
   specialties = SPECIALTIES;
@@ -65,6 +65,6 @@ export class OdontologoFormComponent implements OnChanges {
       turno: this.turno,
       status: this.status
     };
-    this.submit.emit(draft);
+    this.saved.emit(draft);
   }
 }
