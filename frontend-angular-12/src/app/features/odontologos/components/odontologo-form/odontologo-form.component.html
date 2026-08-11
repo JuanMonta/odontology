@@ -33,14 +33,9 @@
 
     <label class="field">
       <span class="field-label">CONSULTORIO</span>
-      <input
-        class="field-input"
-        type="text"
-        [(ngModel)]="consultorio"
-        name="consultorio"
-        placeholder="CON-001"
-        autocomplete="off"
-      />
+      <select class="field-select" [(ngModel)]="consultorio" name="consultorio" aria-label="Consultorio">
+        <option *ngFor="let c of consultorioOptions$ | async" [ngValue]="c">{{ c }}</option>
+      </select>
     </label>
 
     <label class="field">

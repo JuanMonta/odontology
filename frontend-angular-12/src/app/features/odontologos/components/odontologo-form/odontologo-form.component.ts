@@ -1,10 +1,13 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   Odontologo,
   OdontologoDraft,
   OdontologoStatus,
   Turno
 } from '../../../../core/models/odontologo.model';
+import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
 import { SPECIALTIES } from '../../services/odontologos-http.service';
 
 @Component({
@@ -21,6 +24,12 @@ export class OdontologoFormComponent implements OnChanges {
   specialties = SPECIALTIES;
   statuses: OdontologoStatus[] = ['activo', 'ausente', 'inactivo'];
   turnos: Turno[] = ['MAÑANA', 'TARDE', 'COMPLETO'];
+
+  consultorioOptions$: Observable<string[]>;
+
+  constructor(consultorios: ConsultoriosHttpService) {
+    this.consultorioOptions$ = consultorios.consultorios$.pipe(map(list => list.map(c => c.code)));
+  }
 
   name = '';
   specialty: string = SPECIALTIES[0];
