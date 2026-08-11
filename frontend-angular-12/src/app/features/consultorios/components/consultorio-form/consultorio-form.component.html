@@ -13,27 +13,19 @@
     </label>
 
     <label class="field">
-      <span class="field-label">SILLÓN / UNIDAD</span>
-      <input
-        class="field-input"
-        type="text"
-        [(ngModel)]="unit"
-        name="unit"
-        placeholder="SILLÓN F"
-        autocomplete="off"
-      />
+      <span class="field-label">SILLÓN / UNIDAD *</span>
+      <select class="field-select" [(ngModel)]="unit" name="unit" aria-label="Sillón o unidad">
+        <option value="" disabled selected hidden>— SELECCIONAR UNIDAD —</option>
+        <option *ngFor="let u of unidades$ | async" [ngValue]="u">{{ u }}</option>
+      </select>
     </label>
 
     <label class="field">
-      <span class="field-label">UBICACIÓN</span>
-      <input
-        class="field-input"
-        type="text"
-        [(ngModel)]="location"
-        name="location"
-        placeholder="PISO 1 · ALA ESTE"
-        autocomplete="off"
-      />
+      <span class="field-label">UBICACIÓN *</span>
+      <select class="field-select" [(ngModel)]="location" name="location" aria-label="Ubicación">
+        <option value="" disabled selected hidden>— SELECCIONAR UBICACIÓN —</option>
+        <option *ngFor="let l of ubicaciones$ | async" [ngValue]="l">{{ l }}</option>
+      </select>
     </label>
 
     <label class="field">
@@ -43,20 +35,25 @@
       </select>
     </label>
 
-    <label class="field field--full">
+    <div class="field field--full">
       <span class="field-label">EQUIPOS E INSTRUMENTAL</span>
-      <input
-        class="field-input"
-        type="text"
-        [(ngModel)]="equipment"
-        name="equipment"
-        placeholder="SILLÓN · RAYOS X · LÁMPARA LED"
-        autocomplete="off"
-      />
-    </label>
+      <div class="equip-grid">
+        <label class="equip-chip" *ngFor="let e of equipos$ | async" [class.is-on]="equipment.includes(e)">
+          <input
+            class="equip-input"
+            type="checkbox"
+            [checked]="equipment.includes(e)"
+            (change)="toggleEquipo(e)"
+            [attr.aria-label]="e"
+          />
+          <span class="equip-lamp" aria-hidden="true"></span>
+          <span class="equip-name">{{ e }}</span>
+        </label>
+      </div>
+    </div>
   </div>
 
-  <p class="form-error" *ngIf="error" role="alert">LA SALA ES OBLIGATORIA</p>
+  <p class="form-error" *ngIf="error" role="alert">LA SALA, LA UNIDAD Y LA UBICACIÓN SON OBLIGATORIAS</p>
 
   <div class="form-actions">
     <button class="btn-amber" type="submit">{{ consultorio ? 'GUARDAR CAMBIOS' : 'REGISTRAR SALA' }}</button>

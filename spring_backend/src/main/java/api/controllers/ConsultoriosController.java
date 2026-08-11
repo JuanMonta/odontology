@@ -1,5 +1,6 @@
 package api.controllers;
 
+import api.dto.ConsultorioCatalogosDto;
 import api.dto.ConsultorioDto;
 import api.dto.ConsultorioDraftDto;
 import api.services.ConsultoriosService;
@@ -25,6 +26,11 @@ public class ConsultoriosController {
     @GetMapping
     public List<ConsultorioDto> list() {
         return consultoriosService.list();
+    }
+
+    @GetMapping("/catalogos")
+    public ConsultorioCatalogosDto catalogos() {
+        return consultoriosService.catalogos();
     }
 
     @PostMapping
