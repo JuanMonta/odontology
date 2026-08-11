@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import {
   Treatment,
   TreatmentCategory,
@@ -12,10 +12,10 @@ import { TREATMENT_CATEGORIES } from '../../services/treatments-http.service';
   styleUrls: ['./treatment-form.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreatmentFormComponent implements OnInit {
+export class TreatmentFormComponent implements OnChanges {
   @Input() treatment: Treatment | null = null;
   @Input() creating = false;
-  @Output() submit = new EventEmitter<TreatmentDraft>();
+  @Output() saved = new EventEmitter<TreatmentDraft>();
   @Output() cancel = new EventEmitter<void>();
 
   categories = TREATMENT_CATEGORIES;
@@ -28,14 +28,25 @@ export class TreatmentFormComponent implements OnInit {
   active = true;
   error = false;
 
-  ngOnInit(): void {
-    if (this.treatment) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.treatment && this.treatment) {
       this.name = this.treatment.name;
       this.category = this.treatment.category;
       this.durationMin = this.treatment.durationMin;
       this.price = this.treatment.price;
       this.description = this.treatment.description;
       this.active = this.treatment.active;
+    }
+    if (changes.creating && this.creating) {
+      this.name = '';
+      this.category = 'PREVENCIÓN';
+      this.durationMin = 30;
+      this.price = 100;
+      this.description = '';
+      this.active = true;
+    }
+    if (changes.treatment || changes.creating) {
+      this.error = false;
     }
   }
 
@@ -53,6 +64,6 @@ export class TreatmentFormComponent implements OnInit {
       description: this.description.trim().toUpperCase(),
       active: this.active
     };
-    this.submit.emit(draft);
+    this.saved.emit(draft);
   }
 }

@@ -12,7 +12,7 @@ import { ConsultorioCatalogosService, ConsultorioCatalogos } from '../../service
 })
 export class ConsultorioFormComponent implements OnChanges {
   @Input() consultorio: Consultorio | null = null;
-  @Output() submit = new EventEmitter<ConsultorioDraft>();
+  @Output() saved = new EventEmitter<ConsultorioDraft>();
   @Output() cancel = new EventEmitter<void>();
 
   statuses: ConsultorioStatus[] = ['operativo', 'mantenimiento', 'inactivo'];
@@ -69,6 +69,6 @@ export class ConsultorioFormComponent implements OnChanges {
       equipment: this.equipment,
       status: this.status
     };
-    this.submit.emit(draft);
+    this.saved.emit(draft);
   }
 }

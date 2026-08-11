@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -154,8 +155,12 @@ public class PacientesService {
         if (draft.treatment() != null) {
             paciente.setTratamiento(draft.treatment());
         }
-        if (draft.lastVisit() != null) {
-            paciente.setUltimaVisita(draft.lastVisit());
+        if (draft.lastVisit() != null && !draft.lastVisit().isBlank()) {
+            try {
+                paciente.setUltimaVisita(LocalDate.parse(draft.lastVisit()));
+            } catch (DateTimeParseException ignored) {
+                // formato de presentación ("11 AGO 2026"): no toca la última visita
+            }
         }
         pacienteRepository.saveAndFlush(paciente);
         return find(id);

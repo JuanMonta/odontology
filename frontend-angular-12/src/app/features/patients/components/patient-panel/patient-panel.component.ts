@@ -119,8 +119,10 @@ export class PatientPanelComponent implements OnChanges {
 
   onEdit(draft: PatientDraft): void {
     if (this.patient) {
-      this.service.updatePatient(this.patient.id, draft);
-      this.editMode = false;
+      this.service.updatePatient(this.patient.id, draft).subscribe(updated => {
+        this.editMode = false;
+        this.saved.emit(updated);
+      });
     }
   }
 }

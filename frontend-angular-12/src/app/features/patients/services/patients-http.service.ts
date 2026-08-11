@@ -99,11 +99,13 @@ export class PatientsHttpService {
     );
   }
 
-  updatePatient(id: string, draft: PatientDraft): void {
-    this.http.put<Patient>(`${API_BASE}/pacientes/${id}`, draft).subscribe(updated => {
-      this.patientsSubject.next(this.patientsSubject.getValue().map(p => (p.id === updated.id ? updated : p)));
-      this.detailCache.delete(id);
-    });
+  updatePatient(id: string, draft: PatientDraft): Observable<Patient> {
+    return this.http.put<Patient>(`${API_BASE}/pacientes/${id}`, draft).pipe(
+      tap(updated => {
+        this.patientsSubject.next(this.patientsSubject.getValue().map(p => (p.id === updated.id ? updated : p)));
+        this.detailCache.delete(id);
+      })
+    );
   }
 
   addPayment(id: string, amount: number, method = 'EFECTIVO'): void {

@@ -9,7 +9,7 @@ import { MESSAGE_CHANNELS } from '../../services/messages-http.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MessageFormComponent {
-  @Output() submit = new EventEmitter<MessageDraft>();
+  @Output() saved = new EventEmitter<MessageDraft>();
   @Output() cancel = new EventEmitter<void>();
 
   channels = MESSAGE_CHANNELS;
@@ -32,6 +32,6 @@ export class MessageFormComponent {
       body: this.body.trim(),
       channel: this.channel as MessageDraft['channel']
     };
-    this.submit.emit(draft);
+    this.saved.emit(draft);
   }
 }

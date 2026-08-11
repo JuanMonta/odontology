@@ -16,7 +16,7 @@
     <div class="panel-scroll">
       <app-consultorio-form
         [consultorio]="editing ? consultorio : null"
-        (submit)="onSaved($event)"
+        (saved)="onSaved($event)"
         (cancel)="creating ? cancel.emit() : cancelEdit()"
       ></app-consultorio-form>
     </div>

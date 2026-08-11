@@ -16,7 +16,7 @@
     <div class="panel-scroll">
       <app-odontologo-form
         [odontologo]="editing ? odontologo : null"
-        (submit)="onSaved($event)"
+        (saved)="onSaved($event)"
         (cancel)="creating ? cancel.emit() : cancelEdit()"
       ></app-odontologo-form>
     </div>
