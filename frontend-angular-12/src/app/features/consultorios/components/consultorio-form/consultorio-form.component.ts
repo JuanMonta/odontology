@@ -21,8 +21,11 @@ export class ConsultorioFormComponent implements OnChanges {
   status: ConsultorioStatus = 'operativo';
   error = false;
 
+  private syncedId: string | null = null;
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.consultorio && this.consultorio) {
+    if (changes.consultorio && this.consultorio && this.consultorio.id !== this.syncedId) {
+      this.syncedId = this.consultorio.id;
       this.name = this.consultorio.name;
       this.unit = this.consultorio.unit;
       this.location = this.consultorio.location;

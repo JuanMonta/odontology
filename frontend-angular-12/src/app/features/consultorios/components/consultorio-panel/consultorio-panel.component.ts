@@ -31,7 +31,19 @@ export class ConsultorioPanelComponent implements OnChanges {
   statusLabel = consultorioStatusLabel;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.consultorio || changes.creating) {
+    const consultorioChange = changes.consultorio;
+    const creatingChange = changes.creating;
+
+    if (creatingChange && creatingChange.currentValue) {
+      this.editing = false;
+      return;
+    }
+
+    if (
+      consultorioChange &&
+      !consultorioChange.isFirstChange() &&
+      consultorioChange.previousValue?.id !== consultorioChange.currentValue?.id
+    ) {
       this.editing = false;
     }
   }
