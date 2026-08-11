@@ -56,6 +56,67 @@
   cursor: pointer;
 }
 
+/* ============ Equipos: rejilla de chips seleccionables ============ */
+.equip-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.equip-chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.18s var(--ease-out), background 0.18s var(--ease-out);
+}
+
+.equip-chip.is-on {
+  border-color: var(--amber-line);
+  background: rgba(255, 176, 32, 0.08);
+}
+
+.equip-chip:hover {
+  border-color: rgba(255, 176, 32, 0.45);
+}
+
+.equip-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.equip-lamp {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--steel-600);
+  flex-shrink: 0;
+  transition: background 0.18s var(--ease-out), box-shadow 0.18s var(--ease-out);
+}
+
+.equip-chip.is-on .equip-lamp {
+  background: var(--amber);
+  box-shadow: 0 0 7px 1px rgba(255, 176, 32, 0.45);
+}
+
+.equip-name {
+  font-family: var(--font-flap);
+  font-size: 0.72em;
+  letter-spacing: 0.08em;
+  color: var(--steel-300);
+  line-height: 1.25;
+}
+
+.equip-chip.is-on .equip-name {
+  color: var(--flap-ink);
+}
+
 .form-error {
   font-family: var(--font-flap);
   font-size: 0.68em;
@@ -105,6 +166,10 @@
 
 @media (max-width: 480px) {
   .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .equip-grid {
     grid-template-columns: 1fr;
   }
 }

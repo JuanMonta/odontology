@@ -13,8 +13,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Equipo/instrumental de un consultorio (tabla {@code consultorio_equipos}).
- * {@code consultorio_codigo} es FK hacia consultorios (columna plana).
+ * Equipo de un consultorio (tabla {@code consultorio_equipos}).
+ * {@code consultorio_codigo} es FK hacia consultorios y {@code equipo_codigo}
+ * FK hacia el catálogo {@code equipos} (única fuente de verdad del nombre).
  */
 @Entity
 @Table(name = "consultorio_equipos")
@@ -32,6 +33,9 @@ public class ConsultorioEquipo {
 
     @Column(name = "consultorio_codigo", nullable = false, length = 8)
     private String consultorioCodigo;
+
+    @Column(name = "equipo_codigo", length = 8)
+    private String equipoCodigo;
 
     @Column(name = "item", nullable = false, length = 40)
     private String item;

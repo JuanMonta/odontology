@@ -1,11 +1,16 @@
 package api.services;
 
+import api.dto.ConsultorioCatalogosDto;
 import api.dto.ConsultorioDto;
 import api.dto.ConsultorioDraftDto;
 import api.entities.Consultorio;
 import api.entities.ConsultorioEquipo;
+import api.entities.Equipo;
 import api.repositories.ConsultorioEquipoRepository;
 import api.repositories.ConsultorioRepository;
+import api.repositories.EquipoRepository;
+import api.repositories.UbicacionRepository;
+import api.repositories.UnidadRepository;
 import api.util.FormatoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +29,9 @@ public class ConsultoriosService {
     private final ConsultorioRepository consultorioRepository;
     private final ConsultorioEquipoRepository equipoRepository;
     private final CodigoService codigoService;
+    private final UnidadRepository unidadRepository;
+    private final UbicacionRepository ubicacionRepository;
+    private final EquipoRepository equipoCatalogoRepository;
 
     @Transactional(readOnly = true)
     public List<ConsultorioDto> list() {
@@ -31,6 +39,21 @@ public class ConsultoriosService {
                 .sorted(Comparator.comparing(Consultorio::getCodigo))
                 .map(this::toDto)
                 .toList();
+    }
+
+    /** Catálogos (unidades, ubicaciones, equipos) → selects del formulario. */
+    @Transactional(readOnly = true)
+    public ConsultorioCatalogosDto catalogos() {
+        return new ConsultorioCatalogosDto(
+                unidadRepository.findByActivoTrueOrderByNombreAsc().stream()
+                        .map(unidad -> unidad.getNombre() + " · " + unidad.getTipo())
+                        .toList(),
+                ubicacionRepository.findByActivoTrueOrderByNombreAsc().stream()
+                        .map(ubicacion -> ubicacion.getNombre())
+                        .toList(),
+                equipoCatalogoRepository.findByActivoTrueOrderByNombreAsc().stream()
+                        .map(Equipo::getNombre)
+                        .toList());
     }
 
     @Transactional
@@ -77,10 +100,20 @@ public class ConsultoriosService {
     private void guardarEquipos(String codigo, List<String> equipment) {
         equipoRepository.deleteByConsultorioCodigo(codigo);
         if (equipment != null) {
-            equipment.forEach(item -> equipoRepository.save(ConsultorioEquipo.builder()
-                    .consultorioCodigo(codigo)
-                    .item(item)
-                    .build()));
+            equipment.forEach(item -> {
+                String nombre = item.trim().toUpperCase();
+                if (nombre.isEmpty()) {
+                    return;
+                }
+                String equipoCodigo = equipoCatalogoRepository.findByNombre(nombre)
+                        .map(Equipo::getCodigo)
+                        .orElse(null);
+                equipoRepository.save(ConsultorioEquipo.builder()
+                        .consultorioCodigo(codigo)
+                        .equipoCodigo(equipoCodigo)
+                        .item(nombre)
+                        .build());
+            });
         }
     }
 
