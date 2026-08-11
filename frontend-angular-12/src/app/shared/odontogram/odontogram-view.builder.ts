@@ -89,12 +89,12 @@ export interface OdontogramViewModel {
 const CELL = 35;
 const DEC_R = 22;
 
-const PERM_X0 = 70;
+const PERM_X0 = 120;
 const PERM_STEP = 55;
 const PERM_TOP_Y = 95;
 const PERM_BOT_Y = 330;
 
-const DEC_X0 = 140;
+const DEC_X0 = 190;
 const DEC_STEP = 80;
 const DEC_TOP_Y = 200;
 const DEC_BOT_Y = 260;
