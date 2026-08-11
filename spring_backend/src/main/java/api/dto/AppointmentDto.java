@@ -7,5 +7,6 @@ public record AppointmentDto(
         String treatment,
         String consultorio,
         String dentist,
-        String status) {
+        String status,
+        String horaFin) {
 }

@@ -16,7 +16,6 @@ export class ConsultorioFormComponent implements OnChanges {
 
   name = '';
   unit = '';
-  dentist = '';
   location = '';
   equipment = '';
   status: ConsultorioStatus = 'operativo';
@@ -26,7 +25,6 @@ export class ConsultorioFormComponent implements OnChanges {
     if (changes.consultorio && this.consultorio) {
       this.name = this.consultorio.name;
       this.unit = this.consultorio.unit;
-      this.dentist = this.consultorio.dentist;
       this.location = this.consultorio.location;
       this.equipment = this.consultorio.equipment.join(' · ');
       this.status = this.consultorio.status;
@@ -35,7 +33,7 @@ export class ConsultorioFormComponent implements OnChanges {
   }
 
   onSubmit(): void {
-    if (!this.name.trim() || !this.dentist.trim()) {
+    if (!this.name.trim()) {
       this.error = true;
       return;
     }
@@ -43,7 +41,6 @@ export class ConsultorioFormComponent implements OnChanges {
     const draft: ConsultorioDraft = {
       name: this.name.trim().toUpperCase(),
       unit: this.unit.trim().toUpperCase(),
-      dentist: this.dentist.trim().toUpperCase(),
       location: this.location.trim().toUpperCase(),
       equipment: this.equipment
         .split(/[·,]/)

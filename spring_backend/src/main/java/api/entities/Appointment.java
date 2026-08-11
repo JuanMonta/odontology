@@ -44,6 +44,9 @@ public class Appointment {
     @Column(name = "hora", nullable = false)
     private LocalTime hora;
 
+    @Column(name = "hora_fin", nullable = false)
+    private LocalTime horaFin;
+
     @Column(name = "paciente_id", length = 8)
     private String pacienteId;
 

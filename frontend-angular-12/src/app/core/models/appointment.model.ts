@@ -8,6 +8,7 @@ export interface Appointment {
   consultorio: string;     // "CON 01"
   dentist: string;
   status: AppointmentStatus;
+  horaFin?: string | null; // fin del bloque, "09:00" (opcional)
 }
 
 export interface WaitingPatient {
