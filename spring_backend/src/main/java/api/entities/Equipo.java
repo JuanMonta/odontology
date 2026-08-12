@@ -34,6 +34,9 @@ public class Equipo {
     @Column(name = "nombre", nullable = false, length = 40)
     private String nombre;
 
+    @Column(name = "categoria", nullable = false, length = 40)
+    private String categoria;
+
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 

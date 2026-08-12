@@ -5,10 +5,16 @@ import { filter } from 'rxjs/operators';
 import { API_BASE } from '../../../core/config/api.config';
 import { BackendStatusService } from '../../../core/services/backend-status.service';
 
+export interface ConsultorioEquipoCatalogo {
+  codigo: string;
+  nombre: string;
+  categoria: string;
+}
+
 export interface ConsultorioCatalogos {
   unidades: string[];
   ubicaciones: string[];
-  equipos: string[];
+  equipos: ConsultorioEquipoCatalogo[];
 }
 
 /**
