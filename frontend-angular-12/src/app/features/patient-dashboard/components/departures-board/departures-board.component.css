@@ -77,6 +77,19 @@
   white-space: nowrap;
 }
 
+.patient-name {
+  font-family: var(--font-ui);
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--flap-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
 /* Rows */
 .board-rows {
   display: flex;
@@ -155,7 +168,7 @@
 
 /* Row states */
 .row--live .col-time app-flap-text,
-.row--live .col-patient app-flap-text {
+.row--live .col-patient {
   --flap-ink: #ffffff;
 }
 
@@ -164,7 +177,7 @@
 }
 
 .row--delayed .col-time app-flap-text,
-.row--delayed .col-patient app-flap-text {
+.row--delayed .col-patient {
   --flap-ink: var(--amber);
 }
 
@@ -173,10 +186,16 @@
 }
 
 .row--cancelled .col-time app-flap-text,
-.row--cancelled .col-patient app-flap-text,
+.row--cancelled .col-patient,
 .row--cancelled .col-treatment app-flap-text,
 .row--cancelled .col-chair app-flap-text {
   --flap-ink: var(--red-dim);
+}
+
+.row--cancelled .col-time app-flap-text,
+.row--cancelled .col-treatment app-flap-text,
+.row--cancelled .col-chair app-flap-text,
+.row--cancelled .patient-name {
   opacity: 0.7;
 }
 
@@ -185,10 +204,16 @@
 }
 
 .row--done .col-time app-flap-text,
-.row--done .col-patient app-flap-text,
+.row--done .col-patient,
 .row--done .col-treatment app-flap-text,
 .row--done .col-chair app-flap-text {
   --flap-ink: var(--flap-dim);
+}
+
+.row--done .col-time app-flap-text,
+.row--done .col-treatment app-flap-text,
+.row--done .col-chair app-flap-text,
+.row--done .patient-name {
   opacity: 0.55;
 }
 

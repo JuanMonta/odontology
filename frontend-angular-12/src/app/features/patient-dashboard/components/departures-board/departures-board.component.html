@@ -29,7 +29,7 @@
         <app-flap-text [value]="a.time" size="sm"></app-flap-text>
       </div>
       <div class="col col-patient" role="cell">
-        <app-flap-text [value]="a.patient" size="sm" [painted]="true"></app-flap-text>
+        <span class="patient-name">{{ a.patient }}</span>
       </div>
       <div class="col col-treatment" role="cell">
         <app-flap-text [value]="a.treatment" size="sm" [painted]="true"></app-flap-text>
