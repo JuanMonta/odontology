@@ -36,20 +36,29 @@
     </label>
 
     <div class="field field--full">
-      <span class="field-label">EQUIPOS E INSTRUMENTAL</span>
-      <div class="equip-grid">
-        <label class="equip-chip" *ngFor="let e of equipos$ | async" [class.is-on]="equipment.includes(e)">
+      <span class="field-label">EQUIPOS E INSTRUMENTAL <span class="equip-count" *ngIf="equipment.length">{{ equipment.length }} ASIGNADOS</span></span>
+      <div class="equip-assigned" *ngIf="equipment.length">
+        <label class="equip-chip is-on" *ngFor="let e of equipment">
           <input
             class="equip-input"
             type="checkbox"
-            [checked]="equipment.includes(e)"
-            (change)="toggleEquipo(e)"
-            [attr.aria-label]="e"
+            [checked]="true"
+            (change)="removeEquipo(e)"
+            [attr.aria-label]="'Quitar ' + e"
           />
           <span class="equip-lamp" aria-hidden="true"></span>
           <span class="equip-name">{{ e }}</span>
         </label>
+        <button class="equip-add" type="button" (click)="openPicker()">+ AGREGAR</button>
       </div>
+      <button
+        class="equip-add equip-add--empty"
+        type="button"
+        *ngIf="!equipment.length"
+        (click)="openPicker()"
+      >
+        + AGREGAR EQUIPOS E INSTRUMENTAL
+      </button>
     </div>
   </div>
 
@@ -58,5 +67,83 @@
   <div class="form-actions">
     <button class="btn-amber" type="submit">{{ consultorio ? 'GUARDAR CAMBIOS' : 'REGISTRAR SALA' }}</button>
     <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+  </div>
+
+  <!-- ==================== CATÁLOGO DE EQUIPOS (MODAL FLOTANTE) ==================== -->
+  <div
+    class="picker"
+    *ngIf="pickerOpen"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Catálogo de equipos e instrumental"
+  >
+    <div class="picker-backdrop" (click)="onPickBackdrop($event)"></div>
+    <div
+      class="picker-panel"
+      #pickerPanel
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="picker-head">
+        <span class="picker-title">EQUIPOS E INSTRUMENTAL</span>
+        <span class="picker-total" *ngIf="equipment.length">{{ equipment.length }} ASIGNADOS</span>
+        <button class="picker-close" type="button" aria-label="Cerrar catálogo" (click)="closePicker()">
+          <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+            <path d="M3 3l10 10"></path>
+            <path d="M13 3L3 13"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="picker-search">
+        <svg class="picker-search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.5"></circle>
+          <path d="M10.5 10.5L14 14"></path>
+        </svg>
+        <input
+          class="picker-search-input"
+          type="text"
+          [ngModel]="pickQuery"
+          (ngModelChange)="pickQuery = $event; onPickQuery()"
+          name="pickQuery"
+          placeholder="BUSCAR EQUIPO O INSTRUMENTAL…"
+          autocomplete="off"
+        />
+      </div>
+
+      <ng-container *ngIf="equipos$ | async as equipos">
+        <div class="picker-cats">
+          <button
+            class="picker-cat"
+            type="button"
+            *ngFor="let cat of categorias(equipos)"
+            [class.is-on]="pickCategory === cat.nombre"
+            (click)="pickCategory = pickCategory === cat.nombre ? null : cat.nombre; onPickQuery()"
+          >
+            {{ cat.nombre }} <span class="picker-cat-count">{{ cat.count }}</span>
+          </button>
+        </div>
+
+        <div class="picker-body">
+          <label class="equip-chip" *ngFor="let item of visibleEquipos(equipos); trackBy: trackEquipo">
+            <input
+              class="equip-input"
+              type="checkbox"
+              [checked]="selected(item.nombre)"
+              (change)="pickToggle(item)"
+              [attr.aria-label]="item.nombre"
+            />
+            <span class="equip-lamp" aria-hidden="true"></span>
+            <span class="equip-name">{{ item.nombre }}</span>
+          </label>
+          <p class="picker-empty" *ngIf="!visibleEquipos(equipos).length" role="status">SIN RESULTADOS PARA LA BÚSQUEDA</p>
+        </div>
+      </ng-container>
+
+      <div class="picker-foot">
+        <button class="picker-confirm" type="button" (click)="closePicker()">CONFIRMAR</button>
+        <button class="btn-ghost" type="button" (click)="closePicker()">CANCELAR</button>
+      </div>
+    </div>
   </div>
 </form>

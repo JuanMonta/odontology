@@ -3,6 +3,7 @@ package api.services;
 import api.dto.ConsultorioCatalogosDto;
 import api.dto.ConsultorioDto;
 import api.dto.ConsultorioDraftDto;
+import api.dto.EquipoCatalogoDto;
 import api.entities.Consultorio;
 import api.entities.ConsultorioEquipo;
 import api.entities.Equipo;
@@ -52,7 +53,10 @@ public class ConsultoriosService {
                         .map(ubicacion -> ubicacion.getNombre())
                         .toList(),
                 equipoCatalogoRepository.findByActivoTrueOrderByNombreAsc().stream()
-                        .map(Equipo::getNombre)
+                        .map(equipo -> new EquipoCatalogoDto(
+                                equipo.getCodigo(),
+                                equipo.getNombre(),
+                                equipo.getCategoria()))
                         .toList());
     }
 

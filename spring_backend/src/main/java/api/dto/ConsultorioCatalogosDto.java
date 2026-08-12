@@ -9,5 +9,5 @@ import java.util.List;
 public record ConsultorioCatalogosDto(
         List<String> unidades,
         List<String> ubicaciones,
-        List<String> equipos) {
+        List<EquipoCatalogoDto> equipos) {
 }
