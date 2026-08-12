@@ -1,0 +1,66 @@
+<!--
+  DIRECCIÓN: TABLERO DE EMBARQUE — concourse split-flap aplicado al muelle de
+  acceso de la clínica. THESIS: entrar a la app es pasar por el control de
+  embarque; el login es un letrero de tablero donde la tripulación valida su
+  vuelo. OWN-WORLD: matte black flaps, letras pintadas, acero cepillado y
+  lámparas ámbar; la lámpara verde de la nota demo indica "torre en línea".
+  STORY: el usuario llega al mostrador, presenta sus credenciales y "EMBARCA"
+  hacia el tablero principal. FIRST VIEWPORT: caja centrada de acceso con
+  brand, título flap y formulario. FORM: split-flap concourse board (challenger).
+-->
+<div class="stage">
+  <div class="board">
+    <header class="board-head">
+      <span class="brand-mark" aria-hidden="true"><span class="brand-cell">S</span></span>
+      <div class="brand-text">
+        <span class="brand-name">SAS ODONTO</span>
+        <span class="brand-sub">CLÍNICA ODONTOLÓGICA</span>
+      </div>
+    </header>
+
+    <div class="board-body">
+      <div>
+        <span class="kicker">PUERTO DE CONTROL</span>
+        <h1 class="title">ACCESO DE TRIPULACIÓN</h1>
+      </div>
+
+      <form class="form" (ngSubmit)="onSubmit()" novalidate>
+        <label class="field">
+          <span class="field-label">USUARIO</span>
+          <input
+            class="field-input"
+            type="text"
+            name="username"
+            [(ngModel)]="username"
+            autocomplete="username"
+            placeholder="CÓDIGO DE TRIPULACIÓN"
+          />
+        </label>
+
+        <label class="field">
+          <span class="field-label">CONTRASEÑA</span>
+          <input
+            class="field-input"
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            autocomplete="current-password"
+            placeholder="CLAVE DE ACCESO"
+          />
+        </label>
+
+        <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+
+        <button class="btn-embark" type="submit" [disabled]="loading">
+          <span class="lamp" aria-hidden="true"></span>
+          <span>{{ loading ? 'EMBARCANDO…' : 'EMBARCAR' }}</span>
+        </button>
+      </form>
+
+      <footer class="demo">
+        <span class="demo-lamp" aria-hidden="true"></span>
+        <span>ACCESO DEMO — <span class="demo-cred">mrivera / password</span></span>
+      </footer>
+    </div>
+  </div>
+</div>

@@ -4,5 +4,6 @@ public record UsuarioDraftDto(
         String username,
         String name,
         String role,
-        String status) {
+        String status,
+        String password) {
 }

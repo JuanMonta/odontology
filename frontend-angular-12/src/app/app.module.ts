@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MainLayoutModule } from './layouts/main-layout/main-layout.module';
+import { JwtInterceptor } from './core/auth/jwt.interceptor';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,9 @@ import { MainLayoutModule } from './layouts/main-layout/main-layout.module';
     AppRoutingModule,
     MainLayoutModule
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

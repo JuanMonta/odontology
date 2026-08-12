@@ -18,6 +18,12 @@
  * BROWSER POLYFILLS
  */
 
+/***************************************************************************************************
+ * sockjs-client referencia `global` (entorno Node); sin este shim, el chat STOMP
+ * revienta en el navegador con "ReferenceError: global is not defined".
+ */
+(window as any).global = window;
+
 /**
  * IE11 requires the following for NgClass support on SVG elements
  */

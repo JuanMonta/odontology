@@ -8,10 +8,13 @@ import {
   ViewChild
 } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { Subscription, interval, of } from 'rxjs';
+import { filter, switchMap } from 'rxjs/operators';
 import { MessagesHttpService } from '../../features/messages/services/messages-http.service';
 import { ConfiguracionHttpService } from '../../features/configuracion/services/configuracion-http.service';
+import { ChatHttpService } from '../../features/chat/services/chat-http.service';
+import { AuthStore } from '../../core/auth/auth.store';
+import { Usuario } from '../../core/models/usuario.model';
 
 interface NavItem {
   label: string;
@@ -46,11 +49,14 @@ export class MainLayoutComponent {
   today = '';
   open = false;
   toasts: ToastItem[] = [];
+  usuario: Usuario | null = null;
 
   private readonly navSub: Subscription;
   private readonly msgsSub: Subscription;
   private readonly toastsSub: Subscription;
   private readonly settingsSub: Subscription;
+  private readonly userSub: Subscription;
+  private chatPollSub?: Subscription;
   private alertasUrgentes = true;
 
   sections: NavSection[] = [
@@ -68,7 +74,8 @@ export class MainLayoutComponent {
         { label: 'FACTURACIÓN', active: false },
         { label: 'REPORTES', active: false },
         { label: 'CONSULTORIOS', route: '/consultorios', title: 'MAPEO DE CONSULTORIOS', active: false },
-        { label: 'MENSAJES', route: '/mensajes', title: 'BANDEJA DE MENSAJES', active: false }
+        { label: 'MENSAJES', route: '/mensajes', title: 'BANDEJA DE MENSAJES', active: false },
+        { label: 'CHAT EN VIVO', route: '/chat', title: 'ESTACIONES Y TRANSMISIONES', active: false }
       ]
     },
     {
@@ -94,12 +101,25 @@ export class MainLayoutComponent {
     private readonly router: Router,
     private readonly cdr: ChangeDetectorRef,
     private readonly messages: MessagesHttpService,
-    private readonly settings: ConfiguracionHttpService
+    private readonly settings: ConfiguracionHttpService,
+    private readonly chat: ChatHttpService,
+    private readonly auth: AuthStore
   ) {
     this.today = this.formatToday(new Date());
     this.navSub = this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(() => this.syncActiveFromRoute());
+
+    this.userSub = this.auth.usuario$().subscribe(u => {
+      this.usuario = u;
+      if (u) {
+        this.startChatPoll();
+      } else {
+        this.stopChatPoll();
+        this.setChatBadge(undefined);
+      }
+      this.cdr.markForCheck();
+    });
 
     this.msgsSub = this.messages.unreadCount$.subscribe(count => {
       const item = this.sections[1].items.find(i => i.label === 'MENSAJES');
@@ -130,6 +150,8 @@ export class MainLayoutComponent {
     this.msgsSub.unsubscribe();
     this.toastsSub.unsubscribe();
     this.settingsSub.unsubscribe();
+    this.userSub.unsubscribe();
+    this.stopChatPoll();
   }
 
   private syncActiveFromRoute(): void {
@@ -159,6 +181,32 @@ export class MainLayoutComponent {
 
   onLogout(): void {
     this.close();
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
+
+  private startChatPoll(): void {
+    this.stopChatPoll();
+    this.chatPollSub = interval(15000)
+      .pipe(switchMap(() => (this.auth.isLoggedIn() ? this.chat.noLeidos() : of(0))))
+      .subscribe(count => {
+        this.setChatBadge(count > 0 ? count : undefined);
+        this.cdr.markForCheck();
+      });
+  }
+
+  private stopChatPoll(): void {
+    if (this.chatPollSub) {
+      this.chatPollSub.unsubscribe();
+      this.chatPollSub = undefined;
+    }
+  }
+
+  private setChatBadge(badge: number | undefined): void {
+    const item = this.sections[1].items.find(i => i.label === 'CHAT EN VIVO');
+    if (item) {
+      item.badge = badge;
+    }
   }
 
   dismissToast(id: string): void {
