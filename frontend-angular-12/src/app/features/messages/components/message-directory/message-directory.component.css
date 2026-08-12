@@ -91,14 +91,28 @@
   box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.45);
 }
 
-.lamp--urgent {
+.lamp--urgente {
   background: var(--red-dim);
-  box-shadow: 0 0 8px 1px rgba(207, 90, 84, 0.45);
+  box-shadow: 0 0 8px 1px rgba(207, 90, 84, 0.5);
+}
+
+.lamp--importante {
+  background: #d9a441;
+  box-shadow: 0 0 8px 1px rgba(217, 164, 65, 0.45);
+}
+
+.lamp--informacion {
+  background: #5b7c91;
+  box-shadow: 0 0 8px 1px rgba(91, 124, 145, 0.4);
 }
 
 /* ============ Asunto ============ */
 .col-subject {
   color: var(--steel-200);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .dir-row.is-unread .col-subject {
@@ -106,12 +120,38 @@
   font-weight: 500;
 }
 
-.dir-row.is-urgent .col-subject {
-  color: var(--amber);
+.subject-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ============ Remitente / fecha / hora ============ */
-.col-from {
+/* ============ Chip de prioridad ============ */
+.prio-chip {
+  flex-shrink: 0;
+  padding: 2px 7px;
+  font-family: var(--font-flap);
+  font-size: 0.62em;
+  letter-spacing: 0.14em;
+  color: var(--steel-300);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
+}
+
+.prio-chip.prio--urgente {
+  color: var(--red-dim);
+  border-color: rgba(207, 90, 84, 0.5);
+  background: rgba(207, 90, 84, 0.08);
+}
+
+.prio-chip.prio--importante {
+  color: #d9a441;
+  border-color: rgba(217, 164, 65, 0.45);
+  background: rgba(217, 164, 65, 0.07);
+}
+
+/* ============ Destino / fecha / hora ============ */
+.col-para {
   font-size: 0.76em;
   letter-spacing: 0.12em;
   color: var(--steel-400);

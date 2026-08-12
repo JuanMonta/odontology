@@ -44,12 +44,13 @@ public class MessagesService {
                 .codigo(codigoService.nextCodigo("MSG", "MSG-%03d"))
                 .asunto(draft.subject())
                 .cuerpo(draft.body())
-                .remitente(draft.to())
+                .remitente(draft.remitente())
                 .canal(ClinicMessage.Canal.valueOf(draft.channel()))
                 .fecha(hoy)
                 .hora(LocalTime.now())
                 .estado(ClinicMessage.Estado.unread)
-                .urgente(false)
+                .destino(ClinicMessage.Destino.valueOf(draft.destino()))
+                .prioridad(ClinicMessage.Prioridad.valueOf(draft.prioridad()))
                 .build();
         return toDto(messageRepository.save(message));
     }
@@ -81,6 +82,7 @@ public class MessagesService {
                 FormatoUtil.fecha(m.getFecha()),
                 FormatoUtil.hora(m.getHora()),
                 m.getEstado().name(),
-                m.getUrgente());
+                m.getDestino().name(),
+                m.getPrioridad().name());
     }
 }

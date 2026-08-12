@@ -36,8 +36,12 @@
   margin-bottom: 2px;
 }
 
-.panel-kicker--urgent {
+.panel-kicker--urgente {
   color: var(--red-dim);
+}
+
+.panel-kicker--importante {
+  color: var(--amber);
 }
 
 .panel-title {

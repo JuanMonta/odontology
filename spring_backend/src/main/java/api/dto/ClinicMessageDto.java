@@ -9,5 +9,6 @@ public record ClinicMessageDto(
         String date,
         String time,
         String status,
-        boolean urgent) {
+        String destino,
+        String prioridad) {
 }

@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { ClinicMessage, MessageDraft } from '../../../../core/models/message.model';
 import { MessagesHttpService } from '../../services/messages-http.service';
 
-type StatusFilter = 'all' | 'unread' | 'urgent';
+type StatusFilter = 'all' | 'unread' | 'urgente' | 'importante';
 
 @Component({
   selector: 'app-messages-page',
@@ -36,11 +36,13 @@ export class MessagesPageComponent implements OnInit {
           const matchesStatus =
             filter === 'all' ||
             (filter === 'unread' && m.status === 'unread') ||
-            (filter === 'urgent' && m.urgent);
+            (filter === 'urgente' && m.prioridad === 'urgente') ||
+            (filter === 'importante' && m.prioridad === 'importante');
           const matchesQuery =
             !query ||
             m.subject.toUpperCase().includes(query) ||
-            m.from.toUpperCase().includes(query);
+            m.from.toUpperCase().includes(query) ||
+            m.destino.toUpperCase().includes(query);
           return matchesStatus && matchesQuery;
         });
       })

@@ -29,21 +29,22 @@
         <input
           class="search-input"
           type="search"
-          placeholder="BUSCAR MENSAJE · ASUNTO / REMITENTE"
+          placeholder="BUSCAR MENSAJE · ASUNTO / REMITENTE / PARA"
           aria-label="Buscar mensaje"
           (input)="onSearch($any($event.target).value)"
         />
       </label>
       <div class="filter">
-        <span class="filter-label">ESTADO</span>
+        <span class="filter-label">PRIORIDAD</span>
         <select
           class="filter-select"
-          aria-label="Filtrar por estado"
+          aria-label="Filtrar por prioridad"
           (change)="onFilter($any($event.target).value)"
         >
           <option value="all">TODOS</option>
           <option value="unread">NO LEÍDOS</option>
-          <option value="urgent">URGENTES</option>
+          <option value="urgente">URGENTES</option>
+          <option value="importante">IMPORTANTES</option>
         </select>
       </div>
     </div>

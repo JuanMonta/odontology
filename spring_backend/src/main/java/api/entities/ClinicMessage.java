@@ -32,6 +32,10 @@ public class ClinicMessage {
 
     public enum Canal { consulta, paciente, equipo }
 
+    public enum Destino { todos, equipo, recepcion, odontologos }
+
+    public enum Prioridad { urgente, importante, informacion }
+
     public enum Estado { unread, read }
 
     @Id
@@ -61,8 +65,13 @@ public class ClinicMessage {
     @Column(name = "estado", nullable = false)
     private Estado estado;
 
-    @Column(name = "urgente", nullable = false)
-    private Boolean urgente;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "destino", nullable = false)
+    private Destino destino;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "prioridad", nullable = false)
+    private Prioridad prioridad;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

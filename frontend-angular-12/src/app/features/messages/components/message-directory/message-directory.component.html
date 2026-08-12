@@ -2,7 +2,7 @@
   <div class="dir-head">
     <span class="col col-flag">ESTADO</span>
     <span class="col col-subject">ASUNTO</span>
-    <span class="col col-from">REMITENTE</span>
+    <span class="col col-para">PARA</span>
     <span class="col col-date">FECHA</span>
     <span class="col col-time">HORA</span>
   </div>
@@ -13,15 +13,26 @@
       class="dir-row"
       [class.is-selected]="m.id === selectedId"
       [class.is-unread]="m.status === 'unread'"
-      [class.is-urgent]="m.urgent"
       type="button"
       (click)="select.emit(m)"
     >
       <span class="col col-flag">
-        <span class="lamp" [class.lamp--live]="m.status === 'unread'" [class.lamp--urgent]="m.urgent" aria-hidden="true"></span>
+        <span
+          class="lamp"
+          [class.lamp--urgente]="m.prioridad === 'urgente'"
+          [class.lamp--importante]="m.prioridad === 'importante'"
+          [class.lamp--informacion]="m.prioridad === 'informacion'"
+          [class.lamp--live]="m.status === 'unread'"
+          aria-hidden="true"
+        ></span>
       </span>
-      <span class="col col-subject">{{ m.subject }}</span>
-      <span class="col col-from">{{ m.from }}</span>
+      <span class="col col-subject">
+        <span class="prio-chip" [class.prio--urgente]="m.prioridad === 'urgente'" [class.prio--importante]="m.prioridad === 'importante'">
+          {{ prioridadLabel(m.prioridad) }}
+        </span>
+        <span class="subject-text">{{ m.subject }}</span>
+      </span>
+      <span class="col col-para">{{ destinoLabel(m.destino) }}</span>
       <span class="col col-date">{{ m.date }}</span>
       <span class="col col-time">{{ m.time }}</span>
     </button>
