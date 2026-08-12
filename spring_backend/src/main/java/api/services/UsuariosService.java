@@ -6,6 +6,7 @@ import api.entities.Usuario;
 import api.repositories.UsuarioRepository;
 import api.util.FormatoUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,10 +33,11 @@ public class UsuariosService {
 
     @Transactional
     public UsuarioDto add(UsuarioDraftDto draft) {
+        String hash = hashPassword(draft.password());
         Usuario usuario = Usuario.builder()
                 .codigo(codigoService.nextCodigo("USR", "USR-%03d"))
                 .username(draft.username())
-                .passwordHash("")
+                .passwordHash(hash)
                 .nombre(draft.name())
                 .rol(Usuario.Rol.valueOf(draft.role()))
                 .estado(Usuario.Estado.valueOf(draft.status()))
@@ -68,7 +70,7 @@ public class UsuariosService {
         return toDto(usuarioRepository.save(usuario));
     }
 
-    private UsuarioDto toDto(Usuario u) {
+    public UsuarioDto toDto(Usuario u) {
         return new UsuarioDto(
                 u.getCodigo(),
                 u.getCodigo(),
@@ -76,7 +78,12 @@ public class UsuariosService {
                 u.getNombre(),
                 u.getRol().name(),
                 u.getEstado().name(),
-                u.getUltimoAcceso() == null ? "—" : FormatoUtil.fechaHora(u.getUltimoAcceso()),
+                FormatoUtil.fechaHora(u.getUltimoAcceso()),
                 u.getTelefono());
+    }
+
+    private static String hashPassword(String password) {
+        String plano = (password == null || password.isBlank()) ? "sas2026" : password;
+        return BCrypt.hashpw(plano, BCrypt.gensalt(10));
     }
 }

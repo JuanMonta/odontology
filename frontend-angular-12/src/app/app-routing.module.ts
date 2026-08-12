@@ -1,8 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { AuthGuard } from './core/auth/auth.guard';
 
 const routes: Routes = [
+  {
+    path: 'login',
+    loadChildren: () =>
+      import('./features/auth/auth.module').then(m => m.AuthModule)
+  },
   {
     path: '',
     component: MainLayoutComponent,
@@ -28,6 +34,12 @@ const routes: Routes = [
         path: 'mensajes',
         loadChildren: () =>
           import('./features/messages/messages.module').then(m => m.MessagesModule)
+      },
+      {
+        path: 'chat',
+        canActivate: [AuthGuard],
+        loadChildren: () =>
+          import('./features/chat/chat.module').then(m => m.ChatModule)
       },
       {
         path: 'consultorios',

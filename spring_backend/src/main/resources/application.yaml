@@ -1,9 +1,20 @@
 server:
   port: 8000
 
+app:
+  jwt:
+    # Secreto HS256 para firmar los tokens de sesión del chat. En producción
+    # sobreescribir vía variable de entorno JWT_SECRET (mínimo 16 caracteres).
+    secret: ${JWT_SECRET:SAS_ODONTOLOGIA_CLINICA_2026_JWT_HS256_SECRETO_LARGO}
+
 spring:
   application:
     name: crowie.dev
+
+  session:
+    # La identidad es JWT (sin sesión de servidor); spring-session-jdbc queda
+    # en el classpath por starters de test y no debe exigir tabla spring_session.
+    store-type: none
 
   datasource:
     # Base de datos canónica: la crea database/schema.sql (ejecutar una vez con
