@@ -119,4 +119,23 @@
       <router-outlet></router-outlet>
     </main>
   </div>
+
+  <div class="toast-stack" aria-live="polite" aria-label="Notificaciones de mensajes">
+    <button
+      *ngFor="let t of toasts"
+      class="toast"
+      [class.toast--urgente]="t.prioridad === 'urgente'"
+      [class.toast--importante]="t.prioridad === 'importante'"
+      type="button"
+      (click)="goToMessages()"
+    >
+      <span class="toast-lamp" aria-hidden="true"></span>
+      <span class="toast-body">
+        <span class="toast-kicker">NUEVO MENSAJE · {{ t.prioridad | uppercase }}</span>
+        <span class="toast-subject">{{ t.subject }}</span>
+        <span class="toast-from">DE {{ t.from }}</span>
+      </span>
+      <span class="toast-close" (click)="dismissToast(t.id); $event.stopPropagation()" aria-label="Descartar notificación">×</span>
+    </button>
+  </div>
 </div>

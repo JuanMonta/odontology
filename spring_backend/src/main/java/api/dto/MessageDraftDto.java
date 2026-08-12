@@ -3,6 +3,8 @@ package api.dto;
 public record MessageDraftDto(
         String subject,
         String body,
-        String to,
-        String channel) {
+        String remitente,
+        String destino,
+        String channel,
+        String prioridad) {
 }

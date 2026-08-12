@@ -2,14 +2,16 @@
   <div class="form-grid">
     <label class="field">
       <span class="field-label">PARA</span>
-      <input
-        class="field-input"
-        type="text"
-        [(ngModel)]="to"
-        name="to"
-        placeholder="RECEPCIÓN / DRA. TORRES / PACIENTE"
-        autocomplete="off"
-      />
+      <select class="field-select" [(ngModel)]="destino" name="destino" aria-label="Público objetivo del mensaje">
+        <option *ngFor="let d of destinos" [ngValue]="d.id">{{ d.label }}</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="field-label">PRIORIDAD</span>
+      <select class="field-select" [(ngModel)]="prioridad" name="prioridad" aria-label="Prioridad del mensaje">
+        <option *ngFor="let p of priorities" [ngValue]="p.id">{{ p.label }}</option>
+      </select>
     </label>
 
     <label class="field">
@@ -17,6 +19,11 @@
       <select class="field-select" [(ngModel)]="channel" name="channel" aria-label="Canal del mensaje">
         <option *ngFor="let c of channels" [ngValue]="c.id">{{ c.label }}</option>
       </select>
+    </label>
+
+    <label class="field">
+      <span class="field-label">REMITENTE</span>
+      <input class="field-input" type="text" [value]="sender" readonly aria-label="Remitente del mensaje" />
     </label>
 
     <label class="field field--full">
@@ -38,13 +45,13 @@
         rows="6"
         [(ngModel)]="body"
         name="body"
-        placeholder="DETALLE DE LA COMUNICACIÓN"
+        placeholder="DETALLE DE LA COMUNICACIÓN INTERNA DEL CONSULTORIO"
         autocomplete="off"
       ></textarea>
     </label>
   </div>
 
-  <p class="form-error" *ngIf="error" role="alert">DESTINATARIO Y ASUNTO SON OBLIGATORIOS</p>
+  <p class="form-error" *ngIf="error" role="alert">ASUNTO ES OBLIGATORIO</p>
 
   <div class="form-actions">
     <button class="btn-amber" type="submit">ENVIAR MENSAJE</button>

@@ -31,8 +31,12 @@
   <ng-container *ngIf="!creating && message">
     <div class="panel-head">
       <div class="panel-head-info">
-        <span class="panel-kicker" [class.panel-kicker--urgent]="message.urgent">
-          {{ message.urgent ? 'MENSAJE URGENTE' : 'COMUNICACIÓN DEL CONSULTORIO' }}
+        <span
+          class="panel-kicker"
+          [class.panel-kicker--urgente]="message.prioridad === 'urgente'"
+          [class.panel-kicker--importante]="message.prioridad === 'importante'"
+        >
+          {{ prioridadKicker(message.prioridad) }}
         </span>
         <span class="panel-title">{{ message.subject }}</span>
       </div>
@@ -45,6 +49,10 @@
     </div>
 
     <div class="panel-meta">
+      <div class="meta-row">
+        <span class="meta-label">PARA</span>
+        <span class="meta-value">{{ destinoLabel(message.destino) }}</span>
+      </div>
       <div class="meta-row">
         <span class="meta-label">REMITENTE</span>
         <span class="meta-value">{{ message.from }}</span>
