@@ -1,0 +1,40 @@
+<div class="dir">
+  <div class="dir-head">
+    <span class="col col-code">CÓDIGO</span>
+    <span class="col col-name">TURNO</span>
+    <span class="col col-jornada">JORNADA</span>
+    <span class="col col-descanso">DESCANSO</span>
+    <span class="col col-status">ESTADO</span>
+  </div>
+
+  <div class="dir-list" *ngIf="turnos.length; else empty">
+    <button
+      *ngFor="let t of turnos"
+      class="dir-row"
+      [class.is-selected]="t.id === selectedId"
+      [class.is-inactive]="!t.activo"
+      type="button"
+      (click)="select.emit(t)"
+    >
+      <span class="col col-code">{{ t.code }}</span>
+      <span class="col col-name">
+        {{ t.nombre }}
+        <span class="col-name-license">TURNO LABORAL</span>
+      </span>
+      <span class="col col-jornada">{{ jornada(t) }}</span>
+      <span class="col col-descanso">{{ descanso(t) }}</span>
+      <span class="col col-status">
+        <span class="lamp" [class.lamp--live]="t.activo" aria-hidden="true"></span>
+        <span class="status-text" [class.status-text--away]="!t.activo">{{ t.activo ? 'activo' : 'inactivo' }}</span>
+      </span>
+    </button>
+  </div>
+
+  <ng-template #empty>
+    <div class="dir-empty">
+      <span class="dir-empty-lamp" aria-hidden="true"></span>
+      <p>SIN TURNOS</p>
+      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
+    </div>
+  </ng-template>
+</div>

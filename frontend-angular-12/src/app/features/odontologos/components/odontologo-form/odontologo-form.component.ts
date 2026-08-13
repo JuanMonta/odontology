@@ -4,10 +4,10 @@ import { map } from 'rxjs/operators';
 import {
   Odontologo,
   OdontologoDraft,
-  OdontologoStatus,
-  Turno
+  OdontologoStatus
 } from '../../../../core/models/odontologo.model';
 import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
+import { TurnosHttpService } from '../../../turnos/services/turnos-http.service';
 import { SPECIALTIES } from '../../services/odontologos-http.service';
 
 @Component({
@@ -23,19 +23,20 @@ export class OdontologoFormComponent implements OnChanges {
 
   specialties = SPECIALTIES;
   statuses: OdontologoStatus[] = ['activo', 'ausente', 'inactivo'];
-  turnos: Turno[] = ['MAÑANA', 'TARDE', 'COMPLETO'];
 
   consultorioOptions$: Observable<string[]>;
+  turnoOptions$: Observable<string[]>;
 
-  constructor(consultorios: ConsultoriosHttpService) {
+  constructor(consultorios: ConsultoriosHttpService, turnos: TurnosHttpService) {
     this.consultorioOptions$ = consultorios.consultorios$.pipe(map(list => list.map(c => c.code)));
+    this.turnoOptions$ = turnos.activos$.pipe(map(list => list.map(t => t.nombre)));
   }
 
   name = '';
   specialty: string = SPECIALTIES[0];
   license = '';
   consultorio = '';
-  turno: Turno = 'MAÑANA';
+  turno = '';
   status: OdontologoStatus = 'activo';
   error = false;
 

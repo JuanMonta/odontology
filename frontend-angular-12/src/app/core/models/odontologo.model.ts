@@ -1,5 +1,4 @@
 export type OdontologoStatus = 'activo' | 'ausente' | 'inactivo';
-export type Turno = 'MAÑANA' | 'TARDE' | 'COMPLETO';
 
 export interface Odontologo {
   id: string;           // "odo-1"
@@ -8,7 +7,7 @@ export interface Odontologo {
   specialty: string;    // "CIRUGÍA ORAL"
   license: string;      // "COP 12453"
   consultorio: string;  // "CON-001"
-  turno: Turno;         // "MAÑANA" | "TARDE" | "COMPLETO"
+  turno: string;        // catálogo turnos (nombre)
   status: OdontologoStatus;
   experience: number;   // años de ejercicio
   procedures: number;   // procedimientos del mes
@@ -19,6 +18,6 @@ export interface OdontologoDraft {
   specialty: string;
   license: string;
   consultorio: string;
-  turno: Turno;
+  turno: string;
   status: OdontologoStatus;
 }

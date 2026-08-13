@@ -18,7 +18,9 @@ import java.time.LocalDateTime;
 
 /**
  * Odontólogo (tabla {@code odontologos}).
- * {@code consultorioCodigo} es FK hacia consultorios (columna plana).
+ * {@code consultorioCodigo} es FK hacia consultorios (columna plana) y
+ * {@code turno} referencia el catálogo {@code turnos} por nombre (columna
+ * plana, validada en el servicio), igual que usuarios.rol → usuario_roles.
  */
 @Entity
 @Table(name = "odontologos")
@@ -28,8 +30,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Odontologo {
-
-    public enum Turno { MAÑANA, TARDE, COMPLETO }
 
     public enum Estado { activo, ausente, inactivo }
 
@@ -49,9 +49,8 @@ public class Odontologo {
     @Column(name = "consultorio_codigo", length = 8)
     private String consultorioCodigo;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "turno", nullable = false)
-    private Turno turno;
+    private String turno;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
