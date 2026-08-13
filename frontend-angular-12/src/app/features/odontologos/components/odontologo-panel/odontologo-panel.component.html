@@ -3,7 +3,7 @@
   <ng-container *ngIf="creating || editing">
     <div class="panel-head">
       <div class="panel-head-info">
-        <span class="panel-kicker">{{ creating ? 'NUEVO ODONTÓLOGO' : 'EDITAR PROFESIONAL' }}</span>
+        <span class="panel-kicker">{{ creating ? 'NUEVO PROFESIONAL' : 'EDITAR PROFESIONAL' }}</span>
         <span class="panel-title">{{ creating ? 'REGISTRO DE PROFESIONAL' : (odontologo?.code ?? '') }}</span>
       </div>
       <button class="icon-btn" type="button" aria-label="Cerrar" (click)="closeForm()">

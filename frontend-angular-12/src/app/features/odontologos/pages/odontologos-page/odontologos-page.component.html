@@ -14,13 +14,13 @@
   <header class="page-head">
     <div class="page-head-row">
       <div class="page-head-left">
-        <h2 class="page-title">ROSTER DE ODONTÓLOGOS</h2>
-        <span class="page-sub">PERSONAL CLÍNICO · ESPECIALIDADES Y ASIGNACIONES · {{ (odontologos$ | async)?.length ?? 0 }} PROFESIONALES</span>
+        <h2 class="page-title">PERSONAL CLÍNICO</h2>
+        <span class="page-sub">ESPECIALIDADES Y ASIGNACIONES · {{ (odontologos$ | async)?.length ?? 0 }} PROFESIONALES</span>
       </div>
       <div class="page-head-actions">
         <button class="btn-amber" type="button" (click)="startCreate()">
           <span class="btn-plus" aria-hidden="true"></span>
-          NUEVO ODONTÓLOGO
+          NUEVO PROFESIONAL
         </button>
       </div>
     </div>
