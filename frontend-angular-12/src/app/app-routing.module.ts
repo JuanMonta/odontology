@@ -57,6 +57,11 @@ const routes: Routes = [
           import('./features/usuarios/usuarios.module').then(m => m.UsuariosModule)
       },
       {
+        path: 'turnos',
+        loadChildren: () =>
+          import('./features/turnos/turnos.module').then(m => m.TurnosModule)
+      },
+      {
         path: 'configuracion',
         loadChildren: () =>
           import('./features/configuracion/configuracion.module').then(m => m.ConfiguracionModule)

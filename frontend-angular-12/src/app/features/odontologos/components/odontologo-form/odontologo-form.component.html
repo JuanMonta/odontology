@@ -41,7 +41,7 @@
     <label class="field">
       <span class="field-label">TURNO</span>
       <select class="field-select" [(ngModel)]="turno" name="turno" aria-label="Turno">
-        <option *ngFor="let t of turnos" [ngValue]="t">{{ t }}</option>
+        <option *ngFor="let t of turnoOptions$ | async" [ngValue]="t">{{ t }}</option>
       </select>
     </label>
 

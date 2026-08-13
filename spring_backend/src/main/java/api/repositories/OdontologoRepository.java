@@ -14,7 +14,7 @@ public interface OdontologoRepository extends JpaRepository<Odontologo, String> 
 
     List<Odontologo> findByEstado(Odontologo.Estado estado);
 
-    List<Odontologo> findByTurno(Odontologo.Turno turno);
+    List<Odontologo> findByTurno(String turno);
 
     List<Odontologo> findByConsultorioCodigo(String consultorioCodigo);
 

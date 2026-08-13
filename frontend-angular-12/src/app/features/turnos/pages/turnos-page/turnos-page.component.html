@@ -1,0 +1,61 @@
+<div class="page turnos">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-left">
+        <h2 class="page-title">TURNOS Y HORARIOS</h2>
+        <span class="page-sub">JORNADAS LABORALES · HORARIOS Y PAUSAS · {{ (turnos$ | async)?.length ?? 0 }} TURNOS</span>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn-amber" type="button" (click)="startCreate()">
+          <span class="btn-plus" aria-hidden="true"></span>
+          NUEVO TURNO
+        </button>
+      </div>
+    </div>
+    <div class="page-toolbar">
+      <label class="search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="BUSCAR TURNO · NOMBRE / CÓDIGO"
+          aria-label="Buscar turno"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </label>
+      <div class="filter">
+        <span class="filter-label">ESTADO</span>
+        <select
+          class="filter-select"
+          aria-label="Filtrar por estado"
+          (change)="onFilter($any($event.target).value)"
+        >
+          <option value="all">TODOS</option>
+          <option [value]="true">ACTIVOS</option>
+          <option [value]="false">INACTIVOS</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <section class="directory" aria-label="Turnos laborales">
+      <app-turno-directory
+        [turnos]="(turnos$ | async) ?? []"
+        [selectedId]="selectedId"
+        (select)="onSelect($event)"
+      ></app-turno-directory>
+    </section>
+
+    <aside class="detail" aria-label="Ficha de turno">
+      <app-turno-panel
+        [turno]="(selected$ | async) ?? null"
+        [creating]="creating"
+        (close)="onClosePanel()"
+        (cancel)="cancelCreate()"
+        (saved)="onSaved($event)"
+        (toggle)="onToggleStatus($event)"
+      ></app-turno-panel>
+    </aside>
+  </div>
+</div>

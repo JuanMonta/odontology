@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {
   Odontologo,
@@ -7,12 +7,12 @@ import {
 } from '../../../core/models/odontologo.model';
 
 export const SPECIALTIES: string[] = [
-  'CIRUGÍA ORAL',
+  'CIRUGÃA ORAL',
   'ORTODONCIA',
   'PERIODONCIA',
   'ENDODONCIA',
-  'ODONTOPEDIATRÍA',
-  'REHABILITACIÓN ORAL'
+  'ODONTOPEDIATRÃA',
+  'REHABILITACIÃ“N ORAL'
 ];
 
 @Injectable({ providedIn: 'root' })
@@ -75,10 +75,10 @@ export class OdontologosMockService {
         id: 'o1',
         code: 'ODO-001',
         name: 'DR. RIVERA',
-        specialty: 'CIRUGÍA ORAL',
+        specialty: 'CIRUGÃA ORAL',
         license: 'COP 12453',
         consultorio: 'CON-001',
-        turno: 'COMPLETO',
+        turno: 'completo',
         status: 'activo',
         experience: 14,
         procedures: 126
@@ -90,7 +90,7 @@ export class OdontologosMockService {
         specialty: 'ORTODONCIA',
         license: 'COP 10988',
         consultorio: 'CON-002',
-        turno: 'MAÑANA',
+        turno: 'MAÃ‘ANA',
         status: 'activo',
         experience: 9,
         procedures: 94
@@ -102,7 +102,7 @@ export class OdontologosMockService {
         specialty: 'ENDODONCIA',
         license: 'COP 13014',
         consultorio: 'CON-003',
-        turno: 'TARDE',
+        turno: 'tarde',
         status: 'ausente',
         experience: 11,
         procedures: 58
@@ -114,7 +114,7 @@ export class OdontologosMockService {
         specialty: 'PERIODONCIA',
         license: 'COP 14221',
         consultorio: 'CON-005',
-        turno: 'COMPLETO',
+        turno: 'completo',
         status: 'activo',
         experience: 6,
         procedures: 71
@@ -122,11 +122,11 @@ export class OdontologosMockService {
       {
         id: 'o5',
         code: 'ODO-005',
-        name: 'DR. SÁNCHEZ',
-        specialty: 'ODONTOPEDIATRÍA',
+        name: 'DR. SÃNCHEZ',
+        specialty: 'ODONTOPEDIATRÃA',
         license: 'COP 11892',
         consultorio: 'CON-004',
-        turno: 'MAÑANA',
+        turno: 'MAÃ‘ANA',
         status: 'inactivo',
         experience: 4,
         procedures: 0
@@ -135,10 +135,10 @@ export class OdontologosMockService {
         id: 'o6',
         code: 'ODO-006',
         name: 'DRA. CASTRO',
-        specialty: 'REHABILITACIÓN ORAL',
+        specialty: 'REHABILITACIÃ“N ORAL',
         license: 'COP 15670',
         consultorio: 'CON-006',
-        turno: 'TARDE',
+        turno: 'tarde',
         status: 'activo',
         experience: 8,
         procedures: 63
@@ -146,3 +146,4 @@ export class OdontologosMockService {
     ];
   }
 }
+

@@ -82,6 +82,7 @@ export class MainLayoutComponent {
       label: 'SISTEMA',
       items: [
         { label: 'PERSONAL CLÍNICO', route: '/odontologos', title: 'PERSONAL CLÍNICO', active: false },
+        { label: 'TURNOS Y HORARIOS', route: '/turnos', title: 'TURNOS Y HORARIOS', active: false },
         { label: 'USUARIOS', route: '/usuarios', title: 'CONTROL DE USUARIOS', active: false },
         { label: 'CONFIGURACIÓN', route: '/configuracion', title: 'CONFIGURACIÓN DE LA CLÍNICA', active: false }
       ]
