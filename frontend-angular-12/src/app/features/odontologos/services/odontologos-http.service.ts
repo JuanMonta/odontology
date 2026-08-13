@@ -6,18 +6,10 @@ import { Odontologo, OdontologoDraft } from '../../../core/models/odontologo.mod
 import { API_BASE } from '../../../core/config/api.config';
 import { BackendStatusService } from '../../../core/services/backend-status.service';
 
-export const SPECIALTIES: string[] = [
-  'CIRUGÍA ORAL',
-  'ORTODONCIA',
-  'PERIODONCIA',
-  'ENDODONCIA',
-  'ODONTOPEDIATRÍA',
-  'REHABILITACIÓN ORAL'
-];
-
 /**
  * Consume el backend REST de odontólogos (spring_backend → /api/v1/odontologos).
  * Mantiene el mismo contrato Observable del mock para no tocar las vistas.
+ * La especialidad se lee del catálogo {@code /especialidades/activas}.
  */
 @Injectable({ providedIn: 'root' })
 export class OdontologosHttpService {

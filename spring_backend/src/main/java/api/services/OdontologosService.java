@@ -3,6 +3,7 @@ package api.services;
 import api.dto.OdontologoDto;
 import api.dto.OdontologoDraftDto;
 import api.entities.Odontologo;
+import api.repositories.EspecialidadRepository;
 import api.repositories.OdontologoRepository;
 import api.repositories.TurnoRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +14,9 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Odontólogos del staff. El turno de un profesional se valida contra el
- * catálogo {@code turnos} (columna plana por nombre, igual que usuarios.rol).
+ * Odontólogos del staff. El turno y la especialidad de un profesional se
+ * validan contra los catálogos {@code turnos} y {@code especialidades}
+ * (columnas planas por nombre).
  */
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class OdontologosService {
 
     private final OdontologoRepository odontologoRepository;
     private final TurnoRepository turnoRepository;
+    private final EspecialidadRepository especialidadRepository;
     private final CodigoService codigoService;
 
     @Transactional(readOnly = true)
@@ -35,10 +38,11 @@ public class OdontologosService {
     @Transactional
     public OdontologoDto add(OdontologoDraftDto draft) {
         String turno = validarTurno(draft.turno());
+        String especialidad = validarEspecialidad(draft.specialty());
         Odontologo odontologo = Odontologo.builder()
                 .codigo(codigoService.nextCodigo("ODO", "ODO-%03d"))
                 .nombre(draft.name())
-                .especialidad(draft.specialty())
+                .especialidad(especialidad)
                 .licencia(draft.license())
                 .consultorioCodigo(draft.consultorio())
                 .turno(turno)
@@ -54,8 +58,9 @@ public class OdontologosService {
         Odontologo odontologo = odontologoRepository.findById(dto.code())
                 .orElseThrow(() -> new IllegalArgumentException("Odontólogo no encontrado: " + dto.code()));
         String turno = validarTurno(dto.turno());
+        String especialidad = validarEspecialidad(dto.specialty());
         odontologo.setNombre(dto.name());
-        odontologo.setEspecialidad(dto.specialty());
+        odontologo.setEspecialidad(especialidad);
         odontologo.setLicencia(dto.license());
         odontologo.setConsultorioCodigo(dto.consultorio());
         odontologo.setTurno(turno);
@@ -95,6 +100,14 @@ public class OdontologosService {
         String nombre = turno == null ? "" : turno.trim().toLowerCase();
         if (turnoRepository.findByNombre(nombre).isEmpty()) {
             throw new IllegalArgumentException("TURNO NO VÁLIDO: " + nombre.toUpperCase());
+        }
+        return nombre;
+    }
+
+    private String validarEspecialidad(String especialidad) {
+        String nombre = especialidad == null ? "" : especialidad.trim().toUpperCase();
+        if (especialidadRepository.findByNombre(nombre).isEmpty()) {
+            throw new IllegalArgumentException("ESPECIALIDAD NO VÁLIDA: " + nombre);
         }
         return nombre;
     }

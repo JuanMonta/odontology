@@ -8,7 +8,7 @@ import {
 } from '../../../../core/models/odontologo.model';
 import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
 import { TurnosHttpService } from '../../../turnos/services/turnos-http.service';
-import { SPECIALTIES } from '../../services/odontologos-http.service';
+import { EspecialidadesHttpService } from '../../../especialidades/services/especialidades-http.service';
 
 @Component({
   selector: 'app-odontologo-form',
@@ -21,19 +21,24 @@ export class OdontologoFormComponent implements OnChanges {
   @Output() saved = new EventEmitter<OdontologoDraft>();
   @Output() cancel = new EventEmitter<void>();
 
-  specialties = SPECIALTIES;
   statuses: OdontologoStatus[] = ['activo', 'ausente', 'inactivo'];
 
   consultorioOptions$: Observable<string[]>;
   turnoOptions$: Observable<string[]>;
+  especialidadOptions$: Observable<string[]>;
 
-  constructor(consultorios: ConsultoriosHttpService, turnos: TurnosHttpService) {
+  constructor(
+    consultorios: ConsultoriosHttpService,
+    turnos: TurnosHttpService,
+    especialidades: EspecialidadesHttpService
+  ) {
     this.consultorioOptions$ = consultorios.consultorios$.pipe(map(list => list.map(c => c.code)));
     this.turnoOptions$ = turnos.activos$.pipe(map(list => list.map(t => t.nombre)));
+    this.especialidadOptions$ = especialidades.activas$.pipe(map(list => list.map(e => e.nombre)));
   }
 
   name = '';
-  specialty: string = SPECIALTIES[0];
+  specialty = '';
   license = '';
   consultorio = '';
   turno = '';

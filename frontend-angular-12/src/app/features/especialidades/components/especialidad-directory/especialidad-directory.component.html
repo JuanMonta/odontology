@@ -1,0 +1,36 @@
+<div class="dir">
+  <div class="dir-head">
+    <span class="col col-code">CÓDIGO</span>
+    <span class="col col-name">ESPECIALIDAD</span>
+    <span class="col col-status">ESTADO</span>
+  </div>
+
+  <div class="dir-list" *ngIf="especialidades.length; else empty">
+    <button
+      *ngFor="let e of especialidades"
+      class="dir-row"
+      [class.is-selected]="e.id === selectedId"
+      [class.is-inactive]="!e.activo"
+      type="button"
+      (click)="select.emit(e)"
+    >
+      <span class="col col-code">{{ e.code }}</span>
+      <span class="col col-name">
+        {{ e.nombre }}
+        <span class="col-name-license">ÁREA DE TRATAMIENTO</span>
+      </span>
+      <span class="col col-status">
+        <span class="lamp" [class.lamp--live]="e.activo" aria-hidden="true"></span>
+        <span class="status-text" [class.status-text--away]="!e.activo">{{ e.activo ? 'activa' : 'inactiva' }}</span>
+      </span>
+    </button>
+  </div>
+
+  <ng-template #empty>
+    <div class="dir-empty">
+      <span class="dir-empty-lamp" aria-hidden="true"></span>
+      <p>SIN ESPECIALIDADES</p>
+      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
+    </div>
+  </ng-template>
+</div>

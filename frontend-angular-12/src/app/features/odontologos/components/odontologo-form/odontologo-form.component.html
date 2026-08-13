@@ -27,7 +27,7 @@
     <label class="field">
       <span class="field-label">ESPECIALIDAD</span>
       <select class="field-select" [(ngModel)]="specialty" name="specialty" aria-label="Especialidad">
-        <option *ngFor="let s of specialties" [ngValue]="s">{{ s }}</option>
+        <option *ngFor="let s of especialidadOptions$ | async" [ngValue]="s">{{ s }}</option>
       </select>
     </label>
 

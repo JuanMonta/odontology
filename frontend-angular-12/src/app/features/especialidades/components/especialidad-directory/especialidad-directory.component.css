@@ -1,0 +1,196 @@
+﻿:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.dir {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ============ Head ============ */
+.dir-head {
+  display: grid;
+  grid-template-columns: 90px 1fr 130px;
+  gap: 14px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.dir-head .col {
+  font-family: var(--font-flap);
+  font-size: 0.66em;
+  letter-spacing: 0.2em;
+  color: var(--flap-dim);
+}
+
+/* ============ List ============ */
+.dir-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dir-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 130px;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  padding: 13px 20px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  cursor: pointer;
+  transition: background 0.18s var(--ease-out);
+}
+
+.dir-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.dir-row.is-selected {
+  background: rgba(255, 176, 32, 0.07);
+  box-shadow: inset 3px 0 0 var(--amber);
+}
+
+.col {
+  font-family: var(--font-flap);
+  font-size: 0.84em;
+  letter-spacing: 0.1em;
+  color: var(--steel-200);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============ CÃ³digo ============ */
+.col-code {
+  font-size: 0.74em;
+  letter-spacing: 0.14em;
+  color: var(--amber);
+}
+
+/* ============ Profesional ============ */
+.col-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.col-name-license {
+  font-family: var(--font-flap);
+  font-size: 0.66em;
+  letter-spacing: 0.12em;
+  color: var(--steel-500);
+  margin-top: 2px;
+}
+
+/* ============ Jornada / descanso ============ */
+.col-jornada {
+  font-size: 0.76em;
+  letter-spacing: 0.12em;
+  color: var(--steel-400);
+}
+
+.col-descanso {
+  font-size: 0.74em;
+  letter-spacing: 0.12em;
+  color: var(--steel-400);
+}
+
+/* ============ Estado ============ */
+.col-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.lamp {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #333c46;
+  flex-shrink: 0;
+}
+
+.lamp--live {
+  background: var(--amber);
+  box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.45);
+}
+
+.lamp--away {
+  background: var(--red-dim);
+  box-shadow: 0 0 8px 1px rgba(207, 90, 84, 0.45);
+}
+
+.status-text {
+  font-size: 0.68em;
+  letter-spacing: 0.14em;
+  color: var(--steel-400);
+  text-transform: uppercase;
+}
+
+.status-text--away {
+  color: var(--red-dim);
+}
+
+/* ============ Estados atenuados ============ */
+.dir-row.is-away {
+  opacity: 0.72;
+}
+
+.dir-row.is-inactive {
+  opacity: 0.55;
+}
+
+/* ============ Empty ============ */
+.dir-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  font-family: var(--font-flap);
+  font-size: 0.82em;
+  letter-spacing: 0.16em;
+  color: var(--steel-400);
+}
+
+.dir-empty-lamp {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--steel-600);
+}
+
+.dir-empty-hint {
+  font-size: 0.66em;
+  letter-spacing: 0.18em;
+  color: var(--steel-500);
+}
+
+/* ============ Responsive ============ */
+@media (max-width: 980px) {
+  .dir-head,
+  .dir-row {
+    grid-template-columns: 80px 1fr 110px;
+  }
+}
+
+@media (max-width: 720px) {
+  .dir-head,
+  .dir-row {
+    grid-template-columns: 72px 1fr 96px;
+  }
+}
