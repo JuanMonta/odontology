@@ -16,8 +16,13 @@
     <div class="panel-scroll">
       <app-usuario-form
         [usuario]="editing ? usuario : null"
+        [roles]="roles"
+        [estados]="estados"
+        [esAdmin]="esAdmin"
         (saved)="onSaved($event)"
         (cancel)="creating ? cancel.emit() : cancelEdit()"
+        (crearRol)="crearRol.emit($event)"
+        (crearEstado)="crearEstado.emit($event)"
       ></app-usuario-form>
     </div>
   </ng-container>

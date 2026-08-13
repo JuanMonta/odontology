@@ -91,7 +91,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 try {
                     String codigo = (String) jwtUtil.parse(token).get("sub");
                     Usuario usuario = usuarioRepository.findById(codigo).orElse(null);
-                    if (usuario == null || usuario.getEstado() != Usuario.Estado.activo) {
+                    if (usuario == null || !"activo".equals(usuario.getEstado())) {
                         return false;
                     }
                     attributes.put("usuario", usuario);
