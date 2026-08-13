@@ -1,5 +1,6 @@
 package api.controllers;
 
+import api.dto.OdontologoConsultorioDto;
 import api.dto.OdontologoDto;
 import api.dto.OdontologoDraftDto;
 import api.services.OdontologosService;
@@ -40,5 +41,12 @@ public class OdontologosController {
     @PatchMapping("/{code}/toggle-status")
     public OdontologoDto toggleStatus(@PathVariable String code) {
         return odontologosService.toggleStatus(code);
+    }
+
+    @PatchMapping("/{code}/consultorio")
+    public OdontologoDto assignConsultorio(
+            @PathVariable String code,
+            @RequestBody OdontologoConsultorioDto body) {
+        return odontologosService.assignConsultorio(code, body.consultorio());
     }
 }

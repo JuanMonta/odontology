@@ -14,12 +14,18 @@ import {
 } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Consultorio, ConsultorioDraft, ConsultorioStatus } from '../../../../core/models/consultorio.model';
+import {
+  Consultorio,
+  ConsultorioSaveEvent,
+  ConsultorioStatus
+} from '../../../../core/models/consultorio.model';
+import { Odontologo } from '../../../../core/models/odontologo.model';
 import {
   ConsultorioCatalogosService,
   ConsultorioCatalogos,
   ConsultorioEquipoCatalogo
 } from '../../services/consultorio-catalogos.service';
+import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
 
 const EQUIPO_CATEGORIAS = ['MOBILIARIO', 'DIAGNÓSTICO', 'INSTRUMENTAL', 'CONSUMIBLES'] as const;
 
@@ -31,16 +37,18 @@ const EQUIPO_CATEGORIAS = ['MOBILIARIO', 'DIAGNÓSTICO', 'INSTRUMENTAL', 'CONSUM
 })
 export class ConsultorioFormComponent implements OnChanges, OnDestroy {
   @Input() consultorio: Consultorio | null = null;
-  @Output() saved = new EventEmitter<ConsultorioDraft>();
+  @Output() saved = new EventEmitter<ConsultorioSaveEvent>();
   @Output() cancel = new EventEmitter<void>();
 
   @ViewChild('pickerPanel', { static: false }) pickerPanel?: ElementRef<HTMLElement>;
+  @ViewChild('staffPickerPanel', { static: false }) staffPickerPanel?: ElementRef<HTMLElement>;
 
   statuses: ConsultorioStatus[] = ['operativo', 'mantenimiento', 'inactivo'];
 
   unidades$: Observable<string[]>;
   ubicaciones$: Observable<string[]>;
   equipos$: Observable<ConsultorioEquipoCatalogo[]>;
+  odontologos$: Observable<Odontologo[]>;
 
   name = '';
   unit = '';
@@ -49,16 +57,30 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
   status: ConsultorioStatus = 'operativo';
   error = false;
 
+  /** Códigos de odontólogos asignados a esta sala. */
+  assigned: string[] = [];
+
   pickerOpen = false;
   pickQuery = '';
   pickCategory: string | null = null;
 
+  staffPickerOpen = false;
+  staffQuery = '';
+  staffCategory: string | null = null;
+
   private syncedId: string | null = null;
 
-  constructor(catalogos: ConsultorioCatalogosService, private readonly cdr: ChangeDetectorRef) {
+  constructor(
+    catalogos: ConsultorioCatalogosService,
+    odontologos: OdontologosHttpService,
+    private readonly cdr: ChangeDetectorRef
+  ) {
     this.unidades$ = catalogos.catalogos$.pipe(map((c: ConsultorioCatalogos) => c.unidades));
     this.ubicaciones$ = catalogos.catalogos$.pipe(map((c: ConsultorioCatalogos) => c.ubicaciones));
     this.equipos$ = catalogos.catalogos$.pipe(map((c: ConsultorioCatalogos) => c.equipos));
+    this.odontologos$ = odontologos.odontologos$.pipe(
+      map(list => list.filter(o => o.status !== 'inactivo'))
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -69,12 +91,13 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
       this.location = this.consultorio.location;
       this.equipment = [...this.consultorio.equipment];
       this.status = this.consultorio.status;
+      this.assigned = this.consultorio.staff.map(s => s.code);
       this.error = false;
     }
   }
 
   ngOnDestroy(): void {
-    if (this.pickerOpen) {
+    if (this.pickerOpen || this.staffPickerOpen) {
       document.body.style.overflow = '';
     }
   }
@@ -131,8 +154,12 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   onDocKeydown(event: KeyboardEvent): void {
-    if (this.pickerOpen && event.key === 'Escape') {
-      this.closePicker();
+    if (event.key === 'Escape') {
+      if (this.staffPickerOpen) {
+        this.closeStaffPicker();
+      } else if (this.pickerOpen) {
+        this.closePicker();
+      }
     }
   }
 
@@ -153,19 +180,87 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
     this.equipment = this.equipment.filter(n => n !== nombre);
   }
 
+  /* ==================== Picker de profesionales ==================== */
+
+  staffCategorias(odontologos: Odontologo[]): { nombre: string; count: number }[] {
+    const presentes = new Map<string, number>();
+    for (const o of odontologos) {
+      presentes.set(o.specialty, (presentes.get(o.specialty) ?? 0) + 1);
+    }
+    return [...presentes.entries()].map(([nombre, count]) => ({ nombre, count }));
+  }
+
+  visibleStaff(odontologos: Odontologo[]): Odontologo[] {
+    const q = this.staffQuery.trim().toUpperCase();
+    return odontologos.filter(o => {
+      const matchesCategoria = !this.staffCategory || o.specialty === this.staffCategory;
+      const matchesBusqueda = !q || o.name.toUpperCase().includes(q) || o.code.toUpperCase().includes(q);
+      return matchesCategoria && matchesBusqueda;
+    });
+  }
+
+  assignedStaff(odontologos: Odontologo[]): Odontologo[] {
+    return odontologos.filter(o => this.assigned.includes(o.code));
+  }
+
+  isAssigned(code: string): boolean {
+    return this.assigned.includes(code);
+  }
+
+  trackOdontologo(_: number, o: Odontologo): string {
+    return o.code;
+  }
+
+  openStaffPicker(): void {
+    this.staffPickerOpen = true;
+    this.staffQuery = '';
+    this.staffCategory = null;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => this.staffPickerPanel?.nativeElement.focus(), 0);
+  }
+
+  closeStaffPicker(): void {
+    if (!this.staffPickerOpen) {
+      return;
+    }
+    this.staffPickerOpen = false;
+    document.body.style.overflow = '';
+    this.cdr.markForCheck();
+  }
+
+  onStaffPickBackdrop(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeStaffPicker();
+    }
+  }
+
+  onStaffQuery(): void {
+    this.cdr.markForCheck();
+  }
+
+  staffToggle(o: Odontologo): void {
+    this.assigned = this.assigned.includes(o.code)
+      ? this.assigned.filter(c => c !== o.code)
+      : [...this.assigned, o.code];
+  }
+
+  removeStaff(code: string): void {
+    this.assigned = this.assigned.filter(c => c !== code);
+  }
+
   onSubmit(): void {
     if (!this.name.trim() || !this.unit || !this.location) {
       this.error = true;
       return;
     }
     this.error = false;
-    const draft: ConsultorioDraft = {
+    const draft = {
       name: this.name.trim().toUpperCase(),
       unit: this.unit,
       location: this.location,
       equipment: this.equipment,
       status: this.status
     };
-    this.saved.emit(draft);
+    this.saved.emit({ draft, assigned: [...this.assigned] });
   }
 }

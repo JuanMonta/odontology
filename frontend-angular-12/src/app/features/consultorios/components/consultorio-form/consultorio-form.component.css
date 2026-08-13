@@ -162,6 +162,119 @@
   justify-content: center;
 }
 
+/* ============ Profesionales: chips seleccionables ============ */
+.staff-assigned {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.staff-chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.18s var(--ease-out), background 0.18s var(--ease-out);
+}
+
+.staff-chip.is-on {
+  border-color: var(--amber-line);
+  background: rgba(255, 176, 32, 0.08);
+}
+
+.staff-chip:hover {
+  border-color: rgba(255, 176, 32, 0.45);
+}
+
+.staff-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.staff-lamp {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--steel-600);
+  flex-shrink: 0;
+  transition: background 0.18s var(--ease-out), box-shadow 0.18s var(--ease-out);
+}
+
+.staff-chip.is-on .staff-lamp {
+  background: var(--amber);
+  box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.45);
+}
+
+.staff-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.staff-name {
+  font-family: var(--font-flap);
+  font-size: 0.74em;
+  letter-spacing: 0.08em;
+  color: var(--steel-300);
+  line-height: 1.25;
+}
+
+.staff-chip.is-on .staff-name {
+  color: var(--flap-ink);
+}
+
+.staff-sub {
+  font-family: var(--font-flap);
+  font-size: 0.58em;
+  letter-spacing: 0.12em;
+  color: var(--steel-500);
+  margin-top: 2px;
+}
+
+.staff-empty {
+  font-family: var(--font-flap);
+  font-size: 0.66em;
+  letter-spacing: 0.16em;
+  color: var(--steel-500);
+  padding: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+}
+
+.staff-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 14px;
+  font-family: var(--font-flap);
+  font-size: 0.72em;
+  letter-spacing: 0.12em;
+  color: var(--amber);
+  background: transparent;
+  border: 1px dashed rgba(255, 176, 32, 0.55);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.18s var(--ease-out), border-color 0.18s var(--ease-out);
+}
+
+.staff-add:hover {
+  background: rgba(255, 176, 32, 0.08);
+  border-color: var(--amber-line);
+}
+
+.staff-add--empty {
+  width: 100%;
+  padding: 14px;
+  justify-content: center;
+}
+
 /* ============ Catálogo flotante (modal) ============ */
 .picker {
   position: fixed;

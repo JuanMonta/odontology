@@ -60,6 +60,45 @@
         + AGREGAR EQUIPOS E INSTRUMENTAL
       </button>
     </div>
+
+    <div class="field field--full">
+      <span class="field-label">
+        ASIGNAR PROFESIONALES
+        <span class="equip-count" *ngIf="assigned.length">{{ assigned.length }} ASIGNADOS</span>
+      </span>
+      <ng-container *ngIf="odontologos$ | async as odontologos">
+        <p class="staff-empty" *ngIf="!odontologos.length" role="status">
+          SIN PROFESIONALES ACTIVOS · REGISTRA ODONTÓLOGOS EN PERSONAL CLÍNICO
+        </p>
+        <ng-container *ngIf="odontologos.length">
+          <div class="staff-assigned" *ngIf="assigned.length">
+            <label class="staff-chip is-on" *ngFor="let o of assignedStaff(odontologos); trackBy: trackOdontologo">
+              <input
+                class="staff-input"
+                type="checkbox"
+                [checked]="true"
+                (change)="removeStaff(o.code)"
+                [attr.aria-label]="'Quitar ' + o.name"
+              />
+              <span class="staff-lamp" aria-hidden="true"></span>
+              <span class="staff-main">
+                <span class="staff-name">{{ o.name }}</span>
+                <span class="staff-sub">{{ o.code }} · {{ o.specialty }} · {{ o.turno }}</span>
+              </span>
+            </label>
+            <button class="staff-add" type="button" (click)="openStaffPicker()">+ AGREGAR</button>
+          </div>
+          <button
+            class="staff-add staff-add--empty"
+            type="button"
+            *ngIf="!assigned.length"
+            (click)="openStaffPicker()"
+          >
+            + AGREGAR PROFESIONALES
+          </button>
+        </ng-container>
+      </ng-container>
+    </div>
   </div>
 
   <p class="form-error" *ngIf="error" role="alert">LA SALA, LA UNIDAD Y LA UBICACIÓN SON OBLIGATORIAS</p>
@@ -143,6 +182,87 @@
       <div class="picker-foot">
         <button class="picker-confirm" type="button" (click)="closePicker()">CONFIRMAR</button>
         <button class="btn-ghost" type="button" (click)="closePicker()">CANCELAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PERSONAL CLÍNICO (MODAL FLOTANTE) ==================== -->
+  <div
+    class="picker"
+    *ngIf="staffPickerOpen"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Asignar profesionales"
+  >
+    <div class="picker-backdrop" (click)="onStaffPickBackdrop($event)"></div>
+    <div
+      class="picker-panel"
+      #staffPickerPanel
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="picker-head">
+        <span class="picker-title">ASIGNAR PROFESIONALES</span>
+        <span class="picker-total" *ngIf="assigned.length">{{ assigned.length }} ASIGNADOS</span>
+        <button class="picker-close" type="button" aria-label="Cerrar catálogo" (click)="closeStaffPicker()">
+          <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+            <path d="M3 3l10 10"></path>
+            <path d="M13 3L3 13"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="picker-search">
+        <svg class="picker-search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.5"></circle>
+          <path d="M10.5 10.5L14 14"></path>
+        </svg>
+        <input
+          class="picker-search-input"
+          type="text"
+          [ngModel]="staffQuery"
+          (ngModelChange)="staffQuery = $event; onStaffQuery()"
+          name="staffQuery"
+          placeholder="BUSCAR PROFESIONAL…"
+          autocomplete="off"
+        />
+      </div>
+
+      <ng-container *ngIf="odontologos$ | async as odontologos">
+        <div class="picker-cats">
+          <button
+            class="picker-cat"
+            type="button"
+            *ngFor="let cat of staffCategorias(odontologos)"
+            [class.is-on]="staffCategory === cat.nombre"
+            (click)="staffCategory = staffCategory === cat.nombre ? null : cat.nombre; onStaffQuery()"
+          >
+            {{ cat.nombre }} <span class="picker-cat-count">{{ cat.count }}</span>
+          </button>
+        </div>
+
+        <div class="picker-body">
+          <label class="staff-chip" *ngFor="let o of visibleStaff(odontologos); trackBy: trackOdontologo" [class.is-on]="isAssigned(o.code)">
+            <input
+              class="staff-input"
+              type="checkbox"
+              [checked]="isAssigned(o.code)"
+              (change)="staffToggle(o)"
+              [attr.aria-label]="o.name"
+            />
+            <span class="staff-lamp" aria-hidden="true"></span>
+            <span class="staff-main">
+              <span class="staff-name">{{ o.name }}</span>
+              <span class="staff-sub">{{ o.code }} · {{ o.specialty }} · {{ o.turno }}</span>
+            </span>
+          </label>
+          <p class="picker-empty" *ngIf="!visibleStaff(odontologos).length" role="status">SIN RESULTADOS PARA LA BÚSQUEDA</p>
+        </div>
+      </ng-container>
+
+      <div class="picker-foot">
+        <button class="picker-confirm" type="button" (click)="closeStaffPicker()">CONFIRMAR</button>
+        <button class="btn-ghost" type="button" (click)="closeStaffPicker()">CANCELAR</button>
       </div>
     </div>
   </div>

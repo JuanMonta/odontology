@@ -3,6 +3,7 @@ package api.services;
 import api.dto.OdontologoDto;
 import api.dto.OdontologoDraftDto;
 import api.entities.Odontologo;
+import api.repositories.ConsultorioRepository;
 import api.repositories.EspecialidadRepository;
 import api.repositories.OdontologoRepository;
 import api.repositories.TurnoRepository;
@@ -25,6 +26,7 @@ public class OdontologosService {
     private final OdontologoRepository odontologoRepository;
     private final TurnoRepository turnoRepository;
     private final EspecialidadRepository especialidadRepository;
+    private final ConsultorioRepository consultorioRepository;
     private final CodigoService codigoService;
 
     @Transactional(readOnly = true)
@@ -67,6 +69,18 @@ public class OdontologosService {
         odontologo.setEstado(Odontologo.Estado.valueOf(dto.status()));
         odontologo.setExperiencia(dto.experience());
         odontologo.setProcedimientos(dto.procedures());
+        return toDto(odontologoRepository.save(odontologo));
+    }
+
+    /** Asigna (o libera, con {@code null}) el consultorio de un odontólogo. */
+    @Transactional
+    public OdontologoDto assignConsultorio(String code, String consultorioCodigo) {
+        Odontologo odontologo = odontologoRepository.findById(code)
+                .orElseThrow(() -> new IllegalArgumentException("Odontólogo no encontrado: " + code));
+        if (consultorioCodigo != null && consultorioRepository.findById(consultorioCodigo).isEmpty()) {
+            throw new IllegalArgumentException("Consultorio no encontrado: " + consultorioCodigo);
+        }
+        odontologo.setConsultorioCodigo(consultorioCodigo);
         return toDto(odontologoRepository.save(odontologo));
     }
 

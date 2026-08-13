@@ -23,7 +23,8 @@ export class ConsultoriosMockService {
       id: `CON-${Date.now()}`,
       code: this.nextCode(list),
       lastUse: '—',
-      procedures: 0
+      procedures: 0,
+      staff: []
     };
     this.subjects.next([item, ...list]);
     return item;
@@ -71,7 +72,8 @@ export class ConsultoriosMockService {
         equipment: ['SILLÓN DIGITAL', 'RAYOS X PANORÁMICO', 'LÁMPARA LED', 'CARIOGRAFO'],
         status: 'operativo',
         lastUse: '06 AGO 2026',
-        procedures: 482
+        procedures: 482,
+        staff: []
       },
       {
         id: 'c2',
@@ -82,7 +84,8 @@ export class ConsultoriosMockService {
         equipment: ['SILLÓN DIGITAL', 'MICROSCOPIO', 'ULTRASONIDO', 'LÁMPARA LED'],
         status: 'operativo',
         lastUse: '05 AGO 2026',
-        procedures: 391
+        procedures: 391,
+        staff: []
       },
       {
         id: 'c3',
@@ -93,7 +96,8 @@ export class ConsultoriosMockService {
         equipment: ['SILLÓN DIGITAL', 'RAYOS X PERIAPICAL', 'LÁMPARA LED'],
         status: 'mantenimiento',
         lastUse: '01 AGO 2026',
-        procedures: 214
+        procedures: 214,
+        staff: []
       },
       {
         id: 'c4',
@@ -104,7 +108,8 @@ export class ConsultoriosMockService {
         equipment: ['SILLÓN DE CIRUGÍA', 'RAYOS X CEFALOMÉTRICO', 'MONITOR DE SEDACIÓN', 'ASPIRADOR QUIRÚRGICO'],
         status: 'operativo',
         lastUse: '04 AGO 2026',
-        procedures: 158
+        procedures: 158,
+        staff: []
       },
       {
         id: 'c5',
@@ -115,7 +120,8 @@ export class ConsultoriosMockService {
         equipment: ['SILLÓN DIGITAL', 'LÁMPARA LED'],
         status: 'inactivo',
         lastUse: '12 JUL 2026',
-        procedures: 96
+        procedures: 96,
+        staff: []
       },
       {
         id: 'c6',
@@ -126,7 +132,8 @@ export class ConsultoriosMockService {
         equipment: ['ESCÁNER INTRAORAL', 'FRESADORA', 'HORNO DE CERÁMICA', 'BANCO DE TRABAJO'],
         status: 'operativo',
         lastUse: '05 AGO 2026',
-        procedures: 127
+        procedures: 127,
+        staff: []
       }
     ];
   }
