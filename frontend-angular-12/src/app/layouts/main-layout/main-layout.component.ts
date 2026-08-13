@@ -81,7 +81,7 @@ export class MainLayoutComponent {
     {
       label: 'SISTEMA',
       items: [
-        { label: 'ODONTÓLOGOS', route: '/odontologos', title: 'ROSTER DE ODONTÓLOGOS', active: false },
+        { label: 'PERSONAL CLÍNICO', route: '/odontologos', title: 'PERSONAL CLÍNICO', active: false },
         { label: 'USUARIOS', route: '/usuarios', title: 'CONTROL DE USUARIOS', active: false },
         { label: 'CONFIGURACIÓN', route: '/configuracion', title: 'CONFIGURACIÓN DE LA CLÍNICA', active: false }
       ]
