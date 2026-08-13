@@ -58,18 +58,44 @@
         <span class="meta-value">{{ consultorio.unit }}</span>
       </div>
       <div class="meta-row">
-        <span class="meta-label">ODONTÓLOGO EN TURNO</span>
-        <span class="meta-value" [class.meta-value--free]="!consultorio.currentDentist">
-          {{ consultorio.currentDentist || (consultorio.status === 'operativo' ? 'DISPONIBLE' : '—') }}
-        </span>
-      </div>
-      <div class="meta-row">
         <span class="meta-label">UBICACIÓN</span>
         <span class="meta-value">{{ consultorio.location }}</span>
       </div>
     </div>
 
     <div class="panel-scroll">
+      <div class="section">
+        <span class="section-label">
+          PERSONAL EN TURNO · {{ onTurnoCount(consultorio) }} EN SERVICIO / {{ staffCount(consultorio) }} ASIGNADOS
+        </span>
+        <ul class="staff-list" *ngIf="staffCount(consultorio); else staffEmpty">
+          <li
+            class="staff-item"
+            *ngFor="let s of consultorio.staff; trackBy: staffTrack"
+            [class.staff-item--away]="s.state === 'fuera'"
+          >
+            <span class="staff-lamp" [class.staff-lamp--live]="s.state === 'turno'" [class.staff-lamp--break]="s.state === 'descanso'" aria-hidden="true"></span>
+            <div class="staff-main">
+              <span class="staff-name">{{ s.name }}</span>
+              <span class="staff-sub">{{ s.code }} · {{ s.specialty }}</span>
+            </div>
+            <div class="staff-shift">
+              <span class="staff-turno">{{ turnoLabel(s.turno) }} · {{ s.jornada }}</span>
+              <span class="staff-state" [class.staff-state--live]="s.state === 'turno'" [class.staff-state--break]="s.state === 'descanso'">
+                {{ staffStateLabel(s.state) }}
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ng-template #staffEmpty>
+          <div class="staff-empty">
+            <span class="staff-empty-lamp" aria-hidden="true"></span>
+            <span class="staff-empty-text">SIN PERSONAL ASIGNADO</span>
+            <span class="staff-empty-hint">ASIGNA PROFESIONALES DESDE PERSONAL CLÍNICO</span>
+          </div>
+        </ng-template>
+      </div>
+
       <div class="section">
         <span class="section-label">EQUIPOS E INSTRUMENTAL</span>
         <ul class="equip-list">

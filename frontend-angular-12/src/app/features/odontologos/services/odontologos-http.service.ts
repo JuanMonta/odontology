@@ -50,4 +50,13 @@ export class OdontologosHttpService {
       this.subjects.next(this.subjects.getValue().map(o => (o.id === updated.id ? updated : o)));
     });
   }
+
+  /** Asigna (o libera, con null) el consultorio de un odontólogo. */
+  assignConsultorio(code: string, consultorio: string | null): void {
+    this.http
+      .patch<Odontologo>(`${API_BASE}/odontologos/${code}/consultorio`, { consultorio })
+      .subscribe(updated => {
+        this.subjects.next(this.subjects.getValue().map(o => (o.id === updated.id ? updated : o)));
+      });
+  }
 }

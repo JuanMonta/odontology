@@ -4,17 +4,20 @@ import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   Consultorio,
-  ConsultorioDraft,
-  ConsultorioStatus
+  ConsultorioSaveEvent,
+  ConsultorioStaff,
+  ConsultorioStatus,
+  StaffShiftState
 } from '../../../../core/models/consultorio.model';
-import { Appointment } from '../../../../core/models/appointment.model';
+import { Turno } from '../../../../core/models/turno.model';
 import { ConsultoriosHttpService } from '../../services/consultorios-http.service';
-import { DashboardHttpService } from '../../../patient-dashboard/services/dashboard-http.service';
+import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
+import { TurnosHttpService } from '../../../turnos/services/turnos-http.service';
 
 type StatusFilter = ConsultorioStatus | 'all';
 
-/** Duración por defecto de un bloque cuando la cita no informa hora_fin. */
-const SLOT_FALLBACK_MIN = 45;
+/** Prioridad de orden del roster: en turno primero, luego descanso, luego fuera. */
+const STATE_RANK: Record<StaffShiftState, number> = { turno: 0, descanso: 1, fuera: 2 };
 
 @Component({
   selector: 'app-consultorios-page',
@@ -36,17 +39,19 @@ export class ConsultoriosPageComponent implements OnInit {
 
   constructor(
     private service: ConsultoriosHttpService,
-    private dashboard: DashboardHttpService,
+    private odontologos: OdontologosHttpService,
+    private turnos: TurnosHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {
-    const withOccupancy$ = combineLatest([
+    const withStaff$ = combineLatest([
       this.service.consultorios$,
-      this.dashboard.appointments$,
+      this.odontologos.odontologos$,
+      this.turnos.turnos$,
       this.now$
-    ]).pipe(map(([list, appointments, now]) => this.applyOccupancy(list, appointments, now)));
+    ]).pipe(map(([list, odontologos, turnos, now]) => this.applyStaff(list, odontologos, turnos, now)));
 
-    this.consultorios$ = combineLatest([withOccupancy$, this.search$, this.status$]).pipe(
+    this.consultorios$ = combineLatest([withStaff$, this.search$, this.status$]).pipe(
       map(([list, q, filter]) => {
         const query = q.trim().toUpperCase();
         return list.filter(c => {
@@ -55,13 +60,13 @@ export class ConsultoriosPageComponent implements OnInit {
             !query ||
             c.name.toUpperCase().includes(query) ||
             c.code.includes(query) ||
-            (c.currentDentist ?? '').toUpperCase().includes(query) ||
+            c.staff.some(s => s.name.toUpperCase().includes(query)) ||
             c.location.toUpperCase().includes(query);
           return matchesStatus && matchesQuery;
         });
       })
     );
-    this.selected$ = combineLatest([withOccupancy$, this.selectedId$]).pipe(
+    this.selected$ = combineLatest([withStaff$, this.selectedId$]).pipe(
       map(([list, id]) => (id ? list.find(c => c.id === id) ?? null : null))
     );
   }
@@ -94,20 +99,39 @@ export class ConsultoriosPageComponent implements OnInit {
     this.selectedId$.next(null);
   }
 
-  onSaved(draft: ConsultorioDraft): void {
+  onSaved(ev: ConsultorioSaveEvent): void {
+    const { draft, assigned } = ev;
     if (this.selectedId) {
       const current = this.service.snapshot().find(c => c.id === this.selectedId);
       if (current) {
         this.service.updateConsultorio({ ...current, ...draft });
+        this.applyAssignment(current.code, assigned);
       }
     } else {
       this.service.addConsultorio(draft).subscribe(created => {
         this.selectedId = created.id;
         this.selectedId$.next(created.id);
+        this.applyAssignment(created.code, assigned);
       });
     }
     this.creating = false;
     this.router.navigate([], { queryParams: {} });
+  }
+
+  /**
+   * Sincroniza odontologos.consultorio_codigo con la selección del form:
+   * asigna los marcados a esta sala y libera los que dejaron de estarlo.
+   */
+  private applyAssignment(consultorioCode: string, assigned: string[]): void {
+    for (const o of this.odontologos.snapshot()) {
+      const belongs = o.consultorio === consultorioCode;
+      const wanted = assigned.includes(o.code);
+      if (wanted && !belongs) {
+        this.odontologos.assignConsultorio(o.code, consultorioCode);
+      } else if (!wanted && belongs) {
+        this.odontologos.assignConsultorio(o.code, null);
+      }
+    }
   }
 
   cancelCreate(): void {
@@ -123,50 +147,65 @@ export class ConsultoriosPageComponent implements OnInit {
     this.service.toggleStatus(id);
   }
 
-  /** Quién está en turno ahora en cada sala, derivado de la agenda del día. */
-  private applyOccupancy(list: Consultorio[], appointments: Appointment[], now: Date): Consultorio[] {
-    const occupants = new Map<string, { time: number; dentist: string }>();
+  /**
+   * Roster en vivo de la sala: los odontólogos con {@code consultorio_codigo}
+   * igual a esta sala, cada uno con su turno del catálogo y el estado derivado
+   * del reloj (en turno / en descanso / fuera de turno).
+   */
+  private applyStaff(
+    list: Consultorio[],
+    odontologos: { code: string; name: string; specialty: string; turno: string; consultorio: string; status: string }[],
+    turnos: Turno[],
+    now: Date
+  ): Consultorio[] {
     const nowMin = now.getHours() * 60 + now.getMinutes();
-
-    for (const a of appointments) {
-      if (a.status === 'cancelled') {
-        continue;
-      }
-      const start = this.parseMinutes(a.time);
-      if (start === null) {
-        continue;
-      }
-      const end = a.horaFin ? this.parseMinutes(a.horaFin) : start + SLOT_FALLBACK_MIN;
-      if (end === null || nowMin < start || nowMin >= end) {
-        continue;
-      }
-      const key = this.roomKey(a.consultorio);
-      const prev = occupants.get(key);
-      if (!prev || start > prev.time) {
-        occupants.set(key, { time: start, dentist: a.dentist });
-      }
-    }
+    const turnoByName = new Map(turnos.map(t => [t.nombre, t]));
 
     return list.map(c => {
-      const occupant = occupants.get(this.roomKey(c.code));
-      return { ...c, currentDentist: occupant?.dentist ?? null };
+      const staff: ConsultorioStaff[] = odontologos
+        .filter(o => o.consultorio === c.code && o.status !== 'inactivo')
+        .map(o => {
+          const turno = turnoByName.get(o.turno);
+          const state = turno ? this.shiftState(turno, nowMin) : 'fuera';
+          return {
+            code: o.code,
+            name: o.name,
+            specialty: o.specialty,
+            turno: o.turno,
+            jornada: turno ? `${turno.horaInicio}–${turno.horaFin}` : '',
+            state
+          };
+        })
+        .sort(
+          (a, b) =>
+            STATE_RANK[a.state] - STATE_RANK[b.state] || a.name.localeCompare(b.name)
+        );
+      return { ...c, staff };
     });
   }
 
-  private parseMinutes(hhmm: string): number | null {
-    const [h, m] = hhmm.split(':').map(Number);
-    if (!Number.isFinite(h) || !Number.isFinite(m)) {
-      return null;
+  private shiftState(turno: Turno, nowMin: number): StaffShiftState {
+    const start = this.toMin(turno.horaInicio);
+    const end = this.toMin(turno.horaFin);
+    if (nowMin < start || nowMin >= end) {
+      return 'fuera';
     }
-    return h * 60 + m;
+    if (
+      turno.descansoInicio &&
+      turno.descansoFin &&
+      nowMin >= this.toMin(turno.descansoInicio) &&
+      nowMin < this.toMin(turno.descansoFin)
+    ) {
+      return 'descanso';
+    }
+    return 'turno';
   }
 
-  /** "CON 01", "CON-001" y "CONSULTORIO 01" colapsan a la misma clave. */
-  private roomKey(s: string): string {
-    const m = s.toUpperCase().match(/^([A-Z]+)?\D*?(\d+)$/);
-    if (!m) {
-      return s.toUpperCase().replace(/[^A-Z]/g, '');
+  private toMin(hhmm: string): number {
+    const [h, m] = hhmm.split(':').map(Number);
+    if (!Number.isFinite(h) || !Number.isFinite(m)) {
+      return Number.NaN;
     }
-    return `${m[1] || 'CON'}:${Number(m[2])}`;
+    return h * 60 + m;
   }
 }

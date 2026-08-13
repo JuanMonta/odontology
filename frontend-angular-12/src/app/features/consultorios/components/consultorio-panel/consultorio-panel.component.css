@@ -169,6 +169,141 @@
   color: var(--steel-200);
 }
 
+/* ============ Personal en turno (roster en vivo) ============ */
+.staff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.staff-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-sm);
+}
+
+.staff-item--away {
+  opacity: 0.62;
+}
+
+.staff-lamp {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--steel-600);
+  flex-shrink: 0;
+}
+
+.staff-lamp--live {
+  background: var(--amber);
+  box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.45);
+  animation: staff-breathe 1.8s var(--ease-out) infinite;
+}
+
+.staff-lamp--break {
+  background: var(--amber-soft);
+  border: 1px solid var(--amber-line);
+  box-shadow: 0 0 6px 0 rgba(255, 176, 32, 0.25);
+}
+
+@keyframes staff-breathe {
+  0%, 100% {
+    box-shadow: 0 0 4px 0 rgba(255, 176, 32, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 10px 2px rgba(255, 176, 32, 0.55);
+  }
+}
+
+.staff-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.staff-name {
+  font-family: var(--font-flap);
+  font-size: 0.82em;
+  letter-spacing: 0.1em;
+  color: var(--flap-ink);
+}
+
+.staff-sub {
+  font-family: var(--font-flap);
+  font-size: 0.6em;
+  letter-spacing: 0.14em;
+  color: var(--steel-500);
+  margin-top: 2px;
+}
+
+.staff-shift {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.staff-turno {
+  font-family: var(--font-flap);
+  font-size: 0.58em;
+  letter-spacing: 0.16em;
+  color: var(--steel-400);
+}
+
+.staff-state {
+  font-family: var(--font-flap);
+  font-size: 0.6em;
+  letter-spacing: 0.16em;
+  color: var(--steel-400);
+}
+
+.staff-state--live {
+  color: var(--amber);
+}
+
+.staff-state--break {
+  color: var(--amber-line);
+}
+
+.staff-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-flap);
+}
+
+.staff-empty-lamp {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--steel-600);
+}
+
+.staff-empty-text {
+  font-size: 0.7em;
+  letter-spacing: 0.16em;
+  color: var(--steel-300);
+}
+
+.staff-empty-hint {
+  font-size: 0.58em;
+  letter-spacing: 0.18em;
+  color: var(--steel-500);
+}
+
 /* ============ Stats ============ */
 .stats {
   display: grid;

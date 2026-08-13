@@ -1,11 +1,22 @@
 export type ConsultorioStatus = 'operativo' | 'mantenimiento' | 'inactivo';
 
+export type StaffShiftState = 'turno' | 'descanso' | 'fuera';
+
+export interface ConsultorioStaff {
+  code: string;       // "ODO-001"
+  name: string;       // "DR. RIVERA"
+  specialty: string;  // "CIRUGÍA ORAL"
+  turno: string;      // "completo"
+  jornada: string;    // "08:00–18:00"
+  state: StaffShiftState; // derivado del turno + reloj
+}
+
 export interface Consultorio {
   id: string;                    // "CON-001"
   code: string;                  // "CON-001"
   name: string;                  // "CONSULTORIO 01"
   unit: string;                  // "SILLÓN A"
-  currentDentist?: string | null; // odontólogo en turno hoy (por agenda) o null
+  staff: ConsultorioStaff[];     // odontólogos asignados (consultorio_codigo) con turno en vivo
   location: string;              // "PISO 1 · ALA ESTE"
   equipment: string[];           // equipos e instrumental
   status: ConsultorioStatus;
@@ -19,4 +30,10 @@ export interface ConsultorioDraft {
   location: string;
   equipment: string[];
   status: ConsultorioStatus;
+}
+
+export interface ConsultorioSaveEvent {
+  draft: ConsultorioDraft;
+  /** Códigos de odontólogos asignados a esta sala (odontologos.consultorio_codigo). */
+  assigned: string[];
 }
