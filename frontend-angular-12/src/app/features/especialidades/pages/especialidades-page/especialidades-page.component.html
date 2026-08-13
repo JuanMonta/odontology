@@ -1,0 +1,61 @@
+<div class="page especialidades">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-left">
+        <h2 class="page-title">ESPECIALIDADES</h2>
+        <span class="page-sub">CATÁLOGO CLÍNICO · ÁREAS DE TRATAMIENTO · {{ (especialidades$ | async)?.length ?? 0 }} ESPECIALIDADES</span>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn-amber" type="button" (click)="startCreate()">
+          <span class="btn-plus" aria-hidden="true"></span>
+          NUEVA ESPECIALIDAD
+        </button>
+      </div>
+    </div>
+    <div class="page-toolbar">
+      <label class="search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="BUSCAR ESPECIALIDAD · NOMBRE / CÓDIGO"
+          aria-label="Buscar especialidad"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </label>
+      <div class="filter">
+        <span class="filter-label">ESTADO</span>
+        <select
+          class="filter-select"
+          aria-label="Filtrar por estado"
+          (change)="onFilter($any($event.target).value)"
+        >
+          <option value="all">TODAS</option>
+          <option [value]="true">ACTIVAS</option>
+          <option [value]="false">INACTIVAS</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <section class="directory" aria-label="Especialidades clínicas">
+      <app-especialidad-directory
+        [especialidades]="(especialidades$ | async) ?? []"
+        [selectedId]="selectedId"
+        (select)="onSelect($event)"
+      ></app-especialidad-directory>
+    </section>
+
+    <aside class="detail" aria-label="Ficha de especialidad">
+      <app-especialidad-panel
+        [especialidad]="(selected$ | async) ?? null"
+        [creating]="creating"
+        (close)="onClosePanel()"
+        (cancel)="cancelCreate()"
+        (saved)="onSaved($event)"
+        (toggle)="onToggleStatus($event)"
+      ></app-especialidad-panel>
+    </aside>
+  </div>
+</div>

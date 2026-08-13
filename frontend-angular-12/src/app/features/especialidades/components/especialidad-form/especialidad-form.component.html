@@ -1,0 +1,24 @@
+<form class="form" (ngSubmit)="onSubmit()" novalidate>
+  <div class="form-grid">
+    <label class="field">
+      <span class="field-label">NOMBRE DE LA ESPECIALIDAD *</span>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="nombre"
+        name="nombre"
+        placeholder="CIRUGÍA ORAL"
+        autocomplete="off"
+      />
+    </label>
+  </div>
+
+  <p class="form-hint">EL NOMBRE SE ALMACENA EN MAYÚSCULAS EN EL CATÁLOGO CLÍNICO.</p>
+
+  <p class="form-error" *ngIf="error" role="alert">{{ errorMsg }}</p>
+
+  <div class="form-actions">
+    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+    <button class="btn-amber" type="submit">GUARDAR ESPECIALIDAD</button>
+  </div>
+</form>

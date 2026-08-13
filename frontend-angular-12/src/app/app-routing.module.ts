@@ -62,6 +62,11 @@ const routes: Routes = [
           import('./features/turnos/turnos.module').then(m => m.TurnosModule)
       },
       {
+        path: 'especialidades',
+        loadChildren: () =>
+          import('./features/especialidades/especialidades.module').then(m => m.EspecialidadesModule)
+      },
+      {
         path: 'configuracion',
         loadChildren: () =>
           import('./features/configuracion/configuracion.module').then(m => m.ConfiguracionModule)
