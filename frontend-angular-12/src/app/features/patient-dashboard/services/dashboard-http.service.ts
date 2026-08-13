@@ -7,7 +7,7 @@ import { API_BASE } from '../../../core/config/api.config';
 import { BackendStatusService } from '../../../core/services/backend-status.service';
 
 /**
- * Consume el backend REST del tablero de embarque (spring_backend →
+ * Consume el backend REST del panel del consultorio (spring_backend →
  * /api/v1/dashboard). Mantiene el mismo contrato Observable del mock.
  */
 @Injectable({ providedIn: 'root' })
@@ -45,7 +45,7 @@ export class DashboardHttpService {
     };
   }
 
-  /** Llamar al siguiente paciente en espera → pasa a "embarque" (boarding). */
+  /** Llamar al siguiente paciente en espera → pasa a "en consultorio" (boarding). */
   callWaitingPatient(): void {
     this.http.post<Appointment>(`${API_BASE}/dashboard/call-waiting`, {}).subscribe(() => this.refresh());
   }

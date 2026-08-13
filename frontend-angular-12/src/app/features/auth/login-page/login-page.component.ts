@@ -41,8 +41,8 @@ export class LoginPageComponent implements OnInit {
       .catch((err: { status?: number }) => {
         this.error =
           err && err.status === 401
-            ? 'VUELO NO ENCONTRADO — USUARIO O CONTRASEÑA INCORRECTOS'
-            : 'ERROR DE CONEXIÓN — NO SE PUDO ESTABLECER CONTACTO CON LA TORRE';
+            ? 'ACCESO DENEGADO — USUARIO O CONTRASEÑA INCORRECTOS'
+            : 'ERROR DE CONEXIÓN — NO SE PUDO ESTABLECER CONTACTO CON EL SERVIDOR';
       })
       .finally(() => {
         this.loading = false;
