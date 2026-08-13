@@ -1,12 +1,17 @@
-export type UsuarioRol = 'administrador' | 'recepción' | 'odontólogo';
-export type UsuarioStatus = 'activo' | 'suspendido' | 'inactivo';
+export type UsuarioRol = string;
+export type UsuarioStatus = string;
+
+export interface CatalogoItem {
+  codigo: string;
+  nombre: string;
+}
 
 export interface Usuario {
   id: string;           // "usr-1"
   code: string;         // "USR-001"
   username: string;     // "mrivera"
   name: string;         // "MIGUEL RIVERA"
-  role: UsuarioRol;     // "administrador" | "recepción" | "odontólogo"
+  role: UsuarioRol;     // catálogo usuario_roles
   status: UsuarioStatus;
   lastAccess: string;   // "06 AGO 2026 · 14:32"
   phone: string;        // "+51 987 654 321"

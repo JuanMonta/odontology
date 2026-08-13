@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import {
+  CatalogoItem,
   Usuario,
   UsuarioDraft,
   UsuarioRol,
   UsuarioStatus
 } from '../../../../core/models/usuario.model';
-import { ROLES } from '../../services/usuarios-http.service';
 
 @Component({
   selector: 'app-usuario-form',
@@ -15,17 +15,27 @@ import { ROLES } from '../../services/usuarios-http.service';
 })
 export class UsuarioFormComponent implements OnChanges {
   @Input() usuario: Usuario | null = null;
+  @Input() roles: CatalogoItem[] = [];
+  @Input() estados: CatalogoItem[] = [];
+  @Input() esAdmin = false;
   @Output() saved = new EventEmitter<UsuarioDraft>();
   @Output() cancel = new EventEmitter<void>();
-
-  roles = ROLES;
-  statuses: UsuarioStatus[] = ['activo', 'suspendido', 'inactivo'];
+  @Output() crearRol = new EventEmitter<string>();
+  @Output() crearEstado = new EventEmitter<string>();
 
   username = '';
   name = '';
-  role: UsuarioRol = 'odontólogo';
-  status: UsuarioStatus = 'activo';
+  role: UsuarioRol = '';
+  status: UsuarioStatus = '';
   error = false;
+
+  nuevoRol = '';
+  nuevoEstado = '';
+  creandoRol = false;
+  creandoEstado = false;
+
+  private pendienteRol: string | null = null;
+  private pendienteEstado: string | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.usuario && this.usuario) {
@@ -35,6 +45,46 @@ export class UsuarioFormComponent implements OnChanges {
       this.status = this.usuario.status;
       this.error = false;
     }
+    if (changes.roles) {
+      if (this.pendienteRol && this.roles.some(r => r.nombre === this.pendienteRol)) {
+        this.role = this.pendienteRol;
+        this.pendienteRol = null;
+      }
+      if (this.roles.length && !this.role) {
+        this.role = this.roles[0].nombre;
+      }
+    }
+    if (changes.estados) {
+      if (this.pendienteEstado && this.estados.some(e => e.nombre === this.pendienteEstado)) {
+        this.status = this.pendienteEstado;
+        this.pendienteEstado = null;
+      }
+      if (this.estados.length && !this.status) {
+        this.status = this.estados[0].nombre;
+      }
+    }
+  }
+
+  onCrearRol(): void {
+    const nombre = this.nuevoRol.trim().toLowerCase();
+    if (!nombre) {
+      return;
+    }
+    this.creandoRol = false;
+    this.pendienteRol = nombre;
+    this.nuevoRol = '';
+    this.crearRol.emit(nombre);
+  }
+
+  onCrearEstado(): void {
+    const nombre = this.nuevoEstado.trim().toLowerCase();
+    if (!nombre) {
+      return;
+    }
+    this.creandoEstado = false;
+    this.pendienteEstado = nombre;
+    this.nuevoEstado = '';
+    this.crearEstado.emit(nombre);
   }
 
   onSubmit(): void {

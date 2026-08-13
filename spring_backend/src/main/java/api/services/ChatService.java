@@ -70,7 +70,7 @@ public class ChatService {
     public ChatConversacionDto createCanal(String adminCodigo, ChatCanalDraftDto draft) {
         Usuario admin = usuarioRepository.findById(adminCodigo)
                 .orElseThrow(() -> new IllegalArgumentException("ADMIN NO ENCONTRADO"));
-        if (admin.getRol() != Usuario.Rol.administrador) {
+        if (!"administrador".equals(admin.getRol())) {
             throw new IllegalArgumentException("SOLO EL ADMINISTRADOR PUEDE CREAR CANALES");
         }
         String nombre = draft.nombre() == null ? "" : draft.nombre().trim().toUpperCase();
@@ -163,7 +163,7 @@ public class ChatService {
                 .filter(e -> usuarios.containsKey(e.getKey()))
                 .map(e -> {
                     Usuario u = usuarios.get(e.getKey());
-                    return new ChatPresenciaDto(u.getCodigo(), u.getNombre(), u.getRol().name(), e.getValue());
+                    return new ChatPresenciaDto(u.getCodigo(), u.getNombre(), u.getRol(), e.getValue());
                 })
                 .sorted(Comparator.comparing(ChatPresenciaDto::nombre))
                 .toList();
@@ -172,9 +172,9 @@ public class ChatService {
     @Transactional(readOnly = true)
     public List<ChatParticipanteDto> usuariosActivos() {
         return usuarioRepository.findAll().stream()
-                .filter(u -> u.getEstado() == Usuario.Estado.activo)
+                .filter(u -> "activo".equals(u.getEstado()))
                 .sorted(Comparator.comparing(Usuario::getNombre))
-                .map(u -> new ChatParticipanteDto(u.getCodigo(), u.getNombre(), u.getRol().name()))
+                .map(u -> new ChatParticipanteDto(u.getCodigo(), u.getNombre(), u.getRol()))
                 .toList();
     }
 
@@ -184,7 +184,7 @@ public class ChatService {
             throw new IllegalArgumentException("NO ES UN CANAL");
         }
         Usuario admin = usuarioRepository.findById(adminCodigo).orElseThrow();
-        if (admin.getRol() != Usuario.Rol.administrador) {
+        if (!"administrador".equals(admin.getRol())) {
             throw new IllegalArgumentException("SOLO EL ADMINISTRADOR GESTIONA CANALES");
         }
     }
@@ -215,7 +215,7 @@ public class ChatService {
         List<ChatParticipanteDto> participantes = miembros.stream()
                 .map(m -> {
                     Usuario u = usuarios.get(m.getId().getUsuarioCodigo());
-                    return u == null ? null : new ChatParticipanteDto(u.getCodigo(), u.getNombre(), u.getRol().name());
+                    return u == null ? null : new ChatParticipanteDto(u.getCodigo(), u.getNombre(), u.getRol());
                 })
                 .filter(java.util.Objects::nonNull)
                 .toList();

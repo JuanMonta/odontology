@@ -56,6 +56,72 @@
   cursor: pointer;
 }
 
+.field-add {
+  margin-top: 6px;
+  align-self: flex-start;
+  padding: 6px 10px;
+  font-family: var(--font-flap);
+  font-size: 0.6em;
+  letter-spacing: 0.14em;
+  color: var(--amber);
+  background: transparent;
+  border: 1px dashed rgba(255, 176, 32, 0.4);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.18s var(--ease-out), color 0.18s var(--ease-out);
+}
+
+.field-add:hover {
+  border-color: var(--amber);
+  color: var(--flap-ink);
+}
+
+.field-create {
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.field-create-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  font-size: 0.76em;
+  text-transform: uppercase;
+}
+
+.btn-plus {
+  position: relative;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+}
+
+.btn-plus::before,
+.btn-plus::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+}
+
+.btn-plus::before {
+  top: 4px;
+  left: 0;
+  width: 10px;
+  height: 2px;
+}
+
+.btn-plus::after {
+  top: 0;
+  left: 4px;
+  width: 2px;
+  height: 10px;
+}
+
 .form-error {
   font-family: var(--font-flap);
   font-size: 0.68em;

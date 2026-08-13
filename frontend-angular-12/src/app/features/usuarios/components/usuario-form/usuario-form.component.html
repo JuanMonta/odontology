@@ -27,15 +27,57 @@
     <label class="field">
       <span class="field-label">ROL</span>
       <select class="field-select" [(ngModel)]="role" name="role" aria-label="Rol del usuario">
-        <option *ngFor="let r of roles" [ngValue]="r">{{ r }}</option>
+        <option *ngFor="let r of roles" [ngValue]="r.nombre">{{ r.nombre }}</option>
       </select>
+      <button
+        *ngIf="esAdmin"
+        class="field-add"
+        type="button"
+        aria-label="Crear nuevo rol"
+        (click)="creandoRol = !creandoRol"
+      >
+        <span class="btn-plus" aria-hidden="true"></span>
+        CREAR ROL
+      </button>
+      <span class="field-create" *ngIf="esAdmin && creandoRol">
+        <input
+          class="field-input field-create-input"
+          type="text"
+          [(ngModel)]="nuevoRol"
+          name="nuevoRol"
+          placeholder="NOMBRE DEL ROL"
+          autocomplete="off"
+        />
+        <button class="btn-amber" type="button" (click)="onCrearRol()">GUARDAR</button>
+      </span>
     </label>
 
     <label class="field">
       <span class="field-label">ESTADO</span>
       <select class="field-select" [(ngModel)]="status" name="status" aria-label="Estado del usuario">
-        <option *ngFor="let s of statuses" [ngValue]="s">{{ s }}</option>
+        <option *ngFor="let s of estados" [ngValue]="s.nombre">{{ s.nombre }}</option>
       </select>
+      <button
+        *ngIf="esAdmin"
+        class="field-add"
+        type="button"
+        aria-label="Crear nuevo estado"
+        (click)="creandoEstado = !creandoEstado"
+      >
+        <span class="btn-plus" aria-hidden="true"></span>
+        CREAR ESTADO
+      </button>
+      <span class="field-create" *ngIf="esAdmin && creandoEstado">
+        <input
+          class="field-input field-create-input"
+          type="text"
+          [(ngModel)]="nuevoEstado"
+          name="nuevoEstado"
+          placeholder="NOMBRE DEL ESTADO"
+          autocomplete="off"
+        />
+        <button class="btn-amber" type="button" (click)="onCrearEstado()">GUARDAR</button>
+      </span>
     </label>
   </div>
 

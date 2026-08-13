@@ -43,9 +43,7 @@
           (change)="onFilter($any($event.target).value)"
         >
           <option value="all">TODOS</option>
-          <option value="activo">ACTIVOS</option>
-          <option value="suspendido">SUSPENDIDOS</option>
-          <option value="inactivo">INACTIVOS</option>
+          <option *ngFor="let e of estados$ | async" [value]="e.nombre">{{ e.nombre | uppercase }}</option>
         </select>
       </div>
     </div>
@@ -64,10 +62,15 @@
       <app-usuario-panel
         [usuario]="(selected$ | async) ?? null"
         [creating]="creating"
+        [roles]="(roles$ | async) ?? []"
+        [estados]="(estados$ | async) ?? []"
+        [esAdmin]="(esAdmin$ | async) ?? false"
         (close)="onClosePanel()"
         (cancel)="cancelCreate()"
         (saved)="onSaved($event)"
         (toggle)="onToggleStatus($event)"
+        (crearRol)="onCrearRol($event)"
+        (crearEstado)="onCrearEstado($event)"
       ></app-usuario-panel>
     </aside>
   </div>

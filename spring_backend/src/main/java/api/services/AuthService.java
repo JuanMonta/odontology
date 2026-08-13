@@ -24,7 +24,7 @@ public class AuthService {
     public AuthResponseDto login(AuthLoginDto login) {
         Usuario usuario = usuarioRepository.findByUsername(login.username().trim())
                 .orElseThrow(() -> new IllegalArgumentException("USUARIO O CONTRASEÑA INCORRECTOS"));
-        if (usuario.getEstado() != Usuario.Estado.activo) {
+        if (!"activo".equals(usuario.getEstado())) {
             throw new IllegalArgumentException("CUENTA SUSPENDIDA");
         }
         String hash = usuario.getPasswordHash();
@@ -32,9 +32,9 @@ public class AuthService {
             throw new IllegalArgumentException("USUARIO O CONTRASEÑA INCORRECTOS");
         }
         String token = jwtUtil.create(
-                usuario.getCodigo(), usuario.getNombre(), usuario.getRol().name(), 86_400_000L);
+                usuario.getCodigo(), usuario.getNombre(), usuario.getRol(), 86_400_000L);
         return new AuthResponseDto(
                 token, usuario.getCodigo(), usuario.getUsername(), usuario.getNombre(),
-                usuario.getRol().name());
+                usuario.getRol());
     }
 }

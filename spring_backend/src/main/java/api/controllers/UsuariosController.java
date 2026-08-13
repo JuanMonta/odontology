@@ -1,5 +1,7 @@
 package api.controllers;
 
+import api.dto.CatalogoDto;
+import api.dto.CatalogoDraftDto;
 import api.dto.UsuarioDto;
 import api.dto.UsuarioDraftDto;
 import api.services.UsuariosService;
@@ -40,5 +42,25 @@ public class UsuariosController {
     @PatchMapping("/{code}/toggle-status")
     public UsuarioDto toggleStatus(@PathVariable String code) {
         return usuariosService.toggleStatus(code);
+    }
+
+    @GetMapping("/roles")
+    public List<CatalogoDto> roles() {
+        return usuariosService.listRoles();
+    }
+
+    @PostMapping("/roles")
+    public CatalogoDto crearRol(@RequestBody CatalogoDraftDto draft) {
+        return usuariosService.crearRol(draft);
+    }
+
+    @GetMapping("/estados")
+    public List<CatalogoDto> estados() {
+        return usuariosService.listEstados();
+    }
+
+    @PostMapping("/estados")
+    public CatalogoDto crearEstado(@RequestBody CatalogoDraftDto draft) {
+        return usuariosService.crearEstado(draft);
     }
 }

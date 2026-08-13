@@ -3,11 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
+  CatalogoItem,
   Usuario,
   UsuarioDraft,
   UsuarioStatus
 } from '../../../../core/models/usuario.model';
 import { UsuariosHttpService } from '../../services/usuarios-http.service';
+import { AuthStore } from '../../../../core/auth/auth.store';
 
 type StatusFilter = UsuarioStatus | 'all';
 
@@ -20,6 +22,9 @@ type StatusFilter = UsuarioStatus | 'all';
 export class UsuariosPageComponent implements OnInit {
   usuarios$: Observable<Usuario[]>;
   selected$: Observable<Usuario | null>;
+  roles$: Observable<CatalogoItem[]>;
+  estados$: Observable<CatalogoItem[]>;
+  esAdmin$: Observable<boolean>;
 
   selectedId: string | null = null;
   creating = false;
@@ -30,6 +35,7 @@ export class UsuariosPageComponent implements OnInit {
 
   constructor(
     private service: UsuariosHttpService,
+    private auth: AuthStore,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -51,6 +57,9 @@ export class UsuariosPageComponent implements OnInit {
     this.selected$ = combineLatest([this.service.usuarios$, this.selectedId$]).pipe(
       map(([list, id]) => (id ? list.find(u => u.id === id) ?? null : null))
     );
+    this.roles$ = this.service.roles$;
+    this.estados$ = this.service.estados$;
+    this.esAdmin$ = this.auth.esAdmin();
   }
 
   ngOnInit(): void {
@@ -108,5 +117,13 @@ export class UsuariosPageComponent implements OnInit {
 
   onToggleStatus(id: string): void {
     this.service.toggleStatus(id);
+  }
+
+  onCrearRol(nombre: string): void {
+    this.service.crearRol(nombre).subscribe();
+  }
+
+  onCrearEstado(nombre: string): void {
+    this.service.crearEstado(nombre).subscribe();
   }
 }

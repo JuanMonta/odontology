@@ -39,10 +39,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 Map<String, Object> claims = jwtUtil.parse(header.substring(7));
                 String codigo = (String) claims.get("sub");
                 Usuario usuario = usuarioRepository.findById(codigo).orElse(null);
-                if (usuario != null && usuario.getEstado() == Usuario.Estado.activo) {
+                if (usuario != null && "activo".equals(usuario.getEstado())) {
                     var auth = new UsernamePasswordAuthenticationToken(
                             usuario, null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getRol().name().toUpperCase())));
+                            List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getRol().toUpperCase())));
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             } catch (Exception ignored) {

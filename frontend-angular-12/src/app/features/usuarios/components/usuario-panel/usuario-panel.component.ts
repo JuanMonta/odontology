@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import {
+  CatalogoItem,
   Usuario,
   UsuarioDraft,
   UsuarioStatus
@@ -13,6 +14,8 @@ export function usuarioStatusLabel(status: UsuarioStatus): string {
       return 'CUENTA SUSPENDIDA';
     case 'inactivo':
       return 'CUENTA INACTIVA';
+    default:
+      return status ? status.toUpperCase() : 'SIN ESTADO';
   }
 }
 
@@ -25,10 +28,15 @@ export function usuarioStatusLabel(status: UsuarioStatus): string {
 export class UsuarioPanelComponent implements OnChanges {
   @Input() usuario: Usuario | null = null;
   @Input() creating = false;
+  @Input() roles: CatalogoItem[] = [];
+  @Input() estados: CatalogoItem[] = [];
+  @Input() esAdmin = false;
   @Output() close = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
   @Output() saved = new EventEmitter<UsuarioDraft>();
   @Output() toggle = new EventEmitter<string>();
+  @Output() crearRol = new EventEmitter<string>();
+  @Output() crearEstado = new EventEmitter<string>();
 
   editing = false;
 
