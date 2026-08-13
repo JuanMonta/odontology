@@ -16,7 +16,7 @@ interface TypingEvent {
 /**
  * Canal STOMP en vivo del chat (SockJS → Spring /ws con handshake JWT por
  * query param). Difunde transmisiones nuevas, el indicador de escritura y la
- * presencia de la tripulación. La persistencia siempre la hace el backend.
+ * presencia del personal del consultorio. La persistencia siempre la hace el backend.
  */
 @Injectable({ providedIn: 'root' })
 export class ChatSocketService implements OnDestroy {

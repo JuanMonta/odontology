@@ -1,12 +1,11 @@
 <!--
-  DIRECCIÓN: TABLERO DE EMBARQUE — concourse split-flap aplicado al muelle de
-  acceso de la clínica. THESIS: entrar a la app es pasar por el control de
-  embarque; el login es un letrero de tablero donde la tripulación valida su
-  vuelo. OWN-WORLD: matte black flaps, letras pintadas, acero cepillado y
-  lámparas ámbar; la lámpara verde de la nota demo indica "torre en línea".
-  STORY: el usuario llega al mostrador, presenta sus credenciales y "EMBARCA"
-  hacia el tablero principal. FIRST VIEWPORT: caja centrada de acceso con
-  brand, título flap y formulario. FORM: split-flap concourse board (challenger).
+  DIRECCIÓN: SPLIT-FLAP CONCOURSE aplicado al acceso de la clínica. THESIS: entrar
+  a la app es acreditarse en recepción; el login es un letrero de tablero donde el
+  personal valida su acceso. OWN-WORLD: matte black flaps, letras pintadas, acero
+  cepillado y lámparas ámbar; la lámpara verde de la nota demo indica "servidor en
+  línea". STORY: el usuario llega a recepción, presenta sus credenciales e INGRESA
+  hacia el tablero principal. FIRST VIEWPORT: caja centrada de acceso con brand,
+  título flap y formulario. FORM: split-flap concourse board (challenger).
 -->
 <div class="stage">
   <div class="board">
@@ -20,8 +19,8 @@
 
     <div class="board-body">
       <div>
-        <span class="kicker">PUERTO DE CONTROL</span>
-        <h1 class="title">ACCESO DE TRIPULACIÓN</h1>
+        <span class="kicker">CONTROL DE ACCESO</span>
+        <h1 class="title">ACCESO DEL PERSONAL</h1>
       </div>
 
       <form class="form" (ngSubmit)="onSubmit()" novalidate>
@@ -33,7 +32,7 @@
             name="username"
             [(ngModel)]="username"
             autocomplete="username"
-            placeholder="CÓDIGO DE TRIPULACIÓN"
+            placeholder="CÓDIGO DEL PERSONAL"
           />
         </label>
 
@@ -51,9 +50,9 @@
 
         <p *ngIf="error" class="error" role="alert">{{ error }}</p>
 
-        <button class="btn-embark" type="submit" [disabled]="loading">
+        <button class="btn-enter" type="submit" [disabled]="loading">
           <span class="lamp" aria-hidden="true"></span>
-          <span>{{ loading ? 'EMBARCANDO…' : 'EMBARCAR' }}</span>
+          <span>{{ loading ? 'INGRESANDO…' : 'INGRESAR' }}</span>
         </button>
       </form>
 

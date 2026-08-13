@@ -1,10 +1,10 @@
 <!--
-  DIRECCIÓN: PANEL DE CONTROL DE TRIPULACIÓN — split-flap concourse aplicado a
+  DIRECCIÓN: PANEL DE CONTROL DEL PERSONAL — split-flap concourse aplicado a
   la radio del consultorio. THESIS: el chat es una mesa de operaciones en vivo;
   las conversaciones son estaciones/frecuencias y los mensajes son
   transmisiones. OWN-WORLD: matte black flaps, letras pintadas, acero
   cepillado, lámparas ámbar para lo vivo y lámparas verdes para la presencia.
-  STORY: la tripulación sintoniza una estación, abre el hilo de transmisiones,
+  STORY: el personal sintoniza una estación, abre el hilo de transmisiones,
   responde y enciende la luz ámbar de la frecuencia activa. FIRST VIEWPORT:
   estaciones a la izquierda + transmisiones a la derecha. FORM: split-flap
   concourse board (challenger), mismo shell de PACIENTES/TRATAMIENTOS.
@@ -13,7 +13,7 @@
   <header class="page-head">
     <div class="page-head-row">
       <div class="page-head-left">
-        <h2 class="page-title">RADIO DE TRIPULACIÓN</h2>
+        <h2 class="page-title">RADIO DEL PERSONAL</h2>
         <span class="page-sub">CHAT EN VIVO · ESTACIONES A LA IZQUIERDA · TRANSMISIONES A LA DERECHA</span>
       </div>
       <div class="page-head-actions">
@@ -69,7 +69,7 @@
 
       <div class="crew">
         <div class="crew-head">
-          <span class="crew-title">TRIPULACIÓN</span>
+          <span class="crew-title">PERSONAL</span>
           <span class="crew-total">{{ enLinea }}/{{ presencia.length }} EN LÍNEA</span>
         </div>
         <div class="crew-list">
@@ -163,7 +163,7 @@
           </svg>
         </button>
       </div>
-      <div class="overlay-sub">SELECCIONE UN MIEMBRO DE LA TRIPULACIÓN</div>
+      <div class="overlay-sub">SELECCIONE UN MIEMBRO DEL PERSONAL</div>
       <div class="overlay-list">
         <button
           class="overlay-item"
@@ -175,7 +175,7 @@
           <span class="overlay-item-name">{{ u.nombre }}</span>
           <span class="overlay-item-role">{{ u.rol }}</span>
         </button>
-        <div class="overlay-empty" *ngIf="!usuarios.length">SIN TRIPULACIÓN DISPONIBLE</div>
+        <div class="overlay-empty" *ngIf="!usuarios.length">SIN PERSONAL DISPONIBLE</div>
       </div>
     </div>
   </div>
@@ -204,7 +204,7 @@
         />
       </div>
       <div class="canal-field">
-        <span class="canal-label">TRIPULACIÓN</span>
+        <span class="canal-label">PERSONAL</span>
         <div class="canal-members">
           <label class="canal-member" *ngFor="let u of usuarios; trackBy: trackPorCodigo">
             <input

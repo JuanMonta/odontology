@@ -24,7 +24,7 @@ export class DashboardMockService {
     };
   }
 
-  /** Llamar al siguiente paciente en espera → pasa a "embarque" (boarding). */
+  /** Llamar al siguiente paciente en espera → pasa a "en consultorio" (boarding). */
   callWaitingPatient(): void {
     const waiting = this.waitingSubject.getValue();
     const [next, ...rest] = waiting;
