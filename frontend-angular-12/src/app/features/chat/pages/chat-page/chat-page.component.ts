@@ -44,9 +44,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   dmOpen = false;
   canalOpen = false;
+  rosterOpen = false;
   dmSeleccion: string | null = null;
   canalNombre = '';
   canalMiembros: string[] = [];
+  canalRename = '';
 
   nuevoMensaje = '';
 
@@ -256,6 +258,84 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   cerrarCanal(): void {
     this.canalOpen = false;
+  }
+
+  abrirRoster(): void {
+    if (!this.activa) {
+      return;
+    }
+    this.canalRename = this.activa.nombre ?? '';
+    this.chat.usuariosActivos().subscribe(lista => {
+      this.usuarios = lista;
+      this.rosterOpen = true;
+      this.cdr.markForCheck();
+    });
+  }
+
+  cerrarRoster(): void {
+    this.rosterOpen = false;
+  }
+
+  esMiembro(codigo: string): boolean {
+    return this.activa?.participantes.some(p => p.codigo === codigo) ?? false;
+  }
+
+  esOperadorCanal(codigo: string): boolean {
+    return this.activa?.participantes.some(p => p.codigo === codigo && p.esAdmin) ?? false;
+  }
+
+  presenciaDeCodigo(codigo: string): boolean {
+    return this.presencia.some(p => p.codigo === codigo && p.online);
+  }
+
+  rosterGrupos(): { rol: string; miembros: ChatParticipante[] }[] {
+    const grupos = new Map<string, ChatParticipante[]>();
+    for (const u of this.usuarios) {
+      const clave = u.rol.toUpperCase();
+      const lista = grupos.get(clave) ?? [];
+      lista.push(u);
+      grupos.set(clave, lista);
+    }
+    return Array.from(grupos.entries()).map(([rol, miembros]) => ({
+      rol,
+      miembros
+    }));
+  }
+
+  toggleRosterMiembro(codigo: string): void {
+    if (!this.activa || this.activa.tipo !== 'canal') {
+      return;
+    }
+    const yaEsMiembro = this.esMiembro(codigo);
+    const op = yaEsMiembro
+      ? this.chat.quitarMiembro(this.activa.id, codigo)
+      : this.chat.agregarMiembro(this.activa.id, codigo);
+    op.subscribe(conv => this.aplicarConversacion(conv));
+  }
+
+  guardarRemombre(): void {
+    if (!this.activa || this.activa.tipo !== 'canal') {
+      return;
+    }
+    const nombre = this.canalRename.trim();
+    if (!nombre) {
+      return;
+    }
+    this.chat.renombrarCanal(this.activa.id, nombre).subscribe(conv => {
+      this.canalRename = conv.nombre ?? '';
+      this.aplicarConversacion(conv);
+    });
+  }
+
+  private aplicarConversacion(conv: ChatConversacion): void {
+    const idx = this.conversaciones.findIndex(c => c.id === conv.id);
+    if (idx >= 0) {
+      this.conversaciones[idx] = conv;
+    }
+    if (this.activa?.id === conv.id) {
+      this.activa = conv;
+    }
+    this.cdr.markForCheck();
   }
 
   onComposerInput(value: string): void {

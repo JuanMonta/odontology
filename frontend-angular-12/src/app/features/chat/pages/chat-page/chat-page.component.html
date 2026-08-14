@@ -143,13 +143,27 @@
 
       <ng-container *ngIf="activa">
         <div class="transmission-head">
-          <div class="transmission-id">
+          <div
+            class="transmission-id"
+          >
             <span
               class="transmission-lamp"
               aria-hidden="true"
             ></span>
             <span class="transmission-title">{{ tituloDe(activa) }}</span>
           </div>
+          <button
+            class="roster-chip"
+            *ngIf="activa.tipo === 'canal'"
+            type="button"
+            (click)="abrirRoster()"
+          >
+            <span
+              class="roster-chip-lamp"
+              aria-hidden="true"
+            ></span>
+            <span class="roster-chip-text">TRIPULACIÓN · {{ activa.participantes.length }}</span>
+          </button>
           <div
             class="transmission-status"
             [class.is-off]="!conectado"
@@ -368,6 +382,123 @@
           type="button"
           (click)="cerrarCanal()"
         >CANCELAR</button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="overlay"
+    *ngIf="rosterOpen"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Tripulación del canal"
+  >
+    <div
+      class="overlay-backdrop"
+      (click)="cerrarRoster()"
+    ></div>
+    <div
+      class="overlay-panel roster-panel"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="overlay-head">
+        <span class="overlay-title">TRIPULACIÓN DEL CANAL</span>
+        <button
+          class="overlay-close"
+          type="button"
+          aria-label="Cerrar"
+          (click)="cerrarRoster()"
+        >
+          <svg
+            class="icon-x"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M3 3l10 10"></path>
+            <path d="M13 3L3 13"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="roster-sub">
+        <span class="roster-sub-name"># {{ activa?.nombre }}</span>
+        <span class="roster-sub-count">{{ activa?.participantes?.length }} MIEMBROS</span>
+      </div>
+      <div
+        class="canal-field roster-rename"
+        *ngIf="esAdmin"
+      >
+        <span class="canal-label">NOMBRE DEL CANAL</span>
+        <div class="roster-rename-row">
+          <input
+            class="canal-input roster-rename-input"
+            type="text"
+            [(ngModel)]="canalRename"
+            name="canalRename"
+            placeholder="# NUEVO NOMBRE"
+            autocomplete="off"
+            (keydown.enter)="guardarRemombre()"
+          />
+          <button
+            class="btn-ghost roster-rename-btn"
+            type="button"
+            [disabled]="!canalRename.trim()"
+            (click)="guardarRemombre()"
+          >RENOMBRAR</button>
+        </div>
+      </div>
+      <div class="roster-body">
+        <div
+          class="roster-group"
+          *ngFor="let g of rosterGrupos()"
+        >
+          <span class="roster-group-label">{{ g.rol }}</span>
+          <div class="roster-members">
+            <label
+              class="roster-member"
+              *ngFor="let p of g.miembros; trackBy: trackPorCodigo"
+              [class.is-member]="esMiembro(p.codigo)"
+              [class.is-disabled]="!esAdmin || esOperadorCanal(p.codigo)"
+            >
+              <input
+                class="roster-check"
+                type="checkbox"
+                [checked]="esMiembro(p.codigo)"
+                [disabled]="!esAdmin || esOperadorCanal(p.codigo)"
+                (change)="toggleRosterMiembro(p.codigo)"
+                [attr.aria-label]="'Gestionar a ' + p.nombre"
+              />
+              <span
+                class="roster-dot"
+                [class.is-online]="presenciaDeCodigo(p.codigo)"
+                aria-hidden="true"
+              ></span>
+              <span class="roster-name">{{ p.nombre }}</span>
+              <span
+                class="roster-tag"
+                *ngIf="esOperadorCanal(p.codigo)"
+              >OPERADOR</span>
+            </label>
+          </div>
+        </div>
+        <div
+          class="roster-empty"
+          *ngIf="!usuarios.length"
+        >SIN PERSONAL DISPONIBLE</div>
+      </div>
+      <div class="roster-foot">
+        <button
+          class="btn-ghost"
+          type="button"
+          (click)="cerrarRoster()"
+        >CERRAR</button>
+        <span
+          class="roster-hint"
+          *ngIf="!esAdmin"
+        >SOLO EL ADMINISTRADOR GESTIONA LA TRIPULACIÓN</span>
       </div>
     </div>
   </div>
