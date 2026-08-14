@@ -205,9 +205,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   abrirDmModal(): void {
     this.dmSeleccion = null;
+    this.usuarios = [];
+    this.dmOpen = true;
+    this.cdr.markForCheck();
     this.chat.usuariosActivos().subscribe(lista => {
       this.usuarios = lista;
-      this.dmOpen = true;
       this.cdr.markForCheck();
     });
   }
@@ -227,9 +229,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   abrirCanalModal(): void {
     this.canalNombre = '';
     this.canalMiembros = [];
+    this.usuarios = [];
+    this.canalOpen = true;
+    this.cdr.markForCheck();
     this.chat.usuariosActivos().subscribe(lista => {
       this.usuarios = lista;
-      this.canalOpen = true;
       this.cdr.markForCheck();
     });
   }
@@ -265,9 +269,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       return;
     }
     this.canalRename = this.activa.nombre ?? '';
+    this.usuarios = [];
+    this.rosterOpen = true;
+    this.cdr.markForCheck();
     this.chat.usuariosActivos().subscribe(lista => {
       this.usuarios = lista;
-      this.rosterOpen = true;
       this.cdr.markForCheck();
     });
   }
