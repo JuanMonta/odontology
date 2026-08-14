@@ -252,6 +252,10 @@ export class MainLayoutComponent {
   }
 
   close(): void {
+    const activo = document.activeElement as HTMLElement | null;
+    if (activo && this.drawer?.nativeElement.contains(activo)) {
+      activo.blur();
+    }
     this.open = false;
     setTimeout(() => this.burger?.nativeElement.focus());
   }

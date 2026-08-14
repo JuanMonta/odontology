@@ -32,7 +32,11 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "@stomp/stompjs",
+              "sockjs-client"
+            ]
           },
           "configurations": {
             "production": {
