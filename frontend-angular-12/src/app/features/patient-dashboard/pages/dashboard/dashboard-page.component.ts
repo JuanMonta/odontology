@@ -12,6 +12,7 @@ import { OdontologosHttpService } from '../../../odontologos/services/odontologo
 import { PatientsHttpService } from '../../../patients/services/patients-http.service';
 import { TreatmentsHttpService } from '../../../treatments/services/treatments-http.service';
 import { DashboardHttpService } from '../../services/dashboard-http.service';
+import { borradorKey } from '../../../../core/auth/session-local-storage';
 
 export interface NewAppointmentDraft {
   time: string;
@@ -37,6 +38,10 @@ const EMPTY_DRAFT: NewAppointmentDraft = {
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {
   private static readonly DRAFT_KEY = 'saas.clinica.appointment-form.draft';
+
+  private get draftKey(): string {
+    return borradorKey(DashboardPageComponent.DRAFT_KEY);
+  }
 
   appointments$: Observable<Appointment[]>;
   waiting$: Observable<WaitingPatient[]>;
@@ -140,7 +145,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   persistDraft(): void {
     try {
-      localStorage.setItem(DashboardPageComponent.DRAFT_KEY, JSON.stringify(this.draft));
+      localStorage.setItem(this.draftKey, JSON.stringify(this.draft));
     } catch {
       // almacenamiento no disponible: el borrador simplemente no se persiste
     }
@@ -148,7 +153,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   private restoreDraft(): NewAppointmentDraft {
     try {
-      const raw = localStorage.getItem(DashboardPageComponent.DRAFT_KEY);
+      const raw = localStorage.getItem(this.draftKey);
       if (!raw) {
         return { ...EMPTY_DRAFT };
       }
@@ -170,7 +175,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   private clearDraft(): void {
     try {
-      localStorage.removeItem(DashboardPageComponent.DRAFT_KEY);
+      localStorage.removeItem(this.draftKey);
     } catch {
       // almacenamiento no disponible
     }

@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Patient, PatientDraft, PatientStatus } from '../../core/models/patient.model';
+import { borradorKey } from '../../core/auth/session-local-storage';
 
-/** Clave del borrador del alta de paciente en localStorage. */
+/** Clave base del borrador del alta de paciente en localStorage. */
 export const PATIENT_FORM_DRAFT_KEY = 'saas.clinica.patient-form.draft';
 
 /** Descarta el borrador guardado (al cancelar o guardar un alta). */
 export function clearPatientFormDraft(): void {
   try {
-    localStorage.removeItem(PATIENT_FORM_DRAFT_KEY);
+    localStorage.removeItem(borradorKey(PATIENT_FORM_DRAFT_KEY));
   } catch {
     // almacenamiento no disponible: el borrador simplemente se ignora
   }
@@ -91,7 +92,7 @@ export class PatientFormComponent implements OnInit {
     }
     try {
       localStorage.setItem(
-        PATIENT_FORM_DRAFT_KEY,
+        borradorKey(PATIENT_FORM_DRAFT_KEY),
         JSON.stringify({
           name: this.name,
           age: this.age,
@@ -111,7 +112,7 @@ export class PatientFormComponent implements OnInit {
 
   private restoreDraft(): void {
     try {
-      const raw = localStorage.getItem(PATIENT_FORM_DRAFT_KEY);
+      const raw = localStorage.getItem(borradorKey(PATIENT_FORM_DRAFT_KEY));
       if (!raw) {
         return;
       }

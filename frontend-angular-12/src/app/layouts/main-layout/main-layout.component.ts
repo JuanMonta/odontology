@@ -184,7 +184,8 @@ export class MainLayoutComponent {
   onLogout(): void {
     this.close();
     this.auth.logout();
-    this.router.navigate(['/login']);
+    // Recarga completa: descarta las cachés de los servicios singleton y cierra el WebSocket.
+    window.location.assign('/login');
   }
 
   private startChatPoll(): void {

@@ -5,6 +5,7 @@ import {
   TreatmentDraft
 } from '../../../../core/models/treatment.model';
 import { TREATMENT_CATEGORIES } from '../../services/treatments-http.service';
+import { borradorKey } from '../../../../core/auth/session-local-storage';
 
 const TREATMENT_FORM_DRAFT_KEY = 'saas.clinica.treatment-form.draft';
 
@@ -101,11 +102,11 @@ export class TreatmentFormComponent implements OnChanges {
       description: this.description,
       active: this.active
     };
-    localStorage.setItem(TREATMENT_FORM_DRAFT_KEY, JSON.stringify(draft));
+    localStorage.setItem(borradorKey(TREATMENT_FORM_DRAFT_KEY), JSON.stringify(draft));
   }
 
   private readDraft(): TreatmentFormDraft | null {
-    const raw = localStorage.getItem(TREATMENT_FORM_DRAFT_KEY);
+    const raw = localStorage.getItem(borradorKey(TREATMENT_FORM_DRAFT_KEY));
     if (!raw) {
       return null;
     }
@@ -123,6 +124,6 @@ export class TreatmentFormComponent implements OnChanges {
   }
 
   private clearDraft(): void {
-    localStorage.removeItem(TREATMENT_FORM_DRAFT_KEY);
+    localStorage.removeItem(borradorKey(TREATMENT_FORM_DRAFT_KEY));
   }
 }
