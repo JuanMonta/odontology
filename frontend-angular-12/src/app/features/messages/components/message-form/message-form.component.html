@@ -1,9 +1,9 @@
 <form class="form" (ngSubmit)="onSubmit()" novalidate>
   <div class="form-grid">
-    <label class="field">
+    <label class="field field--full">
       <span class="field-label">PARA</span>
       <select class="field-select" [(ngModel)]="destino" name="destino" aria-label="Público objetivo del mensaje">
-        <option *ngFor="let d of destinos" [ngValue]="d.id">{{ d.label }}</option>
+        <option *ngFor="let d of destinos$ | async" [ngValue]="d.id">{{ d.label }}</option>
       </select>
     </label>
 
@@ -11,13 +11,6 @@
       <span class="field-label">PRIORIDAD</span>
       <select class="field-select" [(ngModel)]="prioridad" name="prioridad" aria-label="Prioridad del mensaje">
         <option *ngFor="let p of priorities" [ngValue]="p.id">{{ p.label }}</option>
-      </select>
-    </label>
-
-    <label class="field">
-      <span class="field-label">CANAL</span>
-      <select class="field-select" [(ngModel)]="channel" name="channel" aria-label="Canal del mensaje">
-        <option *ngFor="let c of channels" [ngValue]="c.id">{{ c.label }}</option>
       </select>
     </label>
 

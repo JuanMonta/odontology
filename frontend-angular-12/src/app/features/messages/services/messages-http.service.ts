@@ -4,26 +4,11 @@ import { BehaviorSubject, interval, Observable, Subject } from 'rxjs';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
 import {
   ClinicMessage,
-  MessageChannel,
-  MessageDestino,
   MessageDraft,
   MessagePriority
 } from '../../../core/models/message.model';
 import { API_BASE } from '../../../core/config/api.config';
 import { BackendStatusService } from '../../../core/services/backend-status.service';
-
-export const MESSAGE_CHANNELS: { id: MessageChannel; label: string }[] = [
-  { id: 'consulta', label: 'CONSULTA' },
-  { id: 'paciente', label: 'PACIENTE' },
-  { id: 'equipo', label: 'EQUIPO' }
-];
-
-export const MESSAGE_DESTINOS: { id: MessageDestino; label: string }[] = [
-  { id: 'todos', label: 'TODOS' },
-  { id: 'equipo', label: 'EQUIPO' },
-  { id: 'recepcion', label: 'RECEPCIÓN' },
-  { id: 'odontologos', label: 'ODONTÓLOGOS' }
-];
 
 export const MESSAGE_PRIORITIES: { id: MessagePriority; label: string }[] = [
   { id: 'urgente', label: 'URGENTE' },

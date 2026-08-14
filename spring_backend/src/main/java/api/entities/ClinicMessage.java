@@ -30,10 +30,6 @@ import java.time.LocalTime;
 @Builder
 public class ClinicMessage {
 
-    public enum Canal { consulta, paciente, equipo }
-
-    public enum Destino { todos, equipo, recepcion, odontologos }
-
     public enum Prioridad { urgente, importante, informacion }
 
     public enum Estado { unread, read }
@@ -51,10 +47,6 @@ public class ClinicMessage {
     @Column(name = "remitente", nullable = false, length = 60)
     private String remitente;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "canal", nullable = false)
-    private Canal canal;
-
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
@@ -65,9 +57,8 @@ public class ClinicMessage {
     @Column(name = "estado", nullable = false)
     private Estado estado;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "destino", nullable = false)
-    private Destino destino;
+    @Column(name = "destino", nullable = false, length = 40)
+    private String destino;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "prioridad", nullable = false)

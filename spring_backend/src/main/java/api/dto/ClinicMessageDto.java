@@ -5,7 +5,6 @@ public record ClinicMessageDto(
         String subject,
         String body,
         String from,
-        String channel,
         String date,
         String time,
         String status,

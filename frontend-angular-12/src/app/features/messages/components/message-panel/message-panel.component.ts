@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ClinicMessage, MessageDraft } from '../../../../core/models/message.model';
-import { MESSAGE_DESTINOS, MESSAGE_PRIORITIES, MessagesHttpService } from '../../services/messages-http.service';
+import { MESSAGE_PRIORITIES, MessagesHttpService } from '../../services/messages-http.service';
 
 @Component({
   selector: 'app-message-panel',
@@ -18,7 +18,7 @@ export class MessagePanelComponent {
   constructor(private service: MessagesHttpService) {}
 
   destinoLabel(id: string): string {
-    return MESSAGE_DESTINOS.find(d => d.id === id)?.label ?? id;
+    return id === 'todos' ? 'TODOS' : id.toUpperCase();
   }
 
   prioridadKicker(prioridad: string): string {

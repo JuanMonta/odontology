@@ -10,8 +10,6 @@ import java.util.Optional;
 @RepositoryRestResource(exported = false)
 public interface ClinicMessageRepository extends JpaRepository<ClinicMessage, String> {
 
-    List<ClinicMessage> findByCanal(ClinicMessage.Canal canal);
-
     List<ClinicMessage> findByEstado(ClinicMessage.Estado estado);
 
     List<ClinicMessage> findByPrioridad(ClinicMessage.Prioridad prioridad);
