@@ -1,6 +1,6 @@
-export type MessageChannel = 'consulta' | 'paciente' | 'equipo';
 export type MessageStatus = 'unread' | 'read';
-export type MessageDestino = 'todos' | 'equipo' | 'recepcion' | 'odontologos';
+/** Destino = 'todos' o un rol del catálogo usuario_roles (texto libre). */
+export type MessageDestino = string;
 export type MessagePriority = 'urgente' | 'importante' | 'informacion';
 
 export interface ClinicMessage {
@@ -8,7 +8,6 @@ export interface ClinicMessage {
   subject: string;
   body: string;
   from: string;            // remitente visible
-  channel: MessageChannel;
   date: string;            // "05 AGO 2026"
   time: string;            // "09:15"
   status: MessageStatus;
@@ -21,6 +20,5 @@ export interface MessageDraft {
   body: string;
   remitente: string;
   destino: MessageDestino;
-  channel: MessageChannel;
   prioridad: MessagePriority;
 }

@@ -17,12 +17,27 @@
         <span class="page-sub">CHAT EN VIVO · ESTACIONES A LA IZQUIERDA · TRANSMISIONES A LA DERECHA</span>
       </div>
       <div class="page-head-actions">
-        <button class="btn-ghost" *ngIf="esAdmin" type="button" (click)="abrirCanalModal()">
-          <span class="btn-plus" aria-hidden="true"></span>
-          + CANAL
+        <button
+          class="btn-ghost"
+          *ngIf="esAdmin"
+          type="button"
+          (click)="abrirCanalModal()"
+        >
+          <span
+            class="btn-plus"
+            aria-hidden="true"
+          ></span>
+          CANAL
         </button>
-        <button class="btn-amber" type="button" (click)="abrirDmModal()">
-          <span class="btn-plus" aria-hidden="true"></span>
+        <button
+          class="btn-amber"
+          type="button"
+          (click)="abrirDmModal()"
+        >
+          <span
+            class="btn-plus"
+            aria-hidden="true"
+          ></span>
           NUEVO MENSAJE
         </button>
       </div>
@@ -30,13 +45,19 @@
   </header>
 
   <div class="page-body">
-    <aside class="stations" aria-label="Estaciones de conversación">
+    <aside
+      class="stations"
+      aria-label="Estaciones de conversación"
+    >
       <div class="stations-head">
         <span class="stations-title">ESTACIONES</span>
         <span class="stations-count">{{ conversaciones.length }} FRECUENCIAS</span>
       </div>
 
-      <div class="stations-list" role="list">
+      <div
+        class="stations-list"
+        role="list"
+      >
         <button
           class="station"
           *ngFor="let c of conversaciones; trackBy: trackPorId"
@@ -58,11 +79,17 @@
             </span>
             <span class="station-row">
               <span class="station-preview">{{ c.ultimoMensaje }}</span>
-              <span class="station-badge" *ngIf="c.noLeidos > 0">{{ c.noLeidos }}</span>
+              <span
+                class="station-badge"
+                *ngIf="c.noLeidos > 0"
+              >{{ c.noLeidos }}</span>
             </span>
           </span>
         </button>
-        <div class="stations-empty" *ngIf="!conversaciones.length">
+        <div
+          class="stations-empty"
+          *ngIf="!conversaciones.length"
+        >
           <span class="stations-empty-text">SIN FRECUENCIAS ASIGNADAS</span>
         </div>
       </div>
@@ -73,38 +100,72 @@
           <span class="crew-total">{{ enLinea }}/{{ presencia.length }} EN LÍNEA</span>
         </div>
         <div class="crew-list">
-          <span class="crew-chip" *ngFor="let p of presencia; trackBy: trackPorCodigo">
-            <span class="crew-dot" [class.is-online]="p.online" aria-hidden="true"></span>
+          <span
+            class="crew-chip"
+            *ngFor="let p of presencia; trackBy: trackPorCodigo"
+          >
+            <span
+              class="crew-dot"
+              [class.is-online]="p.online"
+              aria-hidden="true"
+            ></span>
             <span class="crew-name">{{ p.nombre }}</span>
           </span>
         </div>
       </div>
     </aside>
 
-    <section class="transmission" aria-label="Transmisiones de la conversación activa">
-      <div class="transmission-empty" *ngIf="!activa">
+    <section
+      class="transmission"
+      aria-label="Transmisiones de la conversación activa"
+    >
+      <div
+        class="transmission-empty"
+        *ngIf="!activa"
+      >
         <div class="empty-card">
           <span class="empty-kicker">FRECUENCIA SIN SINTONIZAR</span>
           <span class="empty-title">SELECCIONE UNA ESTACIÓN O INICIE UNA TRANSMISIÓN</span>
           <span class="empty-sub">ELIJA UNA FRECUENCIA A LA IZQUIERDA PARA ABRIR EL HILO DE MENSAJES.</span>
-          <button class="btn-amber empty-cta" type="button" (click)="abrirDmModal()">INICIAR TRANSMISIÓN</button>
-          <button class="btn-ghost empty-cta" type="button" *ngIf="esAdmin" (click)="abrirCanalModal()">+ CREAR CANAL</button>
+          <button
+            class="btn-amber empty-cta"
+            type="button"
+            (click)="abrirDmModal()"
+          >INICIAR TRANSMISIÓN</button>
+          <button
+            class="btn-ghost empty-cta"
+            type="button"
+            *ngIf="esAdmin"
+            (click)="abrirCanalModal()"
+          >+ CREAR CANAL</button>
         </div>
       </div>
 
       <ng-container *ngIf="activa">
         <div class="transmission-head">
           <div class="transmission-id">
-            <span class="transmission-lamp" aria-hidden="true"></span>
+            <span
+              class="transmission-lamp"
+              aria-hidden="true"
+            ></span>
             <span class="transmission-title">{{ tituloDe(activa) }}</span>
           </div>
-          <div class="transmission-status" [class.is-off]="!conectado">
-            <span class="status-lamp" aria-hidden="true"></span>
+          <div
+            class="transmission-status"
+            [class.is-off]="!conectado"
+          >
+            <span
+              class="status-lamp"
+              aria-hidden="true"
+            ></span>
             <span class="status-text">{{ conectado ? 'EN VIVO' : 'RECONECTANDO…' }}</span>
           </div>
         </div>
 
-        <div class="transmission-feed" #feed>
+        <div
+          class="transmission-feed"
+          #feed
+        >
           <div
             class="msg"
             *ngFor="let m of mensajes; trackBy: trackPorId"
@@ -116,17 +177,31 @@
               <span class="msg-time">{{ m.fechaHora }}</span>
             </div>
           </div>
-          <div class="feed-empty" *ngIf="!mensajes.length">
+          <div
+            class="feed-empty"
+            *ngIf="!mensajes.length"
+          >
             <span class="feed-empty-text">CANAL ABIERTO · A LA ESPERA DE TRANSMISIONES</span>
           </div>
         </div>
 
-        <div class="typing" *ngIf="typingNombre" aria-live="polite">
-          <span class="typing-dot" aria-hidden="true"></span>
+        <div
+          class="typing"
+          *ngIf="typingNombre"
+          aria-live="polite"
+        >
+          <span
+            class="typing-dot"
+            aria-hidden="true"
+          ></span>
           <span class="typing-text">{{ typingNombre }} ESCRIBIENDO…</span>
         </div>
 
-        <form class="composer" (ngSubmit)="enviarMensaje()" novalidate>
+        <form
+          class="composer"
+          (ngSubmit)="enviarMensaje()"
+          novalidate
+        >
           <input
             class="composer-input"
             type="text"
@@ -137,7 +212,11 @@
             (ngModelChange)="onComposerInput($event)"
             (blur)="onBlurComposer()"
           />
-          <button class="btn-amber composer-send" type="submit" [disabled]="!nuevoMensaje.trim()">
+          <button
+            class="btn-amber composer-send"
+            type="submit"
+            [disabled]="!nuevoMensaje.trim()"
+          >
             TRANSMITIR
           </button>
         </form>
@@ -152,12 +231,31 @@
     aria-modal="true"
     aria-label="Iniciar mensaje directo"
   >
-    <div class="overlay-backdrop" (click)="cerrarDm()"></div>
-    <div class="overlay-panel" (click)="$event.stopPropagation()">
+    <div
+      class="overlay-backdrop"
+      (click)="cerrarDm()"
+    ></div>
+    <div
+      class="overlay-panel"
+      (click)="$event.stopPropagation()"
+    >
       <div class="overlay-head">
         <span class="overlay-title">NUEVA TRANSMISIÓN DIRECTA</span>
-        <button class="overlay-close" type="button" aria-label="Cerrar" (click)="cerrarDm()">
-          <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+        <button
+          class="overlay-close"
+          type="button"
+          aria-label="Cerrar"
+          (click)="cerrarDm()"
+        >
+          <svg
+            class="icon-x"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
             <path d="M3 3l10 10"></path>
             <path d="M13 3L3 13"></path>
           </svg>
@@ -171,22 +269,53 @@
           type="button"
           (click)="elegirDm(u.codigo)"
         >
-          <span class="overlay-item-dot" aria-hidden="true"></span>
+          <span
+            class="overlay-item-dot"
+            aria-hidden="true"
+          ></span>
           <span class="overlay-item-name">{{ u.nombre }}</span>
           <span class="overlay-item-role">{{ u.rol }}</span>
         </button>
-        <div class="overlay-empty" *ngIf="!usuarios.length">SIN PERSONAL DISPONIBLE</div>
+        <div
+          class="overlay-empty"
+          *ngIf="!usuarios.length"
+        >SIN PERSONAL DISPONIBLE</div>
       </div>
     </div>
   </div>
 
-  <div class="overlay" *ngIf="canalOpen" role="dialog" aria-modal="true" aria-label="Crear canal">
-    <div class="overlay-backdrop" (click)="cerrarCanal()"></div>
-    <div class="overlay-panel" (click)="$event.stopPropagation()">
+  <div
+    class="overlay"
+    *ngIf="canalOpen"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Crear canal"
+  >
+    <div
+      class="overlay-backdrop"
+      (click)="cerrarCanal()"
+    ></div>
+    <div
+      class="overlay-panel"
+      (click)="$event.stopPropagation()"
+    >
       <div class="overlay-head">
         <span class="overlay-title">NUEVO CANAL</span>
-        <button class="overlay-close" type="button" aria-label="Cerrar" (click)="cerrarCanal()">
-          <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+        <button
+          class="overlay-close"
+          type="button"
+          aria-label="Cerrar"
+          (click)="cerrarCanal()"
+        >
+          <svg
+            class="icon-x"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
             <path d="M3 3l10 10"></path>
             <path d="M13 3L3 13"></path>
           </svg>
@@ -206,7 +335,10 @@
       <div class="canal-field">
         <span class="canal-label">PERSONAL</span>
         <div class="canal-members">
-          <label class="canal-member" *ngFor="let u of usuarios; trackBy: trackPorCodigo">
+          <label
+            class="canal-member"
+            *ngFor="let u of usuarios; trackBy: trackPorCodigo"
+          >
             <input
               class="canal-check"
               type="checkbox"
@@ -214,16 +346,28 @@
               (change)="toggleMiembro(u.codigo)"
               [attr.aria-label]="'Incluir a ' + u.nombre"
             />
-            <span class="canal-member-dot" aria-hidden="true"></span>
+            <span
+              class="canal-member-dot"
+              aria-hidden="true"
+            ></span>
             <span class="canal-member-name">{{ u.nombre }}</span>
           </label>
         </div>
       </div>
       <div class="overlay-actions">
-        <button class="btn-amber" type="button" [disabled]="!canalNombre.trim()" (click)="crearCanal()">
+        <button
+          class="btn-amber"
+          type="button"
+          [disabled]="!canalNombre.trim()"
+          (click)="crearCanal()"
+        >
           CREAR CANAL
         </button>
-        <button class="btn-ghost" type="button" (click)="cerrarCanal()">CANCELAR</button>
+        <button
+          class="btn-ghost"
+          type="button"
+          (click)="cerrarCanal()"
+        >CANCELAR</button>
       </div>
     </div>
   </div>

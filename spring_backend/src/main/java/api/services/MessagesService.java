@@ -4,6 +4,7 @@ import api.dto.ClinicMessageDto;
 import api.dto.MessageDraftDto;
 import api.entities.ClinicMessage;
 import api.repositories.ClinicMessageRepository;
+import api.repositories.UsuarioRolRepository;
 import api.util.FormatoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class MessagesService {
 
     private final ClinicMessageRepository messageRepository;
     private final CodigoService codigoService;
+    private final UsuarioRolRepository rolRepository;
 
     @Transactional(readOnly = true)
     public List<ClinicMessageDto> list() {
@@ -45,11 +47,10 @@ public class MessagesService {
                 .asunto(draft.subject())
                 .cuerpo(draft.body())
                 .remitente(draft.remitente())
-                .canal(ClinicMessage.Canal.valueOf(draft.channel()))
                 .fecha(hoy)
                 .hora(LocalTime.now())
                 .estado(ClinicMessage.Estado.unread)
-                .destino(ClinicMessage.Destino.valueOf(draft.destino()))
+                .destino(validarDestino(draft.destino()))
                 .prioridad(ClinicMessage.Prioridad.valueOf(draft.prioridad()))
                 .build();
         return toDto(messageRepository.save(message));
@@ -72,17 +73,32 @@ public class MessagesService {
         return toDto(messageRepository.save(message));
     }
 
+    /**
+     * El destino es 'todos' (todo el consultorio) o un rol del catálogo
+     * {@code usuario_roles}. Cualquier otro valor se rechaza, igual que el
+     * rol de un usuario.
+     */
+    private String validarDestino(String destino) {
+        String valor = destino == null ? "" : destino.trim().toLowerCase();
+        if (valor.equals("todos")) {
+            return "todos";
+        }
+        if (valor.isEmpty() || rolRepository.findByNombre(valor).isEmpty()) {
+            throw new IllegalArgumentException("DESTINO NO VÁLIDO: " + destino);
+        }
+        return valor;
+    }
+
     private ClinicMessageDto toDto(ClinicMessage m) {
         return new ClinicMessageDto(
                 m.getCodigo(),
                 m.getAsunto(),
                 m.getCuerpo(),
                 m.getRemitente(),
-                m.getCanal().name(),
                 FormatoUtil.fecha(m.getFecha()),
                 FormatoUtil.hora(m.getHora()),
                 m.getEstado().name(),
-                m.getDestino().name(),
+                m.getDestino(),
                 m.getPrioridad().name());
     }
 }

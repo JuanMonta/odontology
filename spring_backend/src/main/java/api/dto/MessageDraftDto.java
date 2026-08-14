@@ -5,6 +5,5 @@ public record MessageDraftDto(
         String body,
         String remitente,
         String destino,
-        String channel,
         String prioridad) {
 }
