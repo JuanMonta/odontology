@@ -1,0 +1,60 @@
+<div class="reauth" *ngIf="visible" role="dialog" aria-modal="true" aria-label="Sesión expirada: reinicie acceso">
+  <div class="reauth-veil" aria-hidden="true"></div>
+
+  <div class="reauth-board">
+    <header class="reauth-head">
+      <span class="reauth-mark" aria-hidden="true">
+        <span class="reauth-cell">!</span>
+      </span>
+      <div class="reauth-head-text">
+        <span class="reauth-name">SESIÓN EXPIRADA</span>
+        <span class="reauth-kicker">REINICIE ACCESO PARA CONTINUAR</span>
+      </div>
+    </header>
+
+    <div class="reauth-body">
+      <p class="reauth-note">
+        SU SESIÓN CADUCÓ. EL TABLERO PERMANECE OCULTO BAJO EL DIFUMINADO; SU
+        FORMULARIO EN CURSO QUEDA INTACTO. REINGRESE PARA CONTINUAR.
+      </p>
+
+      <form class="reauth-form" (ngSubmit)="onSubmit()" novalidate>
+        <label class="reauth-field">
+          <span class="reauth-label">USUARIO</span>
+          <input
+            class="reauth-input"
+            type="text"
+            name="username"
+            [(ngModel)]="username"
+            autocomplete="username"
+            placeholder="CÓDIGO DEL PERSONAL"
+          />
+        </label>
+
+        <label class="reauth-field">
+          <span class="reauth-label">CONTRASEÑA</span>
+          <input
+            #pwd
+            class="reauth-input"
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            autocomplete="current-password"
+            placeholder="CLAVE DE ACCESO"
+          />
+        </label>
+
+        <p class="reauth-error" *ngIf="error" role="alert">{{ error }}</p>
+
+        <button class="reauth-enter" type="submit" [disabled]="loading">
+          <span class="reauth-lamp" aria-hidden="true"></span>
+          <span>{{ loading ? 'INGRESANDO…' : 'REINICIAR ACCESO' }}</span>
+        </button>
+      </form>
+
+      <button class="reauth-cancel" type="button" (click)="cancelar()">
+        CERRAR SESIÓN
+      </button>
+    </div>
+  </div>
+</div>
