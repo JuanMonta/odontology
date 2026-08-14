@@ -366,6 +366,10 @@
             ></span>
             <span class="canal-member-name">{{ u.nombre }}</span>
           </label>
+          <div
+            class="overlay-empty"
+            *ngIf="!usuarios.length"
+          >SIN PERSONAL DISPONIBLE</div>
         </div>
       </div>
       <div class="overlay-actions">
@@ -457,20 +461,29 @@
         >
           <span class="roster-group-label">{{ g.rol }}</span>
           <div class="roster-members">
-            <label
+            <button
+              type="button"
               class="roster-member"
               *ngFor="let p of g.miembros; trackBy: trackPorCodigo"
               [class.is-member]="esMiembro(p.codigo)"
-              [class.is-disabled]="!esAdmin || esOperadorCanal(p.codigo)"
+              [disabled]="!esAdmin || esOperadorCanal(p.codigo)"
+              [attr.aria-pressed]="esMiembro(p.codigo)"
+              [attr.aria-label]="'Gestionar a ' + p.nombre"
+              (click)="toggleRosterMiembro(p.codigo)"
             >
-              <input
-                class="roster-check"
-                type="checkbox"
-                [checked]="esMiembro(p.codigo)"
-                [disabled]="!esAdmin || esOperadorCanal(p.codigo)"
-                (change)="toggleRosterMiembro(p.codigo)"
-                [attr.aria-label]="'Gestionar a ' + p.nombre"
-              />
+              <span class="roster-check" aria-hidden="true">
+                <svg
+                  class="roster-checkmark"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 8l3.5 3.5L13 4"></path>
+                </svg>
+              </span>
               <span
                 class="roster-dot"
                 [class.is-online]="presenciaDeCodigo(p.codigo)"
@@ -481,7 +494,7 @@
                 class="roster-tag"
                 *ngIf="esOperadorCanal(p.codigo)"
               >OPERADOR</span>
-            </label>
+            </button>
           </div>
         </div>
         <div

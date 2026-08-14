@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MainLayoutModule } from './layouts/main-layout/main-layout.module';
 import { JwtInterceptor } from './core/auth/jwt.interceptor';
+import { AuthErrorInterceptor } from './core/auth/auth-error.interceptor';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { JwtInterceptor } from './core/auth/jwt.interceptor';
     MainLayoutModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthErrorInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
