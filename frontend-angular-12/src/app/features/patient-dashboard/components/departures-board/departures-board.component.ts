@@ -15,7 +15,9 @@ import { Appointment } from '../../../../core/models/appointment.model';
 })
 export class DeparturesBoardComponent {
   @Input() appointments: Appointment[] = [];
+  @Input() waitingPatients: string[] = [];
   @Output() markDone = new EventEmitter<string>();
+  @Output() checkIn = new EventEmitter<string>();
 
   statusLabel(status: Appointment['status']): string {
     const labels: Record<Appointment['status'], string> = {
@@ -26,6 +28,10 @@ export class DeparturesBoardComponent {
       done: 'ATENDIDA'
     };
     return labels[status];
+  }
+
+  isWaiting(name: string): boolean {
+    return this.waitingPatients.includes(name.toUpperCase());
   }
 
   trackById(_: number, a: Appointment): string {

@@ -2,6 +2,7 @@ package api.services;
 
 import api.dto.AppointmentDto;
 import api.dto.BoardTotalsDto;
+import api.dto.WaitingCheckInDto;
 import api.dto.WaitingPatientDto;
 import api.entities.Appointment;
 import api.entities.WaitingQueue;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +42,55 @@ public class DashboardService {
         return waitingRepository.findByAtendidoFalseOrderByLlegadaAsc().stream()
                 .map(this::toWaitingDto)
                 .toList();
+    }
+
+    /**
+     * Check-in de un paciente en la sala de espera.
+     * Si llega {@code appointmentId}, se deriva nombre/motivo de la cita y se
+     * enlaza el paciente (para que LLAMAR SIGUIENTE lo pase a boarding).
+     */
+    @Transactional
+    public WaitingPatientDto checkIn(WaitingCheckInDto dto) {
+        String nombre = dto.pacienteNombre();
+        String motivo = dto.motivo();
+        String pacienteId = null;
+
+        if (dto.appointmentId() != null && !dto.appointmentId().isBlank()) {
+            Appointment cita = appointmentRepository.findById(dto.appointmentId())
+                    .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada: " + dto.appointmentId()));
+            nombre = cita.getPacienteNombre();
+            motivo = cita.getTratamiento();
+            pacienteId = cita.getPacienteId();
+        }
+
+        if (nombre == null || nombre.isBlank() || motivo == null || motivo.isBlank()) {
+            throw new IllegalArgumentException("NOMBRE Y MOTIVO SON OBLIGATORIOS");
+        }
+
+        WaitingQueue paciente = WaitingQueue.builder()
+                .ticket(nextTicket())
+                .pacienteId(pacienteId)
+                .pacienteNombre(nombre.trim().toUpperCase())
+                .llegada(LocalTime.now())
+                .motivo(motivo.trim().toUpperCase())
+                .atendido(false)
+                .build();
+        return toWaitingDto(waitingRepository.save(paciente));
+    }
+
+    /** Siguiente ticket secuencial "A-###" según el último registrado. */
+    private String nextTicket() {
+        int siguiente = waitingRepository.findFirstByOrderByTicketDesc()
+                .map(WaitingQueue::getTicket)
+                .map(t -> {
+                    try {
+                        return Integer.parseInt(t.substring(t.indexOf('-') + 1));
+                    } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                        return 0;
+                    }
+                })
+                .orElse(0);
+        return String.format("A-%03d", siguiente + 1);
     }
 
     @Transactional(readOnly = true)

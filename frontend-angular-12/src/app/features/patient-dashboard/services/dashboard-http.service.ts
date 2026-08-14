@@ -35,6 +35,14 @@ export class DashboardHttpService {
     });
   }
 
+  /**
+   * Alta en sala de espera (check-in). Con {@code appointmentId} deriva los
+   * datos de la cita; sin cita, usa {@code pacienteNombre} + {@code motivo}.
+   */
+  checkIn(payload: { appointmentId?: string; pacienteNombre?: string; motivo?: string }): void {
+    this.http.post(`${API_BASE}/dashboard/waiting`, payload).subscribe(() => this.refresh());
+  }
+
   get totals(): BoardTotals {
     const list = this.appointmentsSubject.getValue();
     return {

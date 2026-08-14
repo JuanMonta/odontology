@@ -79,13 +79,16 @@
 
       <app-departures-board
         [appointments]="(appointments$ | async) ?? []"
+        [waitingPatients]="(waitingNames$ | async) ?? []"
         (markDone)="onMarkDone($event)"
+        (checkIn)="onCheckIn($event)"
       ></app-departures-board>
     </div>
 
     <app-waiting-panel
       [waiting]="(waiting$ | async) ?? []"
       (callNext)="onCallNext()"
+      (addWalkIn)="onWalkIn($event)"
     ></app-waiting-panel>
   </div>
 </div>

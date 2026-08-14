@@ -39,6 +39,48 @@ export class DashboardMockService {
     }
   }
 
+  /** Alta en sala de espera (check-in). Con {@code appointmentId} deriva los
+   * datos de la cita; sin cita, usa {@code pacienteNombre} + {@code motivo}. */
+  checkIn(payload: { appointmentId?: string; pacienteNombre?: string; motivo?: string }): void {
+    const list = this.appointmentsSubject.getValue();
+    let nombre = payload.pacienteNombre?.trim().toUpperCase();
+    let motivo = payload.motivo?.trim().toUpperCase();
+    let pacienteId = '';
+
+    if (payload.appointmentId) {
+      const cita = list.find(a => a.id === payload.appointmentId);
+      if (cita) {
+        nombre = cita.patient.toUpperCase();
+        motivo = cita.treatment.toUpperCase();
+        pacienteId = cita.id; // En mock usamos el id de cita como proxy
+      }
+    }
+
+    if (!nombre || !motivo) { return; }
+
+    const ticket = this.nextTicket();
+    const now = new Date();
+    const arrived = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+    const newWait: WaitingPatient = {
+      id: `wt-${Date.now()}`,
+      ticket,
+      patient: nombre,
+      arrivedAt: arrived,
+      reason: motivo
+    };
+    this.waitingSubject.next([...this.waitingSubject.getValue(), newWait]);
+  }
+
+  private nextTicket(): string {
+    const last = this.waitingSubject.getValue()
+      .map(w => w.ticket)
+      .map(t => parseInt(t.split('-')[1], 10))
+      .filter(n => !isNaN(n))
+      .sort((a, b) => b - a)[0] ?? 0;
+    return `A-${(last + 1).toString().padStart(3, '0')}`;
+  }
+
   /** Marcar la cita como atendida. */
   markDone(id: string): void {
     const list = this.appointmentsSubject.getValue();
