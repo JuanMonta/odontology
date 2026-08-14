@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Usuario, UsuarioRol } from '../models/usuario.model';
 import { AuthApiService } from '../../features/auth/services/auth-api.service';
+import { borradorKey, limpiarDatosDeSesion } from './session-local-storage';
 
 const TOKEN_KEY = 'sas_odonto_jwt';
 const USER_KEY = 'sas_odonto_usuario';
@@ -56,8 +57,7 @@ export class AuthStore {
   }
 
   logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    limpiarDatosDeSesion();
     this.token$.next(null);
     this.user$.next(null);
   }

@@ -65,7 +65,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
           });
         }
         this.auth.logout();
-        this.router.navigate(['/login']);
+        // Recarga completa: descarta cachés de singleton y cierra el WebSocket.
+        window.location.assign('/login');
         return throwError(() => err);
       })
     );
