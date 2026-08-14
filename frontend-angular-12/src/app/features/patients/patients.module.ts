@@ -7,12 +7,14 @@ import { PatientFormModule } from '../../shared/patient-form/patient-form.module
 import { PatientsPageComponent } from './pages/patients-page/patients-page.component';
 import { PatientDirectoryComponent } from './components/patient-directory/patient-directory.component';
 import { PatientPanelComponent } from './components/patient-panel/patient-panel.component';
+import { Hcl033Component } from './components/hcl-033/hcl-033.component';
 
 @NgModule({
   declarations: [
     PatientsPageComponent,
     PatientDirectoryComponent,
-    PatientPanelComponent
+    PatientPanelComponent,
+    Hcl033Component
   ],
   imports: [
     CommonModule,

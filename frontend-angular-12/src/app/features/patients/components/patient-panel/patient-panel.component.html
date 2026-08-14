@@ -64,6 +64,11 @@
           <app-odontogram [teeth]="detail.teeth" (change)="onToothChange($event)"></app-odontogram>
         </div>
 
+        <!-- HISTORIA CLÍNICA FORMULARIO 033 (12 secciones) -->
+        <div class="tab-pane" *ngIf="tab === 'hcl033'">
+          <app-hcl-033 [patient]="patient" [teeth]="detail.teeth" (toothChange)="onToothChange($event)"></app-hcl-033>
+        </div>
+
         <!-- HISTORIAL clínico con notas -->
         <div class="tab-pane" *ngIf="tab === 'historial'">
           <ng-container *ngIf="detail.appointments.length; else noHistory">
