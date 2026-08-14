@@ -2,6 +2,7 @@ package api.controllers;
 
 import api.dto.AbonoDto;
 import api.dto.AccountEntryDto;
+import api.dto.HclDto;
 import api.dto.PacienteDetailDto;
 import api.dto.PacienteDto;
 import api.dto.PacienteDraftDto;
@@ -55,6 +56,16 @@ public class PacientesController {
     @PostMapping("/{id}/abonos")
     public AccountEntryDto addAbono(@PathVariable String id, @RequestBody AbonoDto abono) {
         return pacientesService.addAbono(id, abono);
+    }
+
+    @GetMapping("/{id}/hclinica")
+    public HclDto hclinica(@PathVariable String id) {
+        return pacientesService.hclinica(id);
+    }
+
+    @PutMapping("/{id}/hclinica")
+    public HclDto saveHclinica(@PathVariable String id, @RequestBody HclDto dto) {
+        return pacientesService.guardarHclinica(id, dto);
     }
 
     @PutMapping("/{id}/teeth/{number}")

@@ -2,6 +2,7 @@ package api.services;
 
 import api.dto.AbonoDto;
 import api.dto.AccountEntryDto;
+import api.dto.HclDto;
 import api.dto.PacienteDetailDto;
 import api.dto.PacienteDto;
 import api.dto.PacienteDraftDto;
@@ -11,6 +12,7 @@ import api.dto.ToothConditionDto;
 import api.dto.ToothDto;
 import api.dto.ToothFaceDto;
 import api.entities.AccountEntry;
+import api.entities.HistoriaClinica;
 import api.entities.Paciente;
 import api.entities.PatientAlert;
 import api.entities.PatientAppointment;
@@ -21,6 +23,7 @@ import api.entities.VistaPaciente;
 import api.entities.converter.CondicionDentalConverter;
 import api.entities.converter.PatientAppointmentEstadoConverter;
 import api.repositories.AccountEntryRepository;
+import api.repositories.HistoriaClinicaRepository;
 import api.repositories.PacienteRepository;
 import api.repositories.PatientAlertRepository;
 import api.repositories.PatientAppointmentRepository;
@@ -29,14 +32,19 @@ import api.repositories.PatientToothFaceRepository;
 import api.repositories.PatientToothRepository;
 import api.repositories.VistaPacienteRepository;
 import api.util.FormatoUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -69,7 +77,9 @@ public class PacientesService {
     private final PatientToothConditionRepository conditionRepository;
     private final PatientToothFaceRepository faceRepository;
     private final PatientAlertRepository alertRepository;
+    private final HistoriaClinicaRepository hclRepository;
     private final CodigoService codigoService;
+    private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
     public List<PacienteDto> list() {
@@ -197,6 +207,137 @@ public class PacientesService {
                 .orElseThrow(() -> new IllegalArgumentException("Alerta no encontrada: " + alertId));
         alert.setAtendida(true);
         return toAlertDto(alertRepository.save(alert));
+    }
+
+    @Transactional(readOnly = true)
+    public HclDto hclinica(String id) {
+        return hclRepository.findById(id)
+                .map(this::toHclDto)
+                .orElseGet(() -> new HclDto(
+                        id,
+                        null, false, null, null,
+                        false, false, false, false, false,
+                        false, false, false, false, false,
+                        null, null, null, null,
+                        List.of(),
+                        null, null, null, null, null,
+                        new HclDto.IndicesCpoDto(List.of(), List.of()),
+                        false, false, false, false,
+                        null, null, null,
+                        List.of(), List.of(),
+                        null));
+    }
+
+    @Transactional
+    public HclDto guardarHclinica(String id, HclDto dto) {
+        pacienteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado: " + id));
+        HistoriaClinica hc = hclRepository.findById(id)
+                .orElseGet(() -> HistoriaClinica.builder().pacienteId(id).build());
+
+        hc.setSexo(dto.sexo());
+        hc.setProgramado(dto.programado());
+        hc.setMotivoConsulta(dto.motivoConsulta());
+        hc.setProblemaActual(dto.problemaActual());
+        hc.setAntAlergiaAntibiotico(dto.alergiaAntibiotico());
+        hc.setAntAlergiaAnestesia(dto.alergiaAnestesia());
+        hc.setAntHemorragias(dto.hemorragias());
+        hc.setAntVihSida(dto.vihSida());
+        hc.setAntTuberculosis(dto.tuberculosis());
+        hc.setAntAsma(dto.asma());
+        hc.setAntDiabetes(dto.diabetes());
+        hc.setAntHipertension(dto.hipertension());
+        hc.setAntEnfCardiaca(dto.enfCardiaca());
+        hc.setAntOtro(dto.otroAntecedente());
+        hc.setPresionArterial(dto.presionArterial());
+        hc.setFrecuenciaCardiaca(dto.frecuenciaCardiaca());
+        hc.setTemperatura(dto.temperatura());
+        hc.setFrecuenciaRespiratoria(dto.frecuenciaRespiratoria());
+        hc.setExamenRegiones(toJson(dto.examenRegiones()));
+        hc.setHigienePlaca(dto.higienePlaca());
+        hc.setHigieneCalculo(dto.higieneCalculo());
+        hc.setGingivitis(dto.gingivitis());
+        hc.setMalOclusion(dto.malOclusion());
+        hc.setFluorosis(dto.fluorosis());
+        hc.setIndicesCpo(toJson(dto.indicesCpo()));
+        hc.setPlanBiometria(dto.planBiometria());
+        hc.setPlanRayosX(dto.planRayosX());
+        hc.setPlanQuimicaSanguinea(dto.planQuimicaSanguinea());
+        hc.setPlanOtros(dto.planOtros());
+        hc.setFechaApertura(dto.fechaApertura());
+        hc.setFechaControl(dto.fechaControl());
+        hc.setNumeroHoja(dto.numeroHoja());
+        hc.setDiagnosticosCie(toJson(dto.diagnosticosCie()));
+        hc.setSesiones(toJson(dto.sesiones()));
+        hc.setActualizadaEn(LocalDateTime.now());
+
+        return toHclDto(hclRepository.saveAndFlush(hc));
+    }
+
+    private HclDto toHclDto(HistoriaClinica hc) {
+        return new HclDto(
+                hc.getPacienteId(),
+                hc.getSexo(),
+                hc.isProgramado(),
+                hc.getMotivoConsulta(),
+                hc.getProblemaActual(),
+                hc.isAntAlergiaAntibiotico(),
+                hc.isAntAlergiaAnestesia(),
+                hc.isAntHemorragias(),
+                hc.isAntVihSida(),
+                hc.isAntTuberculosis(),
+                hc.isAntAsma(),
+                hc.isAntDiabetes(),
+                hc.isAntHipertension(),
+                hc.isAntEnfCardiaca(),
+                hc.isAntOtro(),
+                hc.getPresionArterial(),
+                hc.getFrecuenciaCardiaca(),
+                hc.getTemperatura(),
+                hc.getFrecuenciaRespiratoria(),
+                fromJson(hc.getExamenRegiones(), new TypeReference<List<HclDto.RegionExamenDto>>() {
+                }),
+                hc.getHigienePlaca(),
+                hc.getHigieneCalculo(),
+                hc.getGingivitis(),
+                hc.getMalOclusion(),
+                hc.getFluorosis(),
+                fromJson(hc.getIndicesCpo(), new TypeReference<HclDto.IndicesCpoDto>() {
+                }),
+                hc.isPlanBiometria(),
+                hc.isPlanRayosX(),
+                hc.isPlanQuimicaSanguinea(),
+                hc.isPlanOtros(),
+                hc.getFechaApertura(),
+                hc.getFechaControl(),
+                hc.getNumeroHoja(),
+                fromJson(hc.getDiagnosticosCie(), new TypeReference<List<HclDto.DiagnosticoCieDto>>() {
+                }),
+                fromJson(hc.getSesiones(), new TypeReference<List<HclDto.SesionTratamientoDto>>() {
+                }),
+                hc.getActualizadaEn() == null ? null : hc.getActualizadaEn().toString());
+    }
+
+    private <T> String toJson(T value) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    private <T> T fromJson(String json, TypeReference<T> type) {
+        if (json == null || json.isBlank()) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(json, type);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 
     @Transactional

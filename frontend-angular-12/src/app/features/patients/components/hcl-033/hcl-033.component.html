@@ -1,0 +1,362 @@
+<div class="hc">
+  <!-- Cabecera del formulario -->
+  <header class="hc-head">
+    <div class="hc-head-main">
+      <span class="hc-kicker">SNS-MSP · HCU-FORM.033 / 2008 · ODONTOLOGÍA</span>
+      <span class="hc-title">HISTORIA CLÍNICA</span>
+    </div>
+    <div class="hc-head-meta" *ngIf="patient">
+      <span class="hc-meta"><span class="hc-meta-lbl">PACIENTE</span><span class="hc-meta-val">{{ patient.name }}</span></span>
+      <span class="hc-meta"><span class="hc-meta-lbl">Nº HISTORIA</span><span class="hc-meta-val">{{ patient.id }}</span></span>
+      <span class="hc-meta"><span class="hc-meta-lbl">EDAD</span><span class="hc-meta-val">{{ patient.age }}</span></span>
+      <span class="hc-meta"><span class="hc-meta-lbl">SEXO</span>
+        <select class="fld-select fld-select--mini" [(ngModel)]="hc.sexo" aria-label="Sexo">
+          <option [ngValue]="null" selected>—</option>
+          <option value="M">M</option>
+          <option value="F">F</option>
+        </select>
+      </span>
+      <span class="hc-meta"><span class="hc-meta-lbl">GRUPO ETARIO</span><span class="hc-meta-val">{{ grupo() }}</span></span>
+    </div>
+    <div class="hc-prog" role="group" aria-label="Tipo de cita">
+      <button
+        class="seg-btn"
+        [class.is-active]="hc.programado"
+        type="button"
+        role="radio"
+        [attr.aria-checked]="hc.programado"
+        (click)="hc.programado = true"
+      >PROGRAMADO</button>
+      <button
+        class="seg-btn"
+        [class.is-active]="!hc.programado"
+        type="button"
+        role="radio"
+        [attr.aria-checked]="!hc.programado"
+        (click)="hc.programado = false"
+      >NO PROGRAMADO</button>
+    </div>
+  </header>
+
+  <!-- Navegación por secciones 1-12 -->
+  <nav class="rail" aria-label="Secciones del formulario 033">
+    <button
+      *ngFor="let s of secciones"
+      class="rail-btn"
+      [class.is-active]="seccion === s.n"
+      type="button"
+      [attr.aria-current]="seccion === s.n ? 'step' : null"
+      (click)="cambiarSeccion(s.n)"
+    >
+      <span class="rail-n">{{ s.n }}</span>
+      <span class="rail-t">{{ s.titulo }}</span>
+    </button>
+  </nav>
+
+  <div class="hc-body" *ngIf="!cargando; else hcLoading">
+
+    <!-- 1 · MOTIVO DE CONSULTA -->
+    <section class="sec" *ngIf="seccion === 1">
+      <span class="sec-num">1</span>
+      <h3 class="sec-title">MOTIVO DE CONSULTA</h3>
+      <p class="sec-hint">ANOTAR LA CAUSA DEL PROBLEMA EN LA VERSIÓN DEL INFORMANTE</p>
+      <label class="fld">
+        <span class="fld-label">MOTIVO</span>
+        <textarea class="fld-input fld-textarea" rows="5" [(ngModel)]="hc.motivoConsulta" placeholder="DESCRIBA EL MOTIVO EN PALABRAS DEL PACIENTE / ACOMPAÑANTE"></textarea>
+      </label>
+    </section>
+
+    <!-- 2 · ENFERMEDAD O PROBLEMA ACTUAL -->
+    <section class="sec" *ngIf="seccion === 2">
+      <span class="sec-num">2</span>
+      <h3 class="sec-title">ENFERMEDAD O PROBLEMA ACTUAL</h3>
+      <p class="sec-hint">REGISTRAR: CRONOLOGÍA · LOCALIZACIÓN · CARACTERÍSTICAS · INTENSIDAD · CAUSA APARENTE · SÍNTOMAS ASOCIADOS · EVOLUCIÓN · ESTADO ACTUAL</p>
+      <label class="fld">
+        <span class="fld-label">PROBLEMA ACTUAL</span>
+        <textarea class="fld-input fld-textarea" rows="6" [(ngModel)]="hc.problemaActual" placeholder="DESCRIBA LA ENFERMEDAD O PROBLEMA ACTUAL"></textarea>
+      </label>
+    </section>
+
+    <!-- 3 · ANTECEDENTES PERSONALES Y FAMILIARES -->
+    <section class="sec" *ngIf="seccion === 3">
+      <span class="sec-num">3</span>
+      <h3 class="sec-title">ANTECEDENTES PERSONALES Y FAMILIARES</h3>
+      <div class="grid-2" role="group" aria-label="Antecedentes">
+        <button
+          *ngFor="let a of antecedentes"
+          class="chk"
+          [class.is-active]="antVal(a.key)"
+          type="button"
+          [attr.aria-pressed]="antVal(a.key)"
+          (click)="toggleAnt(a.key)"
+        >
+          <span class="chk-box" aria-hidden="true">{{ antVal(a.key) ? '×' : '' }}</span>
+          <span class="chk-lbl">{{ a.label }}</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 4 · SIGNOS VITALES -->
+    <section class="sec" *ngIf="seccion === 4">
+      <span class="sec-num">4</span>
+      <h3 class="sec-title">SIGNOS VITALES</h3>
+      <div class="grid-4">
+        <label class="fld">
+          <span class="fld-label">PRESIÓN ARTERIAL</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.presionArterial" placeholder="120/80" autocomplete="off" />
+        </label>
+        <label class="fld">
+          <span class="fld-label">F. CARDÍACA / MIN</span>
+          <input class="fld-input" type="number" min="0" [(ngModel)]="hc.frecuenciaCardiaca" placeholder="72" />
+        </label>
+        <label class="fld">
+          <span class="fld-label">TEMPERATURA °C</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.temperatura" placeholder="36.5" autocomplete="off" />
+        </label>
+        <label class="fld">
+          <span class="fld-label">F. RESPIRAT. / MIN</span>
+          <input class="fld-input" type="number" min="0" [(ngModel)]="hc.frecuenciaRespiratoria" placeholder="16" />
+        </label>
+      </div>
+    </section>
+
+    <!-- 5 · EXAMEN DEL SISTEMA ESTOMATOGNÁTICO -->
+    <section class="sec" *ngIf="seccion === 5">
+      <span class="sec-num">5</span>
+      <h3 class="sec-title">EXAMEN DEL SISTEMA ESTOMATOGNÁTICO</h3>
+      <p class="sec-hint">DESCRIBIR ABAJO LA PATOLOGÍA DE LA REGIÓN AFECTADA ANOTANDO EL NÚMERO</p>
+      <div class="region-list">
+        <div class="region-row" *ngFor="let r of regiones; let i = index">
+          <span class="region-idx">{{ r.region }}</span>
+          <span class="region-lbl">{{ r.label }}</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.examenRegiones[i].descripcion" placeholder="PATOLOGÍA OBSERVADA…" autocomplete="off" />
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · ODONTOGRAMA -->
+    <section class="sec" *ngIf="seccion === 6">
+      <span class="sec-num">6</span>
+      <h3 class="sec-title">ODONTOGRAMA</h3>
+      <p class="sec-hint">PINTAR CON AZUL EL TRATAMIENTO REALIZADO Y CON ROJO LA PATOLOGÍA ACTUAL</p>
+      <app-odontogram [teeth]="teeth" (change)="onTooth($event)"></app-odontogram>
+    </section>
+
+    <!-- 7 · INDICADORES DE SALUD BUCAL -->
+    <section class="sec" *ngIf="seccion === 7">
+      <span class="sec-num">7</span>
+      <h3 class="sec-title">INDICADORES DE SALUD BUCAL</h3>
+
+      <div class="sec-block">
+        <span class="sec-block-t">HIGIENE ORAL SIMPLIFICADA</span>
+        <span class="sec-block-s">PIEZAS: 16 · 11 · 26 / 36 · 31 · 46</span>
+        <div class="grid-2">
+          <label class="fld">
+            <span class="fld-label">PLACA (0-1-2-3)</span>
+            <select class="fld-select" [(ngModel)]="hc.higienePlaca" aria-label="Índice de placa">
+              <option [ngValue]="null">—</option>
+              <option [ngValue]="0">0</option>
+              <option [ngValue]="1">1</option>
+              <option [ngValue]="2">2</option>
+              <option [ngValue]="3">3</option>
+            </select>
+          </label>
+          <label class="fld">
+            <span class="fld-label">CÁLCULO (0-1)</span>
+            <select class="fld-select" [(ngModel)]="hc.higieneCalculo" aria-label="Índice de cálculo">
+              <option [ngValue]="null">—</option>
+              <option [ngValue]="0">0</option>
+              <option [ngValue]="1">1</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="sec-block">
+        <span class="sec-block-t">GINGIVITIS</span>
+        <div class="seg" role="group" aria-label="Gingivitis">
+          <button class="seg-btn" [class.is-active]="hc.gingivitis === 'LEVE'" type="button" role="radio" [attr.aria-checked]="hc.gingivitis === 'LEVE'" (click)="hc.gingivitis = 'LEVE'">LEVE</button>
+          <button class="seg-btn" [class.is-active]="hc.gingivitis === 'MODERADA'" type="button" role="radio" [attr.aria-checked]="hc.gingivitis === 'MODERADA'" (click)="hc.gingivitis = 'MODERADA'">MODERADA</button>
+          <button class="seg-btn" [class.is-active]="hc.gingivitis === 'SEVERA'" type="button" role="radio" [attr.aria-checked]="hc.gingivitis === 'SEVERA'" (click)="hc.gingivitis = 'SEVERA'">SEVERA</button>
+        </div>
+      </div>
+
+      <div class="sec-block">
+        <span class="sec-block-t">MAL OCLUSIÓN</span>
+        <div class="seg" role="group" aria-label="Mal oclusión">
+          <button class="seg-btn" [class.is-active]="hc.malOclusion === 'ANGLE_I'" type="button" role="radio" [attr.aria-checked]="hc.malOclusion === 'ANGLE_I'" (click)="hc.malOclusion = 'ANGLE_I'">ANGLE I</button>
+          <button class="seg-btn" [class.is-active]="hc.malOclusion === 'ANGLE_II'" type="button" role="radio" [attr.aria-checked]="hc.malOclusion === 'ANGLE_II'" (click)="hc.malOclusion = 'ANGLE_II'">ANGLE II</button>
+          <button class="seg-btn" [class.is-active]="hc.malOclusion === 'ANGLE_III'" type="button" role="radio" [attr.aria-checked]="hc.malOclusion === 'ANGLE_III'" (click)="hc.malOclusion = 'ANGLE_III'">ANGLE III</button>
+        </div>
+      </div>
+
+      <div class="sec-block">
+        <span class="sec-block-t">FLUOROSIS</span>
+        <div class="seg" role="group" aria-label="Fluorosis">
+          <button class="seg-btn" [class.is-active]="hc.fluorosis === 'LEVE'" type="button" role="radio" [attr.aria-checked]="hc.fluorosis === 'LEVE'" (click)="hc.fluorosis = 'LEVE'">LEVE</button>
+          <button class="seg-btn" [class.is-active]="hc.fluorosis === 'MODERADA'" type="button" role="radio" [attr.aria-checked]="hc.fluorosis === 'MODERADA'" (click)="hc.fluorosis = 'MODERADA'">MODERADA</button>
+          <button class="seg-btn" [class.is-active]="hc.fluorosis === 'SEVERA'" type="button" role="radio" [attr.aria-checked]="hc.fluorosis === 'SEVERA'" (click)="hc.fluorosis = 'SEVERA'">SEVERA</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · ÍNDICES CPO-ceo -->
+    <section class="sec" *ngIf="seccion === 8">
+      <span class="sec-num">8</span>
+      <h3 class="sec-title">ÍNDICES CPO-ceo</h3>
+      <div class="table-wrap">
+        <table class="idx">
+          <thead>
+            <tr>
+              <th scope="col">SEXTANTE</th>
+              <th scope="col" colspan="3">CPO (PERMANENTES)</th>
+              <th scope="col" colspan="3">ceo (DECIDUOS)</th>
+            </tr>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">C</th>
+              <th scope="col">P</th>
+              <th scope="col">O</th>
+              <th scope="col">c</th>
+              <th scope="col">e</th>
+              <th scope="col">o</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of sextantes; let i = index">
+              <th scope="row" class="idx-sext">{{ s }}</th>
+              <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.permanente[i].c" [attr.aria-label]="'Caries sextante ' + s" /></td>
+              <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.permanente[i].p" [attr.aria-label]="'Perdido sextante ' + s" /></td>
+              <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.permanente[i].o" [attr.aria-label]="'Obturado sextante ' + s" /></td>
+              <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.deciduo[i].c" [attr.aria-label]="'Carie deciduo sextante ' + s" /></td>
+              <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.deciduo[i].e" [attr.aria-label]="'Extraído sextante ' + s" /></td>
+              <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.deciduo[i].o" [attr.aria-label]="'Obturado deciduo sextante ' + s" /></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" class="idx-sext">TOTALES</th>
+              <td>{{ cpoTotales().c }}</td>
+              <td>{{ cpoTotales().p }}</td>
+              <td>{{ cpoTotales().o }}</td>
+              <td>{{ cpoTotales().ce }}</td>
+              <td>{{ cpoTotales().ee }}</td>
+              <td>{{ cpoTotales().oe }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- 10 · PLANES DE DIAGNÓSTICO, TERAPÉUTICO Y EDUCACIONAL -->
+    <section class="sec" *ngIf="seccion === 10">
+      <span class="sec-num">10</span>
+      <h3 class="sec-title">PLANES DE DIAGNÓSTICO, TERAPÉUTICO Y EDUCACIONAL</h3>
+      <div class="grid-2" role="group" aria-label="Planes">
+        <button class="chk" [class.is-active]="hc.planBiometria" type="button" [attr.aria-pressed]="hc.planBiometria" (click)="hc.planBiometria = !hc.planBiometria">
+          <span class="chk-box" aria-hidden="true">{{ hc.planBiometria ? '×' : '' }}</span><span class="chk-lbl">BIOMETRÍA</span>
+        </button>
+        <button class="chk" [class.is-active]="hc.planRayosX" type="button" [attr.aria-pressed]="hc.planRayosX" (click)="hc.planRayosX = !hc.planRayosX">
+          <span class="chk-box" aria-hidden="true">{{ hc.planRayosX ? '×' : '' }}</span><span class="chk-lbl">RAYOS-X</span>
+        </button>
+        <button class="chk" [class.is-active]="hc.planQuimicaSanguinea" type="button" [attr.aria-pressed]="hc.planQuimicaSanguinea" (click)="hc.planQuimicaSanguinea = !hc.planQuimicaSanguinea">
+          <span class="chk-box" aria-hidden="true">{{ hc.planQuimicaSanguinea ? '×' : '' }}</span><span class="chk-lbl">QUÍMICA SANGUÍNEA</span>
+        </button>
+        <button class="chk" [class.is-active]="hc.planOtros" type="button" [attr.aria-pressed]="hc.planOtros" (click)="hc.planOtros = !hc.planOtros">
+          <span class="chk-box" aria-hidden="true">{{ hc.planOtros ? '×' : '' }}</span><span class="chk-lbl">OTROS</span>
+        </button>
+      </div>
+      <div class="grid-3">
+        <label class="fld">
+          <span class="fld-label">FECHA DE APERTURA</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.fechaApertura" placeholder="DD/MM/AAAA" autocomplete="off" />
+        </label>
+        <label class="fld">
+          <span class="fld-label">FECHA DE CONTROL</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.fechaControl" placeholder="DD/MM/AAAA" autocomplete="off" />
+        </label>
+        <label class="fld">
+          <span class="fld-label">NÚMERO DE HOJA</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.numeroHoja" placeholder="01" autocomplete="off" />
+        </label>
+      </div>
+    </section>
+
+    <!-- 11 · DIAGNÓSTICO CIE -->
+    <section class="sec" *ngIf="seccion === 11">
+      <span class="sec-num">11</span>
+      <h3 class="sec-title">DIAGNÓSTICO CIE</h3>
+      <div class="table-wrap">
+        <table class="cie">
+          <thead>
+            <tr>
+              <th scope="col">CÓDIGO CIE</th>
+              <th scope="col">PRE (PRESUNTIVO)</th>
+              <th scope="col">DEF (DEFINITIVO)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of hc.diagnosticosCie; let i = index">
+              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].codigo" placeholder="K02.9" autocomplete="off" /></td>
+              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].presuntivo" placeholder="DIAGNÓSTICO PRESUNTIVO" autocomplete="off" /></td>
+              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].definitivo" placeholder="DIAGNÓSTICO DEFINITIVO" autocomplete="off" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 11 · TRATAMIENTO -->
+    <section class="sec" *ngIf="seccion === 11">
+      <span class="sec-num">11</span>
+      <h3 class="sec-title">TRATAMIENTO</h3>
+      <div class="ses-list">
+        <div class="ses" *ngFor="let s of hc.sesiones; let i = index">
+          <span class="ses-n">SESIÓN {{ s.sesion }}</span>
+          <div class="ses-grid">
+            <label class="fld">
+              <span class="fld-label">FECHA</span>
+              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].fecha" placeholder="DD/MM/AAAA" autocomplete="off" />
+            </label>
+            <label class="fld">
+              <span class="fld-label">DIAGNÓSTICOS Y COMPLICACIONES</span>
+              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].diagnosticos" autocomplete="off" />
+            </label>
+            <label class="fld">
+              <span class="fld-label">PROCEDIMIENTOS</span>
+              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].procedimientos" autocomplete="off" />
+            </label>
+            <label class="fld">
+              <span class="fld-label">PRESCRIPCIONES</span>
+              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].prescripciones" autocomplete="off" />
+            </label>
+            <label class="fld">
+              <span class="fld-label">CÓDIGO Y FIRMA</span>
+              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].codigo" autocomplete="off" />
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pie: guardar -->
+    <footer class="hc-foot">
+      <span class="hc-status" [class.is-ok]="estado === 'ok'" [class.is-err]="estado === 'error'" role="status">
+        <span class="hc-lamp" aria-hidden="true"></span>
+        {{ mensaje || (hc.actualizadaEn ? 'ÚLTIMA ACTUALIZACIÓN ' + hc.actualizadaEn : 'SIN GUARDAR') }}
+      </span>
+      <button class="btn-save" type="button" [disabled]="guardando" (click)="guardar()">
+        <span class="btn-save-lamp" aria-hidden="true"></span>
+        {{ guardando ? 'GUARDANDO…' : 'GUARDAR HISTORIA CLÍNICA' }}
+      </button>
+    </footer>
+
+  </div>
+
+  <ng-template #hcLoading>
+    <div class="hc-loading">
+      <span class="hc-loading-lamp" aria-hidden="true"></span>
+      <span>CARGANDO HISTORIA CLÍNICA…</span>
+    </div>
+  </ng-template>
+</div>

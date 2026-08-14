@@ -10,7 +10,7 @@ import {
 import { PatientsHttpService } from '../../services/patients-http.service';
 import { clearPatientFormDraft } from '../../../../shared/patient-form/patient-form.component';
 
-type Tab = 'odonto' | 'historial' | 'ficha' | 'cuentas';
+type Tab = 'odonto' | 'hcl033' | 'historial' | 'ficha' | 'cuentas';
 
 @Component({
   selector: 'app-patient-panel',
@@ -33,6 +33,7 @@ export class PatientPanelComponent implements OnChanges {
 
   tabs: { id: Tab; label: string }[] = [
     { id: 'odonto', label: 'ODONTOGRAMA' },
+    { id: 'hcl033', label: 'HISTORIA 033' },
     { id: 'historial', label: 'HISTORIAL' },
     { id: 'ficha', label: 'FICHA' },
     { id: 'cuentas', label: 'CUENTAS' }
