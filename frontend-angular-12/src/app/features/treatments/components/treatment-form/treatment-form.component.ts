@@ -6,6 +6,17 @@ import {
 } from '../../../../core/models/treatment.model';
 import { TREATMENT_CATEGORIES } from '../../services/treatments-http.service';
 
+const TREATMENT_FORM_DRAFT_KEY = 'saas.clinica.treatment-form.draft';
+
+interface TreatmentFormDraft {
+  name: string;
+  category: TreatmentCategory;
+  durationMin: number;
+  price: number;
+  description: string;
+  active: boolean;
+}
+
 @Component({
   selector: 'app-treatment-form',
   templateUrl: './treatment-form.component.html',
@@ -38,12 +49,13 @@ export class TreatmentFormComponent implements OnChanges {
       this.active = this.treatment.active;
     }
     if (changes.creating && this.creating) {
-      this.name = '';
-      this.category = 'PREVENCIÓN';
-      this.durationMin = 30;
-      this.price = 100;
-      this.description = '';
-      this.active = true;
+      const draft = this.readDraft();
+      this.name = draft ? draft.name : '';
+      this.category = draft ? draft.category : 'PREVENCIÓN';
+      this.durationMin = draft ? draft.durationMin : 30;
+      this.price = draft ? draft.price : 100;
+      this.description = draft ? draft.description : '';
+      this.active = draft ? draft.active : true;
     }
     if (changes.treatment || changes.creating) {
       this.error = false;
@@ -56,6 +68,9 @@ export class TreatmentFormComponent implements OnChanges {
       return;
     }
     this.error = false;
+    if (this.creating && !this.treatment) {
+      this.clearDraft();
+    }
     const draft: TreatmentDraft = {
       name: this.name.trim().toUpperCase(),
       category: this.category,
@@ -65,5 +80,49 @@ export class TreatmentFormComponent implements OnChanges {
       active: this.active
     };
     this.saved.emit(draft);
+  }
+
+  onCancel(): void {
+    if (this.creating && !this.treatment) {
+      this.clearDraft();
+    }
+    this.cancel.emit();
+  }
+
+  persistDraft(): void {
+    if (!this.creating || !!this.treatment) {
+      return;
+    }
+    const draft: TreatmentFormDraft = {
+      name: this.name,
+      category: this.category,
+      durationMin: this.durationMin,
+      price: this.price,
+      description: this.description,
+      active: this.active
+    };
+    localStorage.setItem(TREATMENT_FORM_DRAFT_KEY, JSON.stringify(draft));
+  }
+
+  private readDraft(): TreatmentFormDraft | null {
+    const raw = localStorage.getItem(TREATMENT_FORM_DRAFT_KEY);
+    if (!raw) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(raw) as TreatmentFormDraft;
+      return parsed.category &&
+        TREATMENT_CATEGORIES.includes(parsed.category) &&
+        typeof parsed.durationMin === 'number' &&
+        typeof parsed.price === 'number'
+        ? parsed
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private clearDraft(): void {
+    localStorage.removeItem(TREATMENT_FORM_DRAFT_KEY);
   }
 }

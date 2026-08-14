@@ -7,29 +7,29 @@
   <div class="form-grid">
     <label class="field field--full">
       <span class="field-label">NOMBRE DEL TRATAMIENTO *</span>
-      <input class="field-input" type="text" [(ngModel)]="name" name="name" placeholder="LIMPIEZA Y PROFILAXIS" autocomplete="off" />
+      <input class="field-input" type="text" [(ngModel)]="name" name="name" placeholder="LIMPIEZA Y PROFILAXIS" autocomplete="off" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field field--full">
       <span class="field-label">CATEGORÍA</span>
-      <select class="field-select" [(ngModel)]="category" name="category" aria-label="Categoría del tratamiento">
+      <select class="field-select" [(ngModel)]="category" name="category" aria-label="Categoría del tratamiento" (ngModelChange)="persistDraft()">
         <option *ngFor="let c of categories" [ngValue]="c">{{ c }}</option>
       </select>
     </label>
 
     <label class="field">
       <span class="field-label">DURACIÓN (MIN)</span>
-      <input class="field-input" type="number" min="5" max="480" [(ngModel)]="durationMin" name="durationMin" />
+      <input class="field-input" type="number" min="5" max="480" [(ngModel)]="durationMin" name="durationMin" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field">
       <span class="field-label">PRECIO (USD)</span>
-      <input class="field-input" type="number" min="0" [(ngModel)]="price" name="price" />
+      <input class="field-input" type="number" min="0" [(ngModel)]="price" name="price" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field field--full">
       <span class="field-label">DESCRIPCIÓN</span>
-      <textarea class="field-input field-textarea" rows="3" [(ngModel)]="description" name="description" placeholder="DETALLE CLÍNICO DEL TRATAMIENTO" autocomplete="off"></textarea>
+      <textarea class="field-input field-textarea" rows="3" [(ngModel)]="description" name="description" placeholder="DETALLE CLÍNICO DEL TRATAMIENTO" autocomplete="off" (ngModelChange)="persistDraft()"></textarea>
     </label>
 
     <div class="field field--full">
@@ -41,7 +41,7 @@
           type="button"
           role="radio"
           [attr.aria-checked]="active"
-          (click)="active = true"
+          (click)="active = true; persistDraft()"
         >ACTIVO</button>
         <button
           class="seg-btn"
@@ -49,7 +49,7 @@
           type="button"
           role="radio"
           [attr.aria-checked]="!active"
-          (click)="active = false"
+          (click)="active = false; persistDraft()"
         >INACTIVO</button>
       </div>
     </div>
@@ -59,6 +59,6 @@
 
   <div class="form-actions">
     <button class="btn-amber" type="submit">{{ creating ? 'CREAR TRATAMIENTO' : 'GUARDAR CAMBIOS' }}</button>
-    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+    <button class="btn-ghost" type="button" (click)="onCancel()">CANCELAR</button>
   </div>
 </form>
