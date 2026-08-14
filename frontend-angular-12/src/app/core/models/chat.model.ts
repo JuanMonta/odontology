@@ -4,6 +4,7 @@ export interface ChatParticipante {
   codigo: string;
   nombre: string;
   rol: string;
+  esAdmin: boolean;
 }
 
 export interface ChatConversacion {

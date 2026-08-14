@@ -42,6 +42,13 @@ export class ChatHttpService {
     );
   }
 
+  renombrarCanal(conversacionId: number, nombre: string): Observable<ChatConversacion> {
+    return this.http.patch<ChatConversacion>(
+      `${API_BASE}/chat/conversaciones/${conversacionId}/nombre`,
+      { nombre }
+    );
+  }
+
   quitarMiembro(conversacionId: number, usuarioCodigo: string): Observable<ChatConversacion> {
     return this.http.delete<ChatConversacion>(
       `${API_BASE}/chat/conversaciones/${conversacionId}/miembros/${usuarioCodigo}`

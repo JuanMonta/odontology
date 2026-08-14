@@ -5,6 +5,7 @@ import api.dto.ChatConversacionDto;
 import api.dto.ChatMensajeDto;
 import api.dto.ChatParticipanteDto;
 import api.dto.ChatPresenciaDto;
+import api.dto.ChatRenameCanalDto;
 import api.entities.Usuario;
 import api.services.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +77,16 @@ public class ChatController {
                                              @PathVariable String usuarioCodigo) {
         try {
             return chatService.removeMiembro(codigo(auth), id, usuarioCodigo);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        }
+    }
+
+    @PatchMapping("/conversaciones/{id}/nombre")
+    public ChatConversacionDto renombrarCanal(Authentication auth, @PathVariable Long id,
+                                              @RequestBody ChatRenameCanalDto dto) {
+        try {
+            return chatService.renameCanal(codigo(auth), id, dto.nombre());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }

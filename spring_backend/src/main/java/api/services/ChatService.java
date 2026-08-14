@@ -99,12 +99,30 @@ public class ChatService {
     }
 
     @Transactional
+    public ChatConversacionDto renameCanal(String adminCodigo, Long conversacionId, String nombre) {
+        verificarAdminCanal(adminCodigo, conversacionId);
+        String nuevo = nombre == null ? "" : nombre.trim().toUpperCase();
+        if (nuevo.isEmpty()) {
+            throw new IllegalArgumentException("EL CANAL REQUIERE UN NOMBRE");
+        }
+        ChatConversacion canal = obtenerConversacion(conversacionId);
+        canal.setNombre(nuevo);
+        conversacionRepository.save(canal);
+        return toConversacionDto(obtenerConversacion(conversacionId), adminCodigo);
+    }
+
+    @Transactional
     public ChatConversacionDto removeMiembro(String adminCodigo, Long conversacionId, String usuarioCodigo) {
         verificarAdminCanal(adminCodigo, conversacionId);
         ChatMiembro.Id id = new ChatMiembro.Id(conversacionId, usuarioCodigo);
-        if (miembroRepository.existsById(id)) {
-            miembroRepository.deleteById(id);
+        ChatMiembro miembro = miembroRepository.findById(id).orElse(null);
+        if (miembro == null) {
+            return toConversacionDto(obtenerConversacion(conversacionId), adminCodigo);
         }
+        if (miembro.isEsAdmin()) {
+            throw new IllegalArgumentException("EL OPERADOR DEL CANAL NO PUEDE RETIRARSE");
+        }
+        miembroRepository.deleteById(id);
         return toConversacionDto(obtenerConversacion(conversacionId), adminCodigo);
     }
 
@@ -174,7 +192,7 @@ public class ChatService {
         return usuarioRepository.findAll().stream()
                 .filter(u -> "activo".equals(u.getEstado()))
                 .sorted(Comparator.comparing(Usuario::getNombre))
-                .map(u -> new ChatParticipanteDto(u.getCodigo(), u.getNombre(), u.getRol()))
+                .map(u -> new ChatParticipanteDto(u.getCodigo(), u.getNombre(), u.getRol(), false))
                 .toList();
     }
 
@@ -215,7 +233,7 @@ public class ChatService {
         List<ChatParticipanteDto> participantes = miembros.stream()
                 .map(m -> {
                     Usuario u = usuarios.get(m.getId().getUsuarioCodigo());
-                    return u == null ? null : new ChatParticipanteDto(u.getCodigo(), u.getNombre(), u.getRol());
+                    return u == null ? null : new ChatParticipanteDto(u.getCodigo(), u.getNombre(), u.getRol(), m.isEsAdmin());
                 })
                 .filter(java.util.Objects::nonNull)
                 .toList();
