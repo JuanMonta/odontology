@@ -40,6 +40,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   appointments$: Observable<Appointment[]>;
   waiting$: Observable<WaitingPatient[]>;
+  waitingNames$: Observable<string[]>;
   totals$: Observable<BoardTotals>;
 
   patientOptions$: Observable<string[]>;
@@ -63,6 +64,10 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   ) {
     this.appointments$ = this.mock.appointments$;
     this.waiting$ = this.mock.waiting$;
+    this.waitingNames$ = this.waiting$.pipe(
+      map(list => list.map(p => p.patient.toUpperCase())),
+      takeUntil(this.destroy$)
+    );
     this.totals$ = this.mock.appointments$.pipe(
       map(list => this.computeTotals(list)),
       takeUntil(this.destroy$)
@@ -84,8 +89,16 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.mock.callWaitingPatient();
   }
 
+  onCheckIn(appointmentId: string): void {
+    this.mock.checkIn({ appointmentId });
+  }
+
   onMarkDone(id: string): void {
     this.mock.markDone(id);
+  }
+
+  onWalkIn(data: { nombre: string; motivo: string }): void {
+    this.mock.checkIn({ pacienteNombre: data.nombre, motivo: data.motivo });
   }
 
   startCreate(): void {

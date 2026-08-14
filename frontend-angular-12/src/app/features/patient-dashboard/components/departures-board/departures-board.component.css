@@ -238,11 +238,38 @@
 }
 
 .done-btn:hover {
-  background: #ffbd3d;
-  transform: translateY(-1px);
-}
+    background: #ffbd3d;
+    transform: translateY(-1px);
+  }
 
-/* Responsive: column priority drops */
+  .checkin-btn {
+    padding: 6px 10px;
+    font-family: var(--font-flap);
+    font-size: 0.62em;
+    letter-spacing: 0.14em;
+    color: var(--flap-black);
+    background: var(--amber);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.18s var(--ease-out), transform 0.18s var(--ease-out);
+  }
+
+  .checkin-btn:hover {
+    filter: brightness(1.08);
+  }
+
+  .checkin-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .checkin-btn.is-waiting:disabled {
+    background: #4f5b67;
+    color: var(--steel-100);
+  }
+
+  /* Responsive: column priority drops */
 @media (max-width: 980px) {
   .board-columns,
   .row {

@@ -47,6 +47,14 @@
           class="done-btn"
           (click)="markDone.emit(a.id)"
         >ATENDER</button>
+        <button
+          *ngIf="a.status === 'on-time'"
+          class="checkin-btn"
+          [class.is-waiting]="isWaiting(a.patient)"
+          [disabled]="isWaiting(a.patient)"
+          (click)="checkIn.emit(a.id)"
+          title="Marcar llegada"
+        >{{ isWaiting(a.patient) ? 'EN ESPERA' : 'MARCAR LLEGADA' }}</button>
       </div>
     </div>
   </div>

@@ -168,5 +168,174 @@
 }
 
 .call-btn:disabled .call-btn-icon {
-  color: var(--steel-300);
-}
+    color: var(--steel-300);
+  }
+
+  .panel-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .walkin-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 14px;
+    font-family: var(--font-flap);
+    font-size: 0.72em;
+    letter-spacing: 0.12em;
+    color: var(--amber);
+    background: transparent;
+    border: 1px dashed rgba(255, 176, 32, 0.55);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.18s var(--ease-out), border-color 0.18s var(--ease-out);
+  }
+
+  .walkin-btn:hover {
+    background: rgba(255, 176, 32, 0.08);
+    border-color: var(--amber-line);
+  }
+
+  /* ============ Picker modal (reutiliza estilos de consultorio-form) ============ */
+  .picker {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .picker-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+  }
+
+  .picker-panel {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    max-height: 90vh;
+    overflow: hidden;
+    background: var(--steel-950);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    box-shadow: 0 32px 64px -24px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .picker-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .picker-title {
+    font-family: var(--font-flap);
+    font-size: 0.9em;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    color: var(--flap-ink);
+  }
+
+  .picker-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--steel-300);
+    cursor: pointer;
+    transition: background 0.18s var(--ease-out), color 0.18s var(--ease-out);
+  }
+
+  .picker-close:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--flap-ink);
+  }
+
+  .icon-x {
+    width: 16px;
+    height: 16px;
+  }
+
+  .picker-body {
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-label {
+    font-family: var(--font-flap);
+    font-size: 0.66em;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    color: var(--steel-300);
+  }
+
+  .field-input {
+    padding: 10px 12px;
+    font-family: var(--font-body);
+    font-size: 0.9em;
+    color: var(--flap-ink);
+    background: var(--steel-900);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color 0.18s var(--ease-out), box-shadow 0.18s var(--ease-out);
+  }
+
+  .field-input::placeholder {
+    color: var(--steel-500);
+  }
+
+  .field-input:focus {
+    border-color: var(--amber-line);
+    box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.15);
+  }
+
+  .picker-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .picker-confirm {
+    padding: 12px 18px;
+    font-family: var(--font-flap);
+    font-size: 0.8em;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    color: var(--flap-black);
+    background: var(--amber);
+    border: 1px solid var(--amber);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.18s var(--ease-out);
+  }
+
+  .picker-confirm:hover {
+    filter: brightness(1.08);
+  }
