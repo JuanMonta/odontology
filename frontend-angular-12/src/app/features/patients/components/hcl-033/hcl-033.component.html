@@ -94,6 +94,10 @@
           <span class="chk-lbl">{{ a.label }}</span>
         </button>
       </div>
+      <div *ngIf="hc.otroAntecedente" class="fld">
+        <span class="fld-label">DESCRIBE EL ANTECEDENTE</span>
+        <input class="fld-input" type="text" [(ngModel)]="hc.otroAntecedenteTexto" placeholder="Especificar antecedente" autocomplete="off" />
+      </div>
     </section>
 
     <!-- 4 · SIGNOS VITALES -->
@@ -265,6 +269,10 @@
         <button class="chk" [class.is-active]="hc.planOtros" type="button" [attr.aria-pressed]="hc.planOtros" (click)="hc.planOtros = !hc.planOtros">
           <span class="chk-box" aria-hidden="true">{{ hc.planOtros ? '×' : '' }}</span><span class="chk-lbl">OTROS</span>
         </button>
+      </div>
+      <div *ngIf="hc.planOtros" class="fld">
+        <span class="fld-label">ESPECIFICA OTRO PLAN</span>
+        <input class="fld-input" type="text" [(ngModel)]="hc.planOtrosTexto" placeholder="Especificar plan" autocomplete="off" />
       </div>
       <div class="grid-3">
         <label class="fld">
