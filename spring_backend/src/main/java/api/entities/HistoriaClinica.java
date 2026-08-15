@@ -3,6 +3,7 @@ package api.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,16 +11,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Historia clínica odontológica del Formulario 033 (HCU-form.033/2008 MSP).
- * Una fila por paciente. La sección 6 (odontograma) vive en {@code patient_teeth};
- * los bloques estructurados se persisten como JSON (LONGTEXT) y los serializa
- * Jackson a través de la capa de servicio.
+ * Varias hojas por paciente: la clave es compuesta {@code (paciente_id, hoja)};
+ * cada hoja es una continuación de la misma numeración de HC (regla 4 del manual).
+ * La sección 6 (odontograma) vive en {@code patient_teeth}; los bloques
+ * estructurados se persisten como JSON (LONGTEXT) y los serializa Jackson.
  */
 @Entity
 @Table(name = "historia_clinica_033")
+@IdClass(HistoriaClinica.Id.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,6 +35,13 @@ public class HistoriaClinica {
     @Id
     @Column(name = "paciente_id", length = 12)
     private String pacienteId;
+
+    @Id
+    @Column(name = "hoja")
+    private Integer hoja;
+
+    @Column(name = "establecimiento", length = 120)
+    private String establecimiento;
 
     @Column(name = "sexo", length = 1)
     private String sexo;
@@ -76,6 +88,9 @@ public class HistoriaClinica {
     @Column(name = "ant_otro_texto", columnDefinition = "TEXT")
     private String antOtroTexto;
 
+    @Column(name = "parentesco", length = 120)
+    private String parentesco;
+
     @Column(name = "presion_arterial", length = 16)
     private String presionArterial;
 
@@ -106,6 +121,12 @@ public class HistoriaClinica {
     @Column(name = "fluorosis", length = 16)
     private String fluorosis;
 
+    @Column(name = "enfermedad_periodontal", length = 16)
+    private String enfermedadPeriodontal;
+
+    @Column(name = "higiene_sextantes", columnDefinition = "LONGTEXT")
+    private String higieneSextantes;
+
     @Column(name = "indices_cpo", columnDefinition = "LONGTEXT")
     private String indicesCpo;
 
@@ -124,6 +145,12 @@ public class HistoriaClinica {
     @Column(name = "plan_otros_texto", columnDefinition = "TEXT")
     private String planOtrosTexto;
 
+    @Column(name = "plan_terapeutico", columnDefinition = "TEXT")
+    private String planTerapeutico;
+
+    @Column(name = "plan_educacional", columnDefinition = "TEXT")
+    private String planEducacional;
+
     @Column(name = "fecha_apertura", length = 10)
     private String fechaApertura;
 
@@ -133,6 +160,15 @@ public class HistoriaClinica {
     @Column(name = "numero_hoja", length = 16)
     private String numeroHoja;
 
+    @Column(name = "profesional_nombre", length = 120)
+    private String profesionalNombre;
+
+    @Column(name = "profesional_fecha", length = 10)
+    private String profesionalFecha;
+
+    @Column(name = "profesional_firma", length = 120)
+    private String profesionalFirma;
+
     @Column(name = "diagnosticos_cie", columnDefinition = "LONGTEXT")
     private String diagnosticosCie;
 
@@ -141,4 +177,51 @@ public class HistoriaClinica {
 
     @Column(name = "actualizada_en")
     private LocalDateTime actualizadaEn;
+
+    /** Clave compuesta del Formulario 033: paciente + número de hoja. */
+    public static class Id implements Serializable {
+
+        private String pacienteId;
+        private Integer hoja;
+
+        public Id() {
+        }
+
+        public Id(String pacienteId, Integer hoja) {
+            this.pacienteId = pacienteId;
+            this.hoja = hoja;
+        }
+
+        public String getPacienteId() {
+            return pacienteId;
+        }
+
+        public void setPacienteId(String pacienteId) {
+            this.pacienteId = pacienteId;
+        }
+
+        public Integer getHoja() {
+            return hoja;
+        }
+
+        public void setHoja(Integer hoja) {
+            this.hoja = hoja;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Id id)) {
+                return false;
+            }
+            return Objects.equals(pacienteId, id.pacienteId) && Objects.equals(hoja, id.hoja);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(pacienteId, hoja);
+        }
+    }
 }

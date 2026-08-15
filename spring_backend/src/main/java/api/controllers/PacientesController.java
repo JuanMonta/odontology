@@ -63,9 +63,26 @@ public class PacientesController {
         return pacientesService.hclinica(id);
     }
 
+    @GetMapping("/{id}/hclinica/hojas")
+    public List<HclDto.HojaResumenDto> hojas(@PathVariable String id) {
+        return pacientesService.listarHojas(id);
+    }
+
+    @GetMapping("/{id}/hclinica/{hoja}")
+    public HclDto hclinicaHoja(@PathVariable String id, @PathVariable int hoja) {
+        return pacientesService.hclinica(id, hoja);
+    }
+
     @PutMapping("/{id}/hclinica")
     public HclDto saveHclinica(@PathVariable String id, @RequestBody HclDto dto) {
-        return pacientesService.guardarHclinica(id, dto);
+        return pacientesService.guardarHclinica(id, 1, dto);
+    }
+
+    @PutMapping("/{id}/hclinica/{hoja}")
+    public HclDto saveHclinicaHoja(@PathVariable String id,
+                                   @PathVariable int hoja,
+                                   @RequestBody HclDto dto) {
+        return pacientesService.guardarHclinica(id, hoja, dto);
     }
 
     @PutMapping("/{id}/teeth/{number}")
