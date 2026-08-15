@@ -320,31 +320,50 @@
       <h3 class="sec-title">TRATAMIENTO</h3>
       <div class="ses-list">
         <div class="ses" *ngFor="let s of hc.sesiones; let i = index">
-          <span class="ses-n">SESIÓN {{ s.sesion }}</span>
-          <div class="ses-grid">
-            <label class="fld">
+          <div class="ses-head">
+            <span class="ses-badge" aria-hidden="true">{{ s.sesion < 10 ? '0' + s.sesion : s.sesion }}</span>
+            <span class="ses-tag">SESIÓN</span>
+            <label class="fld ses-date">
               <span class="fld-label">FECHA</span>
               <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].fecha" placeholder="DD/MM/AAAA" autocomplete="off" />
             </label>
+            <button
+              class="ses-del"
+              type="button"
+              [attr.aria-label]="'Eliminar sesión ' + s.sesion"
+              [disabled]="hc.sesiones.length <= 1"
+              (click)="quitarSesion(i)"
+            >
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true">
+                <path d="M2.5 2.5l7 7"></path>
+                <path d="M9.5 2.5l-7 7"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="ses-grid">
             <label class="fld">
               <span class="fld-label">DIAGNÓSTICOS Y COMPLICACIONES</span>
-              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].diagnosticos" autocomplete="off" />
+              <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="hc.sesiones[i].diagnosticos" placeholder="DIAGNÓSTICO Y/O COMPLICACIÓN DE LA SESIÓN" autocomplete="off"></textarea>
             </label>
             <label class="fld">
               <span class="fld-label">PROCEDIMIENTOS</span>
-              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].procedimientos" autocomplete="off" />
+              <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="hc.sesiones[i].procedimientos" placeholder="PROCEDIMIENTOS REALIZADOS" autocomplete="off"></textarea>
             </label>
             <label class="fld">
               <span class="fld-label">PRESCRIPCIONES</span>
-              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].prescripciones" autocomplete="off" />
+              <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="hc.sesiones[i].prescripciones" placeholder="MEDICACIÓN / RECETAS" autocomplete="off"></textarea>
             </label>
             <label class="fld">
               <span class="fld-label">CÓDIGO Y FIRMA</span>
-              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].codigo" autocomplete="off" />
+              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].codigo" placeholder="CÓDIGO DEL ODONTÓLOGO" autocomplete="off" />
             </label>
           </div>
         </div>
       </div>
+      <button class="ses-add" type="button" *ngIf="hc.sesiones.length < maxSesiones" (click)="agregarSesion()">
+        <span class="ses-add-mark" aria-hidden="true">+</span>
+        AÑADIR SESIÓN
+      </button>
     </section>
 
     <!-- Pie: guardar -->
