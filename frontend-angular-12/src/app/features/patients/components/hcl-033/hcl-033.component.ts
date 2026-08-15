@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { Patient, Tooth } from '../../../../core/models/patient.model';
 import {
   ANTECEDENTES_033,
@@ -7,7 +7,7 @@ import {
   Hcl,
   HclDiagnosticoCie,
   HclRegionExamen,
-  HclSesion,
+  HojaResumen,
   REGIONES_ESTOMATOGNATICAS,
   SEXTO_SECTANTES,
   crearHclVacia,
@@ -15,6 +15,7 @@ import {
   hclCompleta
 } from '../../../../core/models/hcl.model';
 import { HclHttpService } from '../../services/hcl-http.service';
+import { PROCEDIMIENTOS_ODONTOLOGICOS } from '../../../../core/models/procedimientos-odontologicos';
 
 interface Seccion033 {
   n: number;
@@ -34,11 +35,23 @@ export class Hcl033Component implements OnInit, OnDestroy {
   @Output() toothChange = new EventEmitter<Tooth[]>();
 
   hc: Hcl = crearHclVacia('');
+  hojas: HojaResumen[] = [];
   seccion = 1;
   cargando = false;
   guardando = false;
   estado: EstadoGuardado = 'idle';
   mensaje: string | null = null;
+
+  get hojasSelector(): HojaResumen[] {
+    const lista = this.hojas.length
+      ? this.hojas
+      : [{ hoja: 1, fechaApertura: null, fechaControl: null, actualizadaEn: null }];
+    if (!lista.some(h => h.hoja === this.hc.hoja)) {
+      return [...lista, { hoja: this.hc.hoja, fechaApertura: null, fechaControl: null, actualizadaEn: null }]
+        .sort((a, b) => a.hoja - b.hoja);
+    }
+    return lista;
+  }
 
   readonly secciones: Seccion033[] = [
     { n: 1, titulo: 'MOTIVO DE CONSULTA' },
@@ -54,13 +67,11 @@ export class Hcl033Component implements OnInit, OnDestroy {
     { n: 12, titulo: 'TRATAMIENTO' }
   ];
 
-  /** El form033 imprime hasta 9 filas de sesiones; el botón no agrega más allá. */
-  readonly maxSesiones = 9;
-
   readonly regiones = REGIONES_ESTOMATOGNATICAS;
   readonly antecedentes = ANTECEDENTES_033;
   readonly sextantes = SEXTO_SECTANTES;
   readonly dientesIhos = DIENTES_IHOS;
+  readonly procedimientosOdontologicos = PROCEDIMIENTOS_ODONTOLOGICOS;
 
   private readonly sub = new Subscription();
 
@@ -86,20 +97,110 @@ export class Hcl033Component implements OnInit, OnDestroy {
     this.cargando = true;
     this.mensaje = null;
     this.sub.add(
-      this.hclService.get(this.patient.id).subscribe({
-        next: hc => {
-          this.hc = hclCompleta(this.patient?.id ?? '', hc);
+      forkJoin({
+        hc: this.hclService.get(this.patient.id),
+        hojas: this.hclService.listarHojas(this.patient.id)
+      }).subscribe({
+        next: r => {
+          this.hc = hclCompleta(this.patient?.id ?? '', r.hc);
+          this.hojas = r.hojas ?? [];
           this.cargando = false;
           this.cdr.markForCheck();
         },
         error: () => {
           this.hc = crearHclVacia(this.patient?.id ?? '');
+          this.hojas = [];
           this.cargando = false;
           this.estado = 'error';
           this.mensaje = 'NO SE PUDO CARGAR LA HISTORIA CLÍNICA';
           this.cdr.markForCheck();
         }
       })
+    );
+  }
+
+  abrirHoja(n: number): void {
+    if (!this.patient || n === this.hc.hoja || this.cargando || this.guardando) {
+      return;
+    }
+    if (this.tieneContenido(this.hc) && this.estado !== 'ok' &&
+        !window.confirm('La hoja actual tiene datos sin guardar. ¿Cambiar de hoja? Los cambios no guardados se perderán.')) {
+      return;
+    }
+    this.cargando = true;
+    this.mensaje = null;
+    this.sub.add(
+      this.hclService.getHoja(this.patient.id, n).subscribe({
+        next: hc => {
+          this.hc = hclCompleta(this.patient?.id ?? '', hc);
+          this.cargando = false;
+          this.estado = 'idle';
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.cargando = false;
+          this.estado = 'error';
+          this.mensaje = 'NO SE PUDO CARGAR LA HOJA ' + n;
+          this.cdr.markForCheck();
+        }
+      })
+    );
+  }
+
+  nuevaHoja(): void {
+    if (!this.patient || this.cargando || this.guardando) {
+      return;
+    }
+    if (this.tieneContenido(this.hc) && this.estado !== 'ok' &&
+        !window.confirm('La hoja actual tiene datos sin guardar. ¿Abrir una nueva hoja? Los cambios no guardados se perderán.')) {
+      return;
+    }
+    const siguiente = Math.max(1, ...this.hojas.map(h => h.hoja), this.hc.hoja) + 1;
+    this.hc = crearHclVacia(this.patient.id, siguiente);
+    if (!this.hojas.some(h => h.hoja === siguiente)) {
+      this.hojas = [
+        ...this.hojas,
+        { hoja: siguiente, fechaApertura: null, fechaControl: null, actualizadaEn: null }
+      ];
+    }
+    this.estado = 'idle';
+    this.mensaje = null;
+    this.cdr.markForCheck();
+  }
+
+  sesionNueveLlena(): boolean {
+    const s = this.hc.sesiones[8];
+    return !!s && !!(s.fecha || s.diagnosticos || s.procedimientos || s.prescripciones || s.proximaCita || s.codigo);
+  }
+
+  private refrescarHojas(): void {
+    if (!this.patient) {
+      return;
+    }
+    this.sub.add(
+      this.hclService.listarHojas(this.patient.id).subscribe({
+        next: h => {
+          this.hojas = h ?? [];
+          this.cdr.markForCheck();
+        },
+        error: () => {}
+      })
+    );
+  }
+
+  private tieneContenido(hc: Hcl): boolean {
+    return !!(
+      hc.establecimiento || hc.parentesco || hc.motivoConsulta || hc.problemaActual ||
+      hc.otroAntecedenteTexto || hc.presionArterial || hc.frecuenciaCardiaca || hc.temperatura ||
+      hc.frecuenciaRespiratoria || hc.enfermedadPeriodontal || hc.higienePlaca || hc.higieneCalculo ||
+      hc.gingivitis || hc.malOclusion || hc.fluorosis || hc.planOtrosTexto || hc.planTerapeutico ||
+      hc.planEducacional || hc.profesionalNombre || hc.profesionalFecha || hc.profesionalFirma ||
+      hc.sesiones.some(s => !!(s.fecha || s.diagnosticos || s.procedimientos || s.prescripciones || s.proximaCita || s.codigo)) ||
+      (hc.examenRegiones ?? []).some(r => !!r.descripcion) ||
+      (hc.diagnosticosCie ?? []).some(d => !!d.codigo) ||
+      (hc.higieneSextantes ?? []).some(h => h.placa !== null || h.calculo !== null || h.gingivitis !== null) ||
+      (hc.indicesCpo?.permanente ?? []).some(i => i.c !== null || i.p !== null || i.o !== null) ||
+      (hc.indicesCpo?.deciduo ?? []).some(i => i.c !== null || i.e !== null || i.o !== null)
     );
   }
 
@@ -117,6 +218,7 @@ export class Hcl033Component implements OnInit, OnDestroy {
           this.guardando = false;
           this.estado = 'ok';
           this.mensaje = 'HISTORIA CLÍNICA GUARDADA';
+          this.refrescarHojas();
           this.cdr.markForCheck();
         },
         error: () => {
@@ -137,31 +239,6 @@ export class Hcl033Component implements OnInit, OnDestroy {
     this.seccion = n;
   }
 
-  agregarSesion(): void {
-    if (this.hc.sesiones.length >= this.maxSesiones) {
-      return;
-    }
-    const prox = this.hc.sesiones.reduce((m, s) => Math.max(m, s.sesion || 0), 0) + 1;
-    this.hc.sesiones = [
-      ...this.hc.sesiones,
-      {
-        sesion: prox,
-        fecha: '',
-        diagnosticos: '',
-        procedimientos: '',
-        prescripciones: '',
-        codigo: ''
-      }
-    ];
-  }
-
-  quitarSesion(i: number): void {
-    if (this.hc.sesiones.length <= 1) {
-      return;
-    }
-    this.hc.sesiones = this.hc.sesiones.filter((_, idx) => idx !== i);
-  }
-
   antVal(key: string): boolean {
     return (this.hc as unknown as Record<string, boolean>)[key] ?? false;
   }
@@ -169,6 +246,25 @@ export class Hcl033Component implements OnInit, OnDestroy {
   toggleAnt(key: string): void {
     const target = this.hc as unknown as Record<string, boolean>;
     target[key] = !(target[key] ?? false);
+  }
+
+  algunaAntecedente(): boolean {
+    return this.antecedentes.some(a => a.key !== 'otroAntecedente' && this.antVal(a.key));
+  }
+
+  ihosPromedios(): { placa: string; calculo: string; gingivitis: string } {
+    const prom = (vals: (number | null)[]): string => {
+      const n = vals.filter((v): v is number => v !== null && v !== undefined);
+      if (!n.length) {
+        return '—';
+      }
+      return (n.reduce((s, v) => s + v, 0) / n.length).toFixed(1);
+    };
+    return {
+      placa: prom(this.hc.higieneSextantes.map(h => h.placa)),
+      calculo: prom(this.hc.higieneSextantes.map(h => h.calculo)),
+      gingivitis: prom(this.hc.higieneSextantes.map(h => h.gingivitis))
+    };
   }
 
   grupo(): string {

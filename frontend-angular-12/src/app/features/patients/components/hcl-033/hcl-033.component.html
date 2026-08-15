@@ -6,6 +6,7 @@
       <span class="hc-title">HISTORIA CLÍNICA</span>
     </div>
     <div class="hc-head-meta" *ngIf="patient">
+      <span class="hc-meta hc-meta--edit"><span class="hc-meta-lbl">ESTABLECIMIENTO</span><input class="fld-input hc-meta-input" type="text" [(ngModel)]="hc.establecimiento" placeholder="NOMBRE DEL ESTABLECIMIENTO" autocomplete="off" /></span>
       <span class="hc-meta"><span class="hc-meta-lbl">PACIENTE</span><span class="hc-meta-val">{{ patient.name }}</span></span>
       <span class="hc-meta"><span class="hc-meta-lbl">Nº HISTORIA</span><span class="hc-meta-val">{{ patient.id }}</span></span>
       <span class="hc-meta"><span class="hc-meta-lbl">EDAD</span><span class="hc-meta-val">{{ patient.age }}</span></span>
@@ -17,6 +18,24 @@
         </select>
       </span>
       <span class="hc-meta"><span class="hc-meta-lbl">GRUPO ETARIO</span><span class="hc-meta-val">{{ grupo() }}</span></span>
+    </div>
+    <div class="hc-hojas" *ngIf="patient">
+      <span class="hc-hojas-lbl">HOJAS</span>
+      <div class="hc-hojas-chips" role="tablist" aria-label="Hojas de la historia clínica">
+        <button
+          *ngFor="let h of hojasSelector"
+          class="hc-hoja-chip"
+          [class.is-active]="h.hoja === hc.hoja"
+          type="button"
+          role="tab"
+          [attr.aria-selected]="h.hoja === hc.hoja"
+          (click)="abrirHoja(h.hoja)"
+        >
+          <span class="hc-hoja-chip-n">HOJA {{ h.hoja }}</span>
+          <span *ngIf="h.fechaApertura" class="hc-hoja-chip-d">{{ h.fechaApertura }}</span>
+        </button>
+      </div>
+      <button class="hc-hoja-nueva" type="button" (click)="nuevaHoja()">+ NUEVA HOJA</button>
     </div>
     <div class="hc-prog" role="group" aria-label="Tipo de cita">
       <button
@@ -98,6 +117,10 @@
         <span class="fld-label">DESCRIBE EL ANTECEDENTE</span>
         <input class="fld-input" type="text" [(ngModel)]="hc.otroAntecedenteTexto" placeholder="Especificar antecedente" autocomplete="off" />
       </div>
+      <div *ngIf="algunaAntecedente()" class="fld">
+        <span class="fld-label">PARENTESCO (HASTA 3ER GRADO DE CONSANGUINIDAD / 1RO DE AFINIDAD)</span>
+        <input class="fld-input" type="text" [(ngModel)]="hc.parentesco" placeholder="Especificar parentesco del informante…" autocomplete="off" />
+      </div>
     </section>
 
     <!-- 4 · SIGNOS VITALES -->
@@ -153,35 +176,66 @@
 
       <div class="sec-block">
         <span class="sec-block-t">HIGIENE ORAL SIMPLIFICADA</span>
-        <span class="sec-block-s">PIEZAS: 16 · 11 · 26 / 36 · 31 · 46</span>
-        <div class="grid-2">
-          <label class="fld">
-            <span class="fld-label">PLACA (0-1-2-3)</span>
-            <select class="fld-select" [(ngModel)]="hc.higienePlaca" aria-label="Índice de placa">
-              <option [ngValue]="null">—</option>
-              <option [ngValue]="0">0</option>
-              <option [ngValue]="1">1</option>
-              <option [ngValue]="2">2</option>
-              <option [ngValue]="3">3</option>
-            </select>
-          </label>
-          <label class="fld">
-            <span class="fld-label">CÁLCULO (0-1)</span>
-            <select class="fld-select" [(ngModel)]="hc.higieneCalculo" aria-label="Índice de cálculo">
-              <option [ngValue]="null">—</option>
-              <option [ngValue]="0">0</option>
-              <option [ngValue]="1">1</option>
-            </select>
-          </label>
+        <span class="sec-block-s">SEXTANTES: 16·17 · 11·21 · 26·27 / 36·37 · 31·41 · 46·47</span>
+        <div class="table-wrap">
+          <table class="idx ihos">
+            <thead>
+              <tr>
+                <th scope="col">SEXTANTE</th>
+                <th scope="col">PLACA<br /><span class="idx-sub">0-1-2-3</span></th>
+                <th scope="col">CÁLCULO<br /><span class="idx-sub">0-1-2-3</span></th>
+                <th scope="col">GINGIVITIS<br /><span class="idx-sub">0-1</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let h of hc.higieneSextantes; let i = index">
+                <th scope="row" class="idx-sext">{{ h.sextante }}</th>
+                <td>
+                  <select class="fld-select fld-select--mini" [(ngModel)]="hc.higieneSextantes[i].placa" [attr.aria-label]="'Placa sextante ' + h.sextante">
+                    <option [ngValue]="null">—</option>
+                    <option [ngValue]="0">0</option>
+                    <option [ngValue]="1">1</option>
+                    <option [ngValue]="2">2</option>
+                    <option [ngValue]="3">3</option>
+                  </select>
+                </td>
+                <td>
+                  <select class="fld-select fld-select--mini" [(ngModel)]="hc.higieneSextantes[i].calculo" [attr.aria-label]="'Cálculo sextante ' + h.sextante">
+                    <option [ngValue]="null">—</option>
+                    <option [ngValue]="0">0</option>
+                    <option [ngValue]="1">1</option>
+                    <option [ngValue]="2">2</option>
+                    <option [ngValue]="3">3</option>
+                  </select>
+                </td>
+                <td>
+                  <select class="fld-select fld-select--mini" [(ngModel)]="hc.higieneSextantes[i].gingivitis" [attr.aria-label]="'Gingivitis sextante ' + h.sextante">
+                    <option [ngValue]="null">—</option>
+                    <option [ngValue]="0">0</option>
+                    <option [ngValue]="1">1</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row" class="idx-sext">PROMEDIO</th>
+                <td>{{ ihosPromedios().placa }}</td>
+                <td>{{ ihosPromedios().calculo }}</td>
+                <td>{{ ihosPromedios().gingivitis }}</td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
 
       <div class="sec-block">
-        <span class="sec-block-t">GINGIVITIS</span>
-        <div class="seg" role="group" aria-label="Gingivitis">
-          <button class="seg-btn" [class.is-active]="hc.gingivitis === 'LEVE'" type="button" role="radio" [attr.aria-checked]="hc.gingivitis === 'LEVE'" (click)="hc.gingivitis = 'LEVE'">LEVE</button>
-          <button class="seg-btn" [class.is-active]="hc.gingivitis === 'MODERADA'" type="button" role="radio" [attr.aria-checked]="hc.gingivitis === 'MODERADA'" (click)="hc.gingivitis = 'MODERADA'">MODERADA</button>
-          <button class="seg-btn" [class.is-active]="hc.gingivitis === 'SEVERA'" type="button" role="radio" [attr.aria-checked]="hc.gingivitis === 'SEVERA'" (click)="hc.gingivitis = 'SEVERA'">SEVERA</button>
+        <span class="sec-block-t">ENFERMEDAD PERIODONTAL</span>
+        <span class="sec-block-s">LEVE: BOLSA 3-4mm · MODERADA: 4-6mm + MOVILIDAD I · AVANZADA: >6mm + MOVILIDAD II-III</span>
+        <div class="seg" role="group" aria-label="Enfermedad periodontal">
+          <button class="seg-btn" [class.is-active]="hc.enfermedadPeriodontal === 'LEVE'" type="button" role="radio" [attr.aria-checked]="hc.enfermedadPeriodontal === 'LEVE'" (click)="hc.enfermedadPeriodontal = 'LEVE'">LEVE</button>
+          <button class="seg-btn" [class.is-active]="hc.enfermedadPeriodontal === 'MODERADA'" type="button" role="radio" [attr.aria-checked]="hc.enfermedadPeriodontal === 'MODERADA'" (click)="hc.enfermedadPeriodontal = 'MODERADA'">MODERADA</button>
+          <button class="seg-btn" [class.is-active]="hc.enfermedadPeriodontal === 'AVANZADA'" type="button" role="radio" [attr.aria-checked]="hc.enfermedadPeriodontal === 'AVANZADA'" (click)="hc.enfermedadPeriodontal = 'AVANZADA'">AVANZADA</button>
         </div>
       </div>
 
@@ -274,6 +328,14 @@
         <span class="fld-label">ESPECIFICA OTRO PLAN</span>
         <input class="fld-input" type="text" [(ngModel)]="hc.planOtrosTexto" placeholder="Especificar plan" autocomplete="off" />
       </div>
+      <label class="fld">
+        <span class="fld-label">PLAN TERAPÉUTICO</span>
+        <textarea class="fld-input fld-textarea" rows="3" [(ngModel)]="hc.planTerapeutico" placeholder="PROFILAXIS, SELLANTE, RESTAURACIONES, TRATAMIENTO PERIODONTAL…"></textarea>
+      </label>
+      <label class="fld">
+        <span class="fld-label">PLAN EDUCACIONAL</span>
+        <textarea class="fld-input fld-textarea" rows="3" [(ngModel)]="hc.planEducacional" placeholder="TÉCNICA DE CEPILLADO, DIETA, CONTROL DE PLACA…"></textarea>
+      </label>
       <div class="grid-3">
         <label class="fld">
           <span class="fld-label">FECHA DE APERTURA</span>
@@ -285,7 +347,7 @@
         </label>
         <label class="fld">
           <span class="fld-label">NÚMERO DE HOJA</span>
-          <input class="fld-input" type="text" [(ngModel)]="hc.numeroHoja" placeholder="01" autocomplete="off" />
+          <input class="fld-input" type="text" [value]="hc.hoja" readonly aria-readonly="true" title="Se asigna automáticamente al abrir una nueva hoja" />
         </label>
       </div>
     </section>
@@ -312,6 +374,20 @@
           </tbody>
         </table>
       </div>
+      <div class="grid-3">
+        <label class="fld">
+          <span class="fld-label">PROFESIONAL</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalNombre" placeholder="NOMBRE DEL ODONTÓLOGO" autocomplete="off" />
+        </label>
+        <label class="fld">
+          <span class="fld-label">FECHA</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalFecha" placeholder="DD/MM/AAAA" autocomplete="off" />
+        </label>
+        <label class="fld">
+          <span class="fld-label">FIRMA</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalFirma" placeholder="FIRMA / RÚBRICA" autocomplete="off" />
+        </label>
+      </div>
     </section>
 
     <!-- 12 · TRATAMIENTO -->
@@ -327,18 +403,6 @@
               <span class="fld-label">FECHA</span>
               <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].fecha" placeholder="DD/MM/AAAA" autocomplete="off" />
             </label>
-            <button
-              class="ses-del"
-              type="button"
-              [attr.aria-label]="'Eliminar sesión ' + s.sesion"
-              [disabled]="hc.sesiones.length <= 1"
-              (click)="quitarSesion(i)"
-            >
-              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true">
-                <path d="M2.5 2.5l7 7"></path>
-                <path d="M9.5 2.5l-7 7"></path>
-              </svg>
-            </button>
           </div>
           <div class="ses-grid">
             <label class="fld">
@@ -347,11 +411,15 @@
             </label>
             <label class="fld">
               <span class="fld-label">PROCEDIMIENTOS</span>
-              <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="hc.sesiones[i].procedimientos" placeholder="PROCEDIMIENTOS REALIZADOS" autocomplete="off"></textarea>
+              <input class="fld-input" type="text" list="proc-odontologicos" [(ngModel)]="hc.sesiones[i].procedimientos" placeholder="CÓDIGO ANEXO 2 O PROCEDIMIENTO" autocomplete="off" />
+            </label>
+            <label class="fld ses-wide">
+              <span class="fld-label">PRESCRIPCIONES — INDICACIONES, INSUMOS, FÁRMACOS (DOSIS, TIEMPO, VÍA)</span>
+              <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="hc.sesiones[i].prescripciones" placeholder="MEDICACIÓN / RECETAS" autocomplete="off"></textarea>
             </label>
             <label class="fld">
-              <span class="fld-label">PRESCRIPCIONES</span>
-              <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="hc.sesiones[i].prescripciones" placeholder="MEDICACIÓN / RECETAS" autocomplete="off"></textarea>
+              <span class="fld-label">PRÓXIMA CITA / ALTA</span>
+              <input class="fld-input" type="text" [(ngModel)]="hc.sesiones[i].proximaCita" placeholder="FECHA PRÓXIMA CITA O «ALTA»" autocomplete="off" />
             </label>
             <label class="fld">
               <span class="fld-label">CÓDIGO Y FIRMA</span>
@@ -360,10 +428,14 @@
           </div>
         </div>
       </div>
-      <button class="ses-add" type="button" *ngIf="hc.sesiones.length < maxSesiones" (click)="agregarSesion()">
-        <span class="ses-add-mark" aria-hidden="true">+</span>
-        AÑADIR SESIÓN
-      </button>
+      <div *ngIf="sesionNueveLlena()" class="ses-cont">
+        <span class="ses-cont-t">SESIÓN 9 COMPLETADA</span>
+        <span class="ses-cont-s">La hoja {{ hc.hoja }} está completa. Abre una nueva hoja para continuar la historia clínica con la misma numeración de HC.</span>
+        <button class="ses-cont-btn" type="button" (click)="nuevaHoja()">ABRIR NUEVA HOJA · HOJA {{ hc.hoja + 1 }}</button>
+      </div>
+      <datalist id="proc-odontologicos">
+        <option *ngFor="let p of procedimientosOdontologicos" [value]="p.codigo + ' · ' + p.descripcion"></option>
+      </datalist>
     </section>
 
     <!-- Pie: guardar -->

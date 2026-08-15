@@ -44,21 +44,23 @@ export const SYMBOLS: Record<ToothCondition, ToothSymbolMeta> = {
   caries: { label: 'CARIES', color: 'var(--odo-needed)' },
   obturado: { label: 'OBTURADO', color: 'var(--odo-done)' },
   endodoncia: { label: 'ENDODONCIA', color: 'var(--odo-needed)' },
-  corona: { label: 'CORONA', color: 'var(--odo-needed)' },
+  'endodoncia-realizada': { label: 'ENDODONCIA REAL.', color: 'var(--odo-done)' },
+  corona: { label: 'CORONA', color: 'var(--odo-done)' },
   extraccion: { label: 'EXTRACCIÓN', color: 'var(--odo-needed)' },
   'sellante-necesario': { label: 'SELLANTE NEC.', color: 'var(--odo-needed)' },
   'sellante-realizado': { label: 'SELLANTE REAL.', color: 'var(--odo-done)' },
-  'protesis-fija': { label: 'PRÓTESIS FIJA', color: 'var(--odo-needed)' },
-  'protesis-removible': { label: 'PRÓTESIS REM.', color: 'var(--odo-needed)' },
-  'protesis-total': { label: 'PRÓTESIS TOTAL', color: 'var(--odo-needed)' },
+  'protesis-fija': { label: 'PRÓTESIS FIJA', color: 'var(--odo-done)' },
+  'protesis-removible': { label: 'PRÓTESIS REM.', color: 'var(--odo-done)' },
+  'protesis-total': { label: 'PRÓTESIS TOTAL', color: 'var(--odo-done)' },
   'perdida-por-caries': { label: 'PÉRD. CARIES', color: 'var(--odo-done)' },
-  'perdida-otra-causa': { label: 'PÉRD. OTRA CAUSA', color: 'var(--odo-needed)' }
+  'perdida-otra-causa': { label: 'PÉRD. OTRA CAUSA', color: 'var(--odo-done)' }
 };
 
 export const SYMBOL_ORDER: ToothCondition[] = [
   'caries',
   'obturado',
   'endodoncia',
+  'endodoncia-realizada',
   'corona',
   'sellante-necesario',
   'sellante-realizado',
@@ -80,7 +82,7 @@ export const FACE_LABELS: Record<ToothFaceName, string> = {
   lingual: 'LINGUAL'
 };
 
-export const PERIO_CYCLE = ['', 'X', '1', '2', '3'];
+export const PERIO_CYCLE = ['', 'X', '1', '2', '3', '4'];
 
 export const LOST: ToothCondition[] = ['perdida-por-caries', 'perdida-otra-causa'];
 

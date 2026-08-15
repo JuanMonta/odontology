@@ -3,6 +3,7 @@ export type ToothCondition =
   | 'caries'
   | 'obturado'
   | 'endodoncia'
+  | 'endodoncia-realizada'
   | 'corona'
   | 'extraccion'
   | 'sellante-necesario'

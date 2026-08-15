@@ -23,6 +23,20 @@ export interface HclCeoItem {
   o: number | null;
 }
 
+export interface HclHigieneSextante {
+  sextante: string;
+  placa: number | null; // 0-3
+  calculo: number | null; // 0-3
+  gingivitis: number | null; // 0-1 (ausencia/presencia de sangrado)
+}
+
+export interface HojaResumen {
+  hoja: number;
+  fechaApertura: string | null;
+  fechaControl: string | null;
+  actualizadaEn: string | null;
+}
+
 export interface HclIndicesCpo {
   permanente: HclCpoItem[];
   deciduo: HclCeoItem[];
@@ -40,11 +54,15 @@ export interface HclSesion {
   diagnosticos: string;
   procedimientos: string;
   prescripciones: string;
+  proximaCita: string;
   codigo: string;
 }
 
 export interface Hcl {
   pacienteId: string;
+  hoja: number;
+  establecimiento: string | null;
+  parentesco: string | null;
   sexo: string | null;
   programado: boolean;
   motivoConsulta: string | null;
@@ -70,15 +88,22 @@ export interface Hcl {
   gingivitis: string | null;
   malOclusion: string | null;
   fluorosis: string | null;
+  enfermedadPeriodontal: string | null;
   indicesCpo: HclIndicesCpo;
+  higieneSextantes: HclHigieneSextante[];
   planBiometria: boolean;
   planRayosX: boolean;
   planQuimicaSanguinea: boolean;
   planOtros: boolean;
   planOtrosTexto: string | null;
+  planTerapeutico: string | null;
+  planEducacional: string | null;
   fechaApertura: string | null;
   fechaControl: string | null;
   numeroHoja: string | null;
+  profesionalNombre: string | null;
+  profesionalFecha: string | null;
+  profesionalFirma: string | null;
   diagnosticosCie: HclDiagnosticoCie[];
   sesiones: HclSesion[];
   actualizadaEn: string | null;
@@ -123,9 +148,12 @@ export const ANTECEDENTES_033 = [
 
 export const DIENTES_IHOS = [16, 11, 26, 36, 31, 46] as const;
 
-export function crearHclVacia(pacienteId: string): Hcl {
+export function crearHclVacia(pacienteId: string, hoja = 1): Hcl {
   return {
     pacienteId,
+    hoja,
+    establecimiento: null,
+    parentesco: null,
     sexo: null,
     programado: true,
     motivoConsulta: null,
@@ -151,18 +179,25 @@ export function crearHclVacia(pacienteId: string): Hcl {
     gingivitis: null,
     malOclusion: null,
     fluorosis: null,
+    enfermedadPeriodontal: null,
     indicesCpo: {
       permanente: SEXTO_SECTANTES.map(s => ({ sextante: s, c: null, p: null, o: null })),
       deciduo: SEXTO_SECTANTES.map(s => ({ sextante: s, c: null, e: null, o: null }))
     },
+    higieneSextantes: SEXTO_SECTANTES.map(s => ({ sextante: s, placa: null, calculo: null, gingivitis: null })),
     planBiometria: false,
     planRayosX: false,
     planQuimicaSanguinea: false,
     planOtros: false,
     planOtrosTexto: null,
+    planTerapeutico: null,
+    planEducacional: null,
     fechaApertura: null,
     fechaControl: null,
     numeroHoja: null,
+    profesionalNombre: null,
+    profesionalFecha: null,
+    profesionalFirma: null,
     diagnosticosCie: [1, 2, 3, 4].map(() => ({ codigo: '', presuntivo: '', definitivo: '' })),
     sesiones: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => ({
       sesion: n,
@@ -170,6 +205,7 @@ export function crearHclVacia(pacienteId: string): Hcl {
       diagnosticos: '',
       procedimientos: '',
       prescripciones: '',
+      proximaCita: '',
       codigo: ''
     })),
     actualizadaEn: null
@@ -185,6 +221,7 @@ export function hclCompleta(pacienteId: string, hc: Partial<Hcl> | null): Hcl {
   return {
     ...base,
     ...hc,
+    hoja: hc.hoja ?? 1,
     examenRegiones: (hc.examenRegiones && hc.examenRegiones.length
       ? hc.examenRegiones
       : base.examenRegiones
@@ -203,12 +240,22 @@ export function hclCompleta(pacienteId: string, hc: Partial<Hcl> | null): Hcl {
       ? hc.diagnosticosCie
       : base.diagnosticosCie
     ).map(d => ({ codigo: d.codigo ?? '', presuntivo: d.presuntivo ?? '', definitivo: d.definitivo ?? '' })),
+    higieneSextantes: (hc.higieneSextantes && hc.higieneSextantes.length
+      ? hc.higieneSextantes
+      : base.higieneSextantes
+    ).map(h => ({
+      sextante: h.sextante,
+      placa: h.placa ?? null,
+      calculo: h.calculo ?? null,
+      gingivitis: h.gingivitis ?? null
+    })),
     sesiones: (hc.sesiones && hc.sesiones.length ? hc.sesiones : base.sesiones).map(s => ({
       sesion: s.sesion,
       fecha: s.fecha ?? '',
       diagnosticos: s.diagnosticos ?? '',
       procedimientos: s.procedimientos ?? '',
       prescripciones: s.prescripciones ?? '',
+      proximaCita: s.proximaCita ?? '',
       codigo: s.codigo ?? ''
     }))
   };

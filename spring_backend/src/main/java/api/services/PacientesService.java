@@ -211,33 +211,59 @@ public class PacientesService {
 
     @Transactional(readOnly = true)
     public HclDto hclinica(String id) {
-        return hclRepository.findById(id)
+        return hclinica(id, 1);
+    }
+
+    @Transactional(readOnly = true)
+    public HclDto hclinica(String id, int hoja) {
+        return hclRepository.findById(new HistoriaClinica.Id(id, hoja))
                 .map(this::toHclDto)
-                .orElseGet(() -> new HclDto(
-                        id,
-                        null, false, null, null,
-        false, false, false, false, false,
-        false, false, false, false, false,
-        null,
-        null, null, null, null,
-                        List.of(),
-                        null, null, null, null, null,
-                new HclDto.IndicesCpoDto(List.of(), List.of()),
-                false, false, false, false,
+                .orElseGet(() -> hclVacia(id, hoja));
+    }
+
+    @Transactional(readOnly = true)
+    public List<HclDto.HojaResumenDto> listarHojas(String id) {
+        return hclRepository.findAllByPacienteIdOrderByHojaAsc(id).stream()
+                .map(h -> new HclDto.HojaResumenDto(
+                        h.getHoja(),
+                        h.getFechaApertura(),
+                        h.getFechaControl(),
+                        h.getActualizadaEn() == null ? null : h.getActualizadaEn().toString()))
+                .toList();
+    }
+
+    private HclDto hclVacia(String id, int hoja) {
+        return new HclDto(
+                id,
+                hoja,
+                null, null, false, null, null,
+                false, false, false, false, false,
+                false, false, false, false, false,
+                null, null,
+                null, null, null, null,
+                List.of(),
+                null, null, null, null, null,
                 null,
+                new HclDto.IndicesCpoDto(List.of(), List.of()),
+                List.of(),
+                false, false, false, false,
                 null, null, null,
-                        List.of(), List.of(),
-                        null));
+                null, null, null,
+                null, null, null,
+                List.of(), List.of(),
+                null);
     }
 
     @Transactional
-    public HclDto guardarHclinica(String id, HclDto dto) {
+    public HclDto guardarHclinica(String id, int hoja, HclDto dto) {
         pacienteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado: " + id));
-        HistoriaClinica hc = hclRepository.findById(id)
-                .orElseGet(() -> HistoriaClinica.builder().pacienteId(id).build());
+        HistoriaClinica hc = hclRepository.findById(new HistoriaClinica.Id(id, hoja))
+                .orElseGet(() -> HistoriaClinica.builder().pacienteId(id).hoja(hoja).build());
+        hc.setHoja(hoja);
 
         hc.setSexo(dto.sexo());
+        hc.setEstablecimiento(dto.establecimiento());
         hc.setProgramado(dto.programado());
         hc.setMotivoConsulta(dto.motivoConsulta());
         hc.setProblemaActual(dto.problemaActual());
@@ -252,6 +278,7 @@ public class PacientesService {
         hc.setAntEnfCardiaca(dto.enfCardiaca());
          hc.setAntOtro(dto.otroAntecedente());
          hc.setAntOtroTexto(dto.otroAntecedenteTexto());
+         hc.setParentesco(dto.parentesco());
          hc.setPresionArterial(dto.presionArterial());
         hc.setFrecuenciaCardiaca(dto.frecuenciaCardiaca());
         hc.setTemperatura(dto.temperatura());
@@ -262,15 +289,22 @@ public class PacientesService {
         hc.setGingivitis(dto.gingivitis());
         hc.setMalOclusion(dto.malOclusion());
         hc.setFluorosis(dto.fluorosis());
+        hc.setEnfermedadPeriodontal(dto.enfermedadPeriodontal());
+        hc.setHigieneSextantes(toJson(dto.higieneSextantes()));
         hc.setIndicesCpo(toJson(dto.indicesCpo()));
         hc.setPlanBiometria(dto.planBiometria());
         hc.setPlanRayosX(dto.planRayosX());
         hc.setPlanQuimicaSanguinea(dto.planQuimicaSanguinea());
          hc.setPlanOtros(dto.planOtros());
          hc.setPlanOtrosTexto(dto.planOtrosTexto());
+         hc.setPlanTerapeutico(dto.planTerapeutico());
+         hc.setPlanEducacional(dto.planEducacional());
          hc.setFechaApertura(dto.fechaApertura());
         hc.setFechaControl(dto.fechaControl());
         hc.setNumeroHoja(dto.numeroHoja());
+        hc.setProfesionalNombre(dto.profesionalNombre());
+        hc.setProfesionalFecha(dto.profesionalFecha());
+        hc.setProfesionalFirma(dto.profesionalFirma());
         hc.setDiagnosticosCie(toJson(dto.diagnosticosCie()));
         hc.setSesiones(toJson(dto.sesiones()));
         hc.setActualizadaEn(LocalDateTime.now());
@@ -281,6 +315,8 @@ public class PacientesService {
     private HclDto toHclDto(HistoriaClinica hc) {
         return new HclDto(
                 hc.getPacienteId(),
+                hc.getHoja(),
+                hc.getEstablecimiento(),
                 hc.getSexo(),
                 hc.isProgramado(),
                 hc.getMotivoConsulta(),
@@ -296,6 +332,7 @@ public class PacientesService {
                 hc.isAntEnfCardiaca(),
                  hc.isAntOtro(),
                  hc.getAntOtroTexto(),
+                 hc.getParentesco(),
                  hc.getPresionArterial(),
                 hc.getFrecuenciaCardiaca(),
                 hc.getTemperatura(),
@@ -307,16 +344,24 @@ public class PacientesService {
                 hc.getGingivitis(),
                 hc.getMalOclusion(),
                 hc.getFluorosis(),
+                hc.getEnfermedadPeriodontal(),
                 fromJson(hc.getIndicesCpo(), new TypeReference<HclDto.IndicesCpoDto>() {
+                }),
+                fromJson(hc.getHigieneSextantes(), new TypeReference<List<HclDto.HigieneSextanteDto>>() {
                 }),
                 hc.isPlanBiometria(),
                 hc.isPlanRayosX(),
                 hc.isPlanQuimicaSanguinea(),
                  hc.isPlanOtros(),
                  hc.getPlanOtrosTexto(),
+                 hc.getPlanTerapeutico(),
+                 hc.getPlanEducacional(),
                  hc.getFechaApertura(),
                 hc.getFechaControl(),
                 hc.getNumeroHoja(),
+                hc.getProfesionalNombre(),
+                hc.getProfesionalFecha(),
+                hc.getProfesionalFirma(),
                 fromJson(hc.getDiagnosticosCie(), new TypeReference<List<HclDto.DiagnosticoCieDto>>() {
                 }),
                 fromJson(hc.getSesiones(), new TypeReference<List<HclDto.SesionTratamientoDto>>() {
