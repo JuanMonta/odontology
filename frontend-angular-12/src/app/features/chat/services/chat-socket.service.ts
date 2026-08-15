@@ -3,6 +3,7 @@ import { Client, IMessage } from '@stomp/stompjs';
 import * as SockJS from 'sockjs-client';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { AuthStore } from '../../../core/auth/auth.store';
+import { ClinicMessage } from '../../../core/models/message.model';
 import { ChatMensaje, ChatPresencia } from '../../../core/models/chat.model';
 
 const WS_BASE = 'http://localhost:8000/ws';
@@ -15,8 +16,13 @@ interface TypingEvent {
 
 /**
  * Canal STOMP en vivo del chat (SockJS → Spring /ws con handshake JWT por
- * query param). Difunde transmisiones nuevas, el indicador de escritura y la
- * presencia del personal del consultorio. La persistencia siempre la hace el backend.
+ * query param). Difunde transmisiones nuevas, el indicador de escritura, la
+ * presencia del personal del consultorio y los mensajes de la bandeja
+ * (topic {@code /topic/messages}). La persistencia siempre la hace el backend.
+ *
+ * <p>La conexión es compartida: {@link #conectar()} lleva un contador de
+ * clientes para que el shell (main-layout) mantenga el socket vivo mientras
+ * las páginas (chat, bandeja) lo conecten y desconecten sin cerrarlo.
  */
 @Injectable({ providedIn: 'root' })
 export class ChatSocketService implements OnDestroy {
@@ -25,6 +31,8 @@ export class ChatSocketService implements OnDestroy {
   private readonly mensajes$ = new Subject<ChatMensaje>();
   private readonly typing$ = new Subject<TypingEvent>();
   private readonly presencia$ = new Subject<ChatPresencia[]>();
+  private readonly clinicMessages$ = new Subject<ClinicMessage>();
+  private clients = 0;
 
   constructor(private readonly auth: AuthStore) {}
 
@@ -40,12 +48,17 @@ export class ChatSocketService implements OnDestroy {
     return this.presencia$;
   }
 
+  onClinicMessage(): Subject<ClinicMessage> {
+    return this.clinicMessages$;
+  }
+
   conectado(): BehaviorSubject<boolean> {
     return this.connected$;
   }
 
   conectar(): void {
-    if (this.client.active || !this.auth.token) {
+    this.clients++;
+    if (this.clients > 1 || this.client.active || !this.auth.token) {
       return;
     }
     this.client.webSocketFactory = () => new SockJS(`${WS_BASE}?token=${encodeURIComponent(this.auth.token!)}`);
@@ -53,6 +66,9 @@ export class ChatSocketService implements OnDestroy {
       this.connected$.next(true);
       this.client.subscribe('/topic/presencia', (msg: IMessage) => {
         this.presencia$.next(JSON.parse(msg.body) as ChatPresencia[]);
+      });
+      this.client.subscribe('/topic/messages', (msg: IMessage) => {
+        this.clinicMessages$.next(JSON.parse(msg.body) as ClinicMessage);
       });
     };
     this.client.onWebSocketClose = () => this.connected$.next(false);
@@ -93,6 +109,10 @@ export class ChatSocketService implements OnDestroy {
   }
 
   desconectar(): void {
+    this.clients = Math.max(0, this.clients - 1);
+    if (this.clients > 0) {
+      return;
+    }
     this.connected$.next(false);
     this.client.deactivate();
   }

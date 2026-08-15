@@ -13,6 +13,7 @@ import { filter, switchMap } from 'rxjs/operators';
 import { MessagesHttpService } from '../../features/messages/services/messages-http.service';
 import { ConfiguracionHttpService } from '../../features/configuracion/services/configuracion-http.service';
 import { ChatHttpService } from '../../features/chat/services/chat-http.service';
+import { ChatSocketService } from '../../features/chat/services/chat-socket.service';
 import { AuthStore } from '../../core/auth/auth.store';
 import { Usuario } from '../../core/models/usuario.model';
 
@@ -105,6 +106,7 @@ export class MainLayoutComponent {
     private readonly messages: MessagesHttpService,
     private readonly settings: ConfiguracionHttpService,
     private readonly chat: ChatHttpService,
+    private readonly socket: ChatSocketService,
     private readonly auth: AuthStore
   ) {
     this.today = this.formatToday(new Date());
@@ -115,8 +117,10 @@ export class MainLayoutComponent {
     this.userSub = this.auth.usuario$().subscribe(u => {
       this.usuario = u;
       if (u) {
+        this.socket.conectar();
         this.startChatPoll();
       } else {
+        this.socket.desconectar();
         this.stopChatPoll();
         this.setChatBadge(undefined);
       }

@@ -7,6 +7,7 @@ import api.repositories.ClinicMessageRepository;
 import api.repositories.UsuarioRolRepository;
 import api.util.FormatoUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,15 +17,20 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Bandeja de mensajes de la clínica.
+ * Bandeja de mensajes de la clínica. Cada mutación difunde el mensaje por el
+ * topic STOMP {@code /topic/messages} para que la UI actualice el badge y la
+ * bandeja en tiempo real sin polling.
  */
 @Service
 @RequiredArgsConstructor
 public class MessagesService {
 
+    private static final String TOPIC_MESSAGES = "/topic/messages";
+
     private final ClinicMessageRepository messageRepository;
     private final CodigoService codigoService;
     private final UsuarioRolRepository rolRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional(readOnly = true)
     public List<ClinicMessageDto> list() {
@@ -32,11 +38,6 @@ public class MessagesService {
                 .sorted(Comparator.comparing(ClinicMessage::getCodigo).reversed())
                 .map(this::toDto)
                 .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public long unreadCount() {
-        return messageRepository.countByEstado(ClinicMessage.Estado.unread);
     }
 
     @Transactional
@@ -53,17 +54,22 @@ public class MessagesService {
                 .destino(validarDestino(draft.destino()))
                 .prioridad(ClinicMessage.Prioridad.valueOf(draft.prioridad()))
                 .build();
-        return toDto(messageRepository.save(message));
+        return difundir(toDto(messageRepository.save(message)));
     }
 
     @Transactional
     public ClinicMessageDto markRead(String code) {
-        return cambiarEstado(code, ClinicMessage.Estado.read);
+        return difundir(cambiarEstado(code, ClinicMessage.Estado.read));
     }
 
     @Transactional
     public ClinicMessageDto markUnread(String code) {
-        return cambiarEstado(code, ClinicMessage.Estado.unread);
+        return difundir(cambiarEstado(code, ClinicMessage.Estado.unread));
+    }
+
+    private ClinicMessageDto difundir(ClinicMessageDto dto) {
+        messagingTemplate.convertAndSend(TOPIC_MESSAGES, dto);
+        return dto;
     }
 
     private ClinicMessageDto cambiarEstado(String code, ClinicMessage.Estado estado) {
