@@ -54,6 +54,9 @@ export class Hcl033Component implements OnInit, OnDestroy {
     { n: 12, titulo: 'TRATAMIENTO' }
   ];
 
+  /** El form033 imprime hasta 9 filas de sesiones; el botón no agrega más allá. */
+  readonly maxSesiones = 9;
+
   readonly regiones = REGIONES_ESTOMATOGNATICAS;
   readonly antecedentes = ANTECEDENTES_033;
   readonly sextantes = SEXTO_SECTANTES;
@@ -132,6 +135,31 @@ export class Hcl033Component implements OnInit, OnDestroy {
 
   cambiarSeccion(n: number): void {
     this.seccion = n;
+  }
+
+  agregarSesion(): void {
+    if (this.hc.sesiones.length >= this.maxSesiones) {
+      return;
+    }
+    const prox = this.hc.sesiones.reduce((m, s) => Math.max(m, s.sesion || 0), 0) + 1;
+    this.hc.sesiones = [
+      ...this.hc.sesiones,
+      {
+        sesion: prox,
+        fecha: '',
+        diagnosticos: '',
+        procedimientos: '',
+        prescripciones: '',
+        codigo: ''
+      }
+    ];
+  }
+
+  quitarSesion(i: number): void {
+    if (this.hc.sesiones.length <= 1) {
+      return;
+    }
+    this.hc.sesiones = this.hc.sesiones.filter((_, idx) => idx !== i);
   }
 
   antVal(key: string): boolean {
