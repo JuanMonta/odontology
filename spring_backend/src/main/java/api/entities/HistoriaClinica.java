@@ -73,6 +73,9 @@ public class HistoriaClinica {
     @Column(name = "ant_otro")
     private boolean antOtro;
 
+    @Column(name = "ant_otro_texto", columnDefinition = "TEXT")
+    private String antOtroTexto;
+
     @Column(name = "presion_arterial", length = 16)
     private String presionArterial;
 
@@ -117,6 +120,9 @@ public class HistoriaClinica {
 
     @Column(name = "plan_otros")
     private boolean planOtros;
+
+    @Column(name = "plan_otros_texto", columnDefinition = "TEXT")
+    private String planOtrosTexto;
 
     @Column(name = "fecha_apertura", length = 10)
     private String fechaApertura;

@@ -216,14 +216,16 @@ public class PacientesService {
                 .orElseGet(() -> new HclDto(
                         id,
                         null, false, null, null,
-                        false, false, false, false, false,
-                        false, false, false, false, false,
-                        null, null, null, null,
+        false, false, false, false, false,
+        false, false, false, false, false,
+        null,
+        null, null, null, null,
                         List.of(),
                         null, null, null, null, null,
-                        new HclDto.IndicesCpoDto(List.of(), List.of()),
-                        false, false, false, false,
-                        null, null, null,
+                new HclDto.IndicesCpoDto(List.of(), List.of()),
+                false, false, false, false,
+                null,
+                null, null, null,
                         List.of(), List.of(),
                         null));
     }
@@ -248,8 +250,9 @@ public class PacientesService {
         hc.setAntDiabetes(dto.diabetes());
         hc.setAntHipertension(dto.hipertension());
         hc.setAntEnfCardiaca(dto.enfCardiaca());
-        hc.setAntOtro(dto.otroAntecedente());
-        hc.setPresionArterial(dto.presionArterial());
+         hc.setAntOtro(dto.otroAntecedente());
+         hc.setAntOtroTexto(dto.otroAntecedenteTexto());
+         hc.setPresionArterial(dto.presionArterial());
         hc.setFrecuenciaCardiaca(dto.frecuenciaCardiaca());
         hc.setTemperatura(dto.temperatura());
         hc.setFrecuenciaRespiratoria(dto.frecuenciaRespiratoria());
@@ -263,8 +266,9 @@ public class PacientesService {
         hc.setPlanBiometria(dto.planBiometria());
         hc.setPlanRayosX(dto.planRayosX());
         hc.setPlanQuimicaSanguinea(dto.planQuimicaSanguinea());
-        hc.setPlanOtros(dto.planOtros());
-        hc.setFechaApertura(dto.fechaApertura());
+         hc.setPlanOtros(dto.planOtros());
+         hc.setPlanOtrosTexto(dto.planOtrosTexto());
+         hc.setFechaApertura(dto.fechaApertura());
         hc.setFechaControl(dto.fechaControl());
         hc.setNumeroHoja(dto.numeroHoja());
         hc.setDiagnosticosCie(toJson(dto.diagnosticosCie()));
@@ -290,8 +294,9 @@ public class PacientesService {
                 hc.isAntDiabetes(),
                 hc.isAntHipertension(),
                 hc.isAntEnfCardiaca(),
-                hc.isAntOtro(),
-                hc.getPresionArterial(),
+                 hc.isAntOtro(),
+                 hc.getAntOtroTexto(),
+                 hc.getPresionArterial(),
                 hc.getFrecuenciaCardiaca(),
                 hc.getTemperatura(),
                 hc.getFrecuenciaRespiratoria(),
@@ -307,8 +312,9 @@ public class PacientesService {
                 hc.isPlanBiometria(),
                 hc.isPlanRayosX(),
                 hc.isPlanQuimicaSanguinea(),
-                hc.isPlanOtros(),
-                hc.getFechaApertura(),
+                 hc.isPlanOtros(),
+                 hc.getPlanOtrosTexto(),
+                 hc.getFechaApertura(),
                 hc.getFechaControl(),
                 hc.getNumeroHoja(),
                 fromJson(hc.getDiagnosticosCie(), new TypeReference<List<HclDto.DiagnosticoCieDto>>() {

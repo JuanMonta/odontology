@@ -59,6 +59,7 @@ export interface Hcl {
   hipertension: boolean;
   enfCardiaca: boolean;
   otroAntecedente: boolean;
+  otroAntecedenteTexto: string | null;
   presionArterial: string | null;
   frecuenciaCardiaca: number | null;
   temperatura: string | null;
@@ -74,6 +75,7 @@ export interface Hcl {
   planRayosX: boolean;
   planQuimicaSanguinea: boolean;
   planOtros: boolean;
+  planOtrosTexto: string | null;
   fechaApertura: string | null;
   fechaControl: string | null;
   numeroHoja: string | null;
@@ -138,6 +140,7 @@ export function crearHclVacia(pacienteId: string): Hcl {
     hipertension: false,
     enfCardiaca: false,
     otroAntecedente: false,
+    otroAntecedenteTexto: null,
     presionArterial: null,
     frecuenciaCardiaca: null,
     temperatura: null,
@@ -156,6 +159,7 @@ export function crearHclVacia(pacienteId: string): Hcl {
     planRayosX: false,
     planQuimicaSanguinea: false,
     planOtros: false,
+    planOtrosTexto: null,
     fechaApertura: null,
     fechaControl: null,
     numeroHoja: null,
