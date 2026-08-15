@@ -7,7 +7,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import java.util.List;
 
 @RepositoryRestResource(exported = false)
-public interface HistoriaClinicaRepository extends JpaRepository<HistoriaClinica, HistoriaClinica.Id> {
+public interface HistoriaClinicaRepository extends JpaRepository<HistoriaClinica, HistoriaClinica.HojaId> {
 
     /** Todas las hojas del Formulario 033 de un paciente, en orden de numeración. */
     List<HistoriaClinica> findAllByPacienteIdOrderByHojaAsc(String pacienteId);

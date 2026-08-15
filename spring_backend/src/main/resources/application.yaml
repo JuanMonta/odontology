@@ -1,5 +1,8 @@
 server:
   port: 8000
+  error:
+    # Expone el mensaje de las excepciones (ej. sello de la HC) en el body JSON.
+    include-message: always
 
 app:
   jwt:
@@ -10,6 +13,12 @@ app:
 spring:
   application:
     name: crowie.dev
+
+  jackson:
+    deserialization:
+      # Permite que campos primitivos ausentes/null (ej. boolean de la HC) se
+      # mapeen a su default en lugar de rechazar el payload con 400.
+      fail-on-null-for-primitives: false
 
   session:
     # La identidad es JWT (sin sesión de servidor); spring-session-jdbc queda

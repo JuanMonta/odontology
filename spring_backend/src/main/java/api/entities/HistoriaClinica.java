@@ -24,7 +24,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "historia_clinica_033")
-@IdClass(HistoriaClinica.Id.class)
+@IdClass(HistoriaClinica.HojaId.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -178,16 +178,18 @@ public class HistoriaClinica {
     @Column(name = "actualizada_en")
     private LocalDateTime actualizadaEn;
 
-    /** Clave compuesta del Formulario 033: paciente + número de hoja. */
-    public static class Id implements Serializable {
+    /** Clave compuesta del Formulario 033: paciente + número de hoja.
+     *  Nombrada {@code HojaId} (no {@code Id}) para no eclipsar a
+     *  {@code jakarta.persistence.Id} dentro de esta clase. */
+    public static class HojaId implements Serializable {
 
         private String pacienteId;
         private Integer hoja;
 
-        public Id() {
+        public HojaId() {
         }
 
-        public Id(String pacienteId, Integer hoja) {
+        public HojaId(String pacienteId, Integer hoja) {
             this.pacienteId = pacienteId;
             this.hoja = hoja;
         }
@@ -213,7 +215,7 @@ public class HistoriaClinica {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof Id id)) {
+            if (!(o instanceof HojaId id)) {
                 return false;
             }
             return Objects.equals(pacienteId, id.pacienteId) && Objects.equals(hoja, id.hoja);

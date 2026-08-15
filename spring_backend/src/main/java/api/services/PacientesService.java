@@ -34,10 +34,16 @@ import api.repositories.VistaPacienteRepository;
 import api.util.FormatoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -50,6 +56,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Pacientes: directorio, expediente (citas + cuenta + odontograma), abonos y
@@ -216,7 +224,7 @@ public class PacientesService {
 
     @Transactional(readOnly = true)
     public HclDto hclinica(String id, int hoja) {
-        return hclRepository.findById(new HistoriaClinica.Id(id, hoja))
+        return hclRepository.findById(new HistoriaClinica.HojaId(id, hoja))
                 .map(this::toHclDto)
                 .orElseGet(() -> hclVacia(id, hoja));
     }
@@ -258,9 +266,11 @@ public class PacientesService {
     public HclDto guardarHclinica(String id, int hoja, HclDto dto) {
         pacienteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado: " + id));
-        HistoriaClinica hc = hclRepository.findById(new HistoriaClinica.Id(id, hoja))
+        HistoriaClinica hc = hclRepository.findById(new HistoriaClinica.HojaId(id, hoja))
                 .orElseGet(() -> HistoriaClinica.builder().pacienteId(id).hoja(hoja).build());
         hc.setHoja(hoja);
+
+        verificarSello(id, hoja, hc, dto);
 
         hc.setSexo(dto.sexo());
         hc.setEstablecimiento(dto.establecimiento());
@@ -310,6 +320,207 @@ public class PacientesService {
         hc.setActualizadaEn(LocalDateTime.now());
 
         return toHclDto(hclRepository.saveAndFlush(hc));
+    }
+
+    /**
+     * Sello legal del Formulario 033: al iniciar el tratamiento (sesión 1 con
+     * datos registrados) la evaluación inicial (secciones 1-5, 7, 8) y la
+     * identidad de la hoja quedan inmutables; cada sesión que ya tiene contenido
+     * también. Un intento de modificar esos campos devuelve 409 CONFLICT.
+     */
+    private void verificarSello(String id, int hoja, HistoriaClinica hc, HclDto dto) {
+        List<HclDto.SesionTratamientoDto> previas = fromJson(hc.getSesiones(),
+                new TypeReference<List<HclDto.SesionTratamientoDto>>() {
+                });
+
+        boolean sellada = previas != null && previas.stream().anyMatch(s -> s.sesion() == 1 && sesionTieneDatos(s));
+        if (sellada) {
+            List<String> cambios = camposSelladosCambiados(hc, dto);
+            if (!cambios.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "NO SE PUEDE MODIFICAR LA HISTORIA CLÍNICA — TRATAMIENTO INICIADO. CAMPOS SELLADOS: "
+                                + String.join(", ", cambios));
+            }
+        }
+
+        if (previas == null || previas.isEmpty()) {
+            return;
+        }
+        List<String> sesiones = new ArrayList<>();
+        for (HclDto.SesionTratamientoDto previa : previas) {
+            if (!sesionTieneDatos(previa)) {
+                continue;
+            }
+            HclDto.SesionTratamientoDto entrante = dto.sesiones() == null ? null : dto.sesiones().stream()
+                    .filter(s -> s.sesion() == previa.sesion())
+                    .findFirst()
+                    .orElse(null);
+            if (!sesionIgual(previa, entrante)) {
+                sesiones.add(String.valueOf(previa.sesion()));
+            }
+        }
+        if (!sesiones.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "NO SE PUEDE MODIFICAR LA HISTORIA CLÍNICA — SESIONES YA REGISTRADAS: "
+                            + String.join(", ", sesiones));
+        }
+    }
+
+    /** Nombres de los campos de identidad/evaluación que el cliente intentó alterar. */
+    private List<String> camposSelladosCambiados(HistoriaClinica hc, HclDto dto) {
+        List<String> cambios = new ArrayList<>();
+
+        if (!strIgual(hc.getEstablecimiento(), dto.establecimiento())) {
+            cambios.add("ESTABLECIMIENTO");
+        }
+        if (!strIgual(hc.getSexo(), dto.sexo())) {
+            cambios.add("SEXO");
+        }
+        if (hc.isProgramado() != dto.programado()) {
+            cambios.add("TIPO DE CITA");
+        }
+        if (!strIgual(hc.getFechaApertura(), dto.fechaApertura())) {
+            cambios.add("FECHA DE APERTURA");
+        }
+        if (!strIgual(hc.getNumeroHoja(), dto.numeroHoja())) {
+            cambios.add("NÚMERO DE HOJA");
+        }
+        if (!strIgual(hc.getMotivoConsulta(), dto.motivoConsulta())) {
+            cambios.add("MOTIVO DE CONSULTA");
+        }
+        if (!strIgual(hc.getProblemaActual(), dto.problemaActual())) {
+            cambios.add("PROBLEMA ACTUAL");
+        }
+        if (hc.isAntAlergiaAntibiotico() != dto.alergiaAntibiotico()
+                || hc.isAntAlergiaAnestesia() != dto.alergiaAnestesia()
+                || hc.isAntHemorragias() != dto.hemorragias()
+                || hc.isAntVihSida() != dto.vihSida()
+                || hc.isAntTuberculosis() != dto.tuberculosis()
+                || hc.isAntAsma() != dto.asma()
+                || hc.isAntDiabetes() != dto.diabetes()
+                || hc.isAntHipertension() != dto.hipertension()
+                || hc.isAntEnfCardiaca() != dto.enfCardiaca()
+                || hc.isAntOtro() != dto.otroAntecedente()) {
+            cambios.add("ANTECEDENTES");
+        }
+        if (!strIgual(hc.getAntOtroTexto(), dto.otroAntecedenteTexto())) {
+            cambios.add("ANTECEDENTE OTRO");
+        }
+        if (!strIgual(hc.getParentesco(), dto.parentesco())) {
+            cambios.add("PARENTESCO");
+        }
+        if (!strIgual(hc.getPresionArterial(), dto.presionArterial())
+                || !Objects.equals(hc.getFrecuenciaCardiaca(), dto.frecuenciaCardiaca())
+                || !strIgual(hc.getTemperatura(), dto.temperatura())
+                || !Objects.equals(hc.getFrecuenciaRespiratoria(), dto.frecuenciaRespiratoria())) {
+            cambios.add("SIGNOS VITALES");
+        }
+        if (!jsonContenidoIgual(hc.getExamenRegiones(), dto.examenRegiones())) {
+            cambios.add("EXAMEN ESTOMATOGNÁTICO");
+        }
+        if (!Objects.equals(hc.getHigienePlaca(), dto.higienePlaca())
+                || !Objects.equals(hc.getHigieneCalculo(), dto.higieneCalculo())
+                || !strIgual(hc.getGingivitis(), dto.gingivitis())
+                || !strIgual(hc.getMalOclusion(), dto.malOclusion())
+                || !strIgual(hc.getFluorosis(), dto.fluorosis())
+                || !strIgual(hc.getEnfermedadPeriodontal(), dto.enfermedadPeriodontal())
+                || !jsonContenidoIgual(hc.getHigieneSextantes(), dto.higieneSextantes())) {
+            cambios.add("SALUD BUCAL");
+        }
+        if (!jsonContenidoIgual(hc.getIndicesCpo(), dto.indicesCpo())) {
+            cambios.add("ÍNDICES CPO-ceo");
+        }
+        return cambios;
+    }
+
+    /**
+     * Compara dos JSON (listas u objetos, ej. examen por regiones o índices CPO)
+     * por su CONTENIDO significativo, no por su estructura: los campos vacíos
+     * (null, texto en blanco) y los labels estructurales (region, sextante,
+     * sesion) no cuentan. Esto evita falsos positivos cuando el backend guardó
+     * un JSON vacío y el frontend reenvía la lista normalizada con defaults.
+     */
+    private boolean jsonContenidoIgual(String storedJson, Object incoming) {
+        JsonNode a = parseJsonNode(storedJson);
+        JsonNode b = parseJsonNode(toJson(incoming));
+        return Objects.equals(normalizarContenido(a), normalizarContenido(b));
+    }
+
+    private JsonNode parseJsonNode(String json) {
+        if (json == null || json.isBlank()) {
+            return null;
+        }
+        try {
+            return objectMapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    /** Etiquetas estructurales que identifican una fila; no son contenido clínico. */
+    private static final Set<String> ETIQUETAS_ESTRUCTURALES = Set.of("region", "sextante", "sesion");
+
+    /** Devuelve el subárbol con solo contenido significativo (null si no hay). */
+    private JsonNode normalizarContenido(JsonNode n) {
+        if (n == null || n.isNull()) {
+            return null;
+        }
+        if (n.isTextual()) {
+            String t = n.asText();
+            return (t == null || t.isBlank()) ? null : TextNode.valueOf(t);
+        }
+        if (n.isArray()) {
+            ArrayNode arr = objectMapper.createArrayNode();
+            for (JsonNode hijo : n) {
+                JsonNode norm = normalizarContenido(hijo);
+                if (norm != null) {
+                    arr.add(norm);
+                }
+            }
+            return arr.isEmpty() ? null : arr;
+        }
+        if (n.isObject()) {
+            ObjectNode obj = objectMapper.createObjectNode();
+            var it = n.fields();
+            while (it.hasNext()) {
+                var e = it.next();
+                if (ETIQUETAS_ESTRUCTURALES.contains(e.getKey())) {
+                    continue;
+                }
+                JsonNode norm = normalizarContenido(e.getValue());
+                if (norm != null) {
+                    obj.set(e.getKey(), norm);
+                }
+            }
+            return obj.isEmpty() ? null : obj;
+        }
+        return n;
+    }
+
+    private boolean sesionTieneDatos(HclDto.SesionTratamientoDto s) {
+        return s != null && !(blanco(s.fecha()) && blanco(s.diagnosticos()) && blanco(s.procedimientos())
+                && blanco(s.prescripciones()) && blanco(s.proximaCita()) && blanco(s.codigo()));
+    }
+
+    /** Igualdad leniente de sesión: entrada nula o sin datos equivale a sesión vacía. */
+    private boolean sesionIgual(HclDto.SesionTratamientoDto previa, HclDto.SesionTratamientoDto entrante) {
+        if (entrante == null) {
+            return false;
+        }
+        return strIgual(previa.fecha(), entrante.fecha())
+                && strIgual(previa.diagnosticos(), entrante.diagnosticos())
+                && strIgual(previa.procedimientos(), entrante.procedimientos())
+                && strIgual(previa.prescripciones(), entrante.prescripciones())
+                && strIgual(previa.proximaCita(), entrante.proximaCita())
+                && strIgual(previa.codigo(), entrante.codigo());
+    }
+
+    private boolean strIgual(String a, String b) {
+        return blanco(a) && blanco(b) || Objects.equals(a, b);
+    }
+
+    private boolean blanco(String s) {
+        return s == null || s.isBlank();
     }
 
     private HclDto toHclDto(HistoriaClinica hc) {

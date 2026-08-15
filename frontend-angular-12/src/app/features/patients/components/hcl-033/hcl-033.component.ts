@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Subscription, forkJoin } from 'rxjs';
+import { Subscription, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Patient, Tooth } from '../../../../core/models/patient.model';
 import {
   ANTECEDENTES_033,
@@ -7,6 +8,7 @@ import {
   Hcl,
   HclDiagnosticoCie,
   HclRegionExamen,
+  HclSesion,
   HojaResumen,
   REGIONES_ESTOMATOGNATICAS,
   SEXTO_SECTANTES,
@@ -41,6 +43,26 @@ export class Hcl033Component implements OnInit, OnDestroy {
   guardando = false;
   estado: EstadoGuardado = 'idle';
   mensaje: string | null = null;
+
+  /** Estado persistido de la última carga/guardado: de él derivan los sellos,
+   *  no del modelo vivo {@link hc}. Al iniciar el tratamiento (sesión 1 con
+   *  datos registrados) se sella la evaluación inicial y la identidad; cada
+   *  sesión que ya tiene contenido queda bloqueada. */
+  private snapshot: Hcl | null = null;
+
+  get sellada(): boolean {
+    const s1 = this.snapshot?.sesiones?.[0];
+    return !!s1 && this.sesionTieneDatos(s1);
+  }
+
+  sesionBloqueada(n: number): boolean {
+    const s = this.snapshot?.sesiones?.find(x => x.sesion === n);
+    return !!s && this.sesionTieneDatos(s);
+  }
+
+  sesionTieneDatos(s: HclSesion): boolean {
+    return !!(s.fecha || s.diagnosticos || s.procedimientos || s.prescripciones || s.proximaCita || s.codigo);
+  }
 
   get hojasSelector(): HojaResumen[] {
     const lista = this.hojas.length
@@ -99,16 +121,20 @@ export class Hcl033Component implements OnInit, OnDestroy {
     this.sub.add(
       forkJoin({
         hc: this.hclService.get(this.patient.id),
-        hojas: this.hclService.listarHojas(this.patient.id)
+        hojas: this.hclService.listarHojas(this.patient.id).pipe(
+          catchError(() => of<HojaResumen[]>([]))
+        )
       }).subscribe({
         next: r => {
           this.hc = hclCompleta(this.patient?.id ?? '', r.hc);
+          this.snapshot = hclCompleta(this.patient?.id ?? '', r.hc);
           this.hojas = r.hojas ?? [];
           this.cargando = false;
           this.cdr.markForCheck();
         },
         error: () => {
           this.hc = crearHclVacia(this.patient?.id ?? '');
+          this.snapshot = null;
           this.hojas = [];
           this.cargando = false;
           this.estado = 'error';
@@ -133,6 +159,7 @@ export class Hcl033Component implements OnInit, OnDestroy {
       this.hclService.getHoja(this.patient.id, n).subscribe({
         next: hc => {
           this.hc = hclCompleta(this.patient?.id ?? '', hc);
+          this.snapshot = hclCompleta(this.patient?.id ?? '', hc);
           this.cargando = false;
           this.estado = 'idle';
           this.cdr.markForCheck();
@@ -157,6 +184,7 @@ export class Hcl033Component implements OnInit, OnDestroy {
     }
     const siguiente = Math.max(1, ...this.hojas.map(h => h.hoja), this.hc.hoja) + 1;
     this.hc = crearHclVacia(this.patient.id, siguiente);
+    this.snapshot = null;
     if (!this.hojas.some(h => h.hoja === siguiente)) {
       this.hojas = [
         ...this.hojas,
@@ -188,6 +216,22 @@ export class Hcl033Component implements OnInit, OnDestroy {
     );
   }
 
+  /** Extrae el mensaje del backend cuando el guardado choca con un campo sellado. */
+  private conflictoMensaje(err: unknown): string | null {
+    const status = (err as { status?: number })?.status;
+    const body = (err as { error?: unknown })?.error;
+    if (status === 409) {
+      if (typeof body === 'string' && body.trim()) {
+        return body;
+      }
+      const message = (body as { message?: unknown })?.message;
+      if (typeof message === 'string' && message.trim()) {
+        return message;
+      }
+    }
+    return null;
+  }
+
   private tieneContenido(hc: Hcl): boolean {
     return !!(
       hc.establecimiento || hc.parentesco || hc.motivoConsulta || hc.problemaActual ||
@@ -215,16 +259,17 @@ export class Hcl033Component implements OnInit, OnDestroy {
       this.hclService.save(this.patient.id, this.hc).subscribe({
         next: hc => {
           this.hc = hclCompleta(this.patient?.id ?? '', hc);
+          this.snapshot = hclCompleta(this.patient?.id ?? '', hc);
           this.guardando = false;
           this.estado = 'ok';
           this.mensaje = 'HISTORIA CLÍNICA GUARDADA';
           this.refrescarHojas();
           this.cdr.markForCheck();
         },
-        error: () => {
+        error: (err: unknown) => {
           this.guardando = false;
           this.estado = 'error';
-          this.mensaje = 'NO SE PUDO GUARDAR — REVISE LA CONEXIÓN';
+          this.mensaje = this.conflictoMensaje(err) ?? 'NO SE PUDO GUARDAR — REVISE LA CONEXIÓN';
           this.cdr.markForCheck();
         }
       })
