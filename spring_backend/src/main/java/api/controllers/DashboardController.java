@@ -1,7 +1,6 @@
 package api.controllers;
 
 import api.dto.AppointmentDto;
-import api.dto.BoardTotalsDto;
 import api.dto.WaitingCheckInDto;
 import api.dto.WaitingPatientDto;
 import api.services.DashboardService;
@@ -41,13 +40,6 @@ public class DashboardController {
     @PostMapping("/waiting")
     public WaitingPatientDto checkIn(@RequestBody WaitingCheckInDto body) {
         return dashboardService.checkIn(body);
-    }
-
-    @GetMapping("/totals")
-    public BoardTotalsDto totals(
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
-        return dashboardService.totals(fecha == null ? LocalDate.now() : fecha);
     }
 
     @PostMapping("/call-waiting")

@@ -1,7 +1,6 @@
 package api.services;
 
 import api.dto.AppointmentDto;
-import api.dto.BoardTotalsDto;
 import api.dto.WaitingCheckInDto;
 import api.dto.WaitingPatientDto;
 import api.entities.Appointment;
@@ -91,16 +90,6 @@ public class DashboardService {
                 })
                 .orElse(0);
         return String.format("A-%03d", siguiente + 1);
-    }
-
-    @Transactional(readOnly = true)
-    public BoardTotalsDto totals(LocalDate fecha) {
-        List<Appointment> citas = appointmentRepository.findByFechaOrderByHoraAsc(fecha);
-        return new BoardTotalsDto(
-                citas.size(),
-                citas.stream().filter(a -> a.getEstado() == Appointment.Estado.ON_TIME).count(),
-                citas.stream().filter(a -> a.getEstado() == Appointment.Estado.DELAYED).count(),
-                citas.stream().filter(a -> a.getEstado() == Appointment.Estado.DONE).count());
     }
 
     /** Llamar al siguiente paciente en espera → pasa a "embarque" (boarding). */

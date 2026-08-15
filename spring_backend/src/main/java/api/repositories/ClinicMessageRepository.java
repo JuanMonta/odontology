@@ -14,7 +14,5 @@ public interface ClinicMessageRepository extends JpaRepository<ClinicMessage, St
 
     List<ClinicMessage> findByPrioridad(ClinicMessage.Prioridad prioridad);
 
-    long countByEstado(ClinicMessage.Estado estado);
-
     Optional<ClinicMessage> findFirstByOrderByCodigoDesc();
 }

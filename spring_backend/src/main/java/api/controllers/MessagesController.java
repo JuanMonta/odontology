@@ -26,11 +26,6 @@ public class MessagesController {
         return messagesService.list();
     }
 
-    @GetMapping("/unread-count")
-    public long unreadCount() {
-        return messagesService.unreadCount();
-    }
-
     @PostMapping
     public ClinicMessageDto send(@RequestBody MessageDraftDto draft) {
         return messagesService.send(draft);
