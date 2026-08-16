@@ -1,13 +1,15 @@
 package api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
  * Catálogos para el formulario de consultorios: opciones de unidad,
- * ubicación y equipos. Son la única fuente de verdad para los selects.
+ * ubicación, equipos y tratamientos. Son la única fuente de verdad para los selects.
  */
 public record ConsultorioCatalogosDto(
-        List<String> unidades,
-        List<String> ubicaciones,
-        List<EquipoCatalogoDto> equipos) {
+        @JsonProperty("unidades") List<String> unidades,
+        @JsonProperty("ubicaciones") List<String> ubicaciones,
+        @JsonProperty("equipos") List<EquipoCatalogoDto> equipos,
+        @JsonProperty("tratamientos") List<TratamientoSimpleDto> tratamientos) {
 }

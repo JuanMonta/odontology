@@ -23,11 +23,13 @@ import { Odontologo } from '../../../../core/models/odontologo.model';
 import {
   ConsultorioCatalogosService,
   ConsultorioCatalogos,
-  ConsultorioEquipoCatalogo
+  ConsultorioEquipoCatalogo,
+  TratamientoSimple
 } from '../../services/consultorio-catalogos.service';
 import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
 
 const EQUIPO_CATEGORIAS = ['MOBILIARIO', 'DIAGNÓSTICO', 'INSTRUMENTAL', 'CONSUMIBLES'] as const;
+const TRATAMIENTO_CATEGORIAS = ['DIAGNÓSTICO', 'PREVENCIÓN', 'RESTAURADORA', 'ENDODONCIA', 'PERIODONCIA', 'ORTODONCIA', 'CIRUGÍA', 'PRÓTESIS', 'ESTÉTICA', 'EMERGENCIA'] as const;
 
 @Component({
   selector: 'app-consultorio-form',
@@ -42,18 +44,21 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
 
   @ViewChild('pickerPanel', { static: false }) pickerPanel?: ElementRef<HTMLElement>;
   @ViewChild('staffPickerPanel', { static: false }) staffPickerPanel?: ElementRef<HTMLElement>;
+  @ViewChild('trtPickerPanel', { static: false }) trtPickerPanel?: ElementRef<HTMLElement>;
 
   statuses: ConsultorioStatus[] = ['operativo', 'mantenimiento', 'inactivo'];
 
   unidades$: Observable<string[]>;
   ubicaciones$: Observable<string[]>;
   equipos$: Observable<ConsultorioEquipoCatalogo[]>;
+  tratamientos$: Observable<TratamientoSimple[]>;
   odontologos$: Observable<Odontologo[]>;
 
   name = '';
   unit = '';
   location = '';
   equipment: string[] = [];
+  tratamientos: string[] = [];
   status: ConsultorioStatus = 'operativo';
   error = false;
 
@@ -68,19 +73,38 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
   staffQuery = '';
   staffCategory: string | null = null;
 
+  trtPickerOpen = false;
+  trtPickQuery = '';
+  trtPickCategory: string | null = null;
+
   private syncedId: string | null = null;
+  private catalogosLoaded = false;
 
   constructor(
-    catalogos: ConsultorioCatalogosService,
+    private readonly catalogos: ConsultorioCatalogosService,
     odontologos: OdontologosHttpService,
     private readonly cdr: ChangeDetectorRef
   ) {
     this.unidades$ = catalogos.catalogos$.pipe(map((c: ConsultorioCatalogos) => c.unidades));
     this.ubicaciones$ = catalogos.catalogos$.pipe(map((c: ConsultorioCatalogos) => c.ubicaciones));
     this.equipos$ = catalogos.catalogos$.pipe(map((c: ConsultorioCatalogos) => c.equipos));
+    this.tratamientos$ = catalogos.catalogos$.pipe(
+      map((c: ConsultorioCatalogos) => {
+        this.catalogosLoaded = c.tratamientos.length > 0;
+        return c.tratamientos;
+      })
+    );
     this.odontologos$ = odontologos.odontologos$.pipe(
       map(list => list.filter(o => o.status !== 'inactivo'))
     );
+  }
+
+  ngOnInit(): void {
+    // Fuerza refresh si los catálogos no tienen tratamientos (ej. backend tardó en arrancar)
+    if (!this.catalogosLoaded) {
+      console.log('[ConsultorioForm] Catálogos vacíos, forzando refresh...');
+      this.catalogos.refresh();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -90,6 +114,7 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
       this.unit = this.consultorio.unit;
       this.location = this.consultorio.location;
       this.equipment = [...this.consultorio.equipment];
+      this.tratamientos = [...this.consultorio.tratamientos];
       this.status = this.consultorio.status;
       this.assigned = this.consultorio.staff.map(s => s.code);
       this.error = false;
@@ -180,6 +205,75 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
     this.equipment = this.equipment.filter(n => n !== nombre);
   }
 
+  /* ==================== Picker de tratamientos ==================== */
+
+  trtCategorias(tratamientos: TratamientoSimple[]): { nombre: string; count: number }[] {
+    const presentes = new Map<string, number>();
+    for (const t of tratamientos) {
+      presentes.set(t.category, (presentes.get(t.category) ?? 0) + 1);
+    }
+    return TRATAMIENTO_CATEGORIAS
+      .filter(c => presentes.has(c))
+      .map(c => ({ nombre: c, count: presentes.get(c) ?? 0 }));
+  }
+
+  visibleTratamientos(tratamientos: TratamientoSimple[]): TratamientoSimple[] {
+    const q = this.trtPickQuery.trim().toUpperCase();
+    return tratamientos.filter(t => {
+      const matchesCategoria = !this.trtPickCategory || t.category === this.trtPickCategory;
+      const matchesBusqueda = !q || t.name.toUpperCase().includes(q) || t.code.toUpperCase().includes(q);
+      return matchesCategoria && matchesBusqueda;
+    });
+  }
+
+  trackTratamiento(_: number, t: TratamientoSimple): string {
+    return t.code;
+  }
+
+  trtSelected(code: string): boolean {
+    return this.tratamientos.includes(code);
+  }
+
+  openTrtPicker(): void {
+    this.trtPickerOpen = true;
+    this.trtPickQuery = '';
+    this.trtPickCategory = null;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => this.trtPickerPanel?.nativeElement.focus(), 0);
+  }
+
+  closeTrtPicker(): void {
+    if (!this.trtPickerOpen) {
+      return;
+    }
+    this.trtPickerOpen = false;
+    document.body.style.overflow = '';
+    this.cdr.markForCheck();
+  }
+
+  onTrtPickBackdrop(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeTrtPicker();
+    }
+  }
+
+  onTrtPickQuery(): void {
+    this.cdr.markForCheck();
+  }
+
+  trtPickToggle(t: TratamientoSimple): void {
+    const idx = this.tratamientos.indexOf(t.code);
+    if (idx === -1) {
+      this.tratamientos = [...this.tratamientos, t.code];
+    } else {
+      this.tratamientos = this.tratamientos.filter(c => c !== t.code);
+    }
+  }
+
+  removeTratamiento(code: string): void {
+    this.tratamientos = this.tratamientos.filter(c => c !== code);
+  }
+
   /* ==================== Picker de profesionales ==================== */
 
   staffCategorias(odontologos: Odontologo[]): { nombre: string; count: number }[] {
@@ -259,6 +353,7 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
       unit: this.unit,
       location: this.location,
       equipment: this.equipment,
+      tratamientos: this.tratamientos,
       status: this.status
     };
     this.saved.emit({ draft, assigned: [...this.assigned] });

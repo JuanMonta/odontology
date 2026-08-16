@@ -49,6 +49,8 @@ export class ConsultorioPanelComponent implements OnChanges {
   @Output() toggle = new EventEmitter<string>();
 
   editing = false;
+  /** Copia local del consultorio para edición, evita parpadeo por async pipe */
+  editingConsultorio: Consultorio | null = null;
 
   statusLabel = consultorioStatusLabel;
   staffStateLabel = staffStateLabel;
@@ -72,6 +74,7 @@ export class ConsultorioPanelComponent implements OnChanges {
 
     if (creatingChange && creatingChange.currentValue) {
       this.editing = false;
+      this.editingConsultorio = null;
       return;
     }
 
@@ -81,15 +84,19 @@ export class ConsultorioPanelComponent implements OnChanges {
       consultorioChange.previousValue?.id !== consultorioChange.currentValue?.id
     ) {
       this.editing = false;
+      this.editingConsultorio = null;
     }
   }
 
   startEdit(): void {
+    // Capturar el consultorio ANTES de activar edición para evitar parpadeo
+    this.editingConsultorio = this.consultorio;
     this.editing = true;
   }
 
   cancelEdit(): void {
     this.editing = false;
+    this.editingConsultorio = null;
   }
 
   closeForm(): void {
@@ -102,6 +109,7 @@ export class ConsultorioPanelComponent implements OnChanges {
 
   onSaved(ev: ConsultorioSaveEvent): void {
     this.editing = false;
+    this.editingConsultorio = null;
     this.saved.emit(ev);
   }
 }

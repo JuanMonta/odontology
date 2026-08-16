@@ -48,6 +48,7 @@ public class DashboardService {
     private final api.repositories.ConsultorioRepository consultorioRepository;
     private final api.repositories.OdontologoRepository odontologoRepository;
     private final api.repositories.TratamientoRepository tratamientoRepository;
+    private final api.repositories.ConsultorioTratamientoRepository ctRepository;
 
     /** Tolerancia por defecto (minutos) si la clínica no la configuró. */
     private static final int TOLERANCIA_DEFAULT_MINUTOS = 10;
@@ -220,7 +221,7 @@ public class DashboardService {
         LocalTime ahora = LocalTime.now();
         int duracion = duracionBloqueMinutos(paciente.getMotivo());
         AsignacionDisponible asignacion = asignarConsultorioYOdotontologoDisponible(
-                fecha, ahora, duracion);
+                fecha, ahora, duracion, paciente.getMotivo());
         Appointment cita = Appointment.builder()
                 .id(nextAppointmentId())
                 .fecha(fecha)
@@ -247,9 +248,32 @@ public class DashboardService {
         LocalTime hora = parseHora(dto.time());
         LocalDate fecha = LocalDate.now();
         String nombre = dto.patient().trim().toUpperCase();
-        int duracionMinutos = duracionBloqueMinutos(dto.treatment());
-        AsignacionDisponible asignacion = resolverConsultorioYOdotontologo(
-                dto.consultorio(), dto.dentist());
+        String tratamientoNombre = (dto.treatment() == null || dto.treatment().isBlank() ? "CONSULTA" : dto.treatment()).trim().toUpperCase();
+        int duracionMinutos = duracionBloqueMinutos(tratamientoNombre);
+
+        // Si el usuario eligió consultorio, validar que soporte el tratamiento
+        String consultorioNombre = dto.consultorio();
+        String odontologoNombre = dto.dentist();
+        if (consultorioNombre != null && !consultorioNombre.isBlank()) {
+            String consultorioCodigo = consultorioRepository.findAll().stream()
+                    .filter(c -> c.getNombre().equalsIgnoreCase(consultorioNombre.trim()))
+                    .findFirst()
+                    .map(api.entities.Consultorio::getCodigo)
+                    .orElse(null);
+            String tratamientoCodigo = tratamientoRepository.findAll().stream()
+                    .filter(t -> t.getNombre().equalsIgnoreCase(tratamientoNombre))
+                    .findFirst()
+                    .map(api.entities.Tratamiento::getCodigo)
+                    .orElse(null);
+            if (consultorioCodigo != null && tratamientoCodigo != null) {
+                if (!ctRepository.existsByConsultorioCodigoAndTratamientoCodigo(consultorioCodigo, tratamientoCodigo)) {
+                    throw new IllegalArgumentException(
+                            "El consultorio '" + consultorioNombre + "' no está configurado para el tratamiento '" + tratamientoNombre + "'");
+                }
+            }
+        }
+
+        AsignacionDisponible asignacion = resolverConsultorioYOdotontologo(consultorioNombre, odontologoNombre, tratamientoNombre);
         validarSinSolapamiento(fecha, hora, duracionMinutos, asignacion.consultorioCodigo(), asignacion.odontologoCodigo());
         Appointment cita = Appointment.builder()
                 .id(nextAppointmentId())
@@ -303,9 +327,9 @@ public class DashboardService {
     /**
      * Resuelve consultorio/odontólogo del draft: si el usuario los eligió por
      * nombre se buscan sus códigos; si vienen vacíos se asigna automáticamente
-     * el consultorio operativo con menos carga del día.
+     * el consultorio operativo con menos carga del día (que soporte el tratamiento).
      */
-    private AsignacionDisponible resolverConsultorioYOdotontologo(String consultorioNombre, String odontologoNombre) {
+    private AsignacionDisponible resolverConsultorioYOdotontologo(String consultorioNombre, String odontologoNombre, String tratamientoNombre) {
         boolean hayConsultorio = consultorioNombre != null && !consultorioNombre.isBlank();
         boolean hayOdontologo = odontologoNombre != null && !odontologoNombre.isBlank();
 
@@ -321,7 +345,7 @@ public class DashboardService {
                             .findFirst().orElse(null)
                     : null;
             if (consultorio == null && odontologo == null) {
-                return asignarConsultorioYOdotontologo(LocalDate.now());
+                return asignarConsultorioYOdotontologoDisponible(LocalDate.now(), LocalTime.now(), 45, tratamientoNombre);
             }
             return new AsignacionDisponible(
                     consultorio != null ? consultorio.getNombre() : consultorioNombre.trim().toUpperCase(),
@@ -329,7 +353,7 @@ public class DashboardService {
                     odontologo != null ? odontologo.getNombre() : odontologoNombre.trim().toUpperCase(),
                     odontologo != null ? odontologo.getCodigo() : null);
         }
-        return asignarConsultorioYOdotontologo(LocalDate.now());
+        return asignarConsultorioYOdotontologoDisponible(LocalDate.now(), LocalTime.now(), 45, tratamientoNombre);
     }
 
     /** Id de paciente existente cuyo nombre coincide (para ligar check-in â†’ boarding). */
@@ -340,23 +364,43 @@ public class DashboardService {
 
     /**
      * Asigna un consultorio/odontólogo que esté LIBRE en el instante dado para el
-     * bloque [hora, hora+duración]. Se recorre la agenda del día y se descartan
-     * las salas u odontólogos con solapamiento; entre los libres se elige el de
-     * menor carga. Si ninguno queda libre se lanza {@link SolapamientoException}
-     * (409) y el walk-in se queda en la sala de espera.
+     * bloque [hora, hora+duración] Y que soporte el tratamiento indicado.
+     * Se recorre la agenda del día y se descartan las salas u odontólogos con
+     * solapamiento; entre los libres se elige el de menor carga.
+     * Si ninguno queda libre se lanza {@link SolapamientoException} (409).
      */
     private AsignacionDisponible asignarConsultorioYOdotontologoDisponible(
-            LocalDate fecha, LocalTime hora, int duracionMinutos) {
+            LocalDate fecha, LocalTime hora, int duracionMinutos, String tratamientoNombre) {
         LocalTime horaFin = hora.plusMinutes(duracionMinutos);
+
+        // Consultorios operativos que SOPORTAN el tratamiento
         List<api.entities.Consultorio> disponibles = consultorioRepository
                 .findByEstado(api.entities.Consultorio.Estado.operativo);
         if (disponibles.isEmpty()) {
             throw new api.services.SolapamientoException(
-                    "No hay consultorio disponible en este momento (" + hora + ")");
+                    "No hay consultorio operativo en este momento (" + hora + ")");
+        }
+
+        // Filtrar por capacidad de tratamiento
+        List<String> consultoriosConCapacidad = ctRepository
+                .findByTratamientoCodigo(
+                        tratamientoRepository.findAll().stream()
+                                .filter(t -> t.getNombre().equalsIgnoreCase(tratamientoNombre.trim()))
+                                .findFirst()
+                                .map(api.entities.Tratamiento::getCodigo)
+                                .orElse(null))
+                .stream()
+                .map(api.entities.ConsultorioTratamiento::getConsultorioCodigo)
+                .toList();
+
+        if (consultoriosConCapacidad.isEmpty()) {
+            throw new api.services.SolapamientoException(
+                    "Ningún consultorio está configurado para el tratamiento '" + tratamientoNombre + "'");
         }
 
         List<Appointment> citasHoy = appointmentRepository.findByFechaOrderByHoraAsc(fecha);
         List<api.entities.Consultorio> candidatos = disponibles.stream()
+                .filter(c -> consultoriosConCapacidad.contains(c.getCodigo()))
                 .filter(c -> !haySolapamiento(fecha, hora, horaFin, c.getCodigo(), null))
                 .sorted(java.util.Comparator
                         .comparingLong((api.entities.Consultorio c) -> citasHoy.stream()
@@ -367,6 +411,11 @@ public class DashboardService {
                                 .count())
                         .thenComparing(api.entities.Consultorio::getCodigo))
                 .toList();
+
+        if (candidatos.isEmpty()) {
+            throw new api.services.SolapamientoException(
+                    "Sin consultorio compatible libre a las " + hora + " para '" + tratamientoNombre + "'");
+        }
 
         for (api.entities.Consultorio consultorio : candidatos) {
             api.entities.Odontologo odontologo = odontologoRepository
@@ -499,9 +548,9 @@ public class DashboardService {
     }
 
     /**
-     * Asigna el consultorio operativo con menos carga del día y un odontólogo
-     * activo que trabaje en él (o el odontólogo activo con menos carga).
-     * El snapshot visible usa el nombre del consultorio/odontólogo.
+     * Fallback genérico: asigna el consultorio operativo con menos carga del día
+     * y un odontólogo activo que trabaje en él. NO filtra por tratamiento.
+     * Solo se usa cuando no hay tratamiento o como último recurso.
      */
     private AsignacionDisponible asignarConsultorioYOdotontologo(LocalDate fecha) {
         List<api.entities.Consultorio> disponibles = consultorioRepository

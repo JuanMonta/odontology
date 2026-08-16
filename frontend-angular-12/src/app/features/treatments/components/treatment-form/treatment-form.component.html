@@ -55,10 +55,101 @@
     </div>
   </div>
 
+  <div class="field field--full">
+    <span class="field-label">CONSULTORIOS DISPONIBLES <span class="equip-count" *ngIf="consultorios.length">{{ consultorios.length }} ASIGNADOS</span></span>
+    <div class="equip-assigned" *ngIf="consultorios.length">
+      <ng-container *ngIf="consultorios$ | async as consultorios">
+        <label class="equip-chip is-on" *ngFor="let c of consultorios; trackBy: trackConsultorio" [class.is-on]="consSelected(c)">
+          <input
+            class="equip-input"
+            type="checkbox"
+            [checked]="consSelected(c)"
+            (change)="removeConsultorio(c)"
+            [attr.aria-label]="'Quitar ' + c"
+          />
+          <span class="equip-name">{{ c }}</span>
+        </label>
+      </ng-container>
+    </div>
+    <button
+      class="equip-add"
+      type="button"
+      (click)="openTrtPicker()"
+    >
+      + AGREGAR CONSULTORIOS
+    </button>
+  </div>
+
   <p class="form-error" *ngIf="error" role="alert">EL NOMBRE DEL TRATAMIENTO ES OBLIGATORIO</p>
 
   <div class="form-actions">
     <button class="btn-amber" type="submit">{{ creating ? 'CREAR TRATAMIENTO' : 'GUARDAR CAMBIOS' }}</button>
     <button class="btn-ghost" type="button" (click)="onCancel()">CANCELAR</button>
+  </div>
+
+  <!-- ==================== CATÁLOGO DE CONSULTORIOS (MODAL FLOTANTE) ==================== -->
+  <div
+    class="picker"
+    *ngIf="trtPickerOpen"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Catálogo de consultorios"
+  >
+    <div class="picker-backdrop" (click)="onTrtPickBackdrop($event)"></div>
+    <div
+      class="picker-panel"
+      #consPickerPanel
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="picker-head">
+        <span class="picker-title">CONSULTORIOS DISPONIBLES</span>
+        <span class="picker-total" *ngIf="consultorios.length">{{ consultorios.length }} ASIGNADOS</span>
+        <button class="picker-close" type="button" aria-label="Cerrar catálogo" (click)="closeTrtPicker()">
+          <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+            <path d="M3 3l10 10"></path>
+            <path d="M13 3L3 13"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="picker-search">
+        <svg class="picker-search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.5"></circle>
+          <path d="M10.5 10.5L14 14"></path>
+        </svg>
+        <input
+          class="picker-search-input"
+          type="text"
+          [ngModel]="trtPickQuery"
+          (ngModelChange)="trtPickQuery = $event; onTrtPickQuery()"
+          name="trtPickQuery"
+          placeholder="BUSCAR CONSULTORIO…"
+          autocomplete="off"
+        />
+      </div>
+
+      <ng-container *ngIf="consultorios$ | async as consultorios">
+        <div class="picker-body">
+          <label class="equip-chip" *ngFor="let item of visibleConsultorios(consultorios); trackBy: trackConsultorio" [class.is-on]="consSelected(item)">
+            <input
+              class="equip-input"
+              type="checkbox"
+              [checked]="consSelected(item)"
+              (change)="consPickToggle(item)"
+              [attr.aria-label]="item"
+            />
+            <span class="equip-lamp" aria-hidden="true"></span>
+            <span class="equip-name">{{ item }}</span>
+          </label>
+          <p class="picker-empty" *ngIf="!visibleConsultorios(consultorios).length" role="status">SIN RESULTADOS PARA LA BÚSQUEDA</p>
+        </div>
+      </ng-container>
+
+      <div class="picker-foot">
+        <button class="picker-confirm" type="button" (click)="closeTrtPicker()">CONFIRMAR</button>
+        <button class="btn-ghost" type="button" (click)="closeTrtPicker()">CANCELAR</button>
+      </div>
+    </div>
   </div>
 </form>

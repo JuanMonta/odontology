@@ -16,5 +16,7 @@ public interface TratamientoRepository extends JpaRepository<Tratamiento, String
 
     List<Tratamiento> findByActivoFalse();
 
+    List<Tratamiento> findByActivoTrueOrderByNombreAsc();
+
     Optional<Tratamiento> findFirstByOrderByCodigoDesc();
 }

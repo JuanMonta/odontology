@@ -30,7 +30,10 @@ public class ConsultoriosController {
 
     @GetMapping("/catalogos")
     public ConsultorioCatalogosDto catalogos() {
-        return consultoriosService.catalogos();
+        System.out.println("=== CONTROLLER: /catalogos endpoint hit ===");
+        var result = consultoriosService.catalogos();
+        System.out.println("=== CONTROLLER: tratamientos count = " + result.tratamientos().size());
+        return result;
     }
 
     @PostMapping
