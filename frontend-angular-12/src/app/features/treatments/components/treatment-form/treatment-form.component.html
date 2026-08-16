@@ -67,13 +67,16 @@
             (change)="removeConsultorio(c)"
             [attr.aria-label]="'Quitar ' + c"
           />
+          <span class="equip-lamp" aria-hidden="true"></span>
           <span class="equip-name">{{ c }}</span>
         </label>
       </ng-container>
+      <button class="equip-add" type="button" (click)="openTrtPicker()">+ AGREGAR</button>
     </div>
     <button
-      class="equip-add"
+      class="equip-add equip-add--empty"
       type="button"
+      *ngIf="!consultorios.length"
       (click)="openTrtPicker()"
     >
       + AGREGAR CONSULTORIOS
