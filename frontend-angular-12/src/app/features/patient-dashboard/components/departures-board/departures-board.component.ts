@@ -18,12 +18,16 @@ export class DeparturesBoardComponent {
   @Input() waitingPatients: string[] = [];
   @Output() markDone = new EventEmitter<string>();
   @Output() checkIn = new EventEmitter<string>();
+  @Output() noShow = new EventEmitter<string>();
+  @Output() cancel = new EventEmitter<string>();
 
   statusLabel(status: Appointment['status']): string {
     const labels: Record<Appointment['status'], string> = {
-      'on-time': 'A TIEMPO',
+      'on-time': 'PROGRAMADA',
+      arrived: 'LLEGÓ',
       boarding: 'EN CONSULTORIO',
-      delayed: 'RETRASADA',
+      delayed: 'CON RETRASO',
+      'no-show': 'NO ASISTIÓ',
       cancelled: 'CANCELADA',
       done: 'ATENDIDA'
     };

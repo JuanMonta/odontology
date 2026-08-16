@@ -6,6 +6,9 @@
           <span class="btn-plus" aria-hidden="true"></span>
           NUEVA CITA
         </button>
+        <button class="btn-ghost" type="button" (click)="onCloseDay()">
+          CIERRE DE DÍA
+        </button>
       </div>
     </div>
     <form class="new-form" *ngIf="creating" (ngSubmit)="onNewAppointment()" novalidate>
@@ -82,6 +85,8 @@
         [waitingPatients]="(waitingNames$ | async) ?? []"
         (markDone)="onMarkDone($event)"
         (checkIn)="onCheckIn($event)"
+        (noShow)="onNoShow($event)"
+        (cancel)="onCancel($event)"
       ></app-departures-board>
     </div>
 

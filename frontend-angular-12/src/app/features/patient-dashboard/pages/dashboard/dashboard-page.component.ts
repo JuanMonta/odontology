@@ -102,6 +102,18 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.mock.markDone(id);
   }
 
+  onNoShow(id: string): void {
+    this.mock.markNoShow(id);
+  }
+
+  onCancel(id: string): void {
+    this.mock.markCancelled(id);
+  }
+
+  onCloseDay(): void {
+    this.mock.closeDay();
+  }
+
   onWalkIn(data: { nombre: string; motivo: string }): void {
     this.mock.checkIn({ pacienteNombre: data.nombre, motivo: data.motivo });
   }
@@ -184,7 +196,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   private computeTotals(list: Appointment[]): BoardTotals {
     return {
       total: list.length,
-      waiting: list.filter(a => a.status === 'on-time').length,
+      waiting: list.filter(a => a.status === 'arrived' || a.status === 'delayed').length,
       delayed: list.filter(a => a.status === 'delayed').length,
       done: list.filter(a => a.status === 'done').length
     };

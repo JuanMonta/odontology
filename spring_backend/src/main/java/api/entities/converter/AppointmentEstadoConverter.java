@@ -18,8 +18,10 @@ public class AppointmentEstadoConverter implements AttributeConverter<Appointmen
         }
         return switch (attribute) {
             case ON_TIME -> "on-time";
-            case BOARDING -> "boarding";
+            case ARRIVED -> "arrived";
             case DELAYED -> "delayed";
+            case BOARDING -> "boarding";
+            case NO_SHOW -> "no-show";
             case CANCELLED -> "cancelled";
             case DONE -> "done";
         };
@@ -32,8 +34,10 @@ public class AppointmentEstadoConverter implements AttributeConverter<Appointmen
         }
         return switch (dbData) {
             case "on-time" -> Appointment.Estado.ON_TIME;
-            case "boarding" -> Appointment.Estado.BOARDING;
+            case "arrived" -> Appointment.Estado.ARRIVED;
             case "delayed" -> Appointment.Estado.DELAYED;
+            case "boarding" -> Appointment.Estado.BOARDING;
+            case "no-show" -> Appointment.Estado.NO_SHOW;
             case "cancelled" -> Appointment.Estado.CANCELLED;
             case "done" -> Appointment.Estado.DONE;
             default -> throw new IllegalArgumentException("Estado de cita de tablero desconocido: " + dbData);

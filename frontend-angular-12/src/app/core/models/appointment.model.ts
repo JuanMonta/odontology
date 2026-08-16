@@ -1,4 +1,11 @@
-export type AppointmentStatus = 'on-time' | 'boarding' | 'delayed' | 'cancelled' | 'done';
+export type AppointmentStatus =
+  | 'on-time'    // programada
+  | 'arrived'    // llegó a tiempo (check-in)
+  | 'delayed'    // llegó tarde
+  | 'boarding'   // en consultorio
+  | 'no-show'    // no asistió
+  | 'cancelled'  // cancelada
+  | 'done';      // atendida
 
 export interface Appointment {
   id: string;

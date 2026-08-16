@@ -22,8 +22,17 @@ export class DashboardHttpService {
     this.refresh();
     status.reconnected$.subscribe(() => this.refresh());
     status.onlineTick$
-      .pipe(filter(() => this.appointmentsSubject.getValue().length === 0))
+      .pipe(
+        filter(() => this.hasLiveAppointments())
+      )
       .subscribe(() => this.refresh());
+  }
+
+  /** ¿Hay citas en juego cuyo estado puede cambiar por el reloj (on-time, arrived, delayed, boarding)? */
+  private hasLiveAppointments(): boolean {
+    return this.appointmentsSubject
+      .getValue()
+      .some(a => ['on-time', 'arrived', 'delayed', 'boarding'].includes(a.status));
   }
 
   refresh(): void {
@@ -47,10 +56,15 @@ export class DashboardHttpService {
     const list = this.appointmentsSubject.getValue();
     return {
       total: list.length,
-      waiting: list.filter(a => a.status === 'on-time').length,
+      waiting: list.filter(a => a.status === 'arrived' || a.status === 'delayed').length,
       delayed: list.filter(a => a.status === 'delayed').length,
       done: list.filter(a => a.status === 'done').length
     };
+  }
+
+  /** Cierre de día: marca no-show todas las on-time restantes del backend. */
+  closeDay(): void {
+    this.http.post(`${API_BASE}/dashboard/close-day`, null).subscribe(() => this.refresh());
   }
 
   /** Llamar al siguiente paciente en espera → pasa a "en consultorio" (boarding). */
@@ -63,11 +77,26 @@ export class DashboardHttpService {
     this.http.patch<Appointment>(`${API_BASE}/dashboard/appointments/${id}/done`, null).subscribe(() => this.refresh());
   }
 
-  /** Registrar una nueva cita en el tablero (inserción local optimista, ordenada por hora). */
+  /** Marcar la cita como cancelada. */
+  markCancelled(id: string): void {
+    this.http.patch<Appointment>(`${API_BASE}/dashboard/appointments/${id}/cancel`, null).subscribe(() => this.refresh());
+  }
+
+  /** Marcar la cita como no-show (no asistió). */
+  markNoShow(id: string): void {
+    this.http.patch<Appointment>(`${API_BASE}/dashboard/appointments/${id}/no-show`, null).subscribe(() => this.refresh());
+  }
+
+  /** Registrar una nueva cita programada para hoy (persistida en el backend). */
   addAppointment(appointment: Appointment): void {
-    const list = this.appointmentsSubject.getValue();
-    this.appointmentsSubject.next(
-      [...list, appointment].sort((a, b) => a.time.localeCompare(b.time))
-    );
+    this.http
+      .post<Appointment>(`${API_BASE}/dashboard/appointments`, {
+        time: appointment.time,
+        patient: appointment.patient,
+        treatment: appointment.treatment,
+        consultorio: appointment.consultorio,
+        dentist: appointment.dentist
+      })
+      .subscribe(() => this.refresh());
   }
 }

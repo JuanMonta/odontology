@@ -1,5 +1,6 @@
 package api.controllers;
 
+import api.dto.AppointmentDraftDto;
 import api.dto.AppointmentDto;
 import api.dto.WaitingCheckInDto;
 import api.dto.WaitingPatientDto;
@@ -49,8 +50,29 @@ public class DashboardController {
         return dashboardService.callWaitingPatient(fecha == null ? LocalDate.now() : fecha);
     }
 
+    @PostMapping("/appointments")
+    public AppointmentDto createAppointment(@RequestBody AppointmentDraftDto draft) {
+        return dashboardService.createAppointment(draft);
+    }
+
     @PatchMapping("/appointments/{id}/done")
     public AppointmentDto markDone(@PathVariable String id) {
         return dashboardService.markDone(id);
+    }
+
+    @PatchMapping("/appointments/{id}/cancel")
+    public AppointmentDto markCancelled(@PathVariable String id) {
+        return dashboardService.markCancelled(id);
+    }
+
+    @PatchMapping("/appointments/{id}/no-show")
+    public AppointmentDto markNoShow(@PathVariable String id) {
+        return dashboardService.markNoShow(id);
+    }
+
+    /** Cierre de día: auto-marca no-show todas las on-time restantes. */
+    @PostMapping("/close-day")
+    public int closeDay() {
+        return dashboardService.closeDay(LocalDate.now());
     }
 }
