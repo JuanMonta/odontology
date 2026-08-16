@@ -10,7 +10,7 @@
 
   <div class="dir-list" *ngIf="treatments.length; else empty">
     <button
-      *ngFor="let t of treatments"
+      *ngFor="let t of visibleTreatments"
       class="dir-row"
       [class.is-selected]="t.id === selectedId"
       type="button"
@@ -35,4 +35,13 @@
       <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
     </div>
   </ng-template>
+
+  <app-pagination
+    *ngIf="treatments.length > pageSize"
+    [total]="treatments.length"
+    [page]="page"
+    [pageSize]="pageSize"
+    (pageChange)="goToPage($event)"
+    (pageSizeChange)="setPageSize($event)"
+  ></app-pagination>
 </div>

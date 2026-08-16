@@ -8,7 +8,11 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { WaitingPatient } from '../../../../core/models/appointment.model';
+import { TreatmentsHttpService } from '../../../treatments/services/treatments-http.service';
+import { PaginatedListComponent } from '../../../../shared/components/pagination/paginated-list.component';
 
 @Component({
   selector: 'app-waiting-panel',
@@ -16,16 +20,32 @@ import { WaitingPatient } from '../../../../core/models/appointment.model';
   styleUrls: ['./waiting-panel.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class WaitingPanelComponent {
+export class WaitingPanelComponent extends PaginatedListComponent {
   @Input() waiting: WaitingPatient[] = [];
   @Output() callNext = new EventEmitter<void>();
   @Output() addWalkIn = new EventEmitter<{ nombre: string; motivo: string }>();
 
   @ViewChild('walkInPanel', { static: false }) walkInPanel?: ElementRef<HTMLElement>;
 
+  treatmentOptions$: Observable<string[]>;
+
   walkInOpen = false;
   walkInNombre = '';
   walkInMotivo = '';
+  walkInTratamiento = '';
+
+  constructor(treatments: TreatmentsHttpService) {
+    super();
+    this.treatmentOptions$ = treatments.treatments$.pipe(map(list => list.map(t => t.name)));
+  }
+
+  protected get totalItems(): number {
+    return this.waiting.length;
+  }
+
+  get visibleWaiting(): WaitingPatient[] {
+    return this.slice(this.waiting) as WaitingPatient[];
+  }
 
   trackById(_: number, p: WaitingPatient): string {
     return p.id;
@@ -35,6 +55,7 @@ export class WaitingPanelComponent {
     this.walkInOpen = true;
     this.walkInNombre = '';
     this.walkInMotivo = '';
+    this.walkInTratamiento = '';
     setTimeout(() => this.walkInPanel?.nativeElement.focus(), 0);
   }
 
@@ -57,10 +78,12 @@ export class WaitingPanelComponent {
   }
 
   onWalkInSubmit(): void {
-    if (!this.walkInNombre.trim() || !this.walkInMotivo.trim()) return;
+    if (!this.walkInNombre.trim()) return;
+    const motivo = this.walkInTratamiento.trim() || this.walkInMotivo.trim();
+    if (!motivo) return;
     this.addWalkIn.emit({
       nombre: this.walkInNombre.trim(),
-      motivo: this.walkInMotivo.trim()
+      motivo
     });
     this.closeWalkIn();
   }

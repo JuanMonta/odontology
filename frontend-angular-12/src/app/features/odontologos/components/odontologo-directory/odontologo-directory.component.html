@@ -9,7 +9,7 @@
 
   <div class="dir-list" *ngIf="odontologos.length; else empty">
     <button
-      *ngFor="let o of odontologos"
+      *ngFor="let o of visibleOdontologos"
       class="dir-row"
       [class.is-selected]="o.id === selectedId"
       [class.is-inactive]="o.status === 'inactivo'"
@@ -38,4 +38,13 @@
       <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
     </div>
   </ng-template>
+
+  <app-pagination
+    *ngIf="odontologos.length > pageSize"
+    [total]="odontologos.length"
+    [page]="page"
+    [pageSize]="pageSize"
+    (pageChange)="goToPage($event)"
+    (pageSizeChange)="setPageSize($event)"
+  ></app-pagination>
 </div>

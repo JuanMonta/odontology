@@ -17,7 +17,7 @@
 
   <div class="board-rows" role="table" aria-label="Citas del día">
     <div
-      *ngFor="let a of appointments; trackBy: trackById"
+      *ngFor="let a of visibleAppointments; trackBy: trackById"
       class="row"
       [class.row--live]="a.status === 'boarding'"
       [class.row--arrived]="a.status === 'arrived'"
@@ -74,4 +74,13 @@
       </div>
     </div>
   </div>
+
+  <app-pagination
+    *ngIf="appointments.length > pageSize"
+    [total]="appointments.length"
+    [page]="page"
+    [pageSize]="pageSize"
+    (pageChange)="goToPage($event)"
+    (pageSizeChange)="setPageSize($event)"
+  ></app-pagination>
 </section>

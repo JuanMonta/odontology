@@ -42,7 +42,7 @@ export class AuthErrorInterceptor implements HttpInterceptor {
         if (err.status === 401 && esApi && !esLogin && sesionActiva && !enLogin) {
           return this.relogin(req, err);
         }
-        return throwError(() => err);
+        return throwError(err);
       })
     );
   }
@@ -67,7 +67,7 @@ export class AuthErrorInterceptor implements HttpInterceptor {
         this.auth.logout();
         // Recarga completa: descarta cachés de singleton y cierra el WebSocket.
         window.location.assign('/login');
-        return throwError(() => err);
+        return throwError(err);
       })
     );
   }

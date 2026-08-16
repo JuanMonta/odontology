@@ -11,7 +11,7 @@
   <div class="dir-list">
     <ng-container *ngIf="patients.length; else empty">
       <div
-        *ngFor="let p of patients; trackBy: trackById"
+        *ngFor="let p of visiblePatients; trackBy: trackById"
         class="dir-row"
         [class.is-selected]="p.id === selectedId"
         role="button"
@@ -38,4 +38,13 @@
       </div>
     </ng-template>
   </div>
+
+  <app-pagination
+    *ngIf="patients.length > pageSize"
+    [total]="patients.length"
+    [page]="page"
+    [pageSize]="pageSize"
+    (pageChange)="goToPage($event)"
+    (pageSizeChange)="setPageSize($event)"
+  ></app-pagination>
 </div>

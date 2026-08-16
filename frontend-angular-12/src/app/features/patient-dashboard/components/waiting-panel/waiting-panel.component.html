@@ -11,7 +11,7 @@
 
   <div class="panel-list">
     <div
-      *ngFor="let p of waiting; trackBy: trackById"
+      *ngFor="let p of visibleWaiting; trackBy: trackById"
       class="ticket"
     >
       <span class="ticket-number">{{ p.ticket }}</span>
@@ -22,6 +22,16 @@
       <span class="ticket-time">{{ p.arrivedAt }}</span>
     </div>
   </div>
+
+  <app-pagination
+    *ngIf="waiting.length > pageSize"
+    [total]="waiting.length"
+    [page]="page"
+    [pageSize]="pageSize"
+    [compact]="true"
+    (pageChange)="goToPage($event)"
+    (pageSizeChange)="setPageSize($event)"
+  ></app-pagination>
 
   <div class="panel-actions">
     <button class="call-btn" (click)="callNext.emit()" [disabled]="waiting.length === 0">
@@ -78,6 +88,13 @@
           aria-label="Motivo de la visita"
         />
       </div>
+      <app-autocomplete
+        label="TRATAMIENTO (OPCIONAL)"
+        [options]="(treatmentOptions$ | async) ?? []"
+        [value]="walkInTratamiento"
+        (valueChange)="walkInTratamiento = $event"
+        placeholder="LIMPIEZA Y PROFILAXIS"
+      ></app-autocomplete>
     </div>
 
     <div class="picker-foot">

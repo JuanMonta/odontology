@@ -1,0 +1,94 @@
+:host {
+  display: flex;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 10px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+:host.is-compact .pager {
+  justify-content: center;
+  padding: 8px 12px;
+}
+
+.pager-summary {
+  font-family: var(--font-flap);
+  font-size: 0.68em;
+  letter-spacing: 0.14em;
+  color: var(--flap-dim);
+  white-space: nowrap;
+}
+
+.pager-pages {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pager-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  font-family: var(--font-flap);
+  font-size: 0.8em;
+  color: var(--steel-300);
+  cursor: pointer;
+  transition: background 0.16s var(--ease-out), color 0.16s var(--ease-out), border-color 0.16s var(--ease-out);
+}
+
+.pager-btn:hover:not(:disabled) {
+  background: rgba(255, 176, 32, 0.1);
+  border-color: rgba(255, 176, 32, 0.35);
+  color: var(--flap-ink);
+}
+
+.pager-btn.is-active {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: #1a1d1f;
+  font-weight: 700;
+}
+
+.pager-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.pager-arrow {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.pager-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-flap);
+  font-size: 0.66em;
+  letter-spacing: 0.14em;
+  color: var(--flap-dim);
+}
+
+.pager-size select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--steel-200);
+  font-family: var(--font-flap);
+  font-size: 0.9em;
+  padding: 3px 6px;
+  cursor: pointer;
+}
