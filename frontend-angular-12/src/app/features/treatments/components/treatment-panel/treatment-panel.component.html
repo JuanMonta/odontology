@@ -82,18 +82,23 @@
 
       <div class="section">
         <span class="section-label">CONSULTORIOS DISPONIBLES</span>
-        <ul class="equip-list" *ngIf="treatment.consultorios.length; else noCons">
-          <li class="equip-item" *ngFor="let c of treatment.consultorios">
-            <span class="equip-lamp" aria-hidden="true"></span>
-            <span class="equip-name">{{ c }}</span>
-          </li>
-        </ul>
-        <ng-template #noCons>
-          <div class="staff-empty">
-            <span class="staff-empty-lamp" aria-hidden="true"></span>
-            <span class="staff-empty-text">NO DISPONIBLE EN NINGÚN CONSULTORIO</span>
+        <ng-container *ngIf="consultorios$ | async as catalog">
+          <div class="cons-wrap" *ngIf="consultoriosDeLaFicha(catalog).length; else noCons">
+            <label class="cons-chip" *ngFor="let c of consultoriosDeLaFicha(catalog); trackBy: consTrack">
+              <span class="cons-chip-lamp" aria-hidden="true"></span>
+              <span class="cons-chip-main">
+                <span class="cons-chip-name">{{ c.name }}</span>
+                <span class="cons-chip-sub">{{ c.code }}</span>
+              </span>
+            </label>
           </div>
-        </ng-template>
+          <ng-template #noCons>
+            <div class="staff-empty">
+              <span class="staff-empty-lamp" aria-hidden="true"></span>
+              <span class="staff-empty-text">NO DISPONIBLE EN NINGÚN CONSULTORIO</span>
+            </div>
+          </ng-template>
+        </ng-container>
       </div>
 
       <div class="section">

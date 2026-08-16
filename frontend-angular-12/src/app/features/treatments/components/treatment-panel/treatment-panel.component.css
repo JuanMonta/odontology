@@ -173,6 +173,59 @@
   color: var(--steel-200);
 }
 
+.cons-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.cons-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  cursor: default;
+  transition: border-color 0.18s var(--ease-out);
+}
+
+.cons-chip:hover {
+  border-color: rgba(255, 176, 32, 0.45);
+}
+
+.cons-chip-lamp {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.45);
+  flex-shrink: 0;
+}
+
+.cons-chip-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cons-chip-name {
+  font-family: var(--font-flap);
+  font-size: 0.74em;
+  letter-spacing: 0.08em;
+  color: var(--flap-ink);
+  line-height: 1.25;
+}
+
+.cons-chip-sub {
+  font-family: var(--font-flap);
+  font-size: 0.58em;
+  letter-spacing: 0.12em;
+  color: var(--steel-500);
+  margin-top: 2px;
+}
+
 /* ============ Vacíos ============ */
 .staff-empty {
   display: flex;
