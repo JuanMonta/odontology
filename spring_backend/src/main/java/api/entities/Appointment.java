@@ -32,7 +32,7 @@ import java.time.LocalTime;
 @Builder
 public class Appointment {
 
-    public enum Estado { ON_TIME, BOARDING, DELAYED, CANCELLED, DONE }
+    public enum Estado { ON_TIME, ARRIVED, DELAYED, BOARDING, NO_SHOW, CANCELLED, DONE }
 
     @Id
     @Column(name = "id", length = 8)
@@ -59,8 +59,14 @@ public class Appointment {
     @Column(name = "consultorio", nullable = false, length = 16)
     private String consultorio;
 
+    @Column(name = "consultorio_codigo", length = 12)
+    private String consultorioCodigo;
+
     @Column(name = "odontologo", nullable = false, length = 60)
     private String odontologo;
+
+    @Column(name = "odontologo_codigo", length = 12)
+    private String odontologoCodigo;
 
     @Convert(converter = AppointmentEstadoConverter.class)
     @Column(name = "estado", nullable = false)
