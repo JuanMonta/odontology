@@ -37,6 +37,10 @@ export class TreatmentsHttpService {
       .subscribe(() => this.refresh());
   }
 
+  snapshot(): Treatment[] {
+    return this.subjects.getValue();
+  }
+
   refresh(): void {
     this.http.get<Treatment[]>(`${API_BASE}/tratamientos`).subscribe(list => this.subjects.next(list));
   }

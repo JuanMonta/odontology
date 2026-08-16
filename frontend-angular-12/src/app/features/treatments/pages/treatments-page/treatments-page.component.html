@@ -41,50 +41,20 @@
     <section class="directory" aria-label="Catálogo de tratamientos">
       <app-treatment-directory
         [treatments]="(treatments$ | async) ?? []"
-        [selectedId]="selected?.id ?? null"
+        [selectedId]="selectedId"
         (select)="onSelect($event)"
       ></app-treatment-directory>
     </section>
 
     <aside class="detail" aria-label="Ficha de tratamiento">
-      <div class="treat-head" *ngIf="selected && !creating">
-        <div class="treat-head-main">
-          <span class="treat-code">{{ selected.code }}</span>
-          <h3 class="treat-name">{{ selected.name }}</h3>
-        </div>
-        <div class="treat-stat" aria-label="Pacientes con este tratamiento">
-          <span class="treat-stat-num">{{ selected.usage }}</span>
-          <span class="treat-stat-lbl">EN PACIENTES</span>
-        </div>
-        <button class="treat-close" type="button" aria-label="Cerrar ficha" (click)="onClosePanel()">
-          <span class="treat-close-x" aria-hidden="true"></span>
-        </button>
-      </div>
-
-      <div class="treat-head" *ngIf="creating">
-        <div class="treat-head-main">
-          <span class="treat-code">NUEVO</span>
-          <h3 class="treat-name">REGISTRO DE TRATAMIENTO</h3>
-        </div>
-        <button class="treat-close" type="button" aria-label="Cancelar registro" (click)="cancelCreate()">
-          <span class="treat-close-x" aria-hidden="true"></span>
-        </button>
-      </div>
-
-      <div class="treat-body" *ngIf="selected || creating">
-        <app-treatment-form
-          [treatment]="selected"
-          [creating]="creating"
-          (saved)="onSaved($event)"
-          (cancel)="cancelCreate()"
-        ></app-treatment-form>
-      </div>
-
-      <div class="detail-empty" *ngIf="!selected && !creating">
-        <span class="dir-empty-lamp" aria-hidden="true"></span>
-        <p>SELECCIONA UN TRATAMIENTO</p>
-        <p class="dir-empty-hint">O CREA UNO NUEVO DESDE EL BOTÓN AMBAR</p>
-      </div>
+      <app-treatment-panel
+        [treatment]="(selected$ | async) ?? null"
+        [creating]="creating"
+        (close)="onClosePanel()"
+        (cancel)="cancelCreate()"
+        (saved)="onSaved($event)"
+        (toggle)="onToggleActive($event)"
+      ></app-treatment-panel>
     </aside>
   </div>
 </div>

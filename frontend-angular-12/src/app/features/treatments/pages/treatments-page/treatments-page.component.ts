@@ -20,12 +20,14 @@ type CategoryFilter = TreatmentCategory | 'all';
 export class TreatmentsPageComponent implements OnInit {
   categories = TREATMENT_CATEGORIES;
   treatments$: Observable<Treatment[]>;
+  selected$: Observable<Treatment | null>;
 
-  selected: Treatment | null = null;
+  selectedId: string | null = null;
   creating = false;
 
   private readonly search$ = new BehaviorSubject<string>('');
   private readonly category$ = new BehaviorSubject<CategoryFilter>('all');
+  private readonly selectedId$ = new BehaviorSubject<string | null>(null);
 
   constructor(
     private service: TreatmentsHttpService,
@@ -46,6 +48,9 @@ export class TreatmentsPageComponent implements OnInit {
         });
       })
     );
+    this.selected$ = combineLatest([this.service.treatments$, this.selectedId$]).pipe(
+      map(([list, id]) => (id ? list.find(t => t.id === id) ?? null : null))
+    );
   }
 
   ngOnInit(): void {
@@ -65,21 +70,27 @@ export class TreatmentsPageComponent implements OnInit {
   }
 
   onSelect(treatment: Treatment): void {
-    this.selected = treatment;
+    this.selectedId = treatment.id;
+    this.selectedId$.next(treatment.id);
     this.creating = false;
   }
 
   startCreate(): void {
     this.creating = true;
-    this.selected = null;
+    this.selectedId = null;
+    this.selectedId$.next(null);
   }
 
   onSaved(draft: TreatmentDraft): void {
-    if (this.selected) {
-      this.service.updateTreatment({ ...this.selected, ...draft });
+    if (this.selectedId) {
+      const current = this.service.snapshot().find(t => t.id === this.selectedId);
+      if (current) {
+        this.service.updateTreatment({ ...current, ...draft });
+      }
     } else {
       this.service.addTreatment(draft).subscribe(created => {
-        this.selected = created;
+        this.selectedId = created.id;
+        this.selectedId$.next(created.id);
       });
     }
     this.creating = false;
@@ -91,7 +102,8 @@ export class TreatmentsPageComponent implements OnInit {
   }
 
   onClosePanel(): void {
-    this.selected = null;
+    this.selectedId = null;
+    this.selectedId$.next(null);
   }
 
   onToggleActive(id: string): void {
