@@ -6,6 +6,7 @@ import {
   TreatmentCategory,
   TreatmentDraft
 } from '../../../../core/models/treatment.model';
+import { Consultorio } from '../../../../core/models/consultorio.model';
 import { TREATMENT_CATEGORIES } from '../../services/treatments-http.service';
 import { borradorKey } from '../../../../core/auth/session-local-storage';
 import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
@@ -47,7 +48,7 @@ export class TreatmentFormComponent implements OnChanges {
   consultorios: string[] = [];
   error = false;
 
-  consultorios$: Observable<string[]>;
+  consultorios$: Observable<Consultorio[]>;
   trtPickerOpen = false;
   trtPickQuery = '';
   trtPickCategory: string | null = null;
@@ -57,7 +58,11 @@ export class TreatmentFormComponent implements OnChanges {
     private readonly cdr: ChangeDetectorRef
   ) {
     this.consultorios$ = consultoriosService.consultorios$.pipe(
-      map((list: any[]) => list.filter((c: any) => c.status === 'operativo').map((c: any) => c.code))
+      map((list: Consultorio[]) =>
+        list
+          .filter((c: Consultorio) => c.status !== 'inactivo')
+          .sort((a: Consultorio, b: Consultorio) => a.name.localeCompare(b.name))
+      )
     );
   }
 
@@ -154,24 +159,25 @@ export class TreatmentFormComponent implements OnChanges {
 
   /* ==================== Picker de consultorios ==================== */
 
-  trtCategorias(consultorios: string[]): { nombre: string; count: number }[] {
-    return [{ nombre: 'TODOS', count: consultorios.length }];
-  }
-
-  visibleConsultorios(consultorios: string[]): string[] {
+  visibleConsultorios(consultorios: Consultorio[]): Consultorio[] {
     const q = this.trtPickQuery.trim().toUpperCase();
-    return consultorios.filter(c => !q || c.includes(q));
+    return consultorios.filter(c => !q || c.name.toUpperCase().includes(q) || c.code.toUpperCase().includes(q));
   }
 
-  trackConsultorio(_: number, c: string): string {
-    return c;
+  trackConsultorio(_: number, c: Consultorio): string {
+    return c.code;
   }
 
   consSelected(code: string): boolean {
     return this.consultorios.includes(code);
   }
 
+  assignedConsultorios(consultorios: Consultorio[]): Consultorio[] {
+    return consultorios.filter(c => this.consultorios.includes(c.code));
+  }
+
   openTrtPicker(): void {
+    this.consultoriosService.refresh();
     this.trtPickerOpen = true;
     this.trtPickQuery = '';
     this.trtPickCategory = null;
@@ -207,16 +213,16 @@ export class TreatmentFormComponent implements OnChanges {
     this.cdr.markForCheck();
   }
 
-  consPickToggle(code: string): void {
-    const idx = this.consultorios.indexOf(code);
+  consPickToggle(c: Consultorio): void {
+    const idx = this.consultorios.indexOf(c.code);
     if (idx === -1) {
-      this.consultorios = [...this.consultorios, code];
+      this.consultorios = [...this.consultorios, c.code];
     } else {
-      this.consultorios = this.consultorios.filter(c => c !== code);
+      this.consultorios = this.consultorios.filter(x => x !== c.code);
     }
   }
 
   removeConsultorio(code: string): void {
-    this.consultorios = this.consultorios.filter(c => c !== code);
+    this.consultorios = this.consultorios.filter(x => x !== code);
   }
 }

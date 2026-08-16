@@ -58,17 +58,17 @@
   <div class="field field--full">
     <span class="field-label">CONSULTORIOS DISPONIBLES <span class="equip-count" *ngIf="consultorios.length">{{ consultorios.length }} ASIGNADOS</span></span>
     <div class="equip-assigned" *ngIf="consultorios.length">
-      <ng-container *ngIf="consultorios$ | async as consultorios">
-        <label class="equip-chip is-on" *ngFor="let c of consultorios; trackBy: trackConsultorio" [class.is-on]="consSelected(c)">
+      <ng-container *ngIf="consultorios$ | async as catalog">
+        <label class="equip-chip is-on" *ngFor="let c of assignedConsultorios(catalog); trackBy: trackConsultorio">
           <input
             class="equip-input"
             type="checkbox"
-            [checked]="consSelected(c)"
-            (change)="removeConsultorio(c)"
-            [attr.aria-label]="'Quitar ' + c"
+            [checked]="true"
+            (change)="removeConsultorio(c.code)"
+            [attr.aria-label]="'Quitar ' + c.name"
           />
           <span class="equip-lamp" aria-hidden="true"></span>
-          <span class="equip-name">{{ c }}</span>
+          <span class="equip-name">{{ c.name }}</span>
         </label>
       </ng-container>
       <button class="equip-add" type="button" (click)="openTrtPicker()">+ AGREGAR</button>
@@ -134,16 +134,26 @@
 
       <ng-container *ngIf="consultorios$ | async as consultorios">
         <div class="picker-body">
-          <label class="equip-chip" *ngFor="let item of visibleConsultorios(consultorios); trackBy: trackConsultorio" [class.is-on]="consSelected(item)">
+          <label
+            class="equip-chip"
+            *ngFor="let item of visibleConsultorios(consultorios); trackBy: trackConsultorio"
+            [class.is-on]="consSelected(item.code)"
+            [class.is-disabled]="item.status === 'mantenimiento'"
+          >
             <input
               class="equip-input"
               type="checkbox"
-              [checked]="consSelected(item)"
+              [checked]="consSelected(item.code)"
+              [disabled]="item.status === 'mantenimiento'"
               (change)="consPickToggle(item)"
-              [attr.aria-label]="item"
+              [attr.aria-label]="item.name"
             />
             <span class="equip-lamp" aria-hidden="true"></span>
-            <span class="equip-name">{{ item }}</span>
+            <span class="equip-main">
+              <span class="equip-name">{{ item.name }}</span>
+              <span class="equip-sub">{{ item.code }}</span>
+            </span>
+            <span class="equip-flag" *ngIf="item.status === 'mantenimiento'">MANTENIMIENTO</span>
           </label>
           <p class="picker-empty" *ngIf="!visibleConsultorios(consultorios).length" role="status">SIN RESULTADOS PARA LA BÚSQUEDA</p>
         </div>
