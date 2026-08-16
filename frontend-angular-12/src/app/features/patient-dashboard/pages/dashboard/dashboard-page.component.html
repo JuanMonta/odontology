@@ -50,7 +50,7 @@
         ></app-autocomplete>
       </div>
 
-      <p class="form-error" *ngIf="error" role="alert">HORA Y PACIENTE SON OBLIGATORIOS</p>
+      <p class="form-error" *ngIf="error" role="alert">{{ errorMessage }}</p>
 
       <div class="form-actions">
         <button class="btn-amber" type="submit">REGISTRAR CITA</button>

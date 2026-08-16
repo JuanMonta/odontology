@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit
@@ -55,12 +56,14 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   creating = false;
   error = false;
+  errorMessage = '';
 
   draft: NewAppointmentDraft = this.restoreDraft();
 
   private readonly destroy$ = new Subject<void>();
 
   constructor(
+    private readonly cdr: ChangeDetectorRef,
     private readonly mock: DashboardHttpService,
     patients: PatientsHttpService,
     treatments: TreatmentsHttpService,
@@ -121,11 +124,13 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   startCreate(): void {
     this.creating = true;
     this.error = false;
+    this.errorMessage = '';
   }
 
   cancelCreate(): void {
     this.creating = false;
     this.error = false;
+    this.errorMessage = '';
     this.clearDraft();
   }
 
@@ -138,9 +143,9 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     const { time, patient, treatment, consultorio, dentist } = this.draft;
     if (!time.trim() || !patient.trim()) {
       this.error = true;
+      this.errorMessage = 'HORA Y PACIENTE SON OBLIGATORIOS';
       return;
     }
-    this.error = false;
     this.mock.addAppointment({
       id: `apt-${Date.now().toString(36)}`,
       time: time.trim(),
@@ -149,10 +154,20 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
       consultorio: (consultorio.trim() || 'CON 01').toUpperCase(),
       dentist: (dentist.trim() || 'DRA. TORRES').toUpperCase(),
       status: 'on-time'
+    }).subscribe({
+      next: () => {
+        this.mock.refresh();
+        this.creating = false;
+        this.draft = { ...EMPTY_DRAFT };
+        this.clearDraft();
+        this.cdr.markForCheck();
+      },
+      error: (err: { error?: { message?: string } }) => {
+        this.error = true;
+        this.errorMessage = err?.error?.message || 'NO SE PUDO AGENDAR LA CITA';
+        this.cdr.markForCheck();
+      }
     });
-    this.creating = false;
-    this.draft = { ...EMPTY_DRAFT };
-    this.clearDraft();
   }
 
   persistDraft(): void {
