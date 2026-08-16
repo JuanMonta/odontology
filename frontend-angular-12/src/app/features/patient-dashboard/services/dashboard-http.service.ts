@@ -68,8 +68,8 @@ export class DashboardHttpService {
   }
 
   /** Llamar al siguiente paciente en espera → pasa a "en consultorio" (boarding). */
-  callWaitingPatient(): void {
-    this.http.post<Appointment>(`${API_BASE}/dashboard/call-waiting`, {}).subscribe(() => this.refresh());
+  callWaitingPatient(): Observable<Appointment> {
+    return this.http.post<Appointment>(`${API_BASE}/dashboard/call-waiting`, {});
   }
 
   /** Marcar la cita como atendida. */

@@ -22,6 +22,7 @@ import { PaginatedListComponent } from '../../../../shared/components/pagination
 })
 export class WaitingPanelComponent extends PaginatedListComponent {
   @Input() waiting: WaitingPatient[] = [];
+  @Input() errorMessage = '';
   @Output() callNext = new EventEmitter<void>();
   @Output() addWalkIn = new EventEmitter<{ nombre: string; motivo: string }>();
 
