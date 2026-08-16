@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit
@@ -26,6 +27,8 @@ export class FlapClockComponent implements OnInit, OnDestroy {
   timeLabel = '';
   private timer: ReturnType<typeof setInterval> | null = null;
 
+  constructor(private readonly cdr: ChangeDetectorRef) {}
+
   ngOnInit(): void {
     this.tick();
     this.timer = setInterval(() => this.tick(), 1000);
@@ -41,6 +44,7 @@ export class FlapClockComponent implements OnInit, OnDestroy {
     this.mm = this.pad(now.getMinutes());
     this.ss = this.pad(now.getSeconds());
     this.timeLabel = `${this.hh}:${this.mm}:${this.ss}`;
+    this.cdr.markForCheck();
   }
 
   private pad(n: number): string {
