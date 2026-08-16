@@ -1,6 +1,7 @@
 package api.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record TratamientoDto(
         String id,
@@ -11,5 +12,6 @@ public record TratamientoDto(
         BigDecimal price,
         boolean active,
         String description,
-        int usage) {
+        int usage,
+        List<String> consultorios) {
 }

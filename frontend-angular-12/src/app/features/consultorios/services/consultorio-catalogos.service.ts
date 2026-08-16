@@ -11,14 +11,21 @@ export interface ConsultorioEquipoCatalogo {
   categoria: string;
 }
 
+export interface TratamientoSimple {
+  code: string;
+  name: string;
+  category: string;
+}
+
 export interface ConsultorioCatalogos {
   unidades: string[];
   ubicaciones: string[];
   equipos: ConsultorioEquipoCatalogo[];
+  tratamientos: TratamientoSimple[];
 }
 
 /**
- * Catálogos (unidades, ubicaciones, equipos) para los selects del formulario
+ * Catálogos (unidades, ubicaciones, equipos, tratamientos) para los selects del formulario
  * de consultorios. Única fuente de verdad → spring_backend /consultorios/catalogos.
  */
 @Injectable({ providedIn: 'root' })
@@ -26,7 +33,8 @@ export class ConsultorioCatalogosService {
   private readonly subject = new BehaviorSubject<ConsultorioCatalogos>({
     unidades: [],
     ubicaciones: [],
-    equipos: []
+    equipos: [],
+    tratamientos: []
   });
 
   readonly catalogos$: Observable<ConsultorioCatalogos> = this.subject.asObservable();
@@ -37,8 +45,19 @@ export class ConsultorioCatalogosService {
   }
 
   refresh(): void {
-    this.http.get<ConsultorioCatalogos>(`${API_BASE}/consultorios/catalogos`).subscribe(data => {
-      this.subject.next(data);
+    this.http.get<ConsultorioCatalogos>(`${API_BASE}/consultorios/catalogos`).subscribe({
+      next: data => {
+        console.log('[ConsultorioCatalogosService] Catalogos loaded:', {
+          unidades: data.unidades.length,
+          ubicaciones: data.ubicaciones.length,
+          equipos: data.equipos.length,
+          tratamientos: data.tratamientos.length
+        });
+        this.subject.next(data);
+      },
+      error: err => {
+        console.error('[ConsultorioCatalogosService] Failed to load catalogos:', err);
+      }
     });
   }
 }

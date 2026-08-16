@@ -4,12 +4,17 @@ import api.dto.ConsultorioCatalogosDto;
 import api.dto.ConsultorioDto;
 import api.dto.ConsultorioDraftDto;
 import api.dto.EquipoCatalogoDto;
+import api.dto.TratamientoSimpleDto;
 import api.entities.Consultorio;
 import api.entities.ConsultorioEquipo;
+import api.entities.ConsultorioTratamiento;
 import api.entities.Equipo;
+import api.entities.Tratamiento;
 import api.repositories.ConsultorioEquipoRepository;
 import api.repositories.ConsultorioRepository;
+import api.repositories.ConsultorioTratamientoRepository;
 import api.repositories.EquipoRepository;
+import api.repositories.TratamientoRepository;
 import api.repositories.UbicacionRepository;
 import api.repositories.UnidadRepository;
 import api.util.FormatoUtil;
@@ -21,7 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Consultorios y su equipamiento.
+ * Consultorios, su equipamiento y capacidad de tratamientos.
  */
 @Service
 @RequiredArgsConstructor
@@ -29,10 +34,12 @@ public class ConsultoriosService {
 
     private final ConsultorioRepository consultorioRepository;
     private final ConsultorioEquipoRepository equipoRepository;
+    private final ConsultorioTratamientoRepository ctRepository;
     private final CodigoService codigoService;
     private final UnidadRepository unidadRepository;
     private final UbicacionRepository ubicacionRepository;
     private final EquipoRepository equipoCatalogoRepository;
+    private final TratamientoRepository tratamientoRepository;
 
     @Transactional(readOnly = true)
     public List<ConsultorioDto> list() {
@@ -42,10 +49,17 @@ public class ConsultoriosService {
                 .toList();
     }
 
-    /** Catálogos (unidades, ubicaciones, equipos) → selects del formulario. */
+    /** Catálogos (unidades, ubicaciones, equipos, tratamientos) → selects del formulario. */
     @Transactional(readOnly = true)
     public ConsultorioCatalogosDto catalogos() {
-        return new ConsultorioCatalogosDto(
+        var tratamientos = tratamientoRepository.findByActivoTrueOrderByNombreAsc();
+        System.out.println("=== SERVICE DEBUG TRATAMIENTOS ===");
+        System.out.println("Count: " + tratamientos.size());
+        for (var t : tratamientos) {
+            System.out.println("  " + t.getCodigo() + " | " + t.getNombre() + " | " + t.getCategoria() + " | activo=" + t.getActivo());
+        }
+        
+        var result = new ConsultorioCatalogosDto(
                 unidadRepository.findByActivoTrueOrderByNombreAsc().stream()
                         .map(unidad -> unidad.getNombre() + " · " + unidad.getTipo())
                         .toList(),
@@ -57,7 +71,18 @@ public class ConsultoriosService {
                                 equipo.getCodigo(),
                                 equipo.getNombre(),
                                 equipo.getCategoria()))
+                        .toList(),
+                tratamientoRepository.findByActivoTrueOrderByNombreAsc().stream()
+                        .map(t -> new TratamientoSimpleDto(t.getCodigo(), t.getNombre(), t.getCategoria().name()))
                         .toList());
+        
+        System.out.println("=== RESULT DEBUG ===");
+        System.out.println("tratamientos in result: " + result.tratamientos().size());
+        for (var tr : result.tratamientos()) {
+            System.out.println("  " + tr.code() + " | " + tr.name() + " | " + tr.category());
+        }
+        
+        return result;
     }
 
     @Transactional
@@ -72,6 +97,7 @@ public class ConsultoriosService {
                 .build();
         consultorio = consultorioRepository.save(consultorio);
         guardarEquipos(consultorio.getCodigo(), draft.equipment());
+        guardarTratamientos(consultorio.getCodigo(), draft.tratamientos());
         return toDto(consultorio);
     }
 
@@ -86,6 +112,7 @@ public class ConsultoriosService {
         consultorio.setProcedimientos(dto.procedures());
         consultorio = consultorioRepository.save(consultorio);
         guardarEquipos(consultorio.getCodigo(), dto.equipment());
+        guardarTratamientos(consultorio.getCodigo(), dto.tratamientos());
         return toDto(consultorio);
     }
 
@@ -121,10 +148,33 @@ public class ConsultoriosService {
         }
     }
 
+    private void guardarTratamientos(String codigo, List<String> tratamientos) {
+        ctRepository.deleteByConsultorioCodigo(codigo);
+        if (tratamientos != null) {
+            tratamientos.forEach(trtCode -> {
+                String code = trtCode.trim().toUpperCase();
+                if (code.isEmpty()) {
+                    return;
+                }
+                if (ctRepository.existsByConsultorioCodigoAndTratamientoCodigo(codigo, code)) {
+                    return;
+                }
+                ctRepository.save(ConsultorioTratamiento.builder()
+                        .consultorioCodigo(codigo)
+                        .tratamientoCodigo(code)
+                        .build());
+            });
+        }
+    }
+
     private ConsultorioDto toDto(Consultorio c) {
         List<String> equipment = equipoRepository.findByConsultorioCodigoOrderByItemAsc(c.getCodigo())
                 .stream()
                 .map(ConsultorioEquipo::getItem)
+                .toList();
+        List<String> tratamientos = ctRepository.findByConsultorioCodigo(c.getCodigo())
+                .stream()
+                .map(ConsultorioTratamiento::getTratamientoCodigo)
                 .toList();
         return new ConsultorioDto(
                 c.getCodigo(),
@@ -133,6 +183,7 @@ public class ConsultoriosService {
                 c.getUnidad(),
                 c.getUbicacion(),
                 equipment,
+                tratamientos,
                 c.getEstado().name(),
                 c.getUltimoUso() == null ? "—" : FormatoUtil.fecha(c.getUltimoUso()),
                 c.getProcedimientos());

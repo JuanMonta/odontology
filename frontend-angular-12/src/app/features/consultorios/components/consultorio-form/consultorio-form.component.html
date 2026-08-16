@@ -62,6 +62,31 @@
     </div>
 
     <div class="field field--full">
+      <span class="field-label">TRATAMIENTOS SOPORTADOS <span class="equip-count" *ngIf="tratamientos.length">{{ tratamientos.length }} ASIGNADOS</span></span>
+      <div class="equip-assigned" *ngIf="tratamientos.length">
+        <ng-container *ngIf="tratamientos$ | async as tratamientos">
+          <label class="equip-chip is-on" *ngFor="let t of tratamientos; trackBy: trackTratamiento" [class.is-on]="trtSelected(t.code)">
+            <input
+              class="equip-input"
+              type="checkbox"
+              [checked]="trtSelected(t.code)"
+              (change)="removeTratamiento(t.code)"
+              [attr.aria-label]="'Quitar ' + t.name"
+            />
+            <span class="equip-name">{{ t.name }}</span>
+          </label>
+        </ng-container>
+      </div>
+      <button
+        class="equip-add"
+        type="button"
+        (click)="openTrtPicker()"
+      >
+        + AGREGAR TRATAMIENTOS
+      </button>
+    </div>
+
+    <div class="field field--full">
       <span class="field-label">
         ASIGNAR PROFESIONALES
         <span class="equip-count" *ngIf="assigned.length">{{ assigned.length }} ASIGNADOS</span>
@@ -263,6 +288,84 @@
       <div class="picker-foot">
         <button class="picker-confirm" type="button" (click)="closeStaffPicker()">CONFIRMAR</button>
         <button class="btn-ghost" type="button" (click)="closeStaffPicker()">CANCELAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CATÁLOGO DE TRATAMIENTOS (MODAL FLOTANTE) ==================== -->
+  <div
+    class="picker"
+    *ngIf="trtPickerOpen"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Catálogo de tratamientos soportados"
+  >
+    <div class="picker-backdrop" (click)="onTrtPickBackdrop($event)"></div>
+    <div
+      class="picker-panel"
+      #trtPickerPanel
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="picker-head">
+        <span class="picker-title">TRATAMIENTOS SOPORTADOS</span>
+        <span class="picker-total" *ngIf="tratamientos.length">{{ tratamientos.length }} ASIGNADOS</span>
+        <button class="picker-close" type="button" aria-label="Cerrar catálogo" (click)="closeTrtPicker()">
+          <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+            <path d="M3 3l10 10"></path>
+            <path d="M13 3L3 13"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="picker-search">
+        <svg class="picker-search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.5"></circle>
+          <path d="M10.5 10.5L14 14"></path>
+        </svg>
+        <input
+          class="picker-search-input"
+          type="text"
+          [ngModel]="trtPickQuery"
+          (ngModelChange)="trtPickQuery = $event; onTrtPickQuery()"
+          name="trtPickQuery"
+          placeholder="BUSCAR TRATAMIENTO…"
+          autocomplete="off"
+        />
+      </div>
+
+      <ng-container *ngIf="tratamientos$ | async as tratamientos">
+        <div class="picker-cats">
+          <button
+            class="picker-cat"
+            type="button"
+            *ngFor="let cat of trtCategorias(tratamientos)"
+            [class.is-on]="trtPickCategory === cat.nombre"
+            (click)="trtPickCategory = trtPickCategory === cat.nombre ? null : cat.nombre; onTrtPickQuery()"
+          >
+            {{ cat.nombre }} <span class="picker-cat-count">{{ cat.count }}</span>
+          </button>
+        </div>
+
+        <div class="picker-body">
+          <label class="equip-chip" *ngFor="let item of visibleTratamientos(tratamientos); trackBy: trackTratamiento" [class.is-on]="trtSelected(item.code)">
+            <input
+              class="equip-input"
+              type="checkbox"
+              [checked]="trtSelected(item.code)"
+              (change)="trtPickToggle(item)"
+              [attr.aria-label]="item.name"
+            />
+            <span class="equip-lamp" aria-hidden="true"></span>
+            <span class="equip-name">{{ item.name }}</span>
+          </label>
+          <p class="picker-empty" *ngIf="!visibleTratamientos(tratamientos).length" role="status">SIN RESULTADOS PARA LA BÚSQUEDA</p>
+        </div>
+      </ng-container>
+
+      <div class="picker-foot">
+        <button class="picker-confirm" type="button" (click)="closeTrtPicker()">CONFIRMAR</button>
+        <button class="btn-ghost" type="button" (click)="closeTrtPicker()">CANCELAR</button>
       </div>
     </div>
   </div>

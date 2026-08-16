@@ -9,6 +9,7 @@ public record ConsultorioDto(
         String unit,
         String location,
         List<String> equipment,
+        List<String> tratamientos,
         String status,
         String lastUse,
         int procedures) {

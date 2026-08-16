@@ -7,5 +7,6 @@ public record ConsultorioDraftDto(
         String unit,
         String location,
         List<String> equipment,
+        List<String> tratamientos,
         String status) {
 }

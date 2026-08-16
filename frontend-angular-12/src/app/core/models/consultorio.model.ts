@@ -19,6 +19,7 @@ export interface Consultorio {
   staff: ConsultorioStaff[];     // odontólogos asignados (consultorio_codigo) con turno en vivo
   location: string;              // "PISO 1 · ALA ESTE"
   equipment: string[];           // equipos e instrumental
+  tratamientos: string[];        // códigos de tratamientos que soporta
   status: ConsultorioStatus;
   lastUse: string;               // "05 AGO 2026"
   procedures: number;            // procedimientos realizados
@@ -29,6 +30,7 @@ export interface ConsultorioDraft {
   unit: string;
   location: string;
   equipment: string[];
+  tratamientos: string[];
   status: ConsultorioStatus;
 }
 

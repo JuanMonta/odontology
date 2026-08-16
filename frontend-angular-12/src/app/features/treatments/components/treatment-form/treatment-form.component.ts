@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   Treatment,
   TreatmentCategory,
@@ -6,6 +8,7 @@ import {
 } from '../../../../core/models/treatment.model';
 import { TREATMENT_CATEGORIES } from '../../services/treatments-http.service';
 import { borradorKey } from '../../../../core/auth/session-local-storage';
+import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
 
 const TREATMENT_FORM_DRAFT_KEY = 'saas.clinica.treatment-form.draft';
 
@@ -16,6 +19,7 @@ interface TreatmentFormDraft {
   price: number;
   description: string;
   active: boolean;
+  consultorios: string[];
 }
 
 @Component({
@@ -30,6 +34,8 @@ export class TreatmentFormComponent implements OnChanges {
   @Output() saved = new EventEmitter<TreatmentDraft>();
   @Output() cancel = new EventEmitter<void>();
 
+  @ViewChild('consPickerPanel', { static: false }) consPickerPanel?: ElementRef<HTMLElement>;
+
   categories = TREATMENT_CATEGORIES;
 
   name = '';
@@ -38,7 +44,22 @@ export class TreatmentFormComponent implements OnChanges {
   price = 100;
   description = '';
   active = true;
+  consultorios: string[] = [];
   error = false;
+
+  consultorios$: Observable<string[]>;
+  trtPickerOpen = false;
+  trtPickQuery = '';
+  trtPickCategory: string | null = null;
+
+  constructor(
+    private readonly consultoriosService: ConsultoriosHttpService,
+    private readonly cdr: ChangeDetectorRef
+  ) {
+    this.consultorios$ = consultoriosService.consultorios$.pipe(
+      map((list: any[]) => list.filter((c: any) => c.status === 'operativo').map((c: any) => c.code))
+    );
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.treatment && this.treatment) {
@@ -48,6 +69,7 @@ export class TreatmentFormComponent implements OnChanges {
       this.price = this.treatment.price;
       this.description = this.treatment.description;
       this.active = this.treatment.active;
+      this.consultorios = [...this.treatment.consultorios];
     }
     if (changes.creating && this.creating) {
       const draft = this.readDraft();
@@ -57,6 +79,7 @@ export class TreatmentFormComponent implements OnChanges {
       this.price = draft ? draft.price : 100;
       this.description = draft ? draft.description : '';
       this.active = draft ? draft.active : true;
+      this.consultorios = draft ? draft.consultorios : [];
     }
     if (changes.treatment || changes.creating) {
       this.error = false;
@@ -78,7 +101,8 @@ export class TreatmentFormComponent implements OnChanges {
       durationMin: Math.max(5, Math.round(this.durationMin || 0)),
       price: Math.max(0, Math.round(this.price || 0)),
       description: this.description.trim().toUpperCase(),
-      active: this.active
+      active: this.active,
+      consultorios: this.consultorios
     };
     this.saved.emit(draft);
   }
@@ -100,7 +124,8 @@ export class TreatmentFormComponent implements OnChanges {
       durationMin: this.durationMin,
       price: this.price,
       description: this.description,
-      active: this.active
+      active: this.active,
+      consultorios: this.consultorios
     };
     localStorage.setItem(borradorKey(TREATMENT_FORM_DRAFT_KEY), JSON.stringify(draft));
   }
@@ -125,5 +150,73 @@ export class TreatmentFormComponent implements OnChanges {
 
   private clearDraft(): void {
     localStorage.removeItem(borradorKey(TREATMENT_FORM_DRAFT_KEY));
+  }
+
+  /* ==================== Picker de consultorios ==================== */
+
+  trtCategorias(consultorios: string[]): { nombre: string; count: number }[] {
+    return [{ nombre: 'TODOS', count: consultorios.length }];
+  }
+
+  visibleConsultorios(consultorios: string[]): string[] {
+    const q = this.trtPickQuery.trim().toUpperCase();
+    return consultorios.filter(c => !q || c.includes(q));
+  }
+
+  trackConsultorio(_: number, c: string): string {
+    return c;
+  }
+
+  consSelected(code: string): boolean {
+    return this.consultorios.includes(code);
+  }
+
+  openTrtPicker(): void {
+    this.trtPickerOpen = true;
+    this.trtPickQuery = '';
+    this.trtPickCategory = null;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => this.consPickerPanel?.nativeElement.focus(), 0);
+  }
+
+  closeTrtPicker(): void {
+    if (!this.trtPickerOpen) {
+      return;
+    }
+    this.trtPickerOpen = false;
+    document.body.style.overflow = '';
+    this.cdr.markForCheck();
+  }
+
+  onTrtPickBackdrop(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeTrtPicker();
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      if (this.trtPickerOpen) {
+        this.closeTrtPicker();
+      }
+    }
+  }
+
+  onTrtPickQuery(): void {
+    this.cdr.markForCheck();
+  }
+
+  consPickToggle(code: string): void {
+    const idx = this.consultorios.indexOf(code);
+    if (idx === -1) {
+      this.consultorios = [...this.consultorios, code];
+    } else {
+      this.consultorios = this.consultorios.filter(c => c !== code);
+    }
+  }
+
+  removeConsultorio(code: string): void {
+    this.consultorios = this.consultorios.filter(c => c !== code);
   }
 }
