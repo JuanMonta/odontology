@@ -1,0 +1,37 @@
+<div class="pager" role="navigation" aria-label="Paginación">
+  <span class="pager-summary" *ngIf="!compact">{{ firstRow }}–{{ lastRow }} DE {{ total }} {{ label }}</span>
+
+  <div class="pager-pages">
+    <button
+      class="pager-btn pager-arrow"
+      type="button"
+      (click)="onPrev()"
+      [disabled]="!canPrev"
+      aria-label="Página anterior"
+    >‹</button>
+
+    <button
+      *ngFor="let p of pages"
+      class="pager-btn"
+      type="button"
+      (click)="goTo(p)"
+      [class.is-active]="p === page"
+      [attr.aria-current]="p === page ? 'page' : null"
+    >{{ p }}</button>
+
+    <button
+      class="pager-btn pager-arrow"
+      type="button"
+      (click)="onNext()"
+      [disabled]="!canNext"
+      aria-label="Página siguiente"
+    >›</button>
+  </div>
+
+  <label class="pager-size" *ngIf="!compact">
+    <span>PÁG.</span>
+    <select (change)="onSizeChange(+$any($event.target).value)">
+      <option *ngFor="let s of pageSizes" [value]="s" [selected]="s === pageSize">{{ s }}</option>
+    </select>
+  </label>
+</div>

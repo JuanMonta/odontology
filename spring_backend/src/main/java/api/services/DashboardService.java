@@ -47,6 +47,7 @@ public class DashboardService {
     private final api.repositories.ClinicaSettingRepository clinicaSettingRepository;
     private final api.repositories.ConsultorioRepository consultorioRepository;
     private final api.repositories.OdontologoRepository odontologoRepository;
+    private final api.repositories.TratamientoRepository tratamientoRepository;
 
     /** Tolerancia por defecto (minutos) si la clínica no la configuró. */
     private static final int TOLERANCIA_DEFAULT_MINUTOS = 10;
@@ -94,6 +95,27 @@ public class DashboardService {
                 .map(api.entities.ClinicaSetting::getToleranciaRetraso)
                 .filter(t -> t != null && t > 0)
                 .orElse(TOLERANCIA_DEFAULT_MINUTOS);
+    }
+
+    /**
+     * Duración del bloque de una cita: usa la duración real del tratamiento
+     * (por nombre, si existe y está activo); si no hay tratamiento o no se
+     * encuentra, cae al {@code duracionCita} configurado de la clínica; si
+     * tampoco está configurado, al valor por defecto.
+     */
+    private int duracionBloqueMinutos(String tratamientoNombre) {
+        if (tratamientoNombre != null && !tratamientoNombre.isBlank()) {
+            Optional<api.entities.Tratamiento> tratamiento = tratamientoRepository.findAll().stream()
+                    .filter(t -> t.getNombre().equalsIgnoreCase(tratamientoNombre.trim()))
+                    .findFirst();
+            if (tratamiento.isPresent() && Boolean.TRUE.equals(tratamiento.get().getActivo())) {
+                return tratamiento.get().getDuracionMin();
+            }
+        }
+        return clinicaSettingRepository.findById(1)
+                .map(api.entities.ClinicaSetting::getDuracionCita)
+                .filter(d -> d != null && d > 0)
+                .orElse(BLOQUE_DEFAULT_MINUTOS);
     }
 
     @Transactional(readOnly = true)
@@ -192,7 +214,7 @@ public class DashboardService {
                 .id(nextAppointmentId())
                 .fecha(fecha)
                 .hora(LocalTime.now())
-                .horaFin(LocalTime.now().plusMinutes(BLOQUE_DEFAULT_MINUTOS))
+                .horaFin(LocalTime.now().plusMinutes(duracionBloqueMinutos(paciente.getMotivo())))
                 .pacienteId(paciente.getPacienteId())
                 .pacienteNombre(paciente.getPacienteNombre())
                 .tratamiento(paciente.getMotivo())
@@ -214,14 +236,15 @@ public class DashboardService {
         LocalTime hora = parseHora(dto.time());
         LocalDate fecha = LocalDate.now();
         String nombre = dto.patient().trim().toUpperCase();
+        int duracionMinutos = duracionBloqueMinutos(dto.treatment());
         AsignacionDisponible asignacion = resolverConsultorioYOdotontologo(
                 dto.consultorio(), dto.dentist());
-        validarSinSolapamiento(fecha, hora, asignacion.consultorioCodigo(), asignacion.odontologoCodigo());
+        validarSinSolapamiento(fecha, hora, duracionMinutos, asignacion.consultorioCodigo(), asignacion.odontologoCodigo());
         Appointment cita = Appointment.builder()
                 .id(nextAppointmentId())
                 .fecha(fecha)
                 .hora(hora)
-                .horaFin(hora.plusMinutes(BLOQUE_DEFAULT_MINUTOS))
+                .horaFin(hora.plusMinutes(duracionMinutos))
                 .pacienteId(lookupPacienteId(nombre))
                 .pacienteNombre(nombre)
                 .tratamiento((dto.treatment() == null || dto.treatment().isBlank() ? "CONSULTA" : dto.treatment()).trim().toUpperCase())
@@ -239,11 +262,12 @@ public class DashboardService {
      * sala o el odontólogo ya están ocupados en ese rango, el trigger de la BD
      * rechazaría el INSERT. Se traduce a un error de negocio claro (409).
      */
-    private void validarSinSolapamiento(LocalDate fecha, LocalTime hora, String consultorioCodigo, String odontologoCodigo) {
+    private void validarSinSolapamiento(LocalDate fecha, LocalTime hora, int duracionMinutos,
+                                        String consultorioCodigo, String odontologoCodigo) {
         if (consultorioCodigo == null && odontologoCodigo == null) {
             return;
         }
-        LocalTime horaFin = hora.plusMinutes(BLOQUE_DEFAULT_MINUTOS);
+        LocalTime horaFin = hora.plusMinutes(duracionMinutos);
         boolean solapa = appointmentRepository.findByFechaOrderByHoraAsc(fecha).stream()
                 .filter(a -> a.getHoraFin() != null && a.getConsultorioCodigo() != null)
                 .filter(a -> hora.isBefore(a.getHoraFin()) && a.getHora().isBefore(horaFin))

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Turno } from '../../../../core/models/turno.model';
+import { PaginatedListComponent } from '../../../../shared/components/pagination/paginated-list.component';
 
 @Component({
   selector: 'app-turno-directory',
@@ -7,10 +8,18 @@ import { Turno } from '../../../../core/models/turno.model';
   styleUrls: ['./turno-directory.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TurnoDirectoryComponent {
+export class TurnoDirectoryComponent extends PaginatedListComponent {
   @Input() turnos: Turno[] = [];
   @Input() selectedId: string | null = null;
   @Output() select = new EventEmitter<Turno>();
+
+  protected get totalItems(): number {
+    return this.turnos.length;
+  }
+
+  get visibleTurnos(): Turno[] {
+    return this.slice(this.turnos) as Turno[];
+  }
 
   jornada(t: Turno): string {
     return `${t.horaInicio} – ${t.horaFin}`;

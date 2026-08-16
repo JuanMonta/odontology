@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientDashboardRoutingModule } from './patient-dashboard-routing.module';
+import { PaginationModule } from '../../shared/components/pagination/pagination.module';
 import { DashboardPageComponent } from './pages/dashboard/dashboard-page.component';
 import { DeparturesBoardComponent } from './components/departures-board/departures-board.component';
 import { FlapCellComponent } from './components/flap-cell/flap-cell.component';
@@ -22,7 +23,7 @@ import { TimePickerComponent } from './components/time-picker/time-picker.compon
     AutocompleteComponent,
     TimePickerComponent
   ],
-  imports: [CommonModule, FormsModule, PatientDashboardRoutingModule],
+  imports: [CommonModule, FormsModule, PatientDashboardRoutingModule, PaginationModule],
   exports: [DashboardPageComponent]
 })
 export class PatientDashboardModule { }
