@@ -216,6 +216,7 @@ public class DashboardService {
         String nombre = dto.patient().trim().toUpperCase();
         AsignacionDisponible asignacion = resolverConsultorioYOdotontologo(
                 dto.consultorio(), dto.dentist());
+        validarSinSolapamiento(fecha, hora, asignacion.consultorioCodigo(), asignacion.odontologoCodigo());
         Appointment cita = Appointment.builder()
                 .id(nextAppointmentId())
                 .fecha(fecha)
@@ -231,6 +232,27 @@ public class DashboardService {
                 .estado(Appointment.Estado.ON_TIME)
                 .build();
         return toAppointmentDto(appointmentRepository.save(cita));
+    }
+
+    /**
+     * Pre-valida el bloque [hora, hora+BLOQUE] contra las citas del día: si la
+     * sala o el odontólogo ya están ocupados en ese rango, el trigger de la BD
+     * rechazaría el INSERT. Se traduce a un error de negocio claro (409).
+     */
+    private void validarSinSolapamiento(LocalDate fecha, LocalTime hora, String consultorioCodigo, String odontologoCodigo) {
+        if (consultorioCodigo == null && odontologoCodigo == null) {
+            return;
+        }
+        LocalTime horaFin = hora.plusMinutes(BLOQUE_DEFAULT_MINUTOS);
+        boolean solapa = appointmentRepository.findByFechaOrderByHoraAsc(fecha).stream()
+                .filter(a -> a.getHoraFin() != null && a.getConsultorioCodigo() != null)
+                .filter(a -> hora.isBefore(a.getHoraFin()) && a.getHora().isBefore(horaFin))
+                .anyMatch(a -> (consultorioCodigo != null && consultorioCodigo.equals(a.getConsultorioCodigo()))
+                        || (odontologoCodigo != null && odontologoCodigo.equals(a.getOdontologoCodigo())));
+        if (solapa) {
+            throw new api.services.SolapamientoException(
+                    "Solapamiento de horario: sala u odontólogo ya ocupado a las " + hora);
+        }
     }
 
     /**

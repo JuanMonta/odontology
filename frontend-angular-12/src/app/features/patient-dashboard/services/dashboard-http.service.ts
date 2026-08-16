@@ -88,15 +88,13 @@ export class DashboardHttpService {
   }
 
   /** Registrar una nueva cita programada para hoy (persistida en el backend). */
-  addAppointment(appointment: Appointment): void {
-    this.http
-      .post<Appointment>(`${API_BASE}/dashboard/appointments`, {
-        time: appointment.time,
-        patient: appointment.patient,
-        treatment: appointment.treatment,
-        consultorio: appointment.consultorio,
-        dentist: appointment.dentist
-      })
-      .subscribe(() => this.refresh());
+  addAppointment(appointment: Appointment): Observable<Appointment> {
+    return this.http.post<Appointment>(`${API_BASE}/dashboard/appointments`, {
+      time: appointment.time,
+      patient: appointment.patient,
+      treatment: appointment.treatment,
+      consultorio: appointment.consultorio,
+      dentist: appointment.dentist
+    });
   }
 }
