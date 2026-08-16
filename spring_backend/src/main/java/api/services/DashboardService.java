@@ -186,35 +186,46 @@ public class DashboardService {
             return null;
         }
         WaitingQueue paciente = next.get();
-        paciente.setAtendido(true);
-        waitingRepository.save(paciente);
 
+        AppointmentDto dto;
         if (paciente.getPacienteId() == null) {
-            return boardingWalkIn(fecha, paciente);
+            dto = boardingWalkIn(fecha, paciente);
+        } else {
+            dto = appointmentRepository.findByFechaOrderByHoraAsc(fecha).stream()
+                    .filter(a -> a.getPacienteId() != null
+                            && a.getPacienteId().equals(paciente.getPacienteId())
+                            && (a.getEstado() == Appointment.Estado.ARRIVED
+                            || a.getEstado() == Appointment.Estado.DELAYED
+                            || a.getEstado() == Appointment.Estado.ON_TIME))
+                    .findFirst()
+                    .map(a -> {
+                        a.setEstado(Appointment.Estado.BOARDING);
+                        return toAppointmentDto(appointmentRepository.save(a));
+                    })
+                    .orElseGet(() -> boardingWalkIn(fecha, paciente));
         }
 
-        return appointmentRepository.findByFechaOrderByHoraAsc(fecha).stream()
-                .filter(a -> a.getPacienteId() != null
-                        && a.getPacienteId().equals(paciente.getPacienteId())
-                        && (a.getEstado() == Appointment.Estado.ARRIVED
-                        || a.getEstado() == Appointment.Estado.DELAYED
-                        || a.getEstado() == Appointment.Estado.ON_TIME))
-                .findFirst()
-                .map(a -> {
-                    a.setEstado(Appointment.Estado.BOARDING);
-                    return toAppointmentDto(appointmentRepository.save(a));
-                })
-                .orElseGet(() -> boardingWalkIn(fecha, paciente));
+        paciente.setAtendido(true);
+        waitingRepository.save(paciente);
+        return dto;
     }
 
-    /** Un walk-in que entra a consultorio se materializa como cita {@code boarding}. */
+    /**
+     * Un walk-in que entra a consultorio se materializa como cita {@code boarding}.
+     * <p>Busca un consultorio/odontólogo realmente libre en este instante para el
+     * bloque [ahora, ahora+duración del tratamiento]. Si no hay ninguno, lanza un
+     * {@link SolapamientoException} (409) y el paciente se queda en la sala.
+     */
     private AppointmentDto boardingWalkIn(LocalDate fecha, WaitingQueue paciente) {
-        AsignacionDisponible asignacion = asignarConsultorioYOdotontologo(fecha);
+        LocalTime ahora = LocalTime.now();
+        int duracion = duracionBloqueMinutos(paciente.getMotivo());
+        AsignacionDisponible asignacion = asignarConsultorioYOdotontologoDisponible(
+                fecha, ahora, duracion);
         Appointment cita = Appointment.builder()
                 .id(nextAppointmentId())
                 .fecha(fecha)
-                .hora(LocalTime.now())
-                .horaFin(LocalTime.now().plusMinutes(duracionBloqueMinutos(paciente.getMotivo())))
+                .hora(ahora)
+                .horaFin(ahora.plusMinutes(duracion))
                 .pacienteId(paciente.getPacienteId())
                 .pacienteNombre(paciente.getPacienteNombre())
                 .tratamiento(paciente.getMotivo())
@@ -268,15 +279,25 @@ public class DashboardService {
             return;
         }
         LocalTime horaFin = hora.plusMinutes(duracionMinutos);
-        boolean solapa = appointmentRepository.findByFechaOrderByHoraAsc(fecha).stream()
-                .filter(a -> a.getHoraFin() != null && a.getConsultorioCodigo() != null)
-                .filter(a -> hora.isBefore(a.getHoraFin()) && a.getHora().isBefore(horaFin))
-                .anyMatch(a -> (consultorioCodigo != null && consultorioCodigo.equals(a.getConsultorioCodigo()))
-                        || (odontologoCodigo != null && odontologoCodigo.equals(a.getOdontologoCodigo())));
-        if (solapa) {
+        if (haySolapamiento(fecha, hora, horaFin, consultorioCodigo, odontologoCodigo)) {
             throw new api.services.SolapamientoException(
                     "Solapamiento de horario: sala u odontólogo ya ocupado a las " + hora);
         }
+    }
+
+    /**
+     * ¿El bloque [hora, horaFin) choca con alguna cita del día en la misma sala
+     * u odontólogo? Las citas {@code DONE}/{@code CANCELLED}/{@code NO_SHOW} que
+     * se liberaron (hora_fin acortado) ya no bloquean el rango liberado.
+     */
+    private boolean haySolapamiento(LocalDate fecha, LocalTime hora, LocalTime horaFin,
+                                    String consultorioCodigo, String odontologoCodigo) {
+        return appointmentRepository.findByFechaOrderByHoraAsc(fecha).stream()
+                .filter(a -> a.getHoraFin() != null
+                        && (a.getConsultorioCodigo() != null || a.getOdontologoCodigo() != null))
+                .filter(a -> hora.isBefore(a.getHoraFin()) && a.getHora().isBefore(horaFin))
+                .anyMatch(a -> (consultorioCodigo != null && consultorioCodigo.equals(a.getConsultorioCodigo()))
+                        || (odontologoCodigo != null && odontologoCodigo.equals(a.getOdontologoCodigo())));
     }
 
     /**
@@ -317,10 +338,79 @@ public class DashboardService {
                 .stream().findFirst().map(api.entities.Paciente::getId).orElse(null);
     }
 
-    /** Marcar la cita como atendida. */
+    /**
+     * Asigna un consultorio/odontólogo que esté LIBRE en el instante dado para el
+     * bloque [hora, hora+duración]. Se recorre la agenda del día y se descartan
+     * las salas u odontólogos con solapamiento; entre los libres se elige el de
+     * menor carga. Si ninguno queda libre se lanza {@link SolapamientoException}
+     * (409) y el walk-in se queda en la sala de espera.
+     */
+    private AsignacionDisponible asignarConsultorioYOdotontologoDisponible(
+            LocalDate fecha, LocalTime hora, int duracionMinutos) {
+        LocalTime horaFin = hora.plusMinutes(duracionMinutos);
+        List<api.entities.Consultorio> disponibles = consultorioRepository
+                .findByEstado(api.entities.Consultorio.Estado.operativo);
+        if (disponibles.isEmpty()) {
+            throw new api.services.SolapamientoException(
+                    "No hay consultorio disponible en este momento (" + hora + ")");
+        }
+
+        List<Appointment> citasHoy = appointmentRepository.findByFechaOrderByHoraAsc(fecha);
+        List<api.entities.Consultorio> candidatos = disponibles.stream()
+                .filter(c -> !haySolapamiento(fecha, hora, horaFin, c.getCodigo(), null))
+                .sorted(java.util.Comparator
+                        .comparingLong((api.entities.Consultorio c) -> citasHoy.stream()
+                                .filter(a -> c.getCodigo().equals(a.getConsultorioCodigo())
+                                        && a.getEstado() != Appointment.Estado.DONE
+                                        && a.getEstado() != Appointment.Estado.NO_SHOW
+                                        && a.getEstado() != Appointment.Estado.CANCELLED)
+                                .count())
+                        .thenComparing(api.entities.Consultorio::getCodigo))
+                .toList();
+
+        for (api.entities.Consultorio consultorio : candidatos) {
+            api.entities.Odontologo odontologo = odontologoRepository
+                    .findByConsultorioCodigo(consultorio.getCodigo())
+                    .stream()
+                    .filter(o -> o.getEstado() == api.entities.Odontologo.Estado.activo)
+                    .filter(o -> !haySolapamiento(fecha, hora, horaFin, consultorio.getCodigo(), o.getCodigo()))
+                    .min(java.util.Comparator
+                            .comparingLong((api.entities.Odontologo o) -> citasHoy.stream()
+                                    .filter(a -> o.getCodigo().equals(a.getOdontologoCodigo())
+                                            && a.getEstado() != Appointment.Estado.DONE
+                                            && a.getEstado() != Appointment.Estado.NO_SHOW
+                                            && a.getEstado() != Appointment.Estado.CANCELLED)
+                                    .count())
+                            .thenComparing(api.entities.Odontologo::getCodigo))
+                    .orElse(null);
+            if (odontologo != null) {
+                return new AsignacionDisponible(
+                        consultorio.getNombre(), consultorio.getCodigo(),
+                        odontologo.getNombre(), odontologo.getCodigo());
+            }
+        }
+
+        throw new api.services.SolapamientoException(
+                "Sin consultorio ni odontólogo libre a las " + hora
+                        + " para el bloque de " + duracionMinutos + " min");
+    }
+
+    /** Marcar la cita como atendida; si terminó antes del bloque, se libera el resto. */
     @Transactional
     public AppointmentDto markDone(String id) {
-        return cambiarEstado(id, Appointment.Estado.DONE);
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada: " + id));
+        appointment.setEstado(Appointment.Estado.DONE);
+        LocalTime ahora = LocalTime.now();
+        LocalTime horaFin = appointment.getHoraFin();
+        if (horaFin != null && appointment.getHora() != null) {
+            if (ahora.isBefore(appointment.getHora())) {
+                appointment.setHoraFin(appointment.getHora());
+            } else if (ahora.isBefore(horaFin)) {
+                appointment.setHoraFin(ahora);
+            }
+        }
+        return toAppointmentDto(appointmentRepository.save(appointment));
     }
 
     /** Marcar la cita como cancelada. */

@@ -92,6 +92,7 @@
 
     <app-waiting-panel
       [waiting]="(waiting$ | async) ?? []"
+      [errorMessage]="waitingError"
       (callNext)="onCallNext()"
       (addWalkIn)="onWalkIn($event)"
     ></app-waiting-panel>

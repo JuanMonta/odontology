@@ -57,6 +57,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   creating = false;
   error = false;
   errorMessage = '';
+  waitingError = '';
 
   draft: NewAppointmentDraft = this.restoreDraft();
 
@@ -94,7 +95,22 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   onCallNext(): void {
-    this.mock.callWaitingPatient();
+    this.waitingError = '';
+    this.mock.callWaitingPatient().subscribe({
+      next: () => {
+        this.waitingError = '';
+        this.refreshBoards();
+      },
+      error: err => {
+        this.waitingError = err?.error?.message || 'NO SE PUDO LLAMAR AL SIGUIENTE';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private refreshBoards(): void {
+    this.mock.refresh();
+    this.cdr.markForCheck();
   }
 
   onCheckIn(appointmentId: string): void {
