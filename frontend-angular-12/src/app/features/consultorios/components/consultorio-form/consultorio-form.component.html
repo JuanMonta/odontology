@@ -64,22 +64,25 @@
     <div class="field field--full">
       <span class="field-label">TRATAMIENTOS SOPORTADOS <span class="equip-count" *ngIf="tratamientos.length">{{ tratamientos.length }} ASIGNADOS</span></span>
       <div class="equip-assigned" *ngIf="tratamientos.length">
-        <ng-container *ngIf="tratamientos$ | async as tratamientos">
-          <label class="equip-chip is-on" *ngFor="let t of tratamientos; trackBy: trackTratamiento" [class.is-on]="trtSelected(t.code)">
+        <ng-container *ngIf="tratamientos$ | async as catalog">
+          <label class="equip-chip is-on" *ngFor="let t of assignedTratamientos(catalog); trackBy: trackTratamiento">
             <input
               class="equip-input"
               type="checkbox"
-              [checked]="trtSelected(t.code)"
+              [checked]="true"
               (change)="removeTratamiento(t.code)"
               [attr.aria-label]="'Quitar ' + t.name"
             />
+            <span class="equip-lamp" aria-hidden="true"></span>
             <span class="equip-name">{{ t.name }}</span>
           </label>
         </ng-container>
+        <button class="equip-add" type="button" (click)="openTrtPicker()">+ AGREGAR</button>
       </div>
       <button
-        class="equip-add"
+        class="equip-add equip-add--empty"
         type="button"
+        *ngIf="!tratamientos.length"
         (click)="openTrtPicker()"
       >
         + AGREGAR TRATAMIENTOS

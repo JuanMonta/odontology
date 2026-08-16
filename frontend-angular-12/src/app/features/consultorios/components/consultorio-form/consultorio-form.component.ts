@@ -234,6 +234,10 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
     return this.tratamientos.includes(code);
   }
 
+  assignedTratamientos(tratamientos: TratamientoSimple[]): TratamientoSimple[] {
+    return tratamientos.filter(t => this.tratamientos.includes(t.code));
+  }
+
   openTrtPicker(): void {
     this.trtPickerOpen = true;
     this.trtPickQuery = '';
