@@ -1,54 +1,32 @@
-<div class="panel">
-  <!-- Creando / editando sala -->
-  <ng-container *ngIf="creating || editing">
-    <div class="panel-head">
-      <div class="panel-head-info">
-        <span class="panel-kicker">{{ creating ? 'NUEVO CONSULTORIO' : 'EDITAR SALA' }}</span>
-        <span class="panel-title">{{ creating ? 'REGISTRO DE SALA' : (editingConsultorio?.code ?? consultorio?.code ?? '') }}</span>
-      </div>
-      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="closeForm()">
-        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <path d="M3 3l10 10"></path>
-          <path d="M13 3L3 13"></path>
-        </svg>
-      </button>
-    </div>
-    <div class="panel-scroll">
-      <app-consultorio-form
-        [consultorio]="creating ? null : editingConsultorio"
-        (saved)="onSaved($event)"
-        (cancel)="creating ? cancel.emit() : cancelEdit()"
-      ></app-consultorio-form>
-    </div>
-  </ng-container>
+<!-- Creando / editando sala -->
+<ng-container *ngIf="creating || editing">
+  <ui-panel
+    [kicker]="creating ? 'NUEVO CONSULTORIO' : 'EDITAR SALA'"
+    [title]="creating ? 'REGISTRO DE SALA' : (editingConsultorio?.code ?? consultorio?.code ?? '')"
+    (close)="closeForm()"
+  >
+    <app-consultorio-form
+      [consultorio]="creating ? null : editingConsultorio"
+      (saved)="onSaved($event)"
+      (cancel)="creating ? cancel.emit() : cancelEdit()"
+    ></app-consultorio-form>
+  </ui-panel>
+</ng-container>
 
-  <!-- Sin selección -->
-  <ng-container *ngIf="!creating && !editing && !consultorio">
-    <div class="panel-empty">
-      <span class="panel-empty-mark" aria-hidden="true"><span class="panel-empty-cell">+</span></span>
-      <span class="panel-empty-title">SELECCIONA UNA SALA</span>
-      <span class="panel-empty-hint">ABRE UNA FILA DEL MAPEO PARA VER SU FICHA</span>
-    </div>
-  </ng-container>
+<!-- Sin selección -->
+<ng-container *ngIf="!creating && !editing && !consultorio">
+  <ui-empty variant="panel" text="SELECCIONA UNA SALA" hint="ABRE UNA FILA DEL MAPEO PARA VER SU FICHA"></ui-empty>
+</ng-container>
 
-  <!-- Sala seleccionada -->
-  <ng-container *ngIf="!creating && !editing && consultorio">
-    <div class="panel-head">
-      <div class="panel-head-info">
-        <span class="panel-kicker" [class.panel-kicker--warn]="consultorio.status === 'mantenimiento'">
-          {{ statusLabel(consultorio.status) }}
-        </span>
-        <span class="panel-title">{{ consultorio.name }}</span>
-      </div>
-      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="close.emit()">
-        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <path d="M3 3l10 10"></path>
-          <path d="M13 3L3 13"></path>
-        </svg>
-      </button>
-    </div>
-
-    <div class="panel-meta">
+<!-- Sala seleccionada -->
+<ng-container *ngIf="!creating && !editing && consultorio">
+  <ui-panel
+    [kicker]="statusLabel(consultorio.status)"
+    [title]="consultorio.name"
+    [warn]="consultorio.status === 'mantenimiento'"
+    (close)="close.emit()"
+  >
+    <div panelMeta class="panel-meta">
       <div class="meta-row">
         <span class="meta-label">CÓDIGO</span>
         <span class="meta-value">{{ consultorio.code }}</span>
@@ -63,91 +41,76 @@
       </div>
     </div>
 
-    <div class="panel-scroll">
-      <div class="section">
-        <span class="section-label">TRATAMIENTOS SOPORTADOS</span>
-        <ng-container *ngIf="tratamientos$ | async as catalog">
-          <div class="cons-wrap" *ngIf="tratamientosDeLaSala(catalog).length; else noTratamientos">
-            <label class="cons-chip" *ngFor="let t of tratamientosDeLaSala(catalog); trackBy: tratTrack">
-              <span class="cons-chip-lamp" aria-hidden="true"></span>
-              <span class="cons-chip-main">
-                <span class="cons-chip-name">{{ t.name }}</span>
-                <span class="cons-chip-sub">{{ t.code }} · {{ t.category }}</span>
-              </span>
-            </label>
-          </div>
-          <ng-template #noTratamientos>
-            <div class="staff-empty">
-              <span class="staff-empty-lamp" aria-hidden="true"></span>
-              <span class="staff-empty-text">SIN TRATAMIENTOS ASIGNADOS</span>
-              <span class="staff-empty-hint">ASIGNA TRATAMIENTOS DESDE EL FORMULARIO DE LA SALA</span>
-            </div>
-          </ng-template>
-        </ng-container>
-      </div>
-
-      <div class="section">
-        <span class="section-label">
-          PERSONAL EN TURNO · {{ onTurnoCount(consultorio) }} EN SERVICIO / {{ staffCount(consultorio) }} ASIGNADOS
-        </span>
-        <ul class="staff-list" *ngIf="staffCount(consultorio); else staffEmpty">
-          <li
-            class="staff-item"
-            *ngFor="let s of consultorio.staff; trackBy: staffTrack"
-            [class.staff-item--away]="s.state === 'fuera'"
-          >
-            <span class="staff-lamp" [class.staff-lamp--live]="s.state === 'turno'" [class.staff-lamp--break]="s.state === 'descanso'" aria-hidden="true"></span>
-            <div class="staff-main">
-              <span class="staff-name">{{ s.name }}</span>
-              <span class="staff-sub">{{ s.code }} · {{ s.specialty }}</span>
-            </div>
-            <div class="staff-shift">
-              <span class="staff-turno">{{ turnoLabel(s.turno) }} · {{ s.jornada }}</span>
-              <span class="staff-state" [class.staff-state--live]="s.state === 'turno'" [class.staff-state--break]="s.state === 'descanso'">
-                {{ staffStateLabel(s.state) }}
-              </span>
-            </div>
-          </li>
-        </ul>
-        <ng-template #staffEmpty>
-          <div class="staff-empty">
-            <span class="staff-empty-lamp" aria-hidden="true"></span>
-            <span class="staff-empty-text">SIN PERSONAL ASIGNADO</span>
-            <span class="staff-empty-hint">ASIGNA PROFESIONALES DESDE PERSONAL CLÍNICO</span>
-          </div>
-        </ng-template>
-      </div>
-
-      <div class="section">
-        <span class="section-label">EQUIPOS E INSTRUMENTAL</span>
-        <ul class="equip-list">
-          <li class="equip-item" *ngFor="let e of consultorio.equipment">
-            <span class="equip-lamp" aria-hidden="true"></span>
-            <span class="equip-name">{{ e }}</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="section">
-        <span class="section-label">ACTIVIDAD</span>
-        <div class="stats">
-          <div class="stat">
-            <span class="stat-value">{{ consultorio.procedures }}</span>
-            <span class="stat-label">PROCEDIMIENTOS</span>
-          </div>
-          <div class="stat">
-            <span class="stat-value">{{ consultorio.lastUse }}</span>
-            <span class="stat-label">ÚLTIMA ATENCIÓN</span>
-          </div>
+    <div class="section">
+      <span class="section-label">TRATAMIENTOS SOPORTADOS</span>
+      <ng-container *ngIf="tratamientos$ | async as catalog">
+        <div class="cons-wrap" *ngIf="tratamientosDeLaSala(catalog).length; else noTratamientos">
+          <ui-chip
+            *ngFor="let t of tratamientosDeLaSala(catalog); trackBy: tratTrack"
+            [name]="t.name"
+            [sub]="t.code + ' · ' + t.category"
+          ></ui-chip>
         </div>
+        <ng-template #noTratamientos>
+          <ui-empty text="SIN TRATAMIENTOS ASIGNADOS" hint="ASIGNA TRATAMIENTOS DESDE EL FORMULARIO DE LA SALA"></ui-empty>
+        </ng-template>
+      </ng-container>
+    </div>
+
+    <div class="section">
+      <span class="section-label">
+        PERSONAL EN TURNO · {{ onTurnoCount(consultorio) }} EN SERVICIO / {{ staffCount(consultorio) }} ASIGNADOS
+      </span>
+      <ul class="staff-list" *ngIf="staffCount(consultorio); else staffEmpty">
+        <li
+          class="staff-item"
+          *ngFor="let s of consultorio.staff; trackBy: staffTrack"
+          [class.staff-item--away]="s.state === 'fuera'"
+        >
+          <ui-lamp
+            [tone]="s.state === 'turno' ? 'on' : (s.state === 'descanso' ? 'break' : 'off')"
+            [animate]="s.state === 'turno'"
+          ></ui-lamp>
+          <div class="staff-main">
+            <span class="staff-name">{{ s.name }}</span>
+            <span class="staff-sub">{{ s.code }} · {{ s.specialty }}</span>
+          </div>
+          <div class="staff-shift">
+            <span class="staff-turno">{{ turnoLabel(s.turno) }} · {{ s.jornada }}</span>
+            <span class="staff-state" [class.staff-state--live]="s.state === 'turno'" [class.staff-state--break]="s.state === 'descanso'">
+              {{ staffStateLabel(s.state) }}
+            </span>
+          </div>
+        </li>
+      </ul>
+      <ng-template #staffEmpty>
+        <ui-empty text="SIN PERSONAL ASIGNADO" hint="ASIGNA PROFESIONALES DESDE PERSONAL CLÍNICO"></ui-empty>
+      </ng-template>
+    </div>
+
+    <div class="section">
+      <span class="section-label">EQUIPOS E INSTRUMENTAL</span>
+      <ul class="equip-list">
+        <li class="equip-item" *ngFor="let e of consultorio.equipment">
+          <ui-lamp tone="on" size="sm"></ui-lamp>
+          <span class="equip-name">{{ e }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <span class="section-label">ACTIVIDAD</span>
+      <div class="stats">
+        <ui-stat [value]="consultorio.procedures" label="PROCEDIMIENTOS"></ui-stat>
+        <ui-stat [value]="consultorio.lastUse" label="ÚLTIMA ATENCIÓN"></ui-stat>
       </div>
     </div>
 
-    <div class="panel-actions">
-      <button class="btn-amber" type="button" (click)="startEdit()">EDITAR SALA</button>
-      <button class="btn-ghost" type="button" (click)="toggle.emit(consultorio!.id)">
+    <div panelActions class="panel-actions">
+      <ui-button (click)="startEdit()">EDITAR SALA</ui-button>
+      <ui-button variant="ghost" (click)="toggle.emit(consultorio!.id)">
         {{ consultorio.status === 'mantenimiento' ? 'REACTIVAR' : 'A MANTENIMIENTO' }}
-      </button>
+      </ui-button>
     </div>
-  </ng-container>
-</div>
+  </ui-panel>
+</ng-container>

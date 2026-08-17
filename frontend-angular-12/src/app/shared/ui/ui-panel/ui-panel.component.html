@@ -1,0 +1,22 @@
+<div class="panel">
+  <div class="panel-head">
+    <div class="panel-head-info">
+      <span class="panel-kicker" [class.panel-kicker--warn]="warn">{{ kicker }}</span>
+      <span class="panel-title">{{ title }}</span>
+    </div>
+    <button class="icon-btn" type="button" aria-label="Cerrar" (click)="close.emit()" *ngIf="showClose">
+      <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+        <path d="M3 3l10 10"></path>
+        <path d="M13 3L3 13"></path>
+      </svg>
+    </button>
+  </div>
+
+  <ng-content select="[panelMeta]"></ng-content>
+
+  <div class="panel-scroll">
+    <ng-content></ng-content>
+  </div>
+
+  <ng-content select="[panelActions]"></ng-content>
+</div>

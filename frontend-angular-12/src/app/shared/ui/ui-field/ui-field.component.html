@@ -1,0 +1,7 @@
+<label class="field" [class.field--full]="full">
+  <span class="field-label">
+    {{ label }}<span *ngIf="required"> *</span>
+    <ng-content select="[fieldSuffix]"></ng-content>
+  </span>
+  <ng-content></ng-content>
+</label>

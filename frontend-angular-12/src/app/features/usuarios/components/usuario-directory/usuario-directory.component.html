@@ -22,18 +22,14 @@
       <span class="col col-name">{{ u.name }}</span>
       <span class="col col-role">{{ u.role }}</span>
       <span class="col col-status">
-        <span class="lamp" [class.lamp--live]="u.status === 'activo'" [class.lamp--warn]="u.status === 'suspendido'" aria-hidden="true"></span>
+        <ui-lamp [tone]="u.status === 'activo' ? 'on' : (u.status === 'suspendido' ? 'warn' : 'off')"></ui-lamp>
         <span class="status-text" [class.status-text--warn]="u.status === 'suspendido'">{{ u.status }}</span>
       </span>
     </button>
   </div>
 
   <ng-template #empty>
-    <div class="dir-empty">
-      <span class="dir-empty-lamp" aria-hidden="true"></span>
-      <p>SIN USUARIOS</p>
-      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
-    </div>
+    <ui-empty variant="bare" text="SIN USUARIOS" hint="AJUSTA LA BÚSQUEDA O EL FILTRO"></ui-empty>
   </ng-template>
 
   <app-pagination

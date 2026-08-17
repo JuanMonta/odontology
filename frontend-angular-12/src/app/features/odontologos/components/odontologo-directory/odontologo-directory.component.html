@@ -25,18 +25,14 @@
       <span class="col col-specialty">{{ o.specialty }}</span>
       <span class="col col-consultorio">{{ o.consultorio }}</span>
       <span class="col col-status">
-        <span class="lamp" [class.lamp--live]="o.status === 'activo'" [class.lamp--away]="o.status === 'ausente'" aria-hidden="true"></span>
+        <ui-lamp [tone]="o.status === 'activo' ? 'on' : (o.status === 'ausente' ? 'warn' : 'off')"></ui-lamp>
         <span class="status-text" [class.status-text--away]="o.status === 'ausente'">{{ o.status }}</span>
       </span>
     </button>
   </div>
 
   <ng-template #empty>
-    <div class="dir-empty">
-      <span class="dir-empty-lamp" aria-hidden="true"></span>
-      <p>SIN PROFESIONALES</p>
-      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
-    </div>
+    <ui-empty variant="bare" text="SIN PROFESIONALES" hint="AJUSTA LA BÚSQUEDA O EL FILTRO"></ui-empty>
   </ng-template>
 
   <app-pagination

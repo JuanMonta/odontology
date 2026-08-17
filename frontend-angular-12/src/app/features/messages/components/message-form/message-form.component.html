@@ -1,26 +1,22 @@
 <form class="form" (ngSubmit)="onSubmit()" novalidate>
   <div class="form-grid">
-    <label class="field field--full">
-      <span class="field-label">PARA</span>
+    <ui-field label="PARA" [full]="true">
       <select class="field-select" [(ngModel)]="destino" name="destino" aria-label="Público objetivo del mensaje">
         <option *ngFor="let d of destinos$ | async" [ngValue]="d.id">{{ d.label }}</option>
       </select>
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">PRIORIDAD</span>
+    <ui-field label="PRIORIDAD">
       <select class="field-select" [(ngModel)]="prioridad" name="prioridad" aria-label="Prioridad del mensaje">
         <option *ngFor="let p of priorities" [ngValue]="p.id">{{ p.label }}</option>
       </select>
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">REMITENTE</span>
+    <ui-field label="REMITENTE">
       <input class="field-input" type="text" [value]="sender" readonly aria-label="Remitente del mensaje" />
-    </label>
+    </ui-field>
 
-    <label class="field field--full">
-      <span class="field-label">ASUNTO *</span>
+    <ui-field label="ASUNTO" [required]="true" [full]="true">
       <input
         class="field-input"
         type="text"
@@ -29,10 +25,9 @@
         placeholder="REPROGRAMACIÓN · PAGO · CONSULTA CLÍNICA"
         autocomplete="off"
       />
-    </label>
+    </ui-field>
 
-    <label class="field field--full">
-      <span class="field-label">MENSAJE</span>
+    <ui-field label="MENSAJE" [full]="true">
       <textarea
         class="field-input field-textarea"
         rows="6"
@@ -41,13 +36,13 @@
         placeholder="DETALLE DE LA COMUNICACIÓN INTERNA DEL CONSULTORIO"
         autocomplete="off"
       ></textarea>
-    </label>
+    </ui-field>
   </div>
 
   <p class="form-error" *ngIf="error" role="alert">ASUNTO ES OBLIGATORIO</p>
 
   <div class="form-actions">
-    <button class="btn-amber" type="submit">ENVIAR MENSAJE</button>
-    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+    <ui-button type="submit">ENVIAR MENSAJE</ui-button>
+    <ui-button variant="ghost" (click)="cancel.emit()">CANCELAR</ui-button>
   </div>
 </form>

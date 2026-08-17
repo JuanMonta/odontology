@@ -18,10 +18,10 @@
         <span class="page-sub">INFRAESTRUCTURA · SALAS Y EQUIPOS · {{ (consultorios$ | async)?.length ?? 0 }} UNIDADES</span>
       </div>
       <div class="page-head-actions">
-        <button class="btn-amber" type="button" (click)="startCreate()">
+        <ui-button size="lg" (click)="startCreate()">
           <span class="btn-plus" aria-hidden="true"></span>
           NUEVO CONSULTORIO
-        </button>
+        </ui-button>
       </div>
     </div>
     <div class="page-toolbar">

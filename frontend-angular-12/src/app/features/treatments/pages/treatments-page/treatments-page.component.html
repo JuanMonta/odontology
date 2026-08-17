@@ -6,10 +6,10 @@
         <span class="page-sub">OPERACIÓN · TARIFARIO · {{ (treatments$ | async)?.length ?? 0 }} ITEMS</span>
       </div>
       <div class="page-head-actions">
-        <button class="btn-amber" type="button" (click)="startCreate()">
+        <ui-button size="lg" (click)="startCreate()">
           <span class="btn-plus" aria-hidden="true"></span>
           NUEVO TRATAMIENTO
-        </button>
+        </ui-button>
       </div>
     </div>
     <div class="page-toolbar">
