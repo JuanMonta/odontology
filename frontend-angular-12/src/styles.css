@@ -135,3 +135,153 @@ p {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ============================================================
+   Shared UI primitives (base layer)
+   Clases base del sistema consumidas por los átomos del
+   SharedModule (ui-field, ui-panel) y por los formularios y
+   paneles de las features. Fuente única; no duplicar por
+   componente.
+   ============================================================ */
+
+/* --- Form layout --- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-error {
+  font-family: var(--font-flap);
+  font-size: 0.68em;
+  letter-spacing: 0.16em;
+  color: var(--red-dim);
+}
+
+.form-hint {
+  font-family: var(--font-flap);
+  font-size: 0.62em;
+  letter-spacing: 0.14em;
+  color: var(--steel-500);
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+/* --- Field controls (proyectados dentro de <ui-field>) --- */
+.field-input,
+.field-select {
+  padding: 11px 14px;
+  font-family: var(--font-ui);
+  font-size: 0.82em;
+  color: var(--flap-ink);
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.18s var(--ease-out);
+}
+
+.field-input::placeholder {
+  color: var(--steel-500);
+  font-family: var(--font-flap);
+  font-size: 0.82em;
+  letter-spacing: 0.12em;
+}
+
+.field-input:focus,
+.field-select:focus {
+  outline: none;
+  border-color: var(--amber-line);
+}
+
+.field-select {
+  cursor: pointer;
+}
+
+.field-textarea {
+  resize: vertical;
+  min-height: 74px;
+  line-height: 1.5;
+}
+
+/* --- Panel meta y acciones (slots de <ui-panel>) --- */
+.panel-meta {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px;
+  gap: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.meta-label {
+  width: 130px;
+  flex-shrink: 0;
+  font-family: var(--font-flap);
+  font-size: 0.62em;
+  letter-spacing: 0.2em;
+  color: var(--steel-400);
+}
+
+.meta-value {
+  font-family: var(--font-flap);
+  font-size: 0.78em;
+  letter-spacing: 0.1em;
+  color: var(--steel-200);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta-value--free {
+  color: var(--steel-400);
+}
+
+.panel-actions {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* --- Secciones dentro del panel-scroll --- */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-label {
+  font-family: var(--font-flap);
+  font-size: 0.62em;
+  letter-spacing: 0.2em;
+  color: var(--flap-dim);
+}
+
+/* --- Rejilla de estadísticas (envuelve <ui-stat>) --- */
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

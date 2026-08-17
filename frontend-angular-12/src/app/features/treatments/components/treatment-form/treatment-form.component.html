@@ -5,35 +5,29 @@
   </div>
 
   <div class="form-grid">
-    <label class="field field--full">
-      <span class="field-label">NOMBRE DEL TRATAMIENTO *</span>
+    <ui-field label="NOMBRE DEL TRATAMIENTO" [required]="true" [full]="true">
       <input class="field-input" type="text" [(ngModel)]="name" name="name" placeholder="LIMPIEZA Y PROFILAXIS" autocomplete="off" (ngModelChange)="persistDraft()" />
-    </label>
+    </ui-field>
 
-    <label class="field field--full">
-      <span class="field-label">CATEGORÍA</span>
+    <ui-field label="CATEGORÍA" [full]="true">
       <select class="field-select" [(ngModel)]="category" name="category" aria-label="Categoría del tratamiento" (ngModelChange)="persistDraft()">
         <option *ngFor="let c of categories" [ngValue]="c">{{ c }}</option>
       </select>
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">DURACIÓN (MIN)</span>
+    <ui-field label="DURACIÓN (MIN)">
       <input class="field-input" type="number" min="5" max="480" [(ngModel)]="durationMin" name="durationMin" (ngModelChange)="persistDraft()" />
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">PRECIO (USD)</span>
+    <ui-field label="PRECIO (USD)">
       <input class="field-input" type="number" min="0" [(ngModel)]="price" name="price" (ngModelChange)="persistDraft()" />
-    </label>
+    </ui-field>
 
-    <label class="field field--full">
-      <span class="field-label">DESCRIPCIÓN</span>
+    <ui-field label="DESCRIPCIÓN" [full]="true">
       <textarea class="field-input field-textarea" rows="3" [(ngModel)]="description" name="description" placeholder="DETALLE CLÍNICO DEL TRATAMIENTO" autocomplete="off" (ngModelChange)="persistDraft()"></textarea>
-    </label>
+    </ui-field>
 
-    <div class="field field--full">
-      <span class="field-label">ESTADO</span>
+    <ui-field label="ESTADO" [full]="true">
       <div class="seg" role="radiogroup" aria-label="Estado del tratamiento">
         <button
           class="seg-btn"
@@ -52,11 +46,11 @@
           (click)="active = false; persistDraft()"
         >INACTIVO</button>
       </div>
-    </div>
+    </ui-field>
   </div>
 
-  <div class="field field--full">
-    <span class="field-label">CONSULTORIOS DISPONIBLES <span class="equip-count" *ngIf="consultorios.length">{{ consultorios.length }} ASIGNADOS</span></span>
+  <ui-field label="CONSULTORIOS DISPONIBLES" [full]="true">
+    <span fieldSuffix class="equip-count" *ngIf="consultorios.length">{{ consultorios.length }} ASIGNADOS</span>
     <div class="equip-assigned" *ngIf="consultorios.length">
       <ng-container *ngIf="consultorios$ | async as catalog">
         <label class="equip-chip is-on" *ngFor="let c of assignedConsultorios(catalog); trackBy: trackConsultorio">
@@ -81,13 +75,13 @@
     >
       + AGREGAR CONSULTORIOS
     </button>
-  </div>
+  </ui-field>
 
   <p class="form-error" *ngIf="error" role="alert">EL NOMBRE DEL TRATAMIENTO ES OBLIGATORIO</p>
 
   <div class="form-actions">
-    <button class="btn-amber" type="submit">{{ creating ? 'CREAR TRATAMIENTO' : 'GUARDAR CAMBIOS' }}</button>
-    <button class="btn-ghost" type="button" (click)="onCancel()">CANCELAR</button>
+    <ui-button type="submit">{{ creating ? 'CREAR TRATAMIENTO' : 'GUARDAR CAMBIOS' }}</ui-button>
+    <ui-button variant="ghost" (click)="onCancel()">CANCELAR</ui-button>
   </div>
 
   <!-- ==================== CATÁLOGO DE CONSULTORIOS (MODAL FLOTANTE) ==================== -->
@@ -160,8 +154,8 @@
       </ng-container>
 
       <div class="picker-foot">
-        <button class="picker-confirm" type="button" (click)="closeTrtPicker()">CONFIRMAR</button>
-        <button class="btn-ghost" type="button" (click)="closeTrtPicker()">CANCELAR</button>
+        <ui-button (click)="closeTrtPicker()">CONFIRMAR</ui-button>
+        <ui-button variant="ghost" (click)="closeTrtPicker()">CANCELAR</ui-button>
       </div>
     </div>
   </div>

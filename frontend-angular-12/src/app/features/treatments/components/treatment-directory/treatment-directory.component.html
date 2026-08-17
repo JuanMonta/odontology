@@ -22,18 +22,14 @@
       <span class="col col-dur">{{ t.durationMin }} MIN</span>
       <span class="col col-price">{{ money(t.price) }}</span>
       <span class="col col-status">
-        <span class="lamp" [class.lamp--on]="t.active" aria-hidden="true"></span>
+        <ui-lamp [tone]="t.active ? 'on' : 'off'"></ui-lamp>
         <span class="status-text">{{ t.active ? 'ACTIVO' : 'INACTIVO' }}</span>
       </span>
     </button>
   </div>
 
   <ng-template #empty>
-    <div class="dir-empty">
-      <span class="dir-empty-lamp" aria-hidden="true"></span>
-      <p>SIN RESULTADOS</p>
-      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
-    </div>
+    <ui-empty variant="bare" text="SIN RESULTADOS" hint="AJUSTA LA BÚSQUEDA O EL FILTRO"></ui-empty>
   </ng-template>
 
   <app-pagination

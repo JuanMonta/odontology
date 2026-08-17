@@ -79,7 +79,7 @@
   color: var(--amber);
 }
 
-/* ============ Profesional ============ */
+/* ============ Turno ============ */
 .col-name {
   display: flex;
   flex-direction: column;
@@ -114,24 +114,6 @@
   gap: 9px;
 }
 
-.lamp {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #333c46;
-  flex-shrink: 0;
-}
-
-.lamp--live {
-  background: var(--amber);
-  box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.45);
-}
-
-.lamp--away {
-  background: var(--red-dim);
-  box-shadow: 0 0 8px 1px rgba(207, 90, 84, 0.45);
-}
-
 .status-text {
   font-size: 0.68em;
   letter-spacing: 0.14em;
@@ -143,41 +125,9 @@
   color: var(--red-dim);
 }
 
-/* ============ Estados atenuados ============ */
-.dir-row.is-away {
-  opacity: 0.72;
-}
-
+/* ============ Inactivo: atenuado ============ */
 .dir-row.is-inactive {
   opacity: 0.55;
-}
-
-/* ============ Empty ============ */
-.dir-empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 40px;
-  font-family: var(--font-flap);
-  font-size: 0.82em;
-  letter-spacing: 0.16em;
-  color: var(--steel-400);
-}
-
-.dir-empty-lamp {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--steel-600);
-}
-
-.dir-empty-hint {
-  font-size: 0.66em;
-  letter-spacing: 0.18em;
-  color: var(--steel-500);
 }
 
 /* ============ Responsive ============ */

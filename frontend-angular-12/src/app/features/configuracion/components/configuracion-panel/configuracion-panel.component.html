@@ -1,198 +1,180 @@
-<div class="panel">
-  <ng-container *ngIf="settings">
-    <div class="panel-head">
-      <div class="panel-head-info">
-        <span class="panel-kicker">{{ sectionMeta(section)?.sub ?? '' }}</span>
-        <span class="panel-title">{{ sectionMeta(section)?.label ?? '' }}</span>
+<ui-panel
+  *ngIf="settings"
+  [kicker]="sectionMeta(section)?.sub ?? ''"
+  [title]="sectionMeta(section)?.label ?? ''"
+  [showClose]="false"
+>
+  <form class="form" (ngSubmit)="onSubmit()" novalidate>
+    <!-- DATOS DEL CONSULTORIO -->
+    <div class="form-grid" *ngIf="section === 'clinica'">
+      <ui-field label="NOMBRE DEL CONSULTORIO" [required]="true" [full]="true">
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="nombre"
+          name="nombre"
+          placeholder="SAS ODONTO S.A.C."
+          autocomplete="off"
+        />
+      </ui-field>
+
+      <ui-field label="RUC" [required]="true">
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="ruc"
+          name="ruc"
+          placeholder="20512345678"
+          autocomplete="off"
+        />
+      </ui-field>
+
+      <ui-field label="TELÉFONO">
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="telefono"
+          name="telefono"
+          placeholder="+51 987 654 321"
+          autocomplete="off"
+        />
+      </ui-field>
+
+      <ui-field label="DIRECCIÓN" [full]="true">
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="direccion"
+          name="direccion"
+          placeholder="AV. LARCO 1250, MIRAFLORES, LIMA"
+          autocomplete="off"
+        />
+      </ui-field>
+
+      <ui-field label="CORREO" [full]="true">
+        <input
+          class="field-input"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="contacto@sasodonto.com"
+          autocomplete="off"
+        />
+      </ui-field>
+    </div>
+
+    <!-- AGENDA Y HORARIOS -->
+    <div class="form-grid" *ngIf="section === 'agenda'">
+      <ui-field label="INICIO DE ATENCIÓN">
+        <input
+          class="field-input"
+          type="time"
+          [(ngModel)]="horarioInicio"
+          name="horarioInicio"
+          autocomplete="off"
+        />
+      </ui-field>
+
+      <ui-field label="FIN DE ATENCIÓN">
+        <input
+          class="field-input"
+          type="time"
+          [(ngModel)]="horarioFin"
+          name="horarioFin"
+          autocomplete="off"
+        />
+      </ui-field>
+
+      <ui-field label="DURACIÓN DEFAULT CITA (MIN)">
+        <input
+          class="field-input"
+          type="number"
+          min="5"
+          step="5"
+          [(ngModel)]="duracionCita"
+          name="duracionCita"
+          autocomplete="off"
+        />
+      </ui-field>
+
+      <ui-field label="TOLERANCIA DE RETRASO (MIN)">
+        <input
+          class="field-input"
+          type="number"
+          min="0"
+          step="5"
+          [(ngModel)]="toleranciaRetraso"
+          name="toleranciaRetraso"
+          autocomplete="off"
+        />
+      </ui-field>
+
+      <ui-field label="DÍAS DE ATENCIÓN" [full]="true">
+        <div class="days">
+          <button
+            *ngFor="let d of weekdays"
+            class="day"
+            [class.is-on]="diasAtencion.includes(d)"
+            type="button"
+            (click)="toggleDay(d)"
+          >
+            <span class="day-lamp" aria-hidden="true"></span>
+            {{ d }}
+          </button>
+        </div>
+      </ui-field>
+    </div>
+
+    <!-- SISTEMA Y NOTIFICACIONES -->
+    <div class="form-grid" *ngIf="section === 'sistema'">
+      <ui-field label="MONEDA">
+        <select class="field-select" [ngModel]="'USD'" name="moneda" aria-label="Moneda" disabled>
+          <option value="USD">USD · DÓLAR AMERICANO</option>
+        </select>
+      </ui-field>
+
+      <ui-field label="FORMATO DE FECHA">
+        <select class="field-select" [(ngModel)]="formatoFecha" name="formatoFecha" aria-label="Formato de fecha">
+          <option value="DD MMM AAAA">DD MMM AAAA</option>
+          <option value="DD/MM/AAAA">DD/MM/AAAA</option>
+          <option value="AAAA-MM-DD">AAAA-MM-DD</option>
+        </select>
+      </ui-field>
+
+      <div class="toggles field--full">
+        <label class="toggle">
+          <span class="toggle-lamp" [class.is-on]="recordatorioCitas" aria-hidden="true"></span>
+          <span class="toggle-info">
+            <span class="toggle-label">RECORDATORIO DE CITAS</span>
+            <span class="toggle-hint">AVISO AUTOMÁTICO 24 H ANTES DE LA CITA</span>
+          </span>
+          <input class="toggle-input" type="checkbox" [(ngModel)]="recordatorioCitas" name="recordatorioCitas" aria-label="Recordatorio de citas" />
+        </label>
+
+        <label class="toggle">
+          <span class="toggle-lamp" [class.is-on]="notificacionUrgente" aria-hidden="true"></span>
+          <span class="toggle-info">
+            <span class="toggle-label">ALERTAS URGENTES</span>
+            <span class="toggle-hint">MENSAJES PRIORITARIOS EN LA BANDEJA</span>
+          </span>
+          <input class="toggle-input" type="checkbox" [(ngModel)]="notificacionUrgente" name="notificacionUrgente" aria-label="Alertas urgentes" />
+        </label>
+
+        <label class="toggle">
+          <span class="toggle-lamp" [class.is-on]="avisoVencimiento" aria-hidden="true"></span>
+          <span class="toggle-info">
+            <span class="toggle-label">AVISO DE VENCIMIENTO</span>
+            <span class="toggle-hint">NOTIFICAR SALDOS PENDIENTES DE PACIENTES</span>
+          </span>
+          <input class="toggle-input" type="checkbox" [(ngModel)]="avisoVencimiento" name="avisoVencimiento" aria-label="Aviso de vencimiento" />
+        </label>
       </div>
     </div>
 
-    <form class="form" (ngSubmit)="onSubmit()" novalidate>
-      <div class="panel-scroll">
-        <!-- DATOS DEL CONSULTORIO -->
-        <div class="form-grid" *ngIf="section === 'clinica'">
-          <label class="field field--full">
-            <span class="field-label">NOMBRE DEL CONSULTORIO *</span>
-            <input
-              class="field-input"
-              type="text"
-              [(ngModel)]="nombre"
-              name="nombre"
-              placeholder="SAS ODONTO S.A.C."
-              autocomplete="off"
-            />
-          </label>
+    <p class="form-error" *ngIf="error" role="alert">NOMBRE Y RUC SON OBLIGATORIOS</p>
+  </form>
 
-          <label class="field">
-            <span class="field-label">RUC *</span>
-            <input
-              class="field-input"
-              type="text"
-              [(ngModel)]="ruc"
-              name="ruc"
-              placeholder="20512345678"
-              autocomplete="off"
-            />
-          </label>
-
-          <label class="field">
-            <span class="field-label">TELÉFONO</span>
-            <input
-              class="field-input"
-              type="text"
-              [(ngModel)]="telefono"
-              name="telefono"
-              placeholder="+51 987 654 321"
-              autocomplete="off"
-            />
-          </label>
-
-          <label class="field field--full">
-            <span class="field-label">DIRECCIÓN</span>
-            <input
-              class="field-input"
-              type="text"
-              [(ngModel)]="direccion"
-              name="direccion"
-              placeholder="AV. LARCO 1250, MIRAFLORES, LIMA"
-              autocomplete="off"
-            />
-          </label>
-
-          <label class="field field--full">
-            <span class="field-label">CORREO</span>
-            <input
-              class="field-input"
-              type="email"
-              [(ngModel)]="email"
-              name="email"
-              placeholder="contacto@sasodonto.com"
-              autocomplete="off"
-            />
-          </label>
-        </div>
-
-        <!-- AGENDA Y HORARIOS -->
-        <div class="form-grid" *ngIf="section === 'agenda'">
-          <label class="field">
-            <span class="field-label">INICIO DE ATENCIÓN</span>
-            <input
-              class="field-input"
-              type="time"
-              [(ngModel)]="horarioInicio"
-              name="horarioInicio"
-              autocomplete="off"
-            />
-          </label>
-
-          <label class="field">
-            <span class="field-label">FIN DE ATENCIÓN</span>
-            <input
-              class="field-input"
-              type="time"
-              [(ngModel)]="horarioFin"
-              name="horarioFin"
-              autocomplete="off"
-            />
-          </label>
-
-          <label class="field">
-            <span class="field-label">DURACIÓN DEFAULT CITA (MIN)</span>
-            <input
-              class="field-input"
-              type="number"
-              min="5"
-              step="5"
-              [(ngModel)]="duracionCita"
-              name="duracionCita"
-              autocomplete="off"
-            />
-          </label>
-
-          <label class="field">
-            <span class="field-label">TOLERANCIA DE RETRASO (MIN)</span>
-            <input
-              class="field-input"
-              type="number"
-              min="0"
-              step="5"
-              [(ngModel)]="toleranciaRetraso"
-              name="toleranciaRetraso"
-              autocomplete="off"
-            />
-          </label>
-
-          <div class="field field--full">
-            <span class="field-label">DÍAS DE ATENCIÓN</span>
-            <div class="days">
-              <button
-                *ngFor="let d of weekdays"
-                class="day"
-                [class.is-on]="diasAtencion.includes(d)"
-                type="button"
-                (click)="toggleDay(d)"
-              >
-                <span class="day-lamp" aria-hidden="true"></span>
-                {{ d }}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- SISTEMA Y NOTIFICACIONES -->
-        <div class="form-grid" *ngIf="section === 'sistema'">
-          <label class="field">
-            <span class="field-label">MONEDA</span>
-            <select class="field-select" [ngModel]="'USD'" name="moneda" aria-label="Moneda" disabled>
-              <option value="USD">USD · DÓLAR AMERICANO</option>
-            </select>
-          </label>
-
-          <label class="field">
-            <span class="field-label">FORMATO DE FECHA</span>
-            <select class="field-select" [(ngModel)]="formatoFecha" name="formatoFecha" aria-label="Formato de fecha">
-              <option value="DD MMM AAAA">DD MMM AAAA</option>
-              <option value="DD/MM/AAAA">DD/MM/AAAA</option>
-              <option value="AAAA-MM-DD">AAAA-MM-DD</option>
-            </select>
-          </label>
-
-          <div class="toggles field--full">
-            <label class="toggle">
-              <span class="toggle-lamp" [class.is-on]="recordatorioCitas" aria-hidden="true"></span>
-              <span class="toggle-info">
-                <span class="toggle-label">RECORDATORIO DE CITAS</span>
-                <span class="toggle-hint">AVISO AUTOMÁTICO 24 H ANTES DE LA CITA</span>
-              </span>
-              <input class="toggle-input" type="checkbox" [(ngModel)]="recordatorioCitas" name="recordatorioCitas" aria-label="Recordatorio de citas" />
-            </label>
-
-            <label class="toggle">
-              <span class="toggle-lamp" [class.is-on]="notificacionUrgente" aria-hidden="true"></span>
-              <span class="toggle-info">
-                <span class="toggle-label">ALERTAS URGENTES</span>
-                <span class="toggle-hint">MENSAJES PRIORITARIOS EN LA BANDEJA</span>
-              </span>
-              <input class="toggle-input" type="checkbox" [(ngModel)]="notificacionUrgente" name="notificacionUrgente" aria-label="Alertas urgentes" />
-            </label>
-
-            <label class="toggle">
-              <span class="toggle-lamp" [class.is-on]="avisoVencimiento" aria-hidden="true"></span>
-              <span class="toggle-info">
-                <span class="toggle-label">AVISO DE VENCIMIENTO</span>
-                <span class="toggle-hint">NOTIFICAR SALDOS PENDIENTES DE PACIENTES</span>
-              </span>
-              <input class="toggle-input" type="checkbox" [(ngModel)]="avisoVencimiento" name="avisoVencimiento" aria-label="Aviso de vencimiento" />
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <p class="form-error" *ngIf="error" role="alert">NOMBRE Y RUC SON OBLIGATORIOS</p>
-
-      <div class="panel-actions">
-        <button class="btn-amber" type="submit">GUARDAR CAMBIOS</button>
-      </div>
-    </form>
-  </ng-container>
-</div>
+  <div panelActions class="panel-actions">
+    <ui-button (click)="onSubmit()">GUARDAR CAMBIOS</ui-button>
+  </div>
+</ui-panel>

@@ -1,7 +1,6 @@
 <form class="form" (ngSubmit)="onSubmit()" novalidate>
   <div class="form-grid">
-    <label class="field">
-      <span class="field-label">NOMBRE DEL TURNO *</span>
+    <ui-field label="NOMBRE DEL TURNO" [required]="true">
       <input
         class="field-input"
         type="text"
@@ -10,27 +9,23 @@
         placeholder="MAÑANA"
         autocomplete="off"
       />
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">HORA DE INICIO *</span>
+    <ui-field label="HORA DE INICIO" [required]="true">
       <input class="field-input" type="time" [(ngModel)]="horaInicio" name="horaInicio" aria-label="Hora de inicio" />
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">HORA DE FIN *</span>
+    <ui-field label="HORA DE FIN" [required]="true">
       <input class="field-input" type="time" [(ngModel)]="horaFin" name="horaFin" aria-label="Hora de fin" />
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">INICIO DE DESCANSO</span>
+    <ui-field label="INICIO DE DESCANSO">
       <input class="field-input" type="time" [(ngModel)]="descansoInicio" name="descansoInicio" aria-label="Inicio de descanso" />
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">FIN DE DESCANSO</span>
+    <ui-field label="FIN DE DESCANSO">
       <input class="field-input" type="time" [(ngModel)]="descansoFin" name="descansoFin" aria-label="Fin de descanso" />
-    </label>
+    </ui-field>
   </div>
 
   <p class="form-hint">EL DESCANSO ES OPCIONAL: DEFINE LA PAUSA DE ALMUERZO DENTRO DE LA JORNADA.</p>
@@ -38,7 +33,7 @@
   <p class="form-error" *ngIf="error" role="alert">{{ errorMsg }}</p>
 
   <div class="form-actions">
-    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
-    <button class="btn-amber" type="submit">GUARDAR TURNO</button>
+    <ui-button variant="ghost" (click)="cancel.emit()">CANCELAR</ui-button>
+    <ui-button type="submit">GUARDAR TURNO</ui-button>
   </div>
 </form>

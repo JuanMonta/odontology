@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+}
+
+.stat-value {
+  font-family: var(--font-flap);
+  font-weight: 500;
+  font-size: 1.3em;
+  letter-spacing: 0.08em;
+  color: var(--flap-ink);
+  line-height: 1.1;
+}
+
+.stat-label {
+  font-family: var(--font-flap);
+  font-size: 0.58em;
+  letter-spacing: 0.18em;
+  color: var(--steel-500);
+}

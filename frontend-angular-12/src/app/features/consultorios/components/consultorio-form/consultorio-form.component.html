@@ -1,7 +1,6 @@
 <form class="form" (ngSubmit)="onSubmit()" novalidate>
   <div class="form-grid">
-    <label class="field">
-      <span class="field-label">SALA *</span>
+    <ui-field label="SALA" [required]="true">
       <input
         class="field-input"
         type="text"
@@ -10,33 +9,30 @@
         placeholder="CONSULTORIO 07"
         autocomplete="off"
       />
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">SILLÓN / UNIDAD *</span>
+    <ui-field label="SILLÓN / UNIDAD" [required]="true">
       <select class="field-select" [(ngModel)]="unit" name="unit" aria-label="Sillón o unidad">
         <option value="" disabled selected hidden>— SELECCIONAR UNIDAD —</option>
         <option *ngFor="let u of unidades$ | async" [ngValue]="u">{{ u }}</option>
       </select>
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">UBICACIÓN *</span>
+    <ui-field label="UBICACIÓN" [required]="true">
       <select class="field-select" [(ngModel)]="location" name="location" aria-label="Ubicación">
         <option value="" disabled selected hidden>— SELECCIONAR UBICACIÓN —</option>
         <option *ngFor="let l of ubicaciones$ | async" [ngValue]="l">{{ l }}</option>
       </select>
-    </label>
+    </ui-field>
 
-    <label class="field">
-      <span class="field-label">ESTADO</span>
+    <ui-field label="ESTADO">
       <select class="field-select" [(ngModel)]="status" name="status" aria-label="Estado del consultorio">
         <option *ngFor="let s of statuses" [ngValue]="s">{{ s }}</option>
       </select>
-    </label>
+    </ui-field>
 
-    <div class="field field--full">
-      <span class="field-label">EQUIPOS E INSTRUMENTAL <span class="equip-count" *ngIf="equipment.length">{{ equipment.length }} ASIGNADOS</span></span>
+    <ui-field label="EQUIPOS E INSTRUMENTAL" [full]="true">
+      <span fieldSuffix class="equip-count" *ngIf="equipment.length">{{ equipment.length }} ASIGNADOS</span>
       <div class="equip-assigned" *ngIf="equipment.length">
         <label class="equip-chip is-on" *ngFor="let e of equipment">
           <input
@@ -59,10 +55,10 @@
       >
         + AGREGAR EQUIPOS E INSTRUMENTAL
       </button>
-    </div>
+    </ui-field>
 
-    <div class="field field--full">
-      <span class="field-label">TRATAMIENTOS SOPORTADOS <span class="equip-count" *ngIf="tratamientos.length">{{ tratamientos.length }} ASIGNADOS</span></span>
+    <ui-field label="TRATAMIENTOS SOPORTADOS" [full]="true">
+      <span fieldSuffix class="equip-count" *ngIf="tratamientos.length">{{ tratamientos.length }} ASIGNADOS</span>
       <div class="equip-assigned" *ngIf="tratamientos.length">
         <ng-container *ngIf="tratamientos$ | async as catalog">
           <label class="equip-chip is-on" *ngFor="let t of assignedTratamientos(catalog); trackBy: trackTratamiento">
@@ -87,13 +83,10 @@
       >
         + AGREGAR TRATAMIENTOS
       </button>
-    </div>
+    </ui-field>
 
-    <div class="field field--full">
-      <span class="field-label">
-        ASIGNAR PROFESIONALES
-        <span class="equip-count" *ngIf="assigned.length">{{ assigned.length }} ASIGNADOS</span>
-      </span>
+    <ui-field label="ASIGNAR PROFESIONALES" [full]="true">
+      <span fieldSuffix class="equip-count" *ngIf="assigned.length">{{ assigned.length }} ASIGNADOS</span>
       <ng-container *ngIf="odontologos$ | async as odontologos">
         <p class="staff-empty" *ngIf="!odontologos.length" role="status">
           SIN PROFESIONALES ACTIVOS · REGISTRA ODONTÓLOGOS EN PERSONAL CLÍNICO
@@ -126,14 +119,14 @@
           </button>
         </ng-container>
       </ng-container>
-    </div>
+    </ui-field>
   </div>
 
   <p class="form-error" *ngIf="error" role="alert">LA SALA, LA UNIDAD Y LA UBICACIÓN SON OBLIGATORIAS</p>
 
   <div class="form-actions">
-    <button class="btn-amber" type="submit">{{ consultorio ? 'GUARDAR CAMBIOS' : 'REGISTRAR SALA' }}</button>
-    <button class="btn-ghost" type="button" (click)="cancel.emit()">CANCELAR</button>
+    <ui-button type="submit">{{ consultorio ? 'GUARDAR CAMBIOS' : 'REGISTRAR SALA' }}</ui-button>
+    <ui-button variant="ghost" (click)="cancel.emit()">CANCELAR</ui-button>
   </div>
 
   <!-- ==================== CATÁLOGO DE EQUIPOS (MODAL FLOTANTE) ==================== -->
@@ -208,8 +201,8 @@
       </ng-container>
 
       <div class="picker-foot">
-        <button class="picker-confirm" type="button" (click)="closePicker()">CONFIRMAR</button>
-        <button class="btn-ghost" type="button" (click)="closePicker()">CANCELAR</button>
+        <ui-button (click)="closePicker()">CONFIRMAR</ui-button>
+        <ui-button variant="ghost" (click)="closePicker()">CANCELAR</ui-button>
       </div>
     </div>
   </div>
@@ -289,8 +282,8 @@
       </ng-container>
 
       <div class="picker-foot">
-        <button class="picker-confirm" type="button" (click)="closeStaffPicker()">CONFIRMAR</button>
-        <button class="btn-ghost" type="button" (click)="closeStaffPicker()">CANCELAR</button>
+        <ui-button (click)="closeStaffPicker()">CONFIRMAR</ui-button>
+        <ui-button variant="ghost" (click)="closeStaffPicker()">CANCELAR</ui-button>
       </div>
     </div>
   </div>
@@ -367,8 +360,8 @@
       </ng-container>
 
       <div class="picker-foot">
-        <button class="picker-confirm" type="button" (click)="closeTrtPicker()">CONFIRMAR</button>
-        <button class="btn-ghost" type="button" (click)="closeTrtPicker()">CANCELAR</button>
+        <ui-button (click)="closeTrtPicker()">CONFIRMAR</ui-button>
+        <ui-button variant="ghost" (click)="closeTrtPicker()">CANCELAR</ui-button>
       </div>
     </div>
   </div>

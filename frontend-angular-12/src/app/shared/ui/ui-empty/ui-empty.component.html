@@ -1,0 +1,12 @@
+<span
+  class="empty"
+  [class.empty--bare]="variant === 'bare'"
+  [class.empty--panel]="variant === 'panel'"
+>
+  <span class="empty-mark" *ngIf="variant === 'panel'" aria-hidden="true">
+    <span class="empty-cell">+</span>
+  </span>
+  <span class="empty-lamp" *ngIf="variant !== 'panel'" aria-hidden="true"></span>
+  <span class="empty-text">{{ text }}</span>
+  <span class="empty-hint" *ngIf="hint">{{ hint }}</span>
+</span>

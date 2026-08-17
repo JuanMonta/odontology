@@ -1,55 +1,33 @@
-<div class="panel">
-  <!-- Creando / editando tratamiento -->
-  <ng-container *ngIf="creating || editing">
-    <div class="panel-head">
-      <div class="panel-head-info">
-        <span class="panel-kicker">{{ creating ? 'NUEVO TRATAMIENTO' : 'EDITAR TRATAMIENTO' }}</span>
-        <span class="panel-title">{{ creating ? 'REGISTRO DE TRATAMIENTO' : (editingTreatment?.code ?? treatment?.code ?? '') }}</span>
-      </div>
-      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="closeForm()">
-        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <path d="M3 3l10 10"></path>
-          <path d="M13 3L3 13"></path>
-        </svg>
-      </button>
-    </div>
-    <div class="panel-scroll">
-      <app-treatment-form
-        [treatment]="creating ? null : editingTreatment"
-        [creating]="creating"
-        (saved)="onSaved($event)"
-        (cancel)="creating ? cancel.emit() : cancelEdit()"
-      ></app-treatment-form>
-    </div>
-  </ng-container>
+<!-- Creando / editando tratamiento -->
+<ng-container *ngIf="creating || editing">
+  <ui-panel
+    [kicker]="creating ? 'NUEVO TRATAMIENTO' : 'EDITAR TRATAMIENTO'"
+    [title]="creating ? 'REGISTRO DE TRATAMIENTO' : (editingTreatment?.code ?? treatment?.code ?? '')"
+    (close)="closeForm()"
+  >
+    <app-treatment-form
+      [treatment]="creating ? null : editingTreatment"
+      [creating]="creating"
+      (saved)="onSaved($event)"
+      (cancel)="creating ? cancel.emit() : cancelEdit()"
+    ></app-treatment-form>
+  </ui-panel>
+</ng-container>
 
-  <!-- Sin selección -->
-  <ng-container *ngIf="!creating && !editing && !treatment">
-    <div class="panel-empty">
-      <span class="panel-empty-mark" aria-hidden="true"><span class="panel-empty-cell">+</span></span>
-      <span class="panel-empty-title">SELECCIONA UN TRATAMIENTO</span>
-      <span class="panel-empty-hint">ABRE UNA FILA DEL CATÁLOGO PARA VER SU FICHA</span>
-    </div>
-  </ng-container>
+<!-- Sin selección -->
+<ng-container *ngIf="!creating && !editing && !treatment">
+  <ui-empty variant="panel" text="SELECCIONA UN TRATAMIENTO" hint="ABRE UNA FILA DEL CATÁLOGO PARA VER SU FICHA"></ui-empty>
+</ng-container>
 
-  <!-- Tratamiento seleccionado -->
-  <ng-container *ngIf="!creating && !editing && treatment">
-    <div class="panel-head">
-      <div class="panel-head-info">
-        <span class="panel-kicker" [class.panel-kicker--warn]="!treatment.active">
-          {{ treatment.active ? 'ACTIVO' : 'INACTIVO' }}
-        </span>
-        <span class="panel-title">{{ treatment.name }}</span>
-      </div>
-      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="close.emit()">
-        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <path d="M3 3l10 10"></path>
-          <path d="M13 3L3 13"></path>
-        </svg>
-      </button>
-    </div>
-
-    <div class="panel-meta">
+<!-- Tratamiento seleccionado -->
+<ng-container *ngIf="!creating && !editing && treatment">
+  <ui-panel
+    [kicker]="treatment.active ? 'ACTIVO' : 'INACTIVO'"
+    [title]="treatment.name"
+    [warn]="!treatment.active"
+    (close)="close.emit()"
+  >
+    <div panelMeta class="panel-meta">
       <div class="meta-row">
         <span class="meta-label">CÓDIGO</span>
         <span class="meta-value">{{ treatment.code }}</span>
@@ -68,59 +46,43 @@
       </div>
     </div>
 
-    <div class="panel-scroll">
-      <div class="section">
-        <span class="section-label">DESCRIPCIÓN</span>
-        <p class="desc-text" *ngIf="treatment.description; else noDesc">{{ treatment.description }}</p>
-        <ng-template #noDesc>
-          <div class="staff-empty">
-            <span class="staff-empty-lamp" aria-hidden="true"></span>
-            <span class="staff-empty-text">SIN DESCRIPCIÓN REGISTRADA</span>
-          </div>
-        </ng-template>
-      </div>
+    <div class="section">
+      <span class="section-label">DESCRIPCIÓN</span>
+      <p class="desc-text" *ngIf="treatment.description; else noDesc">{{ treatment.description }}</p>
+      <ng-template #noDesc>
+        <ui-empty text="SIN DESCRIPCIÓN REGISTRADA"></ui-empty>
+      </ng-template>
+    </div>
 
-      <div class="section">
-        <span class="section-label">CONSULTORIOS DISPONIBLES</span>
-        <ng-container *ngIf="consultorios$ | async as catalog">
-          <div class="cons-wrap" *ngIf="consultoriosDeLaFicha(catalog).length; else noCons">
-            <label class="cons-chip" *ngFor="let c of consultoriosDeLaFicha(catalog); trackBy: consTrack">
-              <span class="cons-chip-lamp" aria-hidden="true"></span>
-              <span class="cons-chip-main">
-                <span class="cons-chip-name">{{ c.name }}</span>
-                <span class="cons-chip-sub">{{ c.code }}</span>
-              </span>
-            </label>
-          </div>
-          <ng-template #noCons>
-            <div class="staff-empty">
-              <span class="staff-empty-lamp" aria-hidden="true"></span>
-              <span class="staff-empty-text">NO DISPONIBLE EN NINGÚN CONSULTORIO</span>
-            </div>
-          </ng-template>
-        </ng-container>
-      </div>
-
-      <div class="section">
-        <span class="section-label">ACTIVIDAD</span>
-        <div class="stats">
-          <div class="stat">
-            <span class="stat-value">{{ treatment.usage }}</span>
-            <span class="stat-label">EN PACIENTES</span>
-          </div>
-          <div class="stat">
-            <span class="stat-value">{{ treatment.active ? 'ACTIVO' : 'INACTIVO' }}</span>
-            <span class="stat-label">ESTADO</span>
-          </div>
+    <div class="section">
+      <span class="section-label">CONSULTORIOS DISPONIBLES</span>
+      <ng-container *ngIf="consultorios$ | async as catalog">
+        <div class="cons-wrap" *ngIf="consultoriosDeLaFicha(catalog).length; else noCons">
+          <ui-chip
+            *ngFor="let c of consultoriosDeLaFicha(catalog); trackBy: consTrack"
+            [name]="c.name"
+            [sub]="c.code"
+          ></ui-chip>
         </div>
+        <ng-template #noCons>
+          <ui-empty text="NO DISPONIBLE EN NINGÚN CONSULTORIO"></ui-empty>
+        </ng-template>
+      </ng-container>
+    </div>
+
+    <div class="section">
+      <span class="section-label">ACTIVIDAD</span>
+      <div class="stats">
+        <ui-stat [value]="treatment.usage" label="EN PACIENTES"></ui-stat>
+        <ui-stat [value]="treatment.active ? 'ACTIVO' : 'INACTIVO'" label="ESTADO"></ui-stat>
       </div>
     </div>
 
-    <div class="panel-actions">
-      <button class="btn-amber" type="button" (click)="startEdit()">EDITAR TRATAMIENTO</button>
-      <button class="btn-ghost" type="button" (click)="toggle.emit(treatment!.id)">
+    <div panelActions class="panel-actions">
+      <ui-button (click)="startEdit()">EDITAR TRATAMIENTO</ui-button>
+      <ui-button variant="ghost" (click)="toggle.emit(treatment!.id)">
         {{ treatment.active ? 'INACTIVAR' : 'REACTIVAR' }}
-      </button>
+      </ui-button>
     </div>
-  </ng-container>
-</div>
+  </ui-panel>
+</ng-container>

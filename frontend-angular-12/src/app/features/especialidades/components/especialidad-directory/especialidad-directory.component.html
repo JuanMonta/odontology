@@ -20,18 +20,14 @@
         <span class="col-name-license">ÁREA DE TRATAMIENTO</span>
       </span>
       <span class="col col-status">
-        <span class="lamp" [class.lamp--live]="e.activo" aria-hidden="true"></span>
+        <ui-lamp [tone]="e.activo ? 'on' : 'off'"></ui-lamp>
         <span class="status-text" [class.status-text--away]="!e.activo">{{ e.activo ? 'activa' : 'inactiva' }}</span>
       </span>
     </button>
   </div>
 
   <ng-template #empty>
-    <div class="dir-empty">
-      <span class="dir-empty-lamp" aria-hidden="true"></span>
-      <p>SIN ESPECIALIDADES</p>
-      <p class="dir-empty-hint">AJUSTA LA BÚSQUEDA O EL FILTRO</p>
-    </div>
+    <ui-empty variant="bare" text="SIN ESPECIALIDADES" hint="AJUSTA LA BÚSQUEDA O EL FILTRO"></ui-empty>
   </ng-template>
 
   <app-pagination
