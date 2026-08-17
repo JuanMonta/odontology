@@ -65,6 +65,28 @@
 
     <div class="panel-scroll">
       <div class="section">
+        <span class="section-label">TRATAMIENTOS SOPORTADOS</span>
+        <ng-container *ngIf="tratamientos$ | async as catalog">
+          <div class="cons-wrap" *ngIf="tratamientosDeLaSala(catalog).length; else noTratamientos">
+            <label class="cons-chip" *ngFor="let t of tratamientosDeLaSala(catalog); trackBy: tratTrack">
+              <span class="cons-chip-lamp" aria-hidden="true"></span>
+              <span class="cons-chip-main">
+                <span class="cons-chip-name">{{ t.name }}</span>
+                <span class="cons-chip-sub">{{ t.code }} · {{ t.category }}</span>
+              </span>
+            </label>
+          </div>
+          <ng-template #noTratamientos>
+            <div class="staff-empty">
+              <span class="staff-empty-lamp" aria-hidden="true"></span>
+              <span class="staff-empty-text">SIN TRATAMIENTOS ASIGNADOS</span>
+              <span class="staff-empty-hint">ASIGNA TRATAMIENTOS DESDE EL FORMULARIO DE LA SALA</span>
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
+
+      <div class="section">
         <span class="section-label">
           PERSONAL EN TURNO · {{ onTurnoCount(consultorio) }} EN SERVICIO / {{ staffCount(consultorio) }} ASIGNADOS
         </span>
