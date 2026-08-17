@@ -22,7 +22,7 @@ export class PatientDirectoryComponent extends PaginatedListComponent {
   }
 
   fmtMoney(n: number): string {
-    return n > 0 ? `$ ${n.toLocaleString('en-US')}` : 'AL D�?A';
+    return n > 0 ? `$ ${n.toLocaleString('en-US')}` : 'AL DÍA';
   }
 
   trackById(_: number, p: Patient): string {
