@@ -16,7 +16,7 @@
       (blur)="onBlur()"
       (keydown)="onKeydown($event)"
     />
-    <ul *ngIf="open" class="ac-list" role="listbox">
+    <ul *ngIf="open" #listEl class="ac-list" role="listbox" (scroll)="onScroll($event)">
       <li
         *ngFor="let option of suggestions; let i = index; trackBy: trackByIndex"
         class="ac-item"
