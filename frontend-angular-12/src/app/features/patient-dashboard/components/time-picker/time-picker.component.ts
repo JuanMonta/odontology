@@ -24,12 +24,18 @@ export class TimePickerComponent {
   @Input() label = 'HORA';
   @Input() required = false;
   @Input() value = '';
+  /** Horas permitidas "HH" (p.ej. turno de mañana → ["08".."14"]). Vacío = todas. */
+  @Input() availableHours: string[] = [];
   @Output() valueChange = new EventEmitter<string>();
 
   @ViewChildren('itemEl') items!: QueryList<ElementRef<HTMLButtonElement>>;
 
-  hours: string[] = Array.from({ length: 24 }, (_, i) => pad(i));
+  private readonly allHours: string[] = Array.from({ length: 24 }, (_, i) => pad(i));
   minutes: string[] = Array.from({ length: 12 }, (_, i) => pad(i * 5));
+
+  get hours(): string[] {
+    return this.availableHours.length ? this.availableHours : this.allHours;
+  }
 
   open = false;
   activeCol: 'h' | 'm' = 'h';

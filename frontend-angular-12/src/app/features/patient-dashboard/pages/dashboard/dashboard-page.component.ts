@@ -5,13 +5,14 @@ import {
   OnDestroy,
   OnInit
 } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { Appointment, BoardTotals, WaitingPatient } from '../../../../core/models/appointment.model';
 import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
 import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
 import { PatientsHttpService } from '../../../patients/services/patients-http.service';
 import { TreatmentsHttpService } from '../../../treatments/services/treatments-http.service';
+import { TurnosHttpService } from '../../../turnos/services/turnos-http.service';
 import { DashboardHttpService } from '../../services/dashboard-http.service';
 import { borradorKey } from '../../../../core/auth/session-local-storage';
 
@@ -30,6 +31,10 @@ const EMPTY_DRAFT: NewAppointmentDraft = {
   consultorio: '',
   dentist: ''
 };
+
+function pad(n: number): string {
+  return n < 10 ? `0${n}` : String(n);
+}
 
 @Component({
   selector: 'app-dashboard-page',
@@ -53,6 +58,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   treatmentOptions$: Observable<string[]>;
   consultorioOptions$: Observable<string[]>;
   dentistOptions$: Observable<string[]>;
+  availableHours$: Observable<string[]>;
 
   creating = false;
   error = false;
@@ -61,6 +67,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   draft: NewAppointmentDraft = this.restoreDraft();
 
+  private readonly draft$ = new BehaviorSubject<NewAppointmentDraft>(EMPTY_DRAFT);
   private readonly destroy$ = new Subject<void>();
 
   constructor(
@@ -69,8 +76,11 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     patients: PatientsHttpService,
     treatments: TreatmentsHttpService,
     consultorios: ConsultoriosHttpService,
-    odontologos: OdontologosHttpService
+    odontologos: OdontologosHttpService,
+    turnos: TurnosHttpService
   ) {
+    this.draft$.next({ ...this.draft });
+
     this.appointments$ = this.mock.appointments$;
     this.waiting$ = this.mock.waiting$;
     this.waitingNames$ = this.waiting$.pipe(
@@ -83,8 +93,72 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     );
     this.patientOptions$ = patients.patients$.pipe(map(list => list.map(p => p.name)));
     this.treatmentOptions$ = treatments.treatments$.pipe(map(list => list.map(t => t.name)));
-    this.consultorioOptions$ = consultorios.consultorios$.pipe(map(list => list.map(c => c.name)));
-    this.dentistOptions$ = odontologos.odontologos$.pipe(map(list => list.map(o => o.name)));
+
+    // Cascada: los consultorios se restringen a los que soportan el tratamiento elegido.
+    this.consultorioOptions$ = combineLatest([
+      consultorios.consultorios$,
+      treatments.treatments$,
+      this.draft$
+    ]).pipe(
+      map(([cons, trts, d]) => {
+        const trt = trts.find(t => t.name === d.treatment);
+        const allowed = trt && trt.consultorios.length ? trt.consultorios : null;
+        return cons
+          .filter(c => c.status !== 'inactivo')
+          .filter(c => !allowed || allowed.includes(c.code))
+          .map(c => c.name);
+      })
+    );
+
+    // Cascada: los odontólogos se restringen a los asignados al consultorio elegido.
+    this.dentistOptions$ = combineLatest([
+      odontologos.odontologos$,
+      consultorios.consultorios$,
+      this.draft$
+    ]).pipe(
+      map(([odos, cons, d]) => {
+        const consObj = cons.find(c => c.name === d.consultorio);
+        return odos
+          .filter(o => o.status === 'activo')
+          .filter(o => !consObj || o.consultorio === consObj.code)
+          .map(o => o.name);
+      })
+    );
+
+    // Cascada: la hora se restringe a la jornada del odontólogo elegido.
+    this.availableHours$ = combineLatest([
+      odontologos.odontologos$,
+      turnos.turnos$,
+      this.draft$
+    ]).pipe(
+      map(([odos, turnos, d]) => {
+        const odo = odos.find(o => o.name === d.dentist);
+        if (!odo) {
+          return [];
+        }
+        const turno = turnos.find(t => t.nombre === odo.turno);
+        if (!turno) {
+          return [];
+        }
+        return this.hourRange(turno.horaInicio, turno.horaFin);
+      })
+    );
+  }
+
+  /** Horas del reloj (HH) dentro de la jornada, sin incluir la hora de fin. */
+  private hourRange(start: string, end: string): string[] {
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    const startMin = sh * 60 + sm;
+    const endMin = eh * 60 + em;
+    const out: string[] = [];
+    for (let h = 0; h < 24; h++) {
+      const hMin = h * 60;
+      if (hMin >= startMin && hMin < endMin) {
+        out.push(pad(h));
+      }
+    }
+    return out;
   }
 
   ngOnInit(): void {}
@@ -152,6 +226,17 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   onValueChange(field: keyof NewAppointmentDraft, value: string): void {
     this.draft[field] = value;
+    if (field === 'treatment') {
+      this.draft.consultorio = '';
+      this.draft.dentist = '';
+      this.draft.time = '';
+    } else if (field === 'consultorio') {
+      this.draft.dentist = '';
+      this.draft.time = '';
+    } else if (field === 'dentist') {
+      this.draft.time = '';
+    }
+    this.draft$.next({ ...this.draft });
     this.persistDraft();
   }
 
@@ -175,6 +260,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
         this.mock.refresh();
         this.creating = false;
         this.draft = { ...EMPTY_DRAFT };
+        this.draft$.next({ ...this.draft });
         this.clearDraft();
         this.cdr.markForCheck();
       },
