@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   Consultorio,
   ConsultorioSaveEvent,
@@ -6,6 +8,8 @@ import {
   ConsultorioStatus,
   StaffShiftState
 } from '../../../../core/models/consultorio.model';
+import { Treatment } from '../../../../core/models/treatment.model';
+import { TreatmentsHttpService } from '../../../treatments/services/treatments-http.service';
 
 export function consultorioStatusLabel(status: ConsultorioStatus): string {
   switch (status) {
@@ -40,7 +44,7 @@ export function turnoLabel(turno: string): string {
   styleUrls: ['./consultorio-panel.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ConsultorioPanelComponent implements OnChanges {
+export class ConsultorioPanelComponent implements OnInit, OnChanges {
   @Input() consultorio: Consultorio | null = null;
   @Input() creating = false;
   @Output() close = new EventEmitter<void>();
@@ -52,9 +56,33 @@ export class ConsultorioPanelComponent implements OnChanges {
   /** Copia local del consultorio para edición, evita parpadeo por async pipe */
   editingConsultorio: Consultorio | null = null;
 
+  tratamientos$: Observable<Treatment[]>;
+
   statusLabel = consultorioStatusLabel;
   staffStateLabel = staffStateLabel;
   turnoLabel = turnoLabel;
+
+  constructor(private readonly treatmentsService: TreatmentsHttpService) {
+    this.tratamientos$ = treatmentsService.treatments$.pipe(
+      map((list: Treatment[]) => list.sort((a, b) => a.name.localeCompare(b.name)))
+    );
+  }
+
+  ngOnInit(): void {
+    this.treatmentsService.refresh();
+  }
+
+  /** Tratamientos soportados por la sala, resueltos desde el catálogo por su código. */
+  tratamientosDeLaSala(tratamientos: Treatment[]): Treatment[] {
+    const codes = this.consultorio?.tratamientos ?? [];
+    return codes
+      .map(code => tratamientos.find(t => t.code === code))
+      .filter((t): t is Treatment => !!t);
+  }
+
+  tratTrack(_i: number, t: Treatment): string {
+    return t.code;
+  }
 
   staffCount(c: Consultorio): number {
     return c.staff.length;
