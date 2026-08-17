@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import {
   Odontologo,
   OdontologoDraft,
   OdontologoStatus
 } from '../../../../core/models/odontologo.model';
+import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
 
 export function odontologoStatusLabel(status: OdontologoStatus): string {
   switch (status) {
@@ -22,7 +23,7 @@ export function odontologoStatusLabel(status: OdontologoStatus): string {
   styleUrls: ['./odontologo-panel.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OdontologoPanelComponent implements OnChanges {
+export class OdontologoPanelComponent implements OnInit, OnChanges {
   @Input() odontologo: Odontologo | null = null;
   @Input() creating = false;
   @Output() close = new EventEmitter<void>();
@@ -34,10 +35,24 @@ export class OdontologoPanelComponent implements OnChanges {
 
   statusLabel = odontologoStatusLabel;
 
+  constructor(private readonly consultorios: ConsultoriosHttpService) {}
+
+  ngOnInit(): void {
+    this.consultorios.refresh();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.odontologo || changes.creating) {
       this.editing = false;
     }
+  }
+
+  consultorioName(code: string): string {
+    if (!code) {
+      return '—';
+    }
+    const consultorio = this.consultorios.snapshot().find(c => c.code === code);
+    return consultorio ? consultorio.name : code;
   }
 
   startEdit(): void {
