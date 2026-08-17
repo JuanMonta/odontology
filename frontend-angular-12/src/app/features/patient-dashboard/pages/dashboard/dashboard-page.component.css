@@ -97,6 +97,21 @@
   gap: 14px;
 }
 
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-hint {
+  font-family: var(--font-flap);
+  font-size: 0.56em;
+  letter-spacing: 0.12em;
+  color: var(--red-dim);
+  margin: 0;
+}
+
 .field {
   display: flex;
   flex-direction: column;

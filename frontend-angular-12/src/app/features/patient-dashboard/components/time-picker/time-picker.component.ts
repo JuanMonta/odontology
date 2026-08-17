@@ -24,12 +24,18 @@ export class TimePickerComponent {
   @Input() label = 'HORA';
   @Input() required = false;
   @Input() value = '';
+  /** Horas permitidas "HH" (p.ej. turno de mañana → ["08".."14"]). Vacío = todas. */
+  @Input() availableHours: string[] = [];
+  /** Si true, no permite elegir horas/minutos anteriores a la hora actual. */
+  @Input() disablePast = false;
   @Output() valueChange = new EventEmitter<string>();
 
   @ViewChildren('itemEl') items!: QueryList<ElementRef<HTMLButtonElement>>;
 
-  hours: string[] = Array.from({ length: 24 }, (_, i) => pad(i));
-  minutes: string[] = Array.from({ length: 12 }, (_, i) => pad(i * 5));
+  private readonly allHours: string[] = Array.from({ length: 24 }, (_, i) => pad(i));
+  private readonly allMinutes: string[] = Array.from({ length: 12 }, (_, i) => pad(i * 5));
+  /** Instante de referencia capturado al abrir el desplegable. */
+  private now = new Date();
 
   open = false;
   activeCol: 'h' | 'm' = 'h';
@@ -58,15 +64,40 @@ export class TimePickerComponent {
     return this.value ? Number(this.value.slice(3, 5)) : -1;
   }
 
+  /** Horas disponibles: restringidas por turno y, si aplica, sin horas pasadas. */
+  get hours(): string[] {
+    let list = this.availableHours.length ? this.availableHours : this.allHours;
+    if (this.disablePast) {
+      list = list.filter(h => Number(h) >= this.now.getHours());
+    }
+    return list;
+  }
+
+  /** Minutos disponibles para la hora bajo el cursor (filtra los ya pasados). */
+  get minutesForCursor(): string[] {
+    const h = this.hours[this.cursorH] ?? this.hours[0];
+    if (h === undefined) {
+      return [];
+    }
+    let list = this.allMinutes;
+    if (this.disablePast && Number(h) === this.now.getHours()) {
+      const firstValid = Math.ceil(this.now.getMinutes() / 5) * 5;
+      list = list.filter(m => Number(m) >= firstValid);
+    }
+    return list;
+  }
+
   onOpen(): void {
     if (this.open) {
       return;
     }
-    const h = this.selectedH >= 0 ? this.selectedH : 8;
+    this.now = new Date();
+    const h = this.selectedH >= 0 ? this.selectedH : this.now.getHours();
     const m = this.selectedM >= 0 ? this.selectedM : 0;
     this.cursorH = this.hours.indexOf(pad(h));
-    this.cursorM = this.minutes.indexOf(pad(m));
     if (this.cursorH < 0) { this.cursorH = 0; }
+    const mins = this.minutesForCursor;
+    this.cursorM = mins.indexOf(pad(m));
     if (this.cursorM < 0) { this.cursorM = 0; }
     this.activeCol = 'h';
     this.open = true;
@@ -101,6 +132,7 @@ export class TimePickerComponent {
 
   chooseH(index: number): void {
     this.cursorH = index;
+    this.cursorM = 0;
     this.cdr.markForCheck();
   }
 
@@ -111,6 +143,7 @@ export class TimePickerComponent {
 
   commitH(index: number): void {
     this.cursorH = index;
+    this.cursorM = 0;
     this.commit();
   }
 
@@ -128,31 +161,39 @@ export class TimePickerComponent {
   }
 
   private move(delta: number): void {
-    const list = this.activeCol === 'h' ? this.hours : this.minutes;
-    const cursor = this.activeCol === 'h' ? this.cursorH : this.cursorM;
-    const next = (cursor + delta + list.length) % list.length;
     if (this.activeCol === 'h') {
-      this.cursorH = next;
+      const list = this.hours;
+      if (list.length === 0) {
+        return;
+      }
+      this.cursorH = (this.cursorH + delta + list.length) % list.length;
+      this.cursorM = 0;
+      this.cdr.markForCheck();
+      this.scrollCursorIntoView(this.cursorH);
     } else {
-      this.cursorM = next;
+      const list = this.minutesForCursor;
+      if (list.length === 0) {
+        return;
+      }
+      this.cursorM = (this.cursorM + delta + list.length) % list.length;
+      this.cdr.markForCheck();
+      this.scrollCursorIntoView(this.cursorM, true);
     }
-    this.cdr.markForCheck();
-    this.scrollCursorIntoView(next);
   }
 
-  private scrollCursorIntoView(index: number): void {
-    if (this.activeCol === 'h') {
-      const el = this.items.toArray()[index];
-      el?.nativeElement.scrollIntoView({ block: 'nearest' });
-    } else {
-      const el = this.items.toArray()[this.hours.length + index];
-      el?.nativeElement.scrollIntoView({ block: 'nearest' });
-    }
+  private scrollCursorIntoView(index: number, isMinutes = false): void {
+    const el = this.items.toArray()[isMinutes ? this.hours.length + index : index];
+    el?.nativeElement.scrollIntoView({ block: 'nearest' });
   }
 
   private commit(): void {
-    const time = `${this.hours[this.cursorH]}:${this.minutes[this.cursorM]}`;
-    this.valueChange.emit(time);
+    const h = this.hours[this.cursorH];
+    const mins = this.minutesForCursor;
+    if (h === undefined || mins.length === 0) {
+      return;
+    }
+    const m = mins[Math.min(this.cursorM, mins.length - 1)];
+    this.valueChange.emit(`${h}:${m}`);
     this.close();
   }
 

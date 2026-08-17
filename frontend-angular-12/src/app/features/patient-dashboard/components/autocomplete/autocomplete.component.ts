@@ -2,11 +2,15 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
-  Output
+  Output,
+  SimpleChanges,
+  ViewChild
 } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -49,23 +53,40 @@ function levenshtein(a: string, b: string): number {
   styleUrls: ['./autocomplete.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AutocompleteComponent implements OnInit, OnDestroy {
+export class AutocompleteComponent implements OnInit, OnChanges, OnDestroy {
   @Input() label = '';
   @Input() placeholder = '';
   @Input() required = false;
   @Input() options: string[] = [];
   @Input() value = '';
+  /** Cuántas sugerencias se muestran por lote (inicial y al hacer scroll). */
+  @Input() pageSize = 8;
   @Output() valueChange = new EventEmitter<string>();
   @Output() select = new EventEmitter<string>();
 
-  suggestions: string[] = [];
+  @ViewChild('listEl') listEl?: ElementRef<HTMLElement>;
+
   open = false;
   activeIndex = -1;
+
+  /** Todas las opciones candidatas (filtradas y ordenadas). */
+  private filtered: string[] = [];
+  /** Cuántas de `filtered` están renderizadas en este momento. */
+  visibleCount = 0;
+  private focused = false;
 
   private readonly query$ = new BehaviorSubject<string>('');
   private readonly destroy$ = new Subject<void>();
 
   constructor(private readonly cdr: ChangeDetectorRef) {}
+
+  get suggestions(): string[] {
+    return this.filtered.slice(0, this.visibleCount);
+  }
+
+  get hasMore(): boolean {
+    return this.visibleCount < this.filtered.length;
+  }
 
   ngOnInit(): void {
     this.query$
@@ -75,6 +96,15 @@ export class AutocompleteComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(query => this.filter(query));
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.options) {
+      this.filter(this.query$.getValue());
+    }
+    if (changes.value && !((changes.value.currentValue as string) || '').trim() && this.query$.getValue().trim()) {
+      this.query$.next('');
+    }
   }
 
   ngOnDestroy(): void {
@@ -88,7 +118,13 @@ export class AutocompleteComponent implements OnInit, OnDestroy {
   }
 
   onFocus(): void {
-    this.open = this.suggestions.length > 0 && this.query$.getValue().trim().length > 0;
+    this.focused = true;
+    if (!this.query$.getValue().trim()) {
+      this.filtered = [...this.options];
+      this.visibleCount = Math.min(this.pageSize, this.filtered.length);
+    }
+    this.open = this.filtered.length > 0;
+    this.activeIndex = -1;
     this.cdr.markForCheck();
   }
 
@@ -111,10 +147,18 @@ export class AutocompleteComponent implements OnInit, OnDestroy {
   }
 
   onBlur(): void {
+    this.focused = false;
     setTimeout(() => {
       this.open = false;
       this.cdr.markForCheck();
     }, 120);
+  }
+
+  onScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 24) {
+      this.loadMore();
+    }
   }
 
   choose(option: string): void {
@@ -136,13 +180,24 @@ export class AutocompleteComponent implements OnInit, OnDestroy {
     this.activeIndex = (this.activeIndex + delta + this.suggestions.length) % this.suggestions.length;
     this.open = true;
     this.cdr.markForCheck();
+    const items = this.listEl?.nativeElement.querySelectorAll('.ac-item');
+    (items?.[this.activeIndex] as HTMLElement | undefined)?.scrollIntoView({ block: 'nearest' });
+  }
+
+  private loadMore(): void {
+    if (!this.hasMore) {
+      return;
+    }
+    this.visibleCount = Math.min(this.visibleCount + this.pageSize, this.filtered.length);
+    this.cdr.markForCheck();
   }
 
   private filter(query: string): void {
     const q = normalize(query.trim());
     if (!q) {
-      this.suggestions = [];
-      this.open = false;
+      this.filtered = [...this.options];
+      this.visibleCount = Math.min(this.pageSize, this.filtered.length);
+      this.open = this.focused && this.filtered.length > 0;
       this.activeIndex = -1;
       this.cdr.markForCheck();
       return;
@@ -152,8 +207,9 @@ export class AutocompleteComponent implements OnInit, OnDestroy {
       .map(option => this.score(option, q, maxDist))
       .filter((entry): entry is { option: string; score: number } => entry !== null);
     scored.sort((a, b) => a.score - b.score);
-    this.suggestions = scored.slice(0, 5).map(entry => entry.option);
-    this.open = this.suggestions.length > 0;
+    this.filtered = scored.map(entry => entry.option);
+    this.visibleCount = Math.min(this.pageSize, this.filtered.length);
+    this.open = this.filtered.length > 0;
     this.activeIndex = -1;
     this.cdr.markForCheck();
   }
