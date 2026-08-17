@@ -57,6 +57,7 @@
           [required]="true"
           [value]="draft.time"
           [availableHours]="(availableHours$ | async) ?? []"
+          [disablePast]="true"
           (valueChange)="onValueChange('time', $event)"
         ></app-time-picker>
       </div>
