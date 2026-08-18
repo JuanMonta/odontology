@@ -1,0 +1,15 @@
+.cat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cat-select {
+  flex: 1;
+  min-width: 0;
+}
+
+.cat-input {
+  font-size: 0.76em;
+  text-transform: uppercase;
+}

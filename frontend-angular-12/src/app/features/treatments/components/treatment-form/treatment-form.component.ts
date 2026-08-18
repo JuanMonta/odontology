@@ -26,7 +26,7 @@ interface TreatmentFormDraft {
 @Component({
   selector: 'app-treatment-form',
   templateUrl: './treatment-form.component.html',
-  styleUrls: ['./treatment-form.component.css'],
+  styleUrls: ['./treatment-form.component.css', '../../../../shared/styles/cat-inline.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreatmentFormComponent implements OnChanges {

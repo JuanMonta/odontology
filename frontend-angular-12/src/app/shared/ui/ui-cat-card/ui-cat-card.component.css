@@ -1,0 +1,56 @@
+.cat-card {
+  margin-top: 10px;
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  animation: cat-card-in 0.18s var(--ease-out);
+}
+
+@keyframes cat-card-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cat-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 176, 32, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cat-card-title {
+  font-family: var(--font-flap);
+  font-size: 0.64em;
+  letter-spacing: 0.18em;
+  color: var(--amber);
+}
+
+.cat-code {
+  margin-left: auto;
+  font-family: var(--font-flap);
+  font-size: 0.6em;
+  letter-spacing: 0.16em;
+  color: var(--steel-400);
+}
+
+.cat-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.cat-card-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cat-error {
+  padding: 0 14px 12px;
+}

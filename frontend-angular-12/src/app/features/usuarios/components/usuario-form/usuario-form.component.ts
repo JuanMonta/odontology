@@ -10,7 +10,7 @@ import {
 @Component({
   selector: 'app-usuario-form',
   templateUrl: './usuario-form.component.html',
-  styleUrls: ['./usuario-form.component.css'],
+  styleUrls: ['./usuario-form.component.css', '../../../../shared/styles/cat-inline.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UsuarioFormComponent implements OnChanges {

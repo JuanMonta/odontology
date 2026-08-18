@@ -1,0 +1,87 @@
+.cat-act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  font-family: var(--font-flap);
+  font-size: 0.72em;
+  letter-spacing: 0.12em;
+  color: var(--amber);
+  background: transparent;
+  border: 1px dashed rgba(255, 176, 32, 0.55);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s var(--ease-out), border-color 0.18s var(--ease-out), color 0.18s var(--ease-out);
+}
+
+.cat-act:hover {
+  background: rgba(255, 176, 32, 0.08);
+  border-color: var(--amber-line);
+  color: var(--flap-ink);
+}
+
+.cat-act.is-open {
+  background: rgba(255, 176, 32, 0.12);
+  border-color: var(--amber-line);
+  border-style: solid;
+}
+
+.btn-plus {
+  position: relative;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+}
+
+.btn-plus::before,
+.btn-plus::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+}
+
+.btn-plus::before {
+  top: 4px;
+  left: 0;
+  width: 10px;
+  height: 2px;
+}
+
+.btn-plus::after {
+  top: 0;
+  left: 4px;
+  width: 2px;
+  height: 10px;
+}
+
+.btn-pencil {
+  position: relative;
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+}
+
+.btn-pencil::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 1px;
+  width: 6px;
+  height: 6px;
+  border: 1.5px solid currentColor;
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+
+.btn-pencil::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 6px;
+  width: 5px;
+  height: 1.5px;
+  background: currentColor;
+  transform: rotate(45deg);
+}
