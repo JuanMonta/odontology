@@ -1,0 +1,71 @@
+<div class="roles">
+  <div class="roles-head">
+    <span class="roles-count" *ngIf="(roles$ | async)?.length">{{ (roles$ | async)?.length }} ROLES</span>
+    <ui-cat-act icon="plus" [open]="creandoRol" (click)="toggleCrearRol()">CREAR ROL</ui-cat-act>
+  </div>
+
+  <ui-cat-card
+    *ngIf="creandoRol"
+    title="NUEVO ROL"
+    [error]="crearError"
+    (save)="onCrearRol()"
+    (cancel)="creandoRol = false; crearError = ''"
+  >
+    <input
+      class="field-input cat-input"
+      type="text"
+      [(ngModel)]="nuevoRol"
+      name="nuevoRol"
+      placeholder="NOMBRE DEL ROL"
+      autocomplete="off"
+    />
+  </ui-cat-card>
+
+  <div class="roles-list" *ngIf="(roles$ | async)?.length">
+    <div class="rol-row" *ngFor="let rol of roles$ | async; trackBy: trackRol">
+      <span class="rol-lamp" [class.is-on]="rol.activo" aria-hidden="true"></span>
+      <span class="rol-name">{{ rol.nombre }}</span>
+      <span class="rol-code">{{ rol.code }}</span>
+      <span class="rol-state" [class.is-off]="!rol.activo">{{ rol.activo ? 'ACTIVO' : 'INACTIVO' }}</span>
+      <ui-cat-act icon="pencil" [open]="editandoCode === rol.code" (click)="onEditarRol(rol)">EDITAR</ui-cat-act>
+    </div>
+  </div>
+
+  <p class="roles-empty" *ngIf="!(roles$ | async)?.length" role="status">SIN ROLES REGISTRADOS</p>
+
+  <ui-cat-card
+    *ngIf="editandoCode"
+    title="EDITAR ROL"
+    [code]="editandoCode"
+    [error]="editarError"
+    (save)="guardarRol()"
+    (cancel)="cancelarEdicion()"
+  >
+    <input
+      class="field-input cat-input"
+      type="text"
+      [(ngModel)]="editarNombre"
+      name="editarNombre"
+      placeholder="NOMBRE DEL ROL"
+      autocomplete="off"
+    />
+    <div class="seg" role="radiogroup" aria-label="Estado del rol">
+      <button
+        class="seg-btn"
+        [class.is-active]="editarActivo"
+        type="button"
+        role="radio"
+        [attr.aria-checked]="editarActivo"
+        (click)="editarActivo = true"
+      >ACTIVO</button>
+      <button
+        class="seg-btn"
+        [class.is-active]="!editarActivo"
+        type="button"
+        role="radio"
+        [attr.aria-checked]="!editarActivo"
+        (click)="editarActivo = false"
+      >INACTIVO</button>
+    </div>
+  </ui-cat-card>
+</div>

@@ -2,6 +2,7 @@ package api.services;
 
 import api.dto.CatalogoDraftDto;
 import api.dto.CatalogoDto;
+import api.dto.RolDto;
 import api.dto.UsuarioDto;
 import api.dto.UsuarioDraftDto;
 import api.entities.Usuario;
@@ -12,9 +13,11 @@ import api.repositories.UsuarioRepository;
 import api.repositories.UsuarioRolRepository;
 import api.util.FormatoUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Comparator;
 import java.util.List;
@@ -87,6 +90,14 @@ public class UsuariosService {
     }
 
     @Transactional(readOnly = true)
+    public List<RolDto> listRolesTodos() {
+        return rolRepository.findAll().stream()
+                .sorted(Comparator.comparing(UsuarioRol::getCodigo))
+                .map(this::toRolDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<CatalogoDto> listEstados() {
         return estadoRepository.findByActivoTrueOrderByNombreAsc().stream()
                 .map(e -> new CatalogoDto(e.getCodigo(), e.getNombre()))
@@ -94,7 +105,7 @@ public class UsuariosService {
     }
 
     @Transactional
-    public CatalogoDto crearRol(CatalogoDraftDto draft) {
+    public RolDto crearRol(CatalogoDraftDto draft) {
         String nombre = normalizar(draft.nombre());
         if (rolRepository.findByNombre(nombre).isPresent()) {
             throw new IllegalArgumentException("EL ROL YA EXISTE: " + nombre.toUpperCase());
@@ -105,7 +116,48 @@ public class UsuariosService {
                 .activo(true)
                 .build();
         rolRepository.save(rol);
-        return new CatalogoDto(rol.getCodigo(), rol.getNombre());
+        return toRolDto(rol);
+    }
+
+    /**
+     * Renombra un rol y (opcionalmente) lo desactiva. Al renombrar se
+     * propaga el cambio a las cuentas que lo tienen asignado para no dejar
+     * referencias huérfanas. La baja respeta la regla "vacía primero":
+     * un rol en uso por cuentas activas no se puede desactivar.
+     */
+    @Transactional
+    public RolDto updateRol(RolDto dto) {
+        UsuarioRol rol = findRol(dto.code());
+        String nombre = normalizar(dto.nombre());
+        rolRepository.findByNombre(nombre)
+                .filter(existente -> !existente.getCodigo().equals(rol.getCodigo()))
+                .ifPresent(existente -> {
+                    throw conflicto("EL ROL YA EXISTE: " + nombre.toUpperCase());
+                });
+        if (Boolean.FALSE.equals(dto.activo()) && Boolean.TRUE.equals(rol.getActivo())) {
+            validarVacio(rol);
+        }
+        String nombreAnterior = rol.getNombre();
+        rol.setNombre(nombre);
+        rol.setActivo(dto.activo());
+        rolRepository.save(rol);
+        if (!nombreAnterior.equals(nombre)) {
+            List<Usuario> afectados = usuarioRepository.findByRol(nombreAnterior);
+            afectados.forEach(u -> u.setRol(nombre));
+            usuarioRepository.saveAll(afectados);
+        }
+        return toRolDto(rol);
+    }
+
+    @Transactional
+    public RolDto toggleRolStatus(String code) {
+        UsuarioRol rol = findRol(code);
+        if (Boolean.TRUE.equals(rol.getActivo())) {
+            validarVacio(rol);
+        }
+        rol.setActivo(!rol.getActivo());
+        rolRepository.save(rol);
+        return toRolDto(rol);
     }
 
     @Transactional
@@ -145,6 +197,29 @@ public class UsuariosService {
             throw new IllegalArgumentException("EL VALOR ES OBLIGATORIO");
         }
         return limpio;
+    }
+
+    private UsuarioRol findRol(String code) {
+        return rolRepository.findById(code)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "ROL NO ENCONTRADO: " + code));
+    }
+
+    private void validarVacio(UsuarioRol rol) {
+        long activos = usuarioRepository.countByRolAndEstado(rol.getNombre(), "activo");
+        if (activos > 0) {
+            throw conflicto(
+                    "NO SE PUEDE DESACTIVAR: EL ROL TIENE " + activos + " CUENTA(S) ACTIVA(S). "
+                            + "REASIGNA PRIMERO LOS USUARIOS");
+        }
+    }
+
+    private ResponseStatusException conflicto(String mensaje) {
+        return new ResponseStatusException(HttpStatus.CONFLICT, mensaje);
+    }
+
+    private RolDto toRolDto(UsuarioRol rol) {
+        return new RolDto(rol.getCodigo(), rol.getCodigo(), rol.getNombre(), rol.getActivo());
     }
 
     public UsuarioDto toDto(Usuario u) {
