@@ -27,6 +27,7 @@ import {
   TratamientoSimple
 } from '../../services/consultorio-catalogos.service';
 import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
+import { ConsultoriosHttpService } from '../../services/consultorios-http.service';
 
 const EQUIPO_CATEGORIAS = ['MOBILIARIO', 'DIAGNÓSTICO', 'INSTRUMENTAL', 'CONSUMIBLES'] as const;
 const TRATAMIENTO_CATEGORIAS = ['DIAGNÓSTICO', 'PREVENCIÓN', 'RESTAURADORA', 'ENDODONCIA', 'PERIODONCIA', 'ORTODONCIA', 'CIRUGÍA', 'PRÓTESIS', 'ESTÉTICA', 'EMERGENCIA'] as const;
@@ -77,11 +78,14 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
   trtPickQuery = '';
   trtPickCategory: string | null = null;
 
+  reassignTarget: Odontologo | null = null;
+
   private syncedId: string | null = null;
   private catalogosLoaded = false;
 
   constructor(
     private readonly catalogos: ConsultorioCatalogosService,
+    private readonly consultorios: ConsultoriosHttpService,
     odontologos: OdontologosHttpService,
     private readonly cdr: ChangeDetectorRef
   ) {
@@ -337,9 +341,33 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
   }
 
   staffToggle(o: Odontologo): void {
+    if (this.isAssignedElsewhere(o)) {
+      this.reassignTarget = o;
+      return;
+    }
     this.assigned = this.assigned.includes(o.code)
       ? this.assigned.filter(c => c !== o.code)
       : [...this.assigned, o.code];
+  }
+
+  isAssignedElsewhere(o: Odontologo): boolean {
+    return !!o.consultorio && o.consultorio !== this.consultorio?.code && !this.assigned.includes(o.code);
+  }
+
+  consultorioName(code: string): string {
+    if (!code) { return '—'; }
+    const c = this.consultorios.snapshot().find(x => x.code === code);
+    return c ? c.name : code;
+  }
+
+  confirmReassign(): void {
+    if (!this.reassignTarget) { return; }
+    this.assigned = [...this.assigned, this.reassignTarget.code];
+    this.reassignTarget = null;
+  }
+
+  cancelReassign(): void {
+    this.reassignTarget = null;
   }
 
   removeStaff(code: string): void {

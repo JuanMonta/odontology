@@ -8,7 +8,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 })
 export class UiButtonComponent {
   @Input() variant: 'amber' | 'ghost' = 'amber';
-  @Input() size: 'md' | 'lg' = 'md';
+  @Input() size: 'sm' | 'md' | 'lg' = 'md';
   @Input() type: 'button' | 'submit' = 'button';
   @Input() disabled = false;
 }
