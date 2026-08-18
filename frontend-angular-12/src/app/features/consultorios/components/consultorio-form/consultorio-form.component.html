@@ -263,38 +263,44 @@
         </div>
 
         <div class="picker-body">
-          <div class="reassign-banner" *ngIf="reassignTarget">
-            <div class="reassign-info">
-              <ui-lamp [tone]="reassignTarget.status === 'activo' ? 'on' : 'warn'"></ui-lamp>
-              <span class="reassign-text">
-                <strong>{{ reassignTarget.name }}</strong> está asignado a
-                <strong>{{ consultorioName(reassignTarget.consultorio) }}</strong>.
-                ¿Reasignar a este consultorio?
+          <ng-container *ngFor="let o of visibleStaff(odontologos); trackBy: trackOdontologo">
+            <!-- Chip de confirmación de reasignación (reemplaza al chip normal) -->
+            <div class="staff-chip staff-chip--confirm" *ngIf="reassignTarget?.code === o.code">
+              <ui-lamp [tone]="o.status === 'activo' ? 'on' : 'warn'"></ui-lamp>
+              <span class="staff-main">
+                <span class="staff-name">{{ o.name }}</span>
+                <span class="staff-sub">Está en <strong>{{ consultorioName(o.consultorio) }}</strong>. ¿Reasignar a este consultorio?</span>
               </span>
+              <div class="staff-confirm-actions">
+                <ui-button size="sm" variant="ghost" (click)="cancelReassign()">CANCELAR</ui-button>
+                <ui-button size="sm" (click)="confirmReassign()">REASIGNAR</ui-button>
+              </div>
             </div>
-            <div class="reassign-actions">
-              <ui-button size="sm" (click)="confirmReassign()">REASIGNAR</ui-button>
-              <ui-button size="sm" variant="ghost" (click)="cancelReassign()">CANCELAR</ui-button>
-            </div>
-          </div>
 
-          <label class="staff-chip" *ngFor="let o of visibleStaff(odontologos); trackBy: trackOdontologo" [class.is-on]="isAssigned(o.code)" [class.staff-chip--reassign]="isAssignedElsewhere(o)">
-            <input
-              class="staff-input"
-              type="checkbox"
-              [checked]="isAssigned(o.code)"
-              (change)="staffToggle(o)"
-              [attr.aria-label]="o.name"
-            />
-            <span class="staff-lamp" aria-hidden="true"></span>
-            <span class="staff-main">
-              <span class="staff-name">{{ o.name }}</span>
-              <span class="staff-sub">{{ o.code }} · {{ o.specialty }} · {{ o.turno }}</span>
-            </span>
-            <span class="staff-badge" *ngIf="isAssignedElsewhere(o)">
-              EN {{ consultorioName(o.consultorio) }}
-            </span>
-          </label>
+            <!-- Chip normal de selección -->
+            <label
+              class="staff-chip"
+              *ngIf="reassignTarget?.code !== o.code"
+              [class.is-on]="isAssigned(o.code)"
+              [class.staff-chip--reassign]="isAssignedElsewhere(o)"
+            >
+              <input
+                class="staff-input"
+                type="checkbox"
+                [checked]="isAssigned(o.code)"
+                (change)="staffToggle(o)"
+                [attr.aria-label]="o.name"
+              />
+              <span class="staff-lamp" aria-hidden="true"></span>
+              <span class="staff-main">
+                <span class="staff-name">{{ o.name }}</span>
+                <span class="staff-sub">{{ o.code }} · {{ o.specialty }} · {{ o.turno }}</span>
+              </span>
+              <span class="staff-badge" *ngIf="isAssignedElsewhere(o)">
+                EN {{ consultorioName(o.consultorio) }}
+              </span>
+            </label>
+          </ng-container>
           <p class="picker-empty" *ngIf="!visibleStaff(odontologos).length" role="status">SIN RESULTADOS PARA LA BÚSQUEDA</p>
         </div>
       </ng-container>

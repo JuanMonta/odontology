@@ -414,7 +414,7 @@
   }
 }
 
-/* ============ Reassign badge + banner ============ */
+/* ============ Reassign badge + inline confirm chip ============ */
 .staff-chip--reassign {
   border-color: rgba(255, 176, 32, 0.3);
 }
@@ -437,37 +437,27 @@
   flex-shrink: 0;
 }
 
-.reassign-banner {
+.staff-chip--confirm {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 8px;
+  padding: 10px 12px;
   background: rgba(255, 176, 32, 0.06);
-  border: 1px solid rgba(255, 176, 32, 0.2);
+  border: 1px solid rgba(255, 176, 32, 0.3);
   border-radius: var(--radius-sm);
-  margin-bottom: 10px;
 }
 
-.reassign-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.reassign-text {
-  font-family: var(--font-flap);
-  font-size: 0.72em;
-  letter-spacing: 0.06em;
+.staff-chip--confirm .staff-sub {
   color: var(--steel-300);
 }
 
-.reassign-text strong {
-  color: var(--flap-ink);
+.staff-chip--confirm .staff-sub strong {
+  color: var(--amber);
 }
 
-.reassign-actions {
+.staff-confirm-actions {
   display: flex;
-  justify-content: center;
-  gap: 8px;
+  justify-content: flex-end;
+  gap: 6px;
 }
