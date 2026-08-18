@@ -37,7 +37,10 @@ export class TreatmentFormComponent implements OnChanges {
 
   @ViewChild('consPickerPanel', { static: false }) consPickerPanel?: ElementRef<HTMLElement>;
 
-  categories = TREATMENT_CATEGORIES;
+  categories = [...TREATMENT_CATEGORIES];
+
+  creandoCategoria = false;
+  nuevaCategoria = '';
 
   name = '';
   category: TreatmentCategory = 'PREVENCIÓN';
@@ -143,7 +146,7 @@ export class TreatmentFormComponent implements OnChanges {
     try {
       const parsed = JSON.parse(raw) as TreatmentFormDraft;
       return parsed.category &&
-        TREATMENT_CATEGORIES.includes(parsed.category) &&
+        this.categories.includes(parsed.category) &&
         typeof parsed.durationMin === 'number' &&
         typeof parsed.price === 'number'
         ? parsed
@@ -155,6 +158,18 @@ export class TreatmentFormComponent implements OnChanges {
 
   private clearDraft(): void {
     localStorage.removeItem(borradorKey(TREATMENT_FORM_DRAFT_KEY));
+  }
+
+  onCrearCategoria(): void {
+    const nombre = this.nuevaCategoria.trim().toUpperCase();
+    if (!nombre || this.categories.includes(nombre)) {
+      return;
+    }
+    this.categories = [...this.categories, nombre];
+    this.category = nombre;
+    this.nuevaCategoria = '';
+    this.creandoCategoria = false;
+    this.cdr.markForCheck();
   }
 
   /* ==================== Picker de consultorios ==================== */
