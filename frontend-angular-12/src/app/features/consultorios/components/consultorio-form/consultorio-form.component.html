@@ -12,17 +12,177 @@
     </ui-field>
 
     <ui-field label="SILLÓN / UNIDAD" [required]="true">
-      <select class="field-select" [(ngModel)]="unit" name="unit" aria-label="Sillón o unidad">
-        <option value="" disabled selected hidden>— SELECCIONAR UNIDAD —</option>
-        <option *ngFor="let u of unidades$ | async" [ngValue]="u">{{ u }}</option>
-      </select>
+      <div class="cat-row">
+        <select class="field-select cat-select" [(ngModel)]="unit" name="unit" aria-label="Sillón o unidad">
+          <option value="" disabled selected hidden>— SELECCIONAR UNIDAD —</option>
+          <option *ngFor="let u of unidades$ | async" [ngValue]="u">{{ u }}</option>
+        </select>
+        <ui-cat-act icon="pencil" [open]="editandoUnidad" (click)="onEditarUnidad()">EDITAR</ui-cat-act>
+        <ui-cat-act icon="plus" [open]="creandoUnidad" (click)="toggleCrearUnidad()">CREAR</ui-cat-act>
+      </div>
+
+      <ui-cat-card
+        *ngIf="editandoUnidad"
+        title="EDITAR UNIDAD"
+        [code]="editarUnidadCodigo"
+        [error]="editarUnidadError"
+        (save)="guardarUnidad()"
+        (cancel)="cancelarEdicionUnidad()"
+      >
+        <input
+          class="field-input cat-input"
+          type="text"
+          [(ngModel)]="editarUnidadNombre"
+          name="editarUnidadNombre"
+          placeholder="NOMBRE DE LA UNIDAD"
+          autocomplete="off"
+        />
+        <div class="cat-inline">
+          <span class="cat-inline-label">TIPO</span>
+          <div class="seg" role="radiogroup" aria-label="Tipo de unidad">
+            <button
+              class="seg-btn"
+              [class.is-active]="editarUnidadTipo === 'SILLÓN'"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="editarUnidadTipo === 'SILLÓN'"
+              (click)="editarUnidadTipo = 'SILLÓN'"
+            >SILLÓN</button>
+            <button
+              class="seg-btn"
+              [class.is-active]="editarUnidadTipo === 'MÓDULO'"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="editarUnidadTipo === 'MÓDULO'"
+              (click)="editarUnidadTipo = 'MÓDULO'"
+            >MÓDULO</button>
+          </div>
+        </div>
+        <div class="cat-inline">
+          <span class="cat-inline-label">ESTADO</span>
+          <div class="seg" role="radiogroup" aria-label="Estado de la unidad">
+            <button
+              class="seg-btn"
+              [class.is-active]="editarUnidadActivo"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="editarUnidadActivo"
+              (click)="editarUnidadActivo = true"
+            >ACTIVO</button>
+            <button
+              class="seg-btn"
+              [class.is-active]="!editarUnidadActivo"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="!editarUnidadActivo"
+              (click)="editarUnidadActivo = false"
+            >INACTIVO</button>
+          </div>
+        </div>
+      </ui-cat-card>
+
+      <ui-cat-card
+        *ngIf="creandoUnidad"
+        title="NUEVA UNIDAD"
+        (save)="onCrearUnidad()"
+        (cancel)="creandoUnidad = false"
+      >
+        <input
+          class="field-input cat-input"
+          type="text"
+          [(ngModel)]="nuevaUnidad"
+          name="nuevaUnidad"
+          placeholder="NOMBRE DE LA UNIDAD"
+          autocomplete="off"
+        />
+        <div class="cat-inline">
+          <span class="cat-inline-label">TIPO</span>
+          <div class="seg" role="radiogroup" aria-label="Tipo de unidad">
+            <button
+              class="seg-btn"
+              [class.is-active]="nuevoTipoUnidad === 'SILLÓN'"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="nuevoTipoUnidad === 'SILLÓN'"
+              (click)="nuevoTipoUnidad = 'SILLÓN'"
+            >SILLÓN</button>
+            <button
+              class="seg-btn"
+              [class.is-active]="nuevoTipoUnidad === 'MÓDULO'"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="nuevoTipoUnidad === 'MÓDULO'"
+              (click)="nuevoTipoUnidad = 'MÓDULO'"
+            >MÓDULO</button>
+          </div>
+        </div>
+      </ui-cat-card>
     </ui-field>
 
     <ui-field label="UBICACIÓN" [required]="true">
-      <select class="field-select" [(ngModel)]="location" name="location" aria-label="Ubicación">
-        <option value="" disabled selected hidden>— SELECCIONAR UBICACIÓN —</option>
-        <option *ngFor="let l of ubicaciones$ | async" [ngValue]="l">{{ l }}</option>
-      </select>
+      <div class="cat-row">
+        <select class="field-select cat-select" [(ngModel)]="location" name="location" aria-label="Ubicación">
+          <option value="" disabled selected hidden>— SELECCIONAR UBICACIÓN —</option>
+          <option *ngFor="let l of ubicaciones$ | async" [ngValue]="l">{{ l }}</option>
+        </select>
+        <ui-cat-act icon="pencil" [open]="editandoUbicacion" (click)="onEditarUbicacion()">EDITAR</ui-cat-act>
+        <ui-cat-act icon="plus" [open]="creandoUbicacion" (click)="toggleCrearUbicacion()">CREAR</ui-cat-act>
+      </div>
+
+      <ui-cat-card
+        *ngIf="editandoUbicacion"
+        title="EDITAR UBICACIÓN"
+        [code]="editarUbicacionCodigo"
+        [error]="editarUbicacionError"
+        (save)="guardarUbicacion()"
+        (cancel)="cancelarEdicionUbicacion()"
+      >
+        <input
+          class="field-input cat-input"
+          type="text"
+          [(ngModel)]="editarUbicacionNombre"
+          name="editarUbicacionNombre"
+          placeholder="NOMBRE DE LA UBICACIÓN"
+          autocomplete="off"
+        />
+        <div class="cat-inline">
+          <span class="cat-inline-label">ESTADO</span>
+          <div class="seg" role="radiogroup" aria-label="Estado de la ubicación">
+            <button
+              class="seg-btn"
+              [class.is-active]="editarUbicacionActivo"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="editarUbicacionActivo"
+              (click)="editarUbicacionActivo = true"
+            >ACTIVO</button>
+            <button
+              class="seg-btn"
+              [class.is-active]="!editarUbicacionActivo"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="!editarUbicacionActivo"
+              (click)="editarUbicacionActivo = false"
+            >INACTIVO</button>
+          </div>
+        </div>
+      </ui-cat-card>
+
+      <ui-cat-card
+        *ngIf="creandoUbicacion"
+        title="NUEVA UBICACIÓN"
+        (save)="onCrearUbicacion()"
+        (cancel)="creandoUbicacion = false"
+      >
+        <input
+          class="field-input cat-input"
+          type="text"
+          [(ngModel)]="nuevaUbicacion"
+          name="nuevaUbicacion"
+          placeholder="NOMBRE DE LA UBICACIÓN"
+          autocomplete="off"
+        />
+      </ui-cat-card>
     </ui-field>
 
     <ui-field label="ESTADO">
