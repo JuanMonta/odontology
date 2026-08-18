@@ -7,6 +7,8 @@ import { UiEmptyComponent } from './ui-empty/ui-empty.component';
 import { UiChipComponent } from './ui-chip/ui-chip.component';
 import { UiPanelComponent } from './ui-panel/ui-panel.component';
 import { UiFieldComponent } from './ui-field/ui-field.component';
+import { UiCatActComponent } from './ui-cat-act/ui-cat-act.component';
+import { UiCatCardComponent } from './ui-cat-card/ui-cat-card.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +18,9 @@ import { UiFieldComponent } from './ui-field/ui-field.component';
     UiEmptyComponent,
     UiChipComponent,
     UiPanelComponent,
-    UiFieldComponent
+    UiFieldComponent,
+    UiCatActComponent,
+    UiCatCardComponent
   ],
   imports: [CommonModule],
   exports: [
@@ -26,7 +30,9 @@ import { UiFieldComponent } from './ui-field/ui-field.component';
     UiEmptyComponent,
     UiChipComponent,
     UiPanelComponent,
-    UiFieldComponent
+    UiFieldComponent,
+    UiCatActComponent,
+    UiCatCardComponent
   ]
 })
 export class SharedModule { }

@@ -1,0 +1,14 @@
+<div class="cat-card">
+  <div class="cat-card-head">
+    <span class="cat-card-title">{{ title }}</span>
+    <span class="cat-code" *ngIf="code">{{ code }}</span>
+  </div>
+  <div class="cat-card-body">
+    <ng-content></ng-content>
+  </div>
+  <div class="cat-card-foot">
+    <ui-button size="sm" variant="ghost" (click)="cancel.emit()">CANCELAR</ui-button>
+    <ui-button size="sm" (click)="save.emit()">GUARDAR</ui-button>
+  </div>
+  <p class="form-error cat-error" *ngIf="error" role="alert">{{ error }}</p>
+</div>

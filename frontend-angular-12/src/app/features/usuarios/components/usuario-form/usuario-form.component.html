@@ -23,57 +23,53 @@
     </ui-field>
 
     <ui-field label="ROL">
-      <select class="field-select" [(ngModel)]="role" name="role" aria-label="Rol del usuario">
-        <option *ngFor="let r of roles" [ngValue]="r.nombre">{{ r.nombre }}</option>
-      </select>
-      <button
-        *ngIf="esAdmin"
-        class="field-add"
-        type="button"
-        aria-label="Crear nuevo rol"
-        (click)="creandoRol = !creandoRol"
+      <div class="cat-row">
+        <select class="field-select cat-select" [(ngModel)]="role" name="role" aria-label="Rol del usuario">
+          <option *ngFor="let r of roles" [ngValue]="r.nombre">{{ r.nombre }}</option>
+        </select>
+        <ui-cat-act *ngIf="esAdmin" icon="plus" [open]="creandoRol" (click)="creandoRol = !creandoRol; creandoEstado = false">CREAR ROL</ui-cat-act>
+      </div>
+
+      <ui-cat-card
+        *ngIf="esAdmin && creandoRol"
+        title="NUEVO ROL"
+        (save)="onCrearRol()"
+        (cancel)="creandoRol = false"
       >
-        <span class="btn-plus" aria-hidden="true"></span>
-        CREAR ROL
-      </button>
-      <span class="field-create" *ngIf="esAdmin && creandoRol">
         <input
-          class="field-input field-create-input"
+          class="field-input cat-input"
           type="text"
           [(ngModel)]="nuevoRol"
           name="nuevoRol"
           placeholder="NOMBRE DEL ROL"
           autocomplete="off"
         />
-        <ui-button (click)="onCrearRol()">GUARDAR</ui-button>
-      </span>
+      </ui-cat-card>
     </ui-field>
 
     <ui-field label="ESTADO">
-      <select class="field-select" [(ngModel)]="status" name="status" aria-label="Estado del usuario">
-        <option *ngFor="let s of estados" [ngValue]="s.nombre">{{ s.nombre }}</option>
-      </select>
-      <button
-        *ngIf="esAdmin"
-        class="field-add"
-        type="button"
-        aria-label="Crear nuevo estado"
-        (click)="creandoEstado = !creandoEstado"
+      <div class="cat-row">
+        <select class="field-select cat-select" [(ngModel)]="status" name="status" aria-label="Estado del usuario">
+          <option *ngFor="let s of estados" [ngValue]="s.nombre">{{ s.nombre }}</option>
+        </select>
+        <ui-cat-act *ngIf="esAdmin" icon="plus" [open]="creandoEstado" (click)="creandoEstado = !creandoEstado; creandoRol = false">CREAR ESTADO</ui-cat-act>
+      </div>
+
+      <ui-cat-card
+        *ngIf="esAdmin && creandoEstado"
+        title="NUEVO ESTADO"
+        (save)="onCrearEstado()"
+        (cancel)="creandoEstado = false"
       >
-        <span class="btn-plus" aria-hidden="true"></span>
-        CREAR ESTADO
-      </button>
-      <span class="field-create" *ngIf="esAdmin && creandoEstado">
         <input
-          class="field-input field-create-input"
+          class="field-input cat-input"
           type="text"
           [(ngModel)]="nuevoEstado"
           name="nuevoEstado"
           placeholder="NOMBRE DEL ESTADO"
           autocomplete="off"
         />
-        <ui-button (click)="onCrearEstado()">GUARDAR</ui-button>
-      </span>
+      </ui-cat-card>
     </ui-field>
   </div>
 

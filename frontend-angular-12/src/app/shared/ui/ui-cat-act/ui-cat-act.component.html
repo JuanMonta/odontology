@@ -1,0 +1,5 @@
+<button class="cat-act" [class.is-open]="open" type="button">
+  <span *ngIf="icon === 'plus'" class="btn-plus" aria-hidden="true"></span>
+  <span *ngIf="icon === 'pencil'" class="btn-pencil" aria-hidden="true"></span>
+  <ng-content></ng-content>
+</button>
