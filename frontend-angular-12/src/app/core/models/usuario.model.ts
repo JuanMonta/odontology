@@ -6,6 +6,13 @@ export interface CatalogoItem {
   nombre: string;
 }
 
+export interface RolItem {
+  id: string;           // "ROL-001"
+  code: string;         // "ROL-001"
+  nombre: string;       // "administrador"
+  activo: boolean;
+}
+
 export interface Usuario {
   id: string;           // "usr-1"
   code: string;         // "USR-001"

@@ -1,0 +1,136 @@
+:host {
+  display: block;
+}
+
+.roles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ============ Head ============ */
+.roles-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.roles-count {
+  font-family: var(--font-flap);
+  font-size: 0.62em;
+  letter-spacing: 0.2em;
+  color: var(--flap-dim);
+}
+
+/* ============ List ============ */
+.roles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rol-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.18s var(--ease-out);
+}
+
+.rol-row:hover {
+  border-color: rgba(255, 176, 32, 0.3);
+}
+
+.rol-lamp {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--steel-600);
+  flex-shrink: 0;
+}
+
+.rol-lamp.is-on {
+  background: var(--amber);
+  box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.45);
+}
+
+.rol-name {
+  font-family: var(--font-flap);
+  font-size: 0.78em;
+  letter-spacing: 0.12em;
+  color: var(--steel-200);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rol-code {
+  font-family: var(--font-flap);
+  font-size: 0.6em;
+  letter-spacing: 0.16em;
+  color: var(--steel-500);
+  flex-shrink: 0;
+}
+
+.rol-state {
+  font-family: var(--font-flap);
+  font-size: 0.58em;
+  letter-spacing: 0.14em;
+  color: var(--green);
+  padding: 4px 8px;
+  border: 1px solid rgba(86, 181, 127, 0.35);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.rol-state.is-off {
+  color: var(--steel-500);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.roles-empty {
+  padding: 22px 14px;
+  text-align: center;
+  font-family: var(--font-flap);
+  font-size: 0.66em;
+  letter-spacing: 0.18em;
+  color: var(--steel-500);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+}
+
+/* ============ Estado: segmentos ============ */
+.seg {
+  display: flex;
+  gap: 6px;
+}
+
+.seg-btn {
+  flex: 1;
+  padding: 11px 12px;
+  font-family: var(--font-flap);
+  font-size: 0.7em;
+  letter-spacing: 0.14em;
+  color: var(--steel-400);
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 0.18s var(--ease-out), border-color 0.18s var(--ease-out), background 0.18s var(--ease-out);
+}
+
+.seg-btn:hover {
+  color: var(--steel-200);
+}
+
+.seg-btn.is-active {
+  color: var(--flap-ink);
+  background: rgba(255, 176, 32, 0.1);
+  border-color: rgba(255, 176, 32, 0.45);
+}
