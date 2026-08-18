@@ -15,4 +15,16 @@ public interface ConsultorioRepository extends JpaRepository<Consultorio, String
     long countByEstado(Consultorio.Estado estado);
 
     Optional<Consultorio> findFirstByOrderByCodigoDesc();
+
+    /** Consultorios que usan un texto de unidad (sillón/módulo) dado. */
+    List<Consultorio> findByUnidadIn(List<String> unidades);
+
+    /** Consultorios no inactivos que usan un texto de unidad dado. */
+    long countByUnidadInAndEstadoNot(List<String> unidades, Consultorio.Estado estado);
+
+    /** Consultorios que usan un texto de ubicación dado. */
+    List<Consultorio> findByUbicacion(String ubicacion);
+
+    /** Consultorios no inactivos que usan un texto de ubicación dado. */
+    long countByUbicacionAndEstadoNot(String ubicacion, Consultorio.Estado estado);
 }

@@ -24,7 +24,9 @@ import {
   ConsultorioCatalogosService,
   ConsultorioCatalogos,
   ConsultorioEquipoCatalogo,
-  TratamientoSimple
+  TratamientoSimple,
+  Unidad,
+  Ubicacion
 } from '../../services/consultorio-catalogos.service';
 import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
 import { ConsultoriosHttpService } from '../../services/consultorios-http.service';
@@ -32,10 +34,14 @@ import { ConsultoriosHttpService } from '../../services/consultorios-http.servic
 const EQUIPO_CATEGORIAS = ['MOBILIARIO', 'DIAGNÓSTICO', 'INSTRUMENTAL', 'CONSUMIBLES'] as const;
 const TRATAMIENTO_CATEGORIAS = ['DIAGNÓSTICO', 'PREVENCIÓN', 'RESTAURADORA', 'ENDODONCIA', 'PERIODONCIA', 'ORTODONCIA', 'CIRUGÍA', 'PRÓTESIS', 'ESTÉTICA', 'EMERGENCIA'] as const;
 
+function unidadTexto(u: Unidad): string {
+  return u.nombre + ' · ' + u.tipo;
+}
+
 @Component({
   selector: 'app-consultorio-form',
   templateUrl: './consultorio-form.component.html',
-  styleUrls: ['./consultorio-form.component.css'],
+  styleUrls: ['./consultorio-form.component.css', '../../../../shared/styles/cat-inline.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConsultorioFormComponent implements OnChanges, OnDestroy {
@@ -54,6 +60,8 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
   equipos$: Observable<ConsultorioEquipoCatalogo[]>;
   tratamientos$: Observable<TratamientoSimple[]>;
   odontologos$: Observable<Odontologo[]>;
+  unidadesTodos$: Observable<Unidad[]>;
+  ubicacionesTodos$: Observable<Ubicacion[]>;
 
   name = '';
   unit = '';
@@ -62,6 +70,28 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
   tratamientos: string[] = [];
   status: ConsultorioStatus = 'operativo';
   error = false;
+
+  creandoUnidad = false;
+  nuevaUnidad = '';
+  nuevoTipoUnidad = 'SILLÓN';
+
+  editandoUnidad = false;
+  editarUnidadCodigo = '';
+  editarUnidadNombre = '';
+  editarUnidadTipo = 'SILLÓN';
+  editarUnidadActivo = true;
+  editarUnidadError = '';
+  editarUnidadTextoAnterior = '';
+
+  creandoUbicacion = false;
+  nuevaUbicacion = '';
+
+  editandoUbicacion = false;
+  editarUbicacionCodigo = '';
+  editarUbicacionNombre = '';
+  editarUbicacionActivo = true;
+  editarUbicacionError = '';
+  editarUbicacionNombreAnterior = '';
 
   /** Códigos de odontólogos asignados a esta sala. */
   assigned: string[] = [];
@@ -98,6 +128,8 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
         return c.tratamientos;
       })
     );
+    this.unidadesTodos$ = catalogos.unidades$;
+    this.ubicacionesTodos$ = catalogos.ubicaciones$;
     this.odontologos$ = odontologos.odontologos$.pipe(
       map(list => list.filter(o => o.status !== 'inactivo'))
     );
@@ -389,5 +421,177 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
       status: this.status
     };
     this.saved.emit({ draft, assigned: [...this.assigned] });
+  }
+
+  /* ==================== Catálogo de unidades (CREAR / EDITAR) ==================== */
+
+  toggleCrearUnidad(): void {
+    this.creandoUnidad = !this.creandoUnidad;
+    if (this.creandoUnidad) {
+      this.editandoUnidad = false;
+      this.editarUnidadError = '';
+    }
+    this.cdr.markForCheck();
+  }
+
+  onCrearUnidad(): void {
+    const nombre = this.nuevaUnidad.trim().toUpperCase();
+    if (!nombre) {
+      return;
+    }
+    this.catalogos.addUnidad({ nombre, tipo: this.nuevoTipoUnidad }).subscribe({
+      next: creada => {
+        this.unit = unidadTexto(creada);
+        this.nuevaUnidad = '';
+        this.creandoUnidad = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  onEditarUnidad(): void {
+    if (this.editandoUnidad) {
+      this.cancelarEdicionUnidad();
+      return;
+    }
+    this.creandoUnidad = false;
+    const actual = this.catalogos.snapshotUnidades().find(
+      u => unidadTexto(u) === this.unit || u.nombre === this.unit
+    );
+    if (!actual) {
+      this.editarUnidadError = 'SELECCIONA UNA UNIDAD PARA EDITARLA';
+      this.editandoUnidad = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.editarUnidadCodigo = actual.code;
+    this.editarUnidadNombre = actual.nombre;
+    this.editarUnidadTipo = actual.tipo;
+    this.editarUnidadActivo = actual.activo;
+    this.editarUnidadTextoAnterior = unidadTexto(actual);
+    this.editarUnidadError = '';
+    this.editandoUnidad = true;
+    this.cdr.markForCheck();
+  }
+
+  guardarUnidad(): void {
+    const nombre = this.editarUnidadNombre.trim().toUpperCase();
+    if (!nombre) {
+      this.editarUnidadError = 'EL NOMBRE DE LA UNIDAD ES OBLIGATORIO';
+      this.cdr.markForCheck();
+      return;
+    }
+    this.editarUnidadError = '';
+    const textoAnterior = this.editarUnidadTextoAnterior;
+    this.catalogos.updateUnidad({
+      id: this.editarUnidadCodigo,
+      code: this.editarUnidadCodigo,
+      nombre,
+      tipo: this.editarUnidadTipo,
+      activo: this.editarUnidadActivo
+    }).subscribe({
+      next: () => {
+        if (textoAnterior && this.unit === textoAnterior) {
+          this.unit = unidadTexto({ id: '', code: '', nombre, tipo: this.editarUnidadTipo, activo: this.editarUnidadActivo });
+        }
+        this.editandoUnidad = false;
+        this.cdr.markForCheck();
+      },
+      error: (err: unknown) => {
+        const body = err as { error?: { message?: string } };
+        this.editarUnidadError = body?.error?.message || 'NO SE PUDO ACTUALIZAR LA UNIDAD';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  cancelarEdicionUnidad(): void {
+    this.editandoUnidad = false;
+    this.editarUnidadError = '';
+    this.cdr.markForCheck();
+  }
+
+  /* ==================== Catálogo de ubicaciones (CREAR / EDITAR) ==================== */
+
+  toggleCrearUbicacion(): void {
+    this.creandoUbicacion = !this.creandoUbicacion;
+    if (this.creandoUbicacion) {
+      this.editandoUbicacion = false;
+      this.editarUbicacionError = '';
+    }
+    this.cdr.markForCheck();
+  }
+
+  onCrearUbicacion(): void {
+    const nombre = this.nuevaUbicacion.trim().toUpperCase();
+    if (!nombre) {
+      return;
+    }
+    this.catalogos.addUbicacion({ nombre }).subscribe({
+      next: creada => {
+        this.location = creada.nombre;
+        this.nuevaUbicacion = '';
+        this.creandoUbicacion = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  onEditarUbicacion(): void {
+    if (this.editandoUbicacion) {
+      this.cancelarEdicionUbicacion();
+      return;
+    }
+    this.creandoUbicacion = false;
+    const actual = this.catalogos.snapshotUbicaciones().find(u => u.nombre === this.location);
+    if (!actual) {
+      this.editarUbicacionError = 'SELECCIONA UNA UBICACIÓN PARA EDITARLA';
+      this.editandoUbicacion = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.editarUbicacionCodigo = actual.code;
+    this.editarUbicacionNombre = actual.nombre;
+    this.editarUbicacionActivo = actual.activo;
+    this.editarUbicacionNombreAnterior = actual.nombre;
+    this.editarUbicacionError = '';
+    this.editandoUbicacion = true;
+    this.cdr.markForCheck();
+  }
+
+  guardarUbicacion(): void {
+    const nombre = this.editarUbicacionNombre.trim().toUpperCase();
+    if (!nombre) {
+      this.editarUbicacionError = 'EL NOMBRE DE LA UBICACIÓN ES OBLIGATORIO';
+      this.cdr.markForCheck();
+      return;
+    }
+    this.editarUbicacionError = '';
+    const nombreAnterior = this.editarUbicacionNombreAnterior;
+    this.catalogos.updateUbicacion({
+      id: this.editarUbicacionCodigo,
+      code: this.editarUbicacionCodigo,
+      nombre,
+      activo: this.editarUbicacionActivo
+    }).subscribe({
+      next: () => {
+        if (nombreAnterior && this.location === nombreAnterior) {
+          this.location = nombre;
+        }
+        this.editandoUbicacion = false;
+        this.cdr.markForCheck();
+      },
+      error: (err: unknown) => {
+        const body = err as { error?: { message?: string } };
+        this.editarUbicacionError = body?.error?.message || 'NO SE PUDO ACTUALIZAR LA UBICACIÓN';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  cancelarEdicionUbicacion(): void {
+    this.editandoUbicacion = false;
+    this.editarUbicacionError = '';
+    this.cdr.markForCheck();
   }
 }
