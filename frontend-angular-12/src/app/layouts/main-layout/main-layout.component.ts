@@ -16,10 +16,11 @@ import { ChatHttpService } from '../../features/chat/services/chat-http.service'
 import { ChatSocketService } from '../../features/chat/services/chat-socket.service';
 import { AuthStore } from '../../core/auth/auth.store';
 import { Usuario } from '../../core/models/usuario.model';
+import { APP_ROUTES, AppRoute } from '../../core/config/app-routes';
 
 interface NavItem {
   label: string;
-  route?: string;
+  route?: AppRoute;
   title?: string;
   active: boolean;
   badge?: number;
@@ -64,9 +65,9 @@ export class MainLayoutComponent {
     {
       label: 'OPERACIÓN',
       items: [
-        { label: 'AGENDA', route: '/', title: 'AGENDA DEL DÍA', active: false },
-        { label: 'PACIENTES', route: '/pacientes', title: 'PACIENTES', active: false },
-        { label: 'TRATAMIENTOS', route: '/tratamientos', title: 'TRATAMIENTOS', active: false }
+        { label: 'AGENDA', route: APP_ROUTES.dashboard, title: 'AGENDA DEL DÍA', active: false },
+        { label: 'PACIENTES', route: APP_ROUTES.pacientes, title: 'PACIENTES', active: false },
+        { label: 'TRATAMIENTOS', route: APP_ROUTES.tratamientos, title: 'TRATAMIENTOS', active: false }
       ]
     },
     {
@@ -74,19 +75,19 @@ export class MainLayoutComponent {
       items: [
         { label: 'FACTURACIÓN', active: false },
         { label: 'REPORTES', active: false },
-        { label: 'CONSULTORIOS', route: '/consultorios', title: 'MAPEO DE CONSULTORIOS', active: false },
-        { label: 'MENSAJES', route: '/mensajes', title: 'BANDEJA DE MENSAJES', active: false },
-        { label: 'CHAT EN VIVO', route: '/chat', title: 'ESTACIONES Y TRANSMISIONES', active: false }
+        { label: 'CONSULTORIOS', route: APP_ROUTES.consultorios, title: 'MAPEO DE CONSULTORIOS', active: false },
+        { label: 'MENSAJES', route: APP_ROUTES.mensajes, title: 'BANDEJA DE MENSAJES', active: false },
+        { label: 'CHAT EN VIVO', route: APP_ROUTES.chat, title: 'ESTACIONES Y TRANSMISIONES', active: false }
       ]
     },
     {
       label: 'SISTEMA',
       items: [
-        { label: 'PERSONAL CLÍNICO', route: '/odontologos', title: 'PERSONAL CLÍNICO', active: false },
-        { label: 'ESPECIALIDADES', route: '/especialidades', title: 'ESPECIALIDADES', active: false },
-        { label: 'TURNOS Y HORARIOS', route: '/turnos', title: 'TURNOS Y HORARIOS', active: false },
-        { label: 'USUARIOS', route: '/usuarios', title: 'CONTROL DE USUARIOS', active: false },
-        { label: 'CONFIGURACIÓN', route: '/configuracion', title: 'CONFIGURACIÓN DE LA CLÍNICA', active: false }
+        { label: 'PERSONAL CLÍNICO', route: APP_ROUTES.odontologos, title: 'PERSONAL CLÍNICO', active: false },
+        { label: 'ESPECIALIDADES', route: APP_ROUTES.especialidades, title: 'ESPECIALIDADES', active: false },
+        { label: 'TURNOS Y HORARIOS', route: APP_ROUTES.turnos, title: 'TURNOS Y HORARIOS', active: false },
+        { label: 'USUARIOS', route: APP_ROUTES.usuarios, title: 'CONTROL DE USUARIOS', active: false },
+        { label: 'CONFIGURACIÓN', route: APP_ROUTES.configuracion, title: 'CONFIGURACIÓN DE LA CLÍNICA', active: false }
       ]
     }
   ];
@@ -189,7 +190,7 @@ export class MainLayoutComponent {
     this.close();
     this.auth.logout();
     // Recarga completa: descarta las cachés de los servicios singleton y cierra el WebSocket.
-    window.location.assign('/login');
+    window.location.assign(APP_ROUTES.login);
   }
 
   private startChatPoll(): void {
@@ -223,7 +224,7 @@ export class MainLayoutComponent {
 
   goToMessages(): void {
     this.close();
-    this.router.navigate(['/mensajes']);
+    this.router.navigate([APP_ROUTES.mensajes]);
   }
 
   private pushToast(msg: { id: string; subject: string; from: string; prioridad: string }): void {

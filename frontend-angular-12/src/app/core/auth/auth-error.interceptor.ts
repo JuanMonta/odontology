@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { catchError, mergeMap } from 'rxjs/operators';
 import { API_BASE } from '../config/api.config';
+import { APP_ROUTES } from '../config/app-routes';
 import { AuthStore } from './auth.store';
 import { ReauthService } from './reauth.service';
 
@@ -38,7 +39,7 @@ export class AuthErrorInterceptor implements HttpInterceptor {
         const esApi = req.url.startsWith(API_BASE);
         const esLogin = req.url.includes('/auth/login');
         const sesionActiva = this.auth.isLoggedIn();
-        const enLogin = this.router.url.startsWith('/login');
+        const enLogin = this.router.url.startsWith(APP_ROUTES.login);
         if (err.status === 401 && esApi && !esLogin && sesionActiva && !enLogin) {
           return this.relogin(req, err);
         }
@@ -66,7 +67,7 @@ export class AuthErrorInterceptor implements HttpInterceptor {
         }
         this.auth.logout();
         // Recarga completa: descarta cachés de singleton y cierra el WebSocket.
-        window.location.assign('/login');
+        window.location.assign(APP_ROUTES.login);
         return throwError(err);
       })
     );

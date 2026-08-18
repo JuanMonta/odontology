@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStore } from '../../../core/auth/auth.store';
+import { APP_ROUTES } from '../../../core/config/app-routes';
 
 @Component({
   selector: 'app-login-page',
@@ -22,7 +23,7 @@ export class LoginPageComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) {
-      this.router.navigate(['/']);
+      this.router.navigate([APP_ROUTES.dashboard]);
     }
   }
 
@@ -36,7 +37,7 @@ export class LoginPageComponent implements OnInit {
     this.auth
       .login(this.username.trim(), this.password)
       .then(() => {
-        this.router.navigate(['/']);
+        this.router.navigate([APP_ROUTES.dashboard]);
       })
       .catch((err: { status?: number }) => {
         this.error =
