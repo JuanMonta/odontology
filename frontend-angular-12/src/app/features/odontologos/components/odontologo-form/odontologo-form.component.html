@@ -50,7 +50,7 @@
   <p class="form-error" *ngIf="error" role="alert">NOMBRE Y LICENCIA SON OBLIGATORIOS</p>
 
   <div class="form-actions">
-    <ui-button type="submit">{{ odontologo ? 'GUARDAR CAMBIOS' : 'REGISTRAR PROFESIONAL' }}</ui-button>
     <ui-button variant="ghost" (click)="cancel.emit()">CANCELAR</ui-button>
+    <ui-button type="submit">{{ odontologo ? 'GUARDAR CAMBIOS' : 'REGISTRAR PROFESIONAL' }}</ui-button>
   </div>
 </form>
