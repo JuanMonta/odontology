@@ -73,7 +73,7 @@ public class ConsultoriosService {
                                 equipo.getCategoria()))
                         .toList(),
                 tratamientoRepository.findByActivoTrueOrderByNombreAsc().stream()
-                        .map(t -> new TratamientoSimpleDto(t.getCodigo(), t.getNombre(), t.getCategoria().name()))
+                        .map(t -> new TratamientoSimpleDto(t.getCodigo(), t.getNombre(), t.getCategoria()))
                         .toList());
         
         System.out.println("=== RESULT DEBUG ===");

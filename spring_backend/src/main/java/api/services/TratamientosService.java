@@ -41,7 +41,7 @@ public class TratamientosService {
         Tratamiento tratamiento = Tratamiento.builder()
                 .codigo(codigoService.nextCodigo("TRT", "TRT-%03d"))
                 .nombre(draft.name())
-                .categoria(Tratamiento.Categoria.valueOf(draft.category()))
+                .categoria(draft.category())
                 .duracionMin(draft.durationMin())
                 .precio(draft.price())
                 .activo(draft.active())
@@ -58,7 +58,7 @@ public class TratamientosService {
         Tratamiento tratamiento = tratamientoRepository.findById(dto.code())
                 .orElseThrow(() -> new IllegalArgumentException("Tratamiento no encontrado: " + dto.code()));
         tratamiento.setNombre(dto.name());
-        tratamiento.setCategoria(Tratamiento.Categoria.valueOf(dto.category()));
+        tratamiento.setCategoria(dto.category());
         tratamiento.setDuracionMin(dto.durationMin());
         tratamiento.setPrecio(dto.price());
         tratamiento.setActivo(dto.active());
@@ -105,7 +105,7 @@ public class TratamientosService {
                 t.getCodigo(),
                 t.getCodigo(),
                 t.getNombre(),
-                t.getCategoria().name(),
+                t.getCategoria(),
                 t.getDuracionMin(),
                 t.getPrecio(),
                 t.getActivo(),

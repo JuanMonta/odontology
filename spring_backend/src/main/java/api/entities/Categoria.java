@@ -12,46 +12,31 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Tratamiento (tabla {@code tratamientos}). Tarifas en USD.
- * La categoría se almacena como string y se valida contra la tabla {@code categorias}.
+ * Categoría de tratamiento (tabla {@code categorias}).
+ * El nombre se almacena en mayúsculas; los tratamientos referencian
+ * este catálogo por nombre en la columna {@code categoria}.
  */
 @Entity
-@Table(name = "tratamientos")
+@Table(name = "categorias")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Tratamiento {
+public class Categoria {
 
     @Id
     @Column(name = "codigo", length = 8)
     private String codigo;
 
-    @Column(name = "nombre", nullable = false, length = 80)
+    @Column(name = "nombre", nullable = false, length = 40, unique = true)
     private String nombre;
-
-    @Column(name = "categoria", nullable = false, length = 40)
-    private String categoria;
-
-    @Column(name = "duracion_min", nullable = false)
-    private Integer duracionMin;
-
-    @Column(name = "precio", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precio;
 
     @Column(name = "activo", nullable = false)
     private Boolean activo;
-
-    @Column(name = "descripcion", nullable = false)
-    private String descripcion;
-
-    @Column(name = "uso", nullable = false)
-    private Integer uso;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

@@ -6,19 +6,6 @@ import { Treatment, TreatmentCategory, TreatmentDraft } from '../../../core/mode
 import { API_BASE } from '../../../core/config/api.config';
 import { BackendStatusService } from '../../../core/services/backend-status.service';
 
-export const TREATMENT_CATEGORIES: TreatmentCategory[] = [
-  'DIAGNÓSTICO',
-  'PREVENCIÓN',
-  'RESTAURADORA',
-  'ENDODONCIA',
-  'PERIODONCIA',
-  'ORTODONCIA',
-  'CIRUGÍA',
-  'PRÓTESIS',
-  'ESTÉTICA',
-  'EMERGENCIA'
-];
-
 /**
  * Consume el backend REST de tratamientos (spring_backend → /api/v1/tratamientos).
  * Mantiene el mismo contrato Observable del mock para no tocar las vistas.
