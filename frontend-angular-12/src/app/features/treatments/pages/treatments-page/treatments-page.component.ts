@@ -7,9 +7,10 @@ import {
   TreatmentCategory,
   TreatmentDraft
 } from '../../../../core/models/treatment.model';
-import { TREATMENT_CATEGORIES, TreatmentsHttpService } from '../../services/treatments-http.service';
+import { CategoriasHttpService, Categoria } from '../../services/categorias-http.service';
+import { TreatmentsHttpService } from '../../services/treatments-http.service';
 
-type CategoryFilter = TreatmentCategory | 'all';
+type CategoryFilter = string | 'all';
 
 @Component({
   selector: 'app-treatments-page',
@@ -18,7 +19,7 @@ type CategoryFilter = TreatmentCategory | 'all';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreatmentsPageComponent implements OnInit {
-  categories = TREATMENT_CATEGORIES;
+  categories$: Observable<Categoria[]>;
   treatments$: Observable<Treatment[]>;
   selected$: Observable<Treatment | null>;
 
@@ -31,9 +32,13 @@ export class TreatmentsPageComponent implements OnInit {
 
   constructor(
     private service: TreatmentsHttpService,
+    private categoriasService: CategoriasHttpService,
     private route: ActivatedRoute,
     private router: Router
   ) {
+    this.categories$ = categoriasService.categorias$.pipe(
+      map(list => list.filter(c => c.activo))
+    );
     this.treatments$ = combineLatest([this.service.treatments$, this.search$, this.category$]).pipe(
       map(([list, q, cat]) => {
         const query = q.trim().toUpperCase();

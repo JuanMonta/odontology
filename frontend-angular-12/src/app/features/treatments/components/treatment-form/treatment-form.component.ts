@@ -7,7 +7,7 @@ import {
   TreatmentDraft
 } from '../../../../core/models/treatment.model';
 import { Consultorio } from '../../../../core/models/consultorio.model';
-import { TREATMENT_CATEGORIES } from '../../services/treatments-http.service';
+import { CategoriasHttpService, Categoria } from '../../services/categorias-http.service';
 import { borradorKey } from '../../../../core/auth/session-local-storage';
 import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
 
@@ -37,8 +37,6 @@ export class TreatmentFormComponent implements OnChanges {
 
   @ViewChild('consPickerPanel', { static: false }) consPickerPanel?: ElementRef<HTMLElement>;
 
-  categories = [...TREATMENT_CATEGORIES];
-
   creandoCategoria = false;
   nuevaCategoria = '';
 
@@ -56,10 +54,16 @@ export class TreatmentFormComponent implements OnChanges {
   trtPickQuery = '';
   trtPickCategory: string | null = null;
 
+  categories$: Observable<Categoria[]>;
+
   constructor(
     private readonly consultoriosService: ConsultoriosHttpService,
+    private readonly categoriasService: CategoriasHttpService,
     private readonly cdr: ChangeDetectorRef
   ) {
+    this.categories$ = categoriasService.categorias$.pipe(
+      map(list => list.filter(c => c.activo))
+    );
     this.consultorios$ = consultoriosService.consultorios$.pipe(
       map((list: Consultorio[]) =>
         list
@@ -146,7 +150,6 @@ export class TreatmentFormComponent implements OnChanges {
     try {
       const parsed = JSON.parse(raw) as TreatmentFormDraft;
       return parsed.category &&
-        this.categories.includes(parsed.category) &&
         typeof parsed.durationMin === 'number' &&
         typeof parsed.price === 'number'
         ? parsed
@@ -162,14 +165,17 @@ export class TreatmentFormComponent implements OnChanges {
 
   onCrearCategoria(): void {
     const nombre = this.nuevaCategoria.trim().toUpperCase();
-    if (!nombre || this.categories.includes(nombre)) {
+    if (!nombre) {
       return;
     }
-    this.categories = [...this.categories, nombre];
-    this.category = nombre;
-    this.nuevaCategoria = '';
-    this.creandoCategoria = false;
-    this.cdr.markForCheck();
+    this.categoriasService.addCategoria({ nombre }).subscribe({
+      next: (creada) => {
+        this.category = creada.nombre;
+        this.nuevaCategoria = '';
+        this.creandoCategoria = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   /* ==================== Picker de consultorios ==================== */

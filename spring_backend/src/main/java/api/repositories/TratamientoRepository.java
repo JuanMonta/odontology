@@ -10,7 +10,7 @@ import java.util.Optional;
 @RepositoryRestResource(exported = false)
 public interface TratamientoRepository extends JpaRepository<Tratamiento, String> {
 
-    List<Tratamiento> findByCategoria(Tratamiento.Categoria categoria);
+    List<Tratamiento> findByCategoria(String categoria);
 
     List<Tratamiento> findByActivoTrue();
 

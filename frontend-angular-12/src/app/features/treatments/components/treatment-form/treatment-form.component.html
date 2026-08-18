@@ -11,7 +11,7 @@
 
     <ui-field label="CATEGORÍA" [full]="true">
       <select class="field-select" [(ngModel)]="category" name="category" aria-label="Categoría del tratamiento" (ngModelChange)="persistDraft()">
-        <option *ngFor="let c of categories" [ngValue]="c">{{ c }}</option>
+        <option *ngFor="let c of categories$ | async" [ngValue]="c.nombre">{{ c.nombre }}</option>
       </select>
       <button
         class="field-add"
