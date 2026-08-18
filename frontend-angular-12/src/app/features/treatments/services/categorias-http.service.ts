@@ -48,15 +48,15 @@ export class CategoriasHttpService {
     );
   }
 
-  updateCategoria(item: Categoria): void {
-    this.http.put<Categoria>(`${API_BASE}/categorias/${item.code}`, item).subscribe(updated => {
-      this.subjects.next(this.subjects.getValue().map(c => c.code === updated.code ? updated : c));
-    });
+  updateCategoria(item: Categoria): Observable<Categoria> {
+    return this.http.put<Categoria>(`${API_BASE}/categorias/${item.code}`, item).pipe(
+      tap(updated => this.subjects.next(this.subjects.getValue().map(c => c.code === updated.code ? updated : c)))
+    );
   }
 
-  toggleStatus(code: string): void {
-    this.http.patch<Categoria>(`${API_BASE}/categorias/${code}/toggle-status`, {}).subscribe(updated => {
-      this.subjects.next(this.subjects.getValue().map(c => c.code === updated.code ? updated : c));
-    });
+  toggleStatus(code: string): Observable<Categoria> {
+    return this.http.patch<Categoria>(`${API_BASE}/categorias/${code}/toggle-status`, {}).pipe(
+      tap(updated => this.subjects.next(this.subjects.getValue().map(c => c.code === updated.code ? updated : c)))
+    );
   }
 }

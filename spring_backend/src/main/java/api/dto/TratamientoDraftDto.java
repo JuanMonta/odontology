@@ -5,7 +5,7 @@ import java.util.List;
 
 public record TratamientoDraftDto(
         String name,
-        String category,
+        String categoryCode,
         int durationMin,
         BigDecimal price,
         boolean active,

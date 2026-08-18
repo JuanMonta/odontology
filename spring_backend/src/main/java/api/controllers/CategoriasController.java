@@ -2,6 +2,8 @@ package api.controllers;
 
 import api.dto.CategoriaDraftDto;
 import api.dto.CategoriaDto;
+import api.dto.CategoriaFusionDto;
+import api.dto.CategoriaFusionResultDto;
 import api.services.CategoriasService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,5 +47,10 @@ public class CategoriasController {
     @PatchMapping("/{code}/toggle-status")
     public CategoriaDto toggleStatus(@PathVariable String code) {
         return categoriasService.toggleStatus(code);
+    }
+
+    @PostMapping("/{code}/fusion")
+    public CategoriaFusionResultDto fusion(@PathVariable String code, @RequestBody CategoriaFusionDto dto) {
+        return categoriasService.fusion(code, dto.toCode());
     }
 }

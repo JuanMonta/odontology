@@ -10,28 +10,89 @@
     </ui-field>
 
     <ui-field label="CATEGORÍA" [full]="true">
-      <select class="field-select" [(ngModel)]="category" name="category" aria-label="Categoría del tratamiento" (ngModelChange)="persistDraft()">
-        <option *ngFor="let c of categories$ | async" [ngValue]="c.nombre">{{ c.nombre }}</option>
-      </select>
-      <button
-        class="field-add"
-        type="button"
-        (click)="creandoCategoria = !creandoCategoria"
-      >
-        <span class="btn-plus" aria-hidden="true"></span>
-        CREAR CATEGORÍA
-      </button>
-      <span class="field-create" *ngIf="creandoCategoria">
-        <input
-          class="field-input field-create-input"
-          type="text"
-          [(ngModel)]="nuevaCategoria"
-          name="nuevaCategoria"
-          placeholder="NOMBRE DE LA CATEGORÍA"
-          autocomplete="off"
-        />
-        <ui-button size="sm" type="button" (click)="onCrearCategoria()">GUARDAR</ui-button>
-      </span>
+      <div class="cat-row">
+        <select class="field-select cat-select" [(ngModel)]="categoryCode" name="categoryCode" aria-label="Categoría del tratamiento" (ngModelChange)="persistDraft()">
+          <option *ngFor="let c of categories$ | async" [ngValue]="c.code">{{ c.nombre }}</option>
+        </select>
+        <button
+          class="cat-act"
+          type="button"
+          [class.is-open]="editandoCategoria"
+          (click)="onEditarCategoria()"
+        >
+          <span class="btn-pencil" aria-hidden="true"></span>
+          EDITAR
+        </button>
+        <button
+          class="cat-act"
+          type="button"
+          [class.is-open]="creandoCategoria"
+          (click)="toggleCrearCategoria()"
+        >
+          <span class="btn-plus" aria-hidden="true"></span>
+          CREAR
+        </button>
+      </div>
+
+      <div class="cat-card" *ngIf="editandoCategoria">
+        <div class="cat-card-head">
+          <span class="cat-card-title">EDITAR CATEGORÍA</span>
+          <span class="cat-code" *ngIf="editarCodigo">{{ editarCodigo }}</span>
+        </div>
+        <div class="cat-card-body">
+          <input
+            class="field-input cat-input"
+            type="text"
+            [(ngModel)]="editarNombre"
+            name="editarNombre"
+            placeholder="NOMBRE DE LA CATEGORÍA"
+            autocomplete="off"
+          />
+          <div class="seg" role="radiogroup" aria-label="Estado de la categoría">
+            <button
+              class="seg-btn"
+              [class.is-active]="editarActivo"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="editarActivo"
+              (click)="editarActivo = true"
+            >ACTIVO</button>
+            <button
+              class="seg-btn"
+              [class.is-active]="!editarActivo"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="!editarActivo"
+              (click)="editarActivo = false"
+            >INACTIVO</button>
+          </div>
+        </div>
+        <div class="cat-card-foot">
+          <ui-button size="sm" variant="ghost" (click)="cancelarEdicion()">CANCELAR</ui-button>
+          <ui-button size="sm" (click)="guardarCategoria()">GUARDAR</ui-button>
+        </div>
+        <p class="form-error cat-error" *ngIf="editarError" role="alert">{{ editarError }}</p>
+      </div>
+
+      <div class="cat-card" *ngIf="creandoCategoria">
+        <div class="cat-card-head">
+          <span class="cat-card-title">NUEVA CATEGORÍA</span>
+        </div>
+        <div class="cat-card-body">
+          <input
+            class="field-input cat-input"
+            type="text"
+            [(ngModel)]="nuevaCategoria"
+            name="nuevaCategoria"
+            placeholder="NOMBRE DE LA CATEGORÍA"
+            autocomplete="off"
+          />
+        </div>
+        <div class="cat-card-foot">
+          <ui-button size="sm" variant="ghost" (click)="creandoCategoria = false">CANCELAR</ui-button>
+          <ui-button size="sm" (click)="onCrearCategoria()">GUARDAR</ui-button>
+        </div>
+      </div>
     </ui-field>
 
     <ui-field label="DURACIÓN (MIN)">

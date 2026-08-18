@@ -15,7 +15,7 @@ const TREATMENT_FORM_DRAFT_KEY = 'saas.clinica.treatment-form.draft';
 
 interface TreatmentFormDraft {
   name: string;
-  category: TreatmentCategory;
+  categoryCode: string;
   durationMin: number;
   price: number;
   description: string;
@@ -40,8 +40,14 @@ export class TreatmentFormComponent implements OnChanges {
   creandoCategoria = false;
   nuevaCategoria = '';
 
+  editandoCategoria = false;
+  editarCodigo = '';
+  editarNombre = '';
+  editarActivo = true;
+  editarError = '';
+
   name = '';
-  category: TreatmentCategory = 'PREVENCIÓN';
+  categoryCode = '';
   durationMin = 30;
   price = 100;
   description = '';
@@ -76,7 +82,7 @@ export class TreatmentFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.treatment && this.treatment) {
       this.name = this.treatment.name;
-      this.category = this.treatment.category;
+      this.categoryCode = this.treatment.categoryCode;
       this.durationMin = this.treatment.durationMin;
       this.price = this.treatment.price;
       this.description = this.treatment.description;
@@ -86,7 +92,7 @@ export class TreatmentFormComponent implements OnChanges {
     if (changes.creating && this.creating) {
       const draft = this.readDraft();
       this.name = draft ? draft.name : '';
-      this.category = draft ? draft.category : 'PREVENCIÓN';
+      this.categoryCode = draft ? draft.categoryCode : '';
       this.durationMin = draft ? draft.durationMin : 30;
       this.price = draft ? draft.price : 100;
       this.description = draft ? draft.description : '';
@@ -109,7 +115,7 @@ export class TreatmentFormComponent implements OnChanges {
     }
     const draft: TreatmentDraft = {
       name: this.name.trim().toUpperCase(),
-      category: this.category,
+      categoryCode: this.categoryCode,
       durationMin: Math.max(5, Math.round(this.durationMin || 0)),
       price: Math.max(0, Math.round(this.price || 0)),
       description: this.description.trim().toUpperCase(),
@@ -132,7 +138,7 @@ export class TreatmentFormComponent implements OnChanges {
     }
     const draft: TreatmentFormDraft = {
       name: this.name,
-      category: this.category,
+      categoryCode: this.categoryCode,
       durationMin: this.durationMin,
       price: this.price,
       description: this.description,
@@ -149,7 +155,7 @@ export class TreatmentFormComponent implements OnChanges {
     }
     try {
       const parsed = JSON.parse(raw) as TreatmentFormDraft;
-      return parsed.category &&
+      return parsed.categoryCode &&
         typeof parsed.durationMin === 'number' &&
         typeof parsed.price === 'number'
         ? parsed
@@ -170,12 +176,74 @@ export class TreatmentFormComponent implements OnChanges {
     }
     this.categoriasService.addCategoria({ nombre }).subscribe({
       next: (creada) => {
-        this.category = creada.nombre;
+        this.categoryCode = creada.code;
         this.nuevaCategoria = '';
         this.creandoCategoria = false;
         this.cdr.markForCheck();
       }
     });
+  }
+
+  toggleCrearCategoria(): void {
+    this.creandoCategoria = !this.creandoCategoria;
+    if (this.creandoCategoria) {
+      this.editandoCategoria = false;
+      this.editarError = '';
+    }
+    this.cdr.markForCheck();
+  }
+
+  onEditarCategoria(): void {
+    if (this.editandoCategoria) {
+      this.cancelarEdicion();
+      return;
+    }
+    this.creandoCategoria = false;
+    const actual = this.categoriasService.snapshot().find(c => c.code === this.categoryCode);
+    if (!actual) {
+      this.editarError = 'SELECCIONA UNA CATEGORÍA PARA EDITARLA';
+      this.editandoCategoria = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.editarCodigo = actual.code;
+    this.editarNombre = actual.nombre;
+    this.editarActivo = actual.activo;
+    this.editarError = '';
+    this.editandoCategoria = true;
+    this.cdr.markForCheck();
+  }
+
+  guardarCategoria(): void {
+    const nombre = this.editarNombre.trim().toUpperCase();
+    if (!nombre) {
+      this.editarError = 'EL NOMBRE DE LA CATEGORÍA ES OBLIGATORIO';
+      this.cdr.markForCheck();
+      return;
+    }
+    this.editarError = '';
+    this.categoriasService.updateCategoria({
+      id: this.editarCodigo,
+      code: this.editarCodigo,
+      nombre,
+      activo: this.editarActivo
+    }).subscribe({
+      next: () => {
+        this.editandoCategoria = false;
+        this.cdr.markForCheck();
+      },
+      error: (err: unknown) => {
+        const body = err as { error?: { message?: string } };
+        this.editarError = body?.error?.message || 'NO SE PUDO ACTUALIZAR LA CATEGORÍA';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  cancelarEdicion(): void {
+    this.editandoCategoria = false;
+    this.editarError = '';
+    this.cdr.markForCheck();
   }
 
   /* ==================== Picker de consultorios ==================== */

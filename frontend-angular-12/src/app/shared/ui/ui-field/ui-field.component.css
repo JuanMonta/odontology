@@ -2,14 +2,14 @@
   display: block;
 }
 
+:host.field--full {
+  grid-column: 1 / -1;
+}
+
 .field {
   display: flex;
   flex-direction: column;
   gap: 6px;
-}
-
-.field--full {
-  grid-column: 1 / -1;
 }
 
 .field-label {

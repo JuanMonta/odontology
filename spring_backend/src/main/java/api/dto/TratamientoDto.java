@@ -7,6 +7,7 @@ public record TratamientoDto(
         String id,
         String code,
         String name,
+        String categoryCode,
         String category,
         int durationMin,
         BigDecimal price,

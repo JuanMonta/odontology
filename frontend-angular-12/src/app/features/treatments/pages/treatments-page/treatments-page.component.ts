@@ -43,7 +43,7 @@ export class TreatmentsPageComponent implements OnInit {
       map(([list, q, cat]) => {
         const query = q.trim().toUpperCase();
         return list.filter(t => {
-          const matchesCat = cat === 'all' || t.category === cat;
+          const matchesCat = cat === 'all' || t.categoryCode === cat;
           const matchesQuery =
             !query ||
             t.name.toUpperCase().includes(query) ||
