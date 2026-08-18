@@ -14,6 +14,7 @@ export interface ConsultorioEquipoCatalogo {
 export interface TratamientoSimple {
   code: string;
   name: string;
+  categoryCode: string;
   category: string;
 }
 

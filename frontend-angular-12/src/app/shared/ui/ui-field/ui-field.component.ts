@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular/core';
 
 @Component({
   selector: 'ui-field',
@@ -10,4 +10,9 @@ export class UiFieldComponent {
   @Input() label = '';
   @Input() required = false;
   @Input() full = false;
+
+  @HostBinding('class.field--full')
+  get fullClass(): boolean {
+    return this.full;
+  }
 }

@@ -5,11 +5,13 @@ import api.dto.ConsultorioDto;
 import api.dto.ConsultorioDraftDto;
 import api.dto.EquipoCatalogoDto;
 import api.dto.TratamientoSimpleDto;
+import api.entities.Categoria;
 import api.entities.Consultorio;
 import api.entities.ConsultorioEquipo;
 import api.entities.ConsultorioTratamiento;
 import api.entities.Equipo;
 import api.entities.Tratamiento;
+import api.repositories.CategoriaRepository;
 import api.repositories.ConsultorioEquipoRepository;
 import api.repositories.ConsultorioRepository;
 import api.repositories.ConsultorioTratamientoRepository;
@@ -24,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Consultorios, su equipamiento y capacidad de tratamientos.
@@ -40,6 +44,7 @@ public class ConsultoriosService {
     private final UbicacionRepository ubicacionRepository;
     private final EquipoRepository equipoCatalogoRepository;
     private final TratamientoRepository tratamientoRepository;
+    private final CategoriaRepository categoriaRepository;
 
     @Transactional(readOnly = true)
     public List<ConsultorioDto> list() {
@@ -56,9 +61,12 @@ public class ConsultoriosService {
         System.out.println("=== SERVICE DEBUG TRATAMIENTOS ===");
         System.out.println("Count: " + tratamientos.size());
         for (var t : tratamientos) {
-            System.out.println("  " + t.getCodigo() + " | " + t.getNombre() + " | " + t.getCategoria() + " | activo=" + t.getActivo());
+            System.out.println("  " + t.getCodigo() + " | " + t.getNombre() + " | " + t.getCategoriaCodigo() + " | activo=" + t.getActivo());
         }
-        
+
+        Map<String, String> categoriaNombres = categoriaRepository.findAll().stream()
+                .collect(Collectors.toMap(Categoria::getCodigo, Categoria::getNombre));
+
         var result = new ConsultorioCatalogosDto(
                 unidadRepository.findByActivoTrueOrderByNombreAsc().stream()
                         .map(unidad -> unidad.getNombre() + " · " + unidad.getTipo())
@@ -73,7 +81,11 @@ public class ConsultoriosService {
                                 equipo.getCategoria()))
                         .toList(),
                 tratamientoRepository.findByActivoTrueOrderByNombreAsc().stream()
-                        .map(t -> new TratamientoSimpleDto(t.getCodigo(), t.getNombre(), t.getCategoria()))
+                        .map(t -> new TratamientoSimpleDto(
+                                t.getCodigo(),
+                                t.getNombre(),
+                                t.getCategoriaCodigo(),
+                                categoriaNombres.getOrDefault(t.getCategoriaCodigo(), t.getCategoriaCodigo())))
                         .toList());
         
         System.out.println("=== RESULT DEBUG ===");

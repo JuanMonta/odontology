@@ -15,12 +15,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * Categoría de tratamiento (tabla {@code categorias}).
+ * Categoría de tratamiento (tabla {@code categorias_tratamientos}).
  * El nombre se almacena en mayúsculas; los tratamientos referencian
- * este catálogo por nombre en la columna {@code categoria}.
+ * este catálogo por FK en la columna {@code categoria_codigo}.
  */
 @Entity
-@Table(name = "categorias")
+@Table(name = "categorias_tratamientos")
 @Getter
 @Setter
 @NoArgsConstructor

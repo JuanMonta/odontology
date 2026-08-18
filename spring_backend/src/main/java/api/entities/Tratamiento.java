@@ -17,7 +17,8 @@ import java.time.LocalDateTime;
 
 /**
  * Tratamiento (tabla {@code tratamientos}). Tarifas en USD.
- * La categoría se almacena como string y se valida contra la tabla {@code categorias}.
+ * La categoría se referencia por FK a la tabla {@code categorias_tratamientos} (columna {@code categoria_codigo});
+ * el nombre legible se resuelve por JOIN al construir los DTOs.
  */
 @Entity
 @Table(name = "tratamientos")
@@ -35,8 +36,8 @@ public class Tratamiento {
     @Column(name = "nombre", nullable = false, length = 80)
     private String nombre;
 
-    @Column(name = "categoria", nullable = false, length = 40)
-    private String categoria;
+    @Column(name = "categoria_codigo", nullable = false, length = 12)
+    private String categoriaCodigo;
 
     @Column(name = "duracion_min", nullable = false)
     private Integer duracionMin;

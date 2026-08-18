@@ -31,7 +31,7 @@
           (change)="onCategory($any($event.target).value)"
         >
           <option value="all">TODAS</option>
-          <option *ngFor="let c of categories$ | async" [value]="c.nombre">{{ c.nombre }}</option>
+          <option *ngFor="let c of categories$ | async" [value]="c.code">{{ c.nombre }}</option>
         </select>
       </div>
     </div>
