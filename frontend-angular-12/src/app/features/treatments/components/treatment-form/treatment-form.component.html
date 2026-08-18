@@ -13,6 +13,25 @@
       <select class="field-select" [(ngModel)]="category" name="category" aria-label="Categoría del tratamiento" (ngModelChange)="persistDraft()">
         <option *ngFor="let c of categories" [ngValue]="c">{{ c }}</option>
       </select>
+      <button
+        class="field-add"
+        type="button"
+        (click)="creandoCategoria = !creandoCategoria"
+      >
+        <span class="btn-plus" aria-hidden="true"></span>
+        CREAR CATEGORÍA
+      </button>
+      <span class="field-create" *ngIf="creandoCategoria">
+        <input
+          class="field-input field-create-input"
+          type="text"
+          [(ngModel)]="nuevaCategoria"
+          name="nuevaCategoria"
+          placeholder="NOMBRE DE LA CATEGORÍA"
+          autocomplete="off"
+        />
+        <ui-button size="sm" type="button" (click)="onCrearCategoria()">GUARDAR</ui-button>
+      </span>
     </ui-field>
 
     <ui-field label="DURACIÓN (MIN)">
