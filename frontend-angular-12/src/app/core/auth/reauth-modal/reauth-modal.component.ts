@@ -5,9 +5,11 @@ import {
   Component,
   ElementRef,
   HostBinding,
+  OnDestroy,
   ViewChild
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AuthStore } from '../auth.store';
 import { ReauthService } from '../reauth.service';
 
@@ -23,7 +25,8 @@ import { ReauthService } from '../reauth.service';
   styleUrls: ['./reauth-modal.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReauthModalComponent implements AfterViewInit {
+export class ReauthModalComponent implements AfterViewInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
   visible = false;
   username = '';
   password = '';
@@ -39,12 +42,11 @@ export class ReauthModalComponent implements AfterViewInit {
   constructor(
     private readonly auth: AuthStore,
     private readonly reauth: ReauthService,
-    private readonly router: Router,
     private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngAfterViewInit(): void {
-    this.reauth.visible().subscribe(v => {
+    this.reauth.visible().pipe(takeUntil(this.destroy$)).subscribe(v => {
       this.visible = v;
       if (v) {
         this.username = this.auth.usuario?.username ?? '';
@@ -85,5 +87,10 @@ export class ReauthModalComponent implements AfterViewInit {
 
   cancelar(): void {
     this.reauth.cancelar();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -29,7 +29,7 @@ export class AuthStore {
   }
 
   isLoggedIn(): boolean {
-    return !!this.token && !!this.user$;
+    return !!this.token && !!this.user$.getValue();
   }
 
   usuario$(): Observable<Usuario | null> {
