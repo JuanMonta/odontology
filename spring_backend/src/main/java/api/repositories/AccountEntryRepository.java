@@ -20,4 +20,6 @@ public interface AccountEntryRepository extends JpaRepository<AccountEntry, Long
                                       @Param("tipo") AccountEntry.Tipo tipo);
 
     void deleteByPacienteId(String pacienteId);
+
+    boolean existsByAppointmentIdAndTipo(String appointmentId, AccountEntry.Tipo tipo);
 }

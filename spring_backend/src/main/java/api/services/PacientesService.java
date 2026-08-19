@@ -722,7 +722,11 @@ public class PacientesService {
                 e.getConcepto(),
                 e.getMonto(),
                 e.getTipo().name(),
-                e.getMetodo() == null ? null : e.getMetodo().name());
+                e.getMetodo() == null ? null : e.getMetodo().name(),
+                e.getAppointmentId(),
+                e.getTratamientoCodigo(),
+                e.getOdontologoCodigo(),
+                e.getConsultorioCodigo());
     }
 
     private PatientAlertDto toAlertDto(PatientAlert a) {
