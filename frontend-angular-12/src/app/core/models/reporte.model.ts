@@ -3,7 +3,11 @@ export type TipoReporte =
   | 'produccion-odontologo'
   | 'produccion-consultorio'
   | 'flujo-caja'
-  | 'cartera';
+  | 'cartera'
+  | 'citas-consultorio'
+  | 'citas-odontologo'
+  | 'citas-perdidas'
+  | 'pacientes-atendidos';
 
 export interface ReporteProduccionItem {
   codigo: string;
@@ -51,4 +55,64 @@ export interface ReporteCartera {
   deudores: ReporteCarteraItem[];
   totalDeudores: number;
   totalCartera: number;
+}
+
+export interface ReporteOperacionItem {
+  codigo: string;
+  nombre: string;
+  grupo: string;
+  programadas: number;
+  atendidas: number;
+  noShow: number;
+  canceladas: number;
+  enProceso: number;
+  ocupacion: number;
+}
+
+export interface ReporteOperacion {
+  items: ReporteOperacionItem[];
+  totalProgramadas: number;
+  totalAtendidas: number;
+  totalNoShow: number;
+  totalCanceladas: number;
+  totalEnProceso: number;
+  ocupacionGlobal: number;
+  desde: string;
+  hasta: string;
+}
+
+export interface ReporteCitaPerdida {
+  id: string;
+  pacienteId: string;
+  paciente: string;
+  fecha: string;
+  hora: string;
+  tratamiento: string;
+  consultorio: string;
+  odontologo: string;
+  estado: string;
+}
+
+export interface ReporteCitasPerdidas {
+  items: ReporteCitaPerdida[];
+  totalNoShow: number;
+  totalCanceladas: number;
+  totalPerdidas: number;
+  desde: string;
+  hasta: string;
+}
+
+export interface ReportePacienteAtendido {
+  pacienteId: string;
+  paciente: string;
+  atenciones: number;
+  ultimaFecha: string;
+}
+
+export interface ReportePacientesAtendidos {
+  items: ReportePacienteAtendido[];
+  pacientesUnicos: number;
+  totalAtenciones: number;
+  desde: string;
+  hasta: string;
 }

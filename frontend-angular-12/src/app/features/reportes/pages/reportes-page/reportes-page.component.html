@@ -203,6 +203,143 @@
           </table>
         </div>
       </section>
+    <!-- OPERACIÓN CLÍNICA: CITAS POR CONSULTORIO / ODONTÓLOGO -->
+      <section class="report-card" *ngIf="esOperacion && operacion" aria-label="Reporte de operación clínica">
+        <div class="report-head">
+          <div>
+            <h3 class="report-title">{{ option.label }}</h3>
+            <span class="report-range">DEL {{ operacion.desde }} AL {{ operacion.hasta }} · {{ operacion.totalProgramadas }} CITAS PROGRAMADAS · OCUPACIÓN {{ pct(operacion.ocupacionGlobal) }}</span>
+          </div>
+        </div>
+        <div class="report-scroll">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th class="col-code">CÓDIGO</th>
+                <th>{{ tipo === 'citas-odontologo' ? 'ODONTÓLOGO' : 'CONSULTORIO' }}</th>
+                <th>{{ tipo === 'citas-odontologo' ? 'ESPECIALIDAD' : 'GRUPO' }}</th>
+                <th class="col-num">PROGRAMADAS</th>
+                <th class="col-num">ATENDIDAS</th>
+                <th class="col-num">NO-SHOW</th>
+                <th class="col-num">CANCELADAS</th>
+                <th class="col-num">EN PROCESO</th>
+                <th class="col-num">OCUPACIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of operacion.items">
+                <td class="col-code">{{ item.codigo || '—' }}</td>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.grupo }}</td>
+                <td class="col-num">{{ item.programadas }}</td>
+                <td class="col-num">{{ item.atendidas }}</td>
+                <td class="col-num">{{ item.noShow }}</td>
+                <td class="col-num">{{ item.canceladas }}</td>
+                <td class="col-num">{{ item.enProceso }}</td>
+                <td class="col-num">{{ pct(item.ocupacion) }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="foot-total">TOTAL GENERAL</td>
+                <td class="col-num foot-total">{{ operacion.totalProgramadas }}</td>
+                <td class="col-num foot-total">{{ operacion.totalAtendidas }}</td>
+                <td class="col-num foot-total">{{ operacion.totalNoShow }}</td>
+                <td class="col-num foot-total">{{ operacion.totalCanceladas }}</td>
+                <td class="col-num foot-total">{{ operacion.totalEnProceso }}</td>
+                <td class="col-num foot-total">{{ pct(operacion.ocupacionGlobal) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <!-- CITAS PERDIDAS -->
+      <section class="report-card" *ngIf="esCitasPerdidas && citasPerdidas" aria-label="Reporte de citas perdidas">
+        <div class="report-head">
+          <div>
+            <h3 class="report-title">{{ option.label }}</h3>
+            <span class="report-range">DEL {{ citasPerdidas.desde }} AL {{ citasPerdidas.hasta }} · {{ citasPerdidas.totalPerdidas }} CITAS NO ATENDIDAS</span>
+          </div>
+        </div>
+        <div class="report-stats">
+          <div class="stat">
+            <span class="stat-label">NO-SHOW</span>
+            <span class="stat-value">{{ citasPerdidas.totalNoShow }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">CANCELADAS</span>
+            <span class="stat-value">{{ citasPerdidas.totalCanceladas }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">TOTAL PERDIDAS</span>
+            <span class="stat-value">{{ citasPerdidas.totalPerdidas }}</span>
+          </div>
+        </div>
+        <div class="report-scroll">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>FECHA</th>
+                <th class="col-num">HORA</th>
+                <th>PACIENTE</th>
+                <th>TRATAMIENTO</th>
+                <th>CONSULTORIO</th>
+                <th>ODONTÓLOGO</th>
+                <th>ESTADO</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of citasPerdidas.items">
+                <td>{{ fecha(c.fecha) }}</td>
+                <td class="col-num">{{ hora(c.hora) }}</td>
+                <td>{{ c.paciente }}</td>
+                <td>{{ c.tratamiento }}</td>
+                <td>{{ c.consultorio }}</td>
+                <td>{{ c.odontologo }}</td>
+                <td><span class="chip" [class.chip--cancelled]="c.estado === 'CANCELADA'" [class.chip--noshow]="c.estado === 'NO-SHOW'">{{ c.estado }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PACIENTES ATENDIDOS -->
+      <section class="report-card" *ngIf="esAtendidos && atendidos" aria-label="Reporte de pacientes atendidos">
+        <div class="report-head">
+          <div>
+            <h3 class="report-title">{{ option.label }}</h3>
+            <span class="report-range">DEL {{ atendidos.desde }} AL {{ atendidos.hasta }} · {{ atendidos.pacientesUnicos }} PACIENTES · {{ atendidos.totalAtenciones }} ATENCIONES</span>
+          </div>
+        </div>
+        <div class="report-scroll">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th class="col-code">PACIENTE ID</th>
+                <th>PACIENTE</th>
+                <th class="col-num">ATENCIONES</th>
+                <th>ÚLTIMA ATENCIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of atendidos.items">
+                <td class="col-code">{{ a.pacienteId || '—' }}</td>
+                <td>{{ a.paciente }}</td>
+                <td class="col-num">{{ a.atenciones }}</td>
+                <td>{{ fecha(a.ultimaFecha) }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" class="foot-total">TOTAL</td>
+                <td class="col-num foot-total">{{ atendidos.totalAtenciones }}</td>
+                <td class="foot-total">{{ atendidos.pacientesUnicos }} PACIENTES</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
     </ng-container>
   </div>
 </div>

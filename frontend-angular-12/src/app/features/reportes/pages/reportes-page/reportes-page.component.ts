@@ -3,13 +3,23 @@ import { Observable } from 'rxjs';
 import { ReportesHttpService } from '../../services/reportes-http.service';
 import {
   ReporteCartera,
+  ReporteCitasPerdidas,
   ReporteFlujo,
+  ReporteOperacion,
+  ReporteOperacionItem,
+  ReportePacientesAtendidos,
   ReporteProduccion,
   ReporteProduccionItem,
   TipoReporte
 } from '../../../../core/models/reporte.model';
 
-type ReporteResultado = ReporteProduccion | ReporteFlujo | ReporteCartera;
+type ReporteResultado =
+  | ReporteProduccion
+  | ReporteFlujo
+  | ReporteCartera
+  | ReporteOperacion
+  | ReporteCitasPerdidas
+  | ReportePacientesAtendidos;
 
 interface TipoReporteOption {
   id: TipoReporte;
@@ -22,7 +32,11 @@ const TIPOS: TipoReporteOption[] = [
   { id: 'produccion-odontologo', label: 'PRODUCCIÓN POR ODONTÓLOGO', corta: 'Producción por odontólogo' },
   { id: 'produccion-consultorio', label: 'PRODUCCIÓN POR CONSULTORIO', corta: 'Producción por consultorio' },
   { id: 'flujo-caja', label: 'FLUJO DE CAJA', corta: 'Flujo de caja' },
-  { id: 'cartera', label: 'CARTERA / DEUDORES', corta: 'Cartera de deudores' }
+  { id: 'cartera', label: 'CARTERA / DEUDORES', corta: 'Cartera de deudores' },
+  { id: 'citas-consultorio', label: 'CITAS POR CONSULTORIO', corta: 'Citas por consultorio' },
+  { id: 'citas-odontologo', label: 'CITAS POR ODONTÓLOGO', corta: 'Citas por odontólogo' },
+  { id: 'citas-perdidas', label: 'CITAS PERDIDAS (NO-SHOW / CANCELADAS)', corta: 'Citas perdidas' },
+  { id: 'pacientes-atendidos', label: 'PACIENTES ATENDIDOS', corta: 'Pacientes atendidos' }
 ];
 
 function iso(d: Date): string {
@@ -81,6 +95,30 @@ export class ReportesPageComponent {
 
   get cartera(): ReporteCartera | null {
     return this.esCartera ? (this.resultado as ReporteCartera) : null;
+  }
+
+  get esOperacion(): boolean {
+    return this.tipo === 'citas-consultorio' || this.tipo === 'citas-odontologo';
+  }
+
+  get esCitasPerdidas(): boolean {
+    return this.tipo === 'citas-perdidas';
+  }
+
+  get esAtendidos(): boolean {
+    return this.tipo === 'pacientes-atendidos';
+  }
+
+  get operacion(): ReporteOperacion | null {
+    return this.esOperacion ? (this.resultado as ReporteOperacion) : null;
+  }
+
+  get citasPerdidas(): ReporteCitasPerdidas | null {
+    return this.esCitasPerdidas ? (this.resultado as ReporteCitasPerdidas) : null;
+  }
+
+  get atendidos(): ReportePacientesAtendidos | null {
+    return this.esAtendidos ? (this.resultado as ReportePacientesAtendidos) : null;
   }
 
   onTipo(): void {
@@ -158,6 +196,14 @@ export class ReportesPageComponent {
     return `${item.codigo || '—'}\t${item.nombre || '—'}\t${item.grupo || '—'}\t${item.cantidad}\t${item.total}\t${item.porcentaje}`;
   }
 
+  filaOperacion(item: ReporteOperacionItem): string {
+    return `${item.codigo || '—'}\t${item.nombre || '—'}\t${item.grupo || '—'}\t${item.programadas}\t${item.atendidas}\t${item.noShow}\t${item.canceladas}\t${item.enProceso}\t${item.ocupacion}`;
+  }
+
+  hora(time: string): string {
+    return time ? time.slice(0, 5) : '—';
+  }
+
   private consulta(): Observable<ReporteResultado> {
     switch (this.tipo) {
       case 'produccion-tratamiento':
@@ -170,6 +216,14 @@ export class ReportesPageComponent {
         return this.service.flujoCaja(this.desde, this.hasta);
       case 'cartera':
         return this.service.cartera();
+      case 'citas-consultorio':
+        return this.service.citasConsultorio(this.desde, this.hasta);
+      case 'citas-odontologo':
+        return this.service.citasOdontologo(this.desde, this.hasta);
+      case 'citas-perdidas':
+        return this.service.citasPerdidas(this.desde, this.hasta);
+      case 'pacientes-atendidos':
+        return this.service.pacientesAtendidos(this.desde, this.hasta);
     }
   }
 
@@ -202,6 +256,34 @@ export class ReportesPageComponent {
         'PACIENTE ID\tPACIENTE\tSALDO\tÚLTIMO MOVIMIENTO',
         ...filas,
         `TOTAL DEUDORES\t${this.cartera.totalDeudores}\t${this.cartera.totalCartera}\t`
+      ].join('\r\n');
+    }
+    if (this.esOperacion && this.operacion) {
+      const filas = this.operacion.items.map(i => this.filaOperacion(i));
+      return [
+        'CÓDIGO\tNOMBRE\tGRUPO\tPROGRAMADAS\tATENDIDAS\tNO-SHOW\tCANCELADAS\tEN PROCESO\tOCUPACIÓN %',
+        ...filas,
+        `TOTAL\t\t\t${this.operacion.totalProgramadas}\t${this.operacion.totalAtendidas}\t${this.operacion.totalNoShow}\t${this.operacion.totalCanceladas}\t${this.operacion.totalEnProceso}\t${this.operacion.ocupacionGlobal}`
+      ].join('\r\n');
+    }
+    if (this.esCitasPerdidas && this.citasPerdidas) {
+      const filas = this.citasPerdidas.items.map(c =>
+        `${c.id}\t${c.paciente}\t${this.fecha(c.fecha)}\t${this.hora(c.hora)}\t${c.tratamiento}\t${c.consultorio}\t${c.odontologo}\t${c.estado}`
+      );
+      return [
+        'CITA\tPACIENTE\tFECHA\tHORA\tTRATAMIENTO\tCONSULTORIO\tODONTÓLOGO\tESTADO',
+        ...filas,
+        `TOTAL\t\t\t\t\t\tNO-SHOW ${this.citasPerdidas.totalNoShow}\tCANCELADAS ${this.citasPerdidas.totalCanceladas}`
+      ].join('\r\n');
+    }
+    if (this.esAtendidos && this.atendidos) {
+      const filas = this.atendidos.items.map(a =>
+        `${a.pacienteId || '—'}\t${a.paciente}\t${a.atenciones}\t${this.fecha(a.ultimaFecha)}`
+      );
+      return [
+        'PACIENTE ID\tPACIENTE\tATENCIONES\tÚLTIMA FECHA',
+        ...filas,
+        `TOTAL\t${this.atendidos.pacientesUnicos} PACIENTES\t${this.atendidos.totalAtenciones} ATENCIONES\t`
       ].join('\r\n');
     }
     return '';

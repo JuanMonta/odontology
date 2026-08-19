@@ -12,6 +12,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
     List<Appointment> findByFechaOrderByHoraAsc(LocalDate fecha);
 
+    List<Appointment> findByFechaBetweenOrderByFechaAscHoraAsc(LocalDate desde, LocalDate hasta);
+
     List<Appointment> findByEstado(Appointment.Estado estado);
 
     List<Appointment> findByFechaAndEstado(LocalDate fecha, Appointment.Estado estado);

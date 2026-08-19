@@ -354,6 +354,28 @@
   letter-spacing: 0.12em;
 }
 
+.chip {
+  display: inline-block;
+  padding: 3px 10px;
+  font-family: var(--font-flap);
+  font-size: 0.72em;
+  letter-spacing: 0.14em;
+  border: 1px solid var(--amber-line);
+  color: var(--amber);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.chip--cancelled {
+  border-color: rgba(207, 90, 84, 0.45);
+  color: var(--red-dim);
+}
+
+.chip--noshow {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--steel-200);
+}
+
 /* ============ Empty / error ============ */
 .report-empty {
   flex: 1;

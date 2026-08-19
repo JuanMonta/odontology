@@ -4,14 +4,17 @@ import { Observable } from 'rxjs';
 import { API_BASE } from '../../../core/config/api.config';
 import {
   ReporteCartera,
+  ReporteCitasPerdidas,
   ReporteFlujo,
+  ReporteOperacion,
+  ReportePacientesAtendidos,
   ReporteProduccion
 } from '../../../core/models/reporte.model';
 
 /**
- * Reportes financieros (Fase 1). Consume el backend REST read-only
- * (/api/v1/reportes). El rango (desde/hasta, ISO yyyy-MM-dd) es opcional:
- * sin él el backend toma el mes en curso.
+ * Reportes financieros (Fase 1) y de operación clínica (Fase 2). Consume el
+ * backend REST read-only (/api/v1/reportes). El rango (desde/hasta, ISO
+ * yyyy-MM-dd) es opcional: sin él el backend toma el mes en curso.
  */
 @Injectable({ providedIn: 'root' })
 export class ReportesHttpService {
@@ -46,6 +49,34 @@ export class ReportesHttpService {
 
   cartera(): Observable<ReporteCartera> {
     return this.http.get<ReporteCartera>(`${API_BASE}/reportes/cartera`);
+  }
+
+  citasConsultorio(desde: string, hasta: string): Observable<ReporteOperacion> {
+    return this.http.get<ReporteOperacion>(
+      `${API_BASE}/reportes/citas-consultorio`,
+      { params: this.rango(desde, hasta) }
+    );
+  }
+
+  citasOdontologo(desde: string, hasta: string): Observable<ReporteOperacion> {
+    return this.http.get<ReporteOperacion>(
+      `${API_BASE}/reportes/citas-odontologo`,
+      { params: this.rango(desde, hasta) }
+    );
+  }
+
+  citasPerdidas(desde: string, hasta: string): Observable<ReporteCitasPerdidas> {
+    return this.http.get<ReporteCitasPerdidas>(
+      `${API_BASE}/reportes/citas-perdidas`,
+      { params: this.rango(desde, hasta) }
+    );
+  }
+
+  pacientesAtendidos(desde: string, hasta: string): Observable<ReportePacientesAtendidos> {
+    return this.http.get<ReportePacientesAtendidos>(
+      `${API_BASE}/reportes/pacientes-atendidos`,
+      { params: this.rango(desde, hasta) }
+    );
   }
 
   private rango(desde: string, hasta: string): HttpParams {
