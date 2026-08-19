@@ -60,6 +60,7 @@ export class MainLayoutComponent {
   private readonly userSub: Subscription;
   private chatPollSub?: Subscription;
   private alertasUrgentes = true;
+  private readonly toastTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   sections: NavSection[] = [
     {
@@ -159,6 +160,8 @@ export class MainLayoutComponent {
     this.settingsSub.unsubscribe();
     this.userSub.unsubscribe();
     this.stopChatPoll();
+    this.toastTimers.forEach(timer => clearTimeout(timer));
+    this.toastTimers.clear();
   }
 
   private syncActiveFromRoute(): void {
@@ -218,6 +221,11 @@ export class MainLayoutComponent {
   }
 
   dismissToast(id: string): void {
+    const timer = this.toastTimers.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      this.toastTimers.delete(id);
+    }
     this.toasts = this.toasts.filter(t => t.id !== id);
     this.cdr.markForCheck();
   }
@@ -236,7 +244,8 @@ export class MainLayoutComponent {
     };
     this.toasts = [toast, ...this.toasts].slice(0, 3);
     this.cdr.markForCheck();
-    setTimeout(() => this.dismissToast(msg.id), 9000);
+    const timer = setTimeout(() => this.dismissToast(toast.id), 9000);
+    this.toastTimers.set(toast.id, timer);
   }
 
   @HostListener('document:keydown.escape')
