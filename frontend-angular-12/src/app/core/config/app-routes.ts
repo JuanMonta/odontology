@@ -18,6 +18,7 @@ export const APP_ROUTE_SEGMENTS = {
   usuarios: 'usuarios',
   turnos: 'turnos',
   especialidades: 'especialidades',
+  reportes: 'reportes',
   configuracion: 'configuracion',
   wildcard: '**'
 } as const;
@@ -34,6 +35,7 @@ export const APP_ROUTES = {
   usuarios: '/' + APP_ROUTE_SEGMENTS.usuarios,
   turnos: '/' + APP_ROUTE_SEGMENTS.turnos,
   especialidades: '/' + APP_ROUTE_SEGMENTS.especialidades,
+  reportes: '/' + APP_ROUTE_SEGMENTS.reportes,
   configuracion: '/' + APP_ROUTE_SEGMENTS.configuracion
 } as const;
 

@@ -75,7 +75,7 @@ export class MainLayoutComponent {
       label: 'GESTIÓN',
       items: [
         { label: 'FACTURACIÓN', active: false },
-        { label: 'REPORTES', active: false },
+        { label: 'REPORTES', route: APP_ROUTES.reportes, title: 'REPORTES FINANCIEROS', active: false },
         { label: 'CONSULTORIOS', route: APP_ROUTES.consultorios, title: 'MAPEO DE CONSULTORIOS', active: false },
         { label: 'MENSAJES', route: APP_ROUTES.mensajes, title: 'BANDEJA DE MENSAJES', active: false },
         { label: 'CHAT EN VIVO', route: APP_ROUTES.chat, title: 'ESTACIONES Y TRANSMISIONES', active: false }

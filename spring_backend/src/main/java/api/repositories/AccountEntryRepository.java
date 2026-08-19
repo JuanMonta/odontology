@@ -7,12 +7,17 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RepositoryRestResource(exported = false)
 public interface AccountEntryRepository extends JpaRepository<AccountEntry, Long> {
 
     List<AccountEntry> findByPacienteIdOrderByFechaDesc(String pacienteId);
+
+    List<AccountEntry> findByFechaBetweenOrderByFechaAsc(LocalDate desde, LocalDate hasta);
+
+    List<AccountEntry> findAllByOrderByFechaAsc();
 
     @Query("select coalesce(sum(e.monto), 0) from AccountEntry e "
             + "where e.pacienteId = :pacienteId and e.tipo = :tipo")

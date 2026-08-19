@@ -1,0 +1,208 @@
+<div class="page reportes">
+  <header class="page-head">
+    <div class="page-head-row">
+      <div class="page-head-left">
+        <h2 class="page-title">REPORTES FINANCIEROS</h2>
+        <span class="page-sub">FASE 1 · PRODUCCIÓN · FLUJO DE CAJA · CARTERA DE DEUDORES</span>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn-ghost" type="button" (click)="imprimir()" [disabled]="!resultado">
+          <span class="btn-print" aria-hidden="true"></span>
+          IMPRIMIR
+        </button>
+        <button class="btn-ghost" type="button" (click)="csv()" [disabled]="!resultado">
+          <span class="btn-csv" aria-hidden="true"></span>
+          EXPORTAR CSV
+        </button>
+      </div>
+    </div>
+    <div class="page-toolbar">
+      <label class="field">
+        <span class="field-label">REPORTE</span>
+        <select class="field-select" [value]="tipo" (change)="tipo = $any($event.target).value; onTipo()" aria-label="Seleccionar reporte">
+          <option *ngFor="let t of tipos" [value]="t.id">{{ t.label }}</option>
+        </select>
+      </label>
+      <label class="field" *ngIf="!esCartera">
+        <span class="field-label">DESDE</span>
+        <input class="field-input" type="date" [value]="desde" (input)="desde = $any($event.target).value" aria-label="Fecha inicial" />
+      </label>
+      <label class="field" *ngIf="!esCartera">
+        <span class="field-label">HASTA</span>
+        <input class="field-input" type="date" [value]="hasta" (input)="hasta = $any($event.target).value" aria-label="Fecha final" />
+      </label>
+      <button class="btn-amber" type="button" (click)="generar()" [disabled]="cargando">
+        <span class="btn-play" aria-hidden="true"></span>
+        {{ cargando ? 'GENERANDO…' : 'GENERAR' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <div class="report-card" *ngIf="!resultado && !error && !cargando">
+      <div class="report-empty">
+        <span class="report-empty-mark" aria-hidden="true">Σ</span>
+        <span class="report-empty-title">SELECCIONA UN REPORTE Y PULSA GENERAR</span>
+        <span class="report-empty-hint" *ngIf="esCartera">CARTERA VIGENTE · SIN RANGO DE FECHAS</span>
+        <span class="report-empty-hint" *ngIf="!esCartera">RANGO POR DEFECTO: MES EN CURSO ({{ desde }} → {{ hasta }})</span>
+      </div>
+    </div>
+
+    <div class="report-card" *ngIf="cargando">
+      <div class="report-empty">
+        <span class="report-empty-mark report-empty-mark--spin" aria-hidden="true">↻</span>
+        <span class="report-empty-title">GENERANDO REPORTE…</span>
+      </div>
+    </div>
+
+    <div class="report-card" *ngIf="error">
+      <div class="report-empty report-empty--error">
+        <span class="report-empty-mark" aria-hidden="true">!</span>
+        <span class="report-empty-title">{{ error }}</span>
+      </div>
+    </div>
+
+    <ng-container *ngIf="resultado && !error && !cargando">
+      <!-- PRODUCCIÓN -->
+      <section class="report-card" *ngIf="esProduccion && produccion" aria-label="Reporte de producción">
+        <div class="report-head">
+          <div>
+            <h3 class="report-title">{{ option.label }}</h3>
+            <span class="report-range" *ngIf="!esCartera">DEL {{ produccion.desde }} AL {{ produccion.hasta }} · {{ produccion.totalCantidad }} ATENCIONES</span>
+          </div>
+        </div>
+        <div class="report-scroll">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th class="col-code">CÓDIGO</th>
+                <th>{{ tipo === 'produccion-consultorio' ? 'CONSULTORIO' : tipo === 'produccion-odontologo' ? 'ODONTÓLOGO' : 'TRATAMIENTO' }}</th>
+                <th>{{ tipo === 'produccion-tratamiento' ? 'CATEGORÍA' : tipo === 'produccion-odontologo' ? 'ESPECIALIDAD' : 'GRUPO' }}</th>
+                <th class="col-num">ATENCIONES</th>
+                <th class="col-num">TOTAL</th>
+                <th class="col-num">%</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of produccion.items">
+                <td class="col-code">{{ item.codigo || '—' }}</td>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.grupo }}</td>
+                <td class="col-num">{{ item.cantidad }}</td>
+                <td class="col-num col-money">{{ money(item.total) }}</td>
+                <td class="col-num">{{ pct(item.porcentaje) }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="foot-total">TOTAL GENERAL</td>
+                <td class="col-num foot-total">{{ produccion.totalCantidad }}</td>
+                <td class="col-num col-money foot-total">{{ money(produccion.total) }}</td>
+                <td class="col-num foot-total">100.0%</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <!-- FLUJO DE CAJA -->
+      <section class="report-card" *ngIf="esFlujo && flujo" aria-label="Reporte de flujo de caja">
+        <div class="report-head">
+          <div>
+            <h3 class="report-title">{{ option.label }}</h3>
+            <span class="report-range">DEL {{ flujo.desde }} AL {{ flujo.hasta }}</span>
+          </div>
+        </div>
+        <div class="report-stats">
+          <div class="stat">
+            <span class="stat-label">TOTAL CARGOS</span>
+            <span class="stat-value">{{ money(flujo.totalCargos) }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">TOTAL PAGOS</span>
+            <span class="stat-value">{{ money(flujo.totalPagos) }}</span>
+          </div>
+          <div class="stat" [class.stat--warn]="flujo.totalNeto < 0">
+            <span class="stat-label">NETO</span>
+            <span class="stat-value">{{ money(flujo.totalNeto) }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">EFECTIVO</span>
+            <span class="stat-value">{{ money(flujo.pagosEfectivo) }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">TARJETA</span>
+            <span class="stat-value">{{ money(flujo.pagosTarjeta) }}</span>
+          </div>
+        </div>
+        <div class="report-scroll">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>FECHA</th>
+                <th class="col-num">CARGOS</th>
+                <th class="col-num">PAGOS</th>
+                <th class="col-num">NETO</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of flujo.porDia">
+                <td>{{ fecha(d.fecha) }}</td>
+                <td class="col-num col-money">{{ money(d.cargos) }}</td>
+                <td class="col-num col-money">{{ money(d.pagos) }}</td>
+                <td class="col-num col-money" [class.col-neg]="d.neto < 0">{{ money(d.neto) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- CARTERA -->
+      <section class="report-card" *ngIf="esCartera && cartera" aria-label="Reporte de cartera de deudores">
+        <div class="report-head">
+          <div>
+            <h3 class="report-title">{{ option.label }}</h3>
+            <span class="report-range">{{ cartera.totalDeudores }} PACIENTES CON SALDO PENDIENTE</span>
+          </div>
+        </div>
+        <div class="report-stats">
+          <div class="stat">
+            <span class="stat-label">DEUDORES</span>
+            <span class="stat-value">{{ cartera.totalDeudores }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">TOTAL CARTERA</span>
+            <span class="stat-value">{{ money(cartera.totalCartera) }}</span>
+          </div>
+        </div>
+        <div class="report-scroll">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th class="col-code">PACIENTE ID</th>
+                <th>PACIENTE</th>
+                <th class="col-num">SALDO PENDIENTE</th>
+                <th>ÚLTIMO MOVIMIENTO</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of cartera.deudores">
+                <td class="col-code">{{ d.pacienteId }}</td>
+                <td>{{ d.paciente }}</td>
+                <td class="col-num col-money">{{ money(d.saldo) }}</td>
+                <td>{{ fecha(d.ultimoMovimiento) }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" class="foot-total">TOTAL CARTERA</td>
+                <td class="col-num col-money foot-total">{{ money(cartera.totalCartera) }}</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+    </ng-container>
+  </div>
+</div>

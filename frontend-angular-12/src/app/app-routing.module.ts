@@ -71,6 +71,11 @@ const routes: Routes = [
         path: APP_ROUTE_SEGMENTS.configuracion,
         loadChildren: () =>
           import('./features/configuracion/configuracion.module').then(m => m.ConfiguracionModule)
+      },
+      {
+        path: APP_ROUTE_SEGMENTS.reportes,
+        loadChildren: () =>
+          import('./features/reportes/reportes.module').then(m => m.ReportesModule)
       }
     ]
   },
