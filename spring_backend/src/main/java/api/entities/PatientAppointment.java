@@ -39,6 +39,9 @@ public class PatientAppointment {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "appointment_id", length = 12)
+    private String appointmentId;
+
     @Column(name = "paciente_id", nullable = false, length = 8)
     private String pacienteId;
 

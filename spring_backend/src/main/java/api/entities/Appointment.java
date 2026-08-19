@@ -56,6 +56,9 @@ public class Appointment {
     @Column(name = "tratamiento", nullable = false, length = 60)
     private String tratamiento;
 
+    @Column(name = "tratamiento_codigo", length = 12)
+    private String tratamientoCodigo;
+
     @Column(name = "consultorio", nullable = false, length = 16)
     private String consultorio;
 

@@ -10,4 +10,6 @@ import java.util.List;
 public interface PatientAppointmentRepository extends JpaRepository<PatientAppointment, Long> {
 
     List<PatientAppointment> findByPacienteIdOrderByFechaDescHoraDesc(String pacienteId);
+
+    boolean existsByAppointmentId(String appointmentId);
 }

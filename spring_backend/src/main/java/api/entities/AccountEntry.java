@@ -61,6 +61,18 @@ public class AccountEntry {
     @Column(name = "metodo")
     private Metodo metodo;
 
+    @Column(name = "appointment_id", length = 12)
+    private String appointmentId;
+
+    @Column(name = "tratamiento_codigo", length = 12)
+    private String tratamientoCodigo;
+
+    @Column(name = "odontologo_codigo", length = 12)
+    private String odontologoCodigo;
+
+    @Column(name = "consultorio_codigo", length = 12)
+    private String consultorioCodigo;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

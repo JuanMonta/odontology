@@ -8,5 +8,9 @@ public record AccountEntryDto(
         String concept,
         BigDecimal amount,
         String type,
-        String method) {
+        String method,
+        String appointmentId,
+        String tratamientoCodigo,
+        String odontologoCodigo,
+        String consultorioCodigo) {
 }

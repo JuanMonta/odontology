@@ -5,6 +5,8 @@ import api.dto.AppointmentDto;
 import api.dto.WaitingCheckInDto;
 import api.dto.WaitingPatientDto;
 import api.entities.Appointment;
+import api.entities.AccountEntry;
+import api.entities.PatientAppointment;
 import api.entities.WaitingQueue;
 import api.entities.converter.AppointmentEstadoConverter;
 import api.repositories.AppointmentRepository;
@@ -49,6 +51,8 @@ public class DashboardService {
     private final api.repositories.OdontologoRepository odontologoRepository;
     private final api.repositories.TratamientoRepository tratamientoRepository;
     private final api.repositories.ConsultorioTratamientoRepository ctRepository;
+    private final api.repositories.PatientAppointmentRepository patientAppointmentRepository;
+    private final api.repositories.AccountEntryRepository accountEntryRepository;
 
     /** Tolerancia por defecto (minutos) si la clínica no la configuró. */
     private static final int TOLERANCIA_DEFAULT_MINUTOS = 10;
@@ -74,7 +78,10 @@ public class DashboardService {
                 .stream()
                 .filter(a -> ahora.isAfter(a.getHora().plusMinutes(tolerancia)))
                 .toList();
-        vencidas.forEach(a -> a.setEstado(Appointment.Estado.NO_SHOW));
+        vencidas.forEach(a -> {
+            a.setEstado(Appointment.Estado.NO_SHOW);
+            sincronizarExpediente(a, PatientAppointment.Estado.NO_SHOW);
+        });
         appointmentRepository.saveAll(vencidas);
         return vencidas.size();
     }
@@ -86,7 +93,10 @@ public class DashboardService {
     @Transactional
     public int closeDay(LocalDate fecha) {
         List<Appointment> pendientes = appointmentRepository.findByFechaAndEstado(fecha, Appointment.Estado.ON_TIME);
-        pendientes.forEach(a -> a.setEstado(Appointment.Estado.NO_SHOW));
+        pendientes.forEach(a -> {
+            a.setEstado(Appointment.Estado.NO_SHOW);
+            sincronizarExpediente(a, PatientAppointment.Estado.NO_SHOW);
+        });
         appointmentRepository.saveAll(pendientes);
         return pendientes.size();
     }
@@ -219,9 +229,11 @@ public class DashboardService {
      */
     private AppointmentDto boardingWalkIn(LocalDate fecha, WaitingQueue paciente) {
         LocalTime ahora = LocalTime.now();
-        int duracion = duracionBloqueMinutos(paciente.getMotivo());
+        String tratamientoNombre = paciente.getMotivo();
+        String tratamientoCodigo = codigoTratamientoPorNombre(tratamientoNombre);
+        int duracion = duracionBloqueMinutos(tratamientoNombre);
         AsignacionDisponible asignacion = asignarConsultorioYOdotontologoDisponible(
-                fecha, ahora, duracion, paciente.getMotivo());
+                fecha, ahora, duracion, tratamientoNombre);
         Appointment cita = Appointment.builder()
                 .id(nextAppointmentId())
                 .fecha(fecha)
@@ -229,13 +241,15 @@ public class DashboardService {
                 .horaFin(ahora.plusMinutes(duracion))
                 .pacienteId(paciente.getPacienteId())
                 .pacienteNombre(paciente.getPacienteNombre())
-                .tratamiento(paciente.getMotivo())
+                .tratamiento(tratamientoNombre)
+                .tratamientoCodigo(tratamientoCodigo)
                 .consultorio(asignacion.consultorio())
                 .consultorioCodigo(asignacion.consultorioCodigo())
                 .odontologo(asignacion.odontologo())
                 .odontologoCodigo(asignacion.odontologoCodigo())
                 .estado(Appointment.Estado.BOARDING)
                 .build();
+        incrementarUso(tratamientoCodigo);
         return toAppointmentDto(appointmentRepository.save(cita));
     }
 
@@ -249,6 +263,7 @@ public class DashboardService {
         LocalDate fecha = LocalDate.now();
         String nombre = dto.patient().trim().toUpperCase();
         String tratamientoNombre = (dto.treatment() == null || dto.treatment().isBlank() ? "CONSULTA" : dto.treatment()).trim().toUpperCase();
+        String tratamientoCodigo = codigoTratamientoPorNombre(tratamientoNombre);
         int duracionMinutos = duracionBloqueMinutos(tratamientoNombre);
 
         // Si el usuario eligió consultorio, validar que soporte el tratamiento
@@ -259,11 +274,6 @@ public class DashboardService {
                     .filter(c -> c.getNombre().equalsIgnoreCase(consultorioNombre.trim()))
                     .findFirst()
                     .map(api.entities.Consultorio::getCodigo)
-                    .orElse(null);
-            String tratamientoCodigo = tratamientoRepository.findAll().stream()
-                    .filter(t -> t.getNombre().equalsIgnoreCase(tratamientoNombre))
-                    .findFirst()
-                    .map(api.entities.Tratamiento::getCodigo)
                     .orElse(null);
             if (consultorioCodigo != null && tratamientoCodigo != null) {
                 if (!ctRepository.existsByConsultorioCodigoAndTratamientoCodigo(consultorioCodigo, tratamientoCodigo)) {
@@ -282,14 +292,17 @@ public class DashboardService {
                 .horaFin(hora.plusMinutes(duracionMinutos))
                 .pacienteId(lookupPacienteId(nombre))
                 .pacienteNombre(nombre)
-                .tratamiento((dto.treatment() == null || dto.treatment().isBlank() ? "CONSULTA" : dto.treatment()).trim().toUpperCase())
+                .tratamiento(tratamientoNombre)
+                .tratamientoCodigo(tratamientoCodigo)
                 .consultorio(asignacion.consultorio())
                 .consultorioCodigo(asignacion.consultorioCodigo())
                 .odontologo(asignacion.odontologo())
                 .odontologoCodigo(asignacion.odontologoCodigo())
                 .estado(Appointment.Estado.ON_TIME)
                 .build();
-        return toAppointmentDto(appointmentRepository.save(cita));
+        AppointmentDto creada = toAppointmentDto(appointmentRepository.save(cita));
+        incrementarUso(tratamientoCodigo);
+        return creada;
     }
 
     /**
@@ -449,6 +462,7 @@ public class DashboardService {
     public AppointmentDto markDone(String id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada: " + id));
+        boolean yaAtendida = appointment.getEstado() == Appointment.Estado.DONE;
         appointment.setEstado(Appointment.Estado.DONE);
         LocalTime ahora = LocalTime.now();
         LocalTime horaFin = appointment.getHoraFin();
@@ -459,7 +473,13 @@ public class DashboardService {
                 appointment.setHoraFin(ahora);
             }
         }
-        return toAppointmentDto(appointmentRepository.save(appointment));
+        appointmentRepository.save(appointment);
+        if (!yaAtendida) {
+            incrementarProcedimientos(appointment);
+            sincronizarExpediente(appointment, PatientAppointment.Estado.DONE);
+            registrarCargo(appointment);
+        }
+        return toAppointmentDto(appointment);
     }
 
     /** Marcar la cita como cancelada. */
@@ -477,8 +497,21 @@ public class DashboardService {
     private AppointmentDto cambiarEstado(String id, Appointment.Estado estado) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada: " + id));
+        Appointment.Estado previo = appointment.getEstado();
         appointment.setEstado(estado);
-        return toAppointmentDto(appointmentRepository.save(appointment));
+        appointmentRepository.save(appointment);
+        if (previo != estado) {
+            PatientAppointment.Estado expediente = switch (estado) {
+                case DONE -> PatientAppointment.Estado.DONE;
+                case CANCELLED -> PatientAppointment.Estado.CANCELLED;
+                case NO_SHOW -> PatientAppointment.Estado.NO_SHOW;
+                default -> null;
+            };
+            if (expediente != null) {
+                sincronizarExpediente(appointment, expediente);
+            }
+        }
+        return toAppointmentDto(appointment);
     }
 
     /** Siguiente ticket secuencial "A-###" segÃºn el Ãºltimo registrado. */
@@ -525,6 +558,7 @@ public class DashboardService {
                 FormatoUtil.hora(a.getHora()),
                 a.getPacienteNombre(),
                 a.getTratamiento(),
+                a.getTratamientoCodigo(),
                 a.getConsultorio(),
                 a.getOdontologo(),
                 a.getEstado() == null ? null : ESTADO_CONVERTER.convertToDatabaseColumn(a.getEstado()),
@@ -538,6 +572,98 @@ public class DashboardService {
                 w.getPacienteNombre(),
                 FormatoUtil.hora(w.getLlegada()),
                 w.getMotivo());
+    }
+
+    /** Código de tratamiento cuyo nombre coincide (normalización para reportes). */
+    private String codigoTratamientoPorNombre(String nombre) {
+        if (nombre == null || nombre.isBlank()) {
+            return null;
+        }
+        return tratamientoRepository.findAll().stream()
+                .filter(t -> t.getNombre().equalsIgnoreCase(nombre.trim()))
+                .findFirst()
+                .map(api.entities.Tratamiento::getCodigo)
+                .orElse(null);
+    }
+
+    /** Contador de programación: "veces programado" del tratamiento. */
+    private void incrementarUso(String tratamientoCodigo) {
+        if (tratamientoCodigo == null) {
+            return;
+        }
+        tratamientoRepository.findById(tratamientoCodigo).ifPresent(t -> {
+            t.setUso((t.getUso() == null ? 0 : t.getUso()) + 1);
+            tratamientoRepository.save(t);
+        });
+    }
+
+    /** Contadores de procedimientos completados de sala y odontólogo. */
+    private void incrementarProcedimientos(Appointment appointment) {
+        if (appointment.getConsultorioCodigo() != null) {
+            consultorioRepository.findById(appointment.getConsultorioCodigo()).ifPresent(c -> {
+                c.setProcedimientos((c.getProcedimientos() == null ? 0 : c.getProcedimientos()) + 1);
+                consultorioRepository.save(c);
+            });
+        }
+        if (appointment.getOdontologoCodigo() != null) {
+            odontologoRepository.findById(appointment.getOdontologoCodigo()).ifPresent(o -> {
+                o.setProcedimientos((o.getProcedimientos() == null ? 0 : o.getProcedimientos()) + 1);
+                odontologoRepository.save(o);
+            });
+        }
+    }
+
+    /**
+     * Expediente del paciente: vuelca el cierre de la cita de la agenda a
+     * {@code patient_appointments} (una fila por cita, idempotente).
+     */
+    private void sincronizarExpediente(Appointment appointment, PatientAppointment.Estado estado) {
+        if (appointment.getPacienteId() == null) {
+            return;
+        }
+        if (patientAppointmentRepository.existsByAppointmentId(appointment.getId())) {
+            return;
+        }
+        patientAppointmentRepository.save(PatientAppointment.builder()
+                .appointmentId(appointment.getId())
+                .pacienteId(appointment.getPacienteId())
+                .fecha(appointment.getFecha())
+                .hora(appointment.getHora())
+                .tratamiento(appointment.getTratamiento())
+                .odontologo(appointment.getOdontologo())
+                .estado(estado)
+                .build());
+    }
+
+    /**
+     * Cargo de cuenta por cobrar originado por una cita atendida: liga el
+     * movimiento al appointment/tratamiento/odontólogo/sala para poder atribuir
+     * ingresos en reportes. Idempotente (un cargo por cita).
+     */
+    private void registrarCargo(Appointment appointment) {
+        if (appointment.getPacienteId() == null || appointment.getTratamientoCodigo() == null) {
+            return;
+        }
+        if (accountEntryRepository.existsByAppointmentIdAndTipo(appointment.getId(), AccountEntry.Tipo.charge)) {
+            return;
+        }
+        api.entities.Tratamiento tratamiento = tratamientoRepository
+                .findById(appointment.getTratamientoCodigo()).orElse(null);
+        if (tratamiento == null) {
+            return;
+        }
+        accountEntryRepository.save(AccountEntry.builder()
+                .pacienteId(appointment.getPacienteId())
+                .fecha(appointment.getFecha())
+                .concepto("ATENCIÓN — " + tratamiento.getNombre())
+                .monto(tratamiento.getPrecio())
+                .tipo(AccountEntry.Tipo.charge)
+                .metodo(null)
+                .appointmentId(appointment.getId())
+                .tratamientoCodigo(appointment.getTratamientoCodigo())
+                .odontologoCodigo(appointment.getOdontologoCodigo())
+                .consultorioCodigo(appointment.getConsultorioCodigo())
+                .build());
     }
 
     private record AsignacionDisponible(
