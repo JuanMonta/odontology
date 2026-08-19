@@ -6,6 +6,7 @@ public record PatientAppointmentDto(
         String time,
         String treatment,
         String dentist,
+        String dentistCode,
         String status,
         String note) {
 }

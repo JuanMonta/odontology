@@ -71,7 +71,7 @@
 
         <!-- HOJA DE EVOLUCIÓN CLÍNICA (append-only) -->
         <div class="tab-pane" *ngIf="tab === 'evolucion'">
-          <app-evolucion-clinica [patient]="patient"></app-evolucion-clinica>
+          <app-evolucion-clinica [patient]="patient" [contexto]="ultimoControlCita(detail.appointments)"></app-evolucion-clinica>
         </div>
 
         <!-- HISTORIAL clínico con notas -->

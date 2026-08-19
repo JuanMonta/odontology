@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import {
   AccountEntry,
   Patient,
+  PatientAppointment,
   PatientDraft,
   PatientDetail,
   Tooth
@@ -98,6 +99,14 @@ export class PatientPanelComponent implements OnChanges {
 
   statusClass(s: string): string {
     return `hist-status--${s}`;
+  }
+
+  /** Última cita ATENDIDA del paciente (el detalle llega ordenado desc). */
+  ultimoControlCita(citas: PatientAppointment[]): PatientAppointment | null {
+    if (!citas || !citas.length) {
+      return null;
+    }
+    return citas.find(c => c.status === 'done') ?? null;
   }
 
   confirmAbono(): void {

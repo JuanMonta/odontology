@@ -14,6 +14,9 @@ public record EvolucionDto(
         LocalDate fecha,
         LocalTime hora,
         String odontologo,
+        String odontologoCodigo,
+        String registradoPor,
+        String registradoPorNombre,
         String motivo,
         String evolucion,
         String plan,
@@ -25,7 +28,7 @@ public record EvolucionDto(
     public record EvolucionDraftDto(
             LocalDate fecha,
             LocalTime hora,
-            String odontologo,
+            String odontologoCodigo,
             String motivo,
             String evolucion,
             String plan,

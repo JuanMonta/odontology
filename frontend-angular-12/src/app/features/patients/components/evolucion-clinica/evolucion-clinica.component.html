@@ -13,6 +13,7 @@
   </button>
 
   <div class="evo-form" *ngIf="formularioAbierto">
+    <span class="evo-hint" *ngIf="contexto">CONTEXTO DE LA ÚLTIMA CITA ATENDIDA — {{ contexto.date }}</span>
     <div class="evo-grid">
       <label class="evo-field">
         <span class="evo-label">FECHA</span>
@@ -24,7 +25,16 @@
       </label>
       <label class="evo-field">
         <span class="evo-label">ODONTÓLOGO</span>
-        <input class="evo-input" type="text" [(ngModel)]="draft.odontologo" placeholder="NOMBRE DEL PROFESIONAL" autocomplete="off" />
+        <select
+          class="evo-input evo-select"
+          [(ngModel)]="draft.odontologoCodigo"
+          [disabled]="bloqueado"
+          autocomplete="off"
+        >
+          <option value="" disabled>{{ bloqueado ? 'FIJADO POR LA CITA' : 'SELECCIONE ODONTÓLOGO' }}</option>
+          <option *ngFor="let o of odontologosDisponibles" [value]="o.code">{{ o.name }} — {{ o.code }}</option>
+        </select>
+        <span class="evo-lock" *ngIf="bloqueado">BLOQUEADO — EL PROFESIONAL LO DEFINE LA CITA</span>
       </label>
     </div>
     <label class="evo-field">
@@ -60,7 +70,8 @@
         </span>
         <span class="evo-main">
           <span class="evo-motivo" *ngIf="e.motivo">{{ e.motivo }}</span>
-          <span class="evo-dentist" *ngIf="e.odontologo">{{ e.odontologo }}</span>
+          <span class="evo-dentist" *ngIf="e.odontologo">{{ e.odontologo }}<span *ngIf="e.odontologoCodigo"> · {{ e.odontologoCodigo }}</span></span>
+          <span class="evo-autor" *ngIf="e.registradoPorNombre">REGISTRADO POR {{ e.registradoPorNombre }}<span *ngIf="e.registradoPor"> ({{ e.registradoPor }})</span></span>
           <span class="evo-txt" *ngIf="e.evolucion">{{ e.evolucion }}</span>
           <span class="evo-plan" *ngIf="e.plan">PLAN: {{ e.plan }}</span>
           <span class="evo-cita" *ngIf="e.proximaCita">PRÓXIMA CITA: {{ fmtFecha(e.proximaCita) }}</span>

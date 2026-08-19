@@ -62,6 +62,15 @@
   border-radius: var(--radius-sm);
 }
 
+.evo-hint {
+  font-family: var(--font-flap);
+  font-size: 0.64em;
+  letter-spacing: 0.14em;
+  color: var(--amber);
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 176, 32, 0.18);
+}
+
 .evo-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1.4fr;
@@ -149,6 +158,23 @@
   border-color: rgba(255, 176, 32, 0.5);
 }
 
+.evo-select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.evo-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.evo-lock {
+  font-family: var(--font-flap);
+  font-size: 0.58em;
+  letter-spacing: 0.16em;
+  color: var(--amber);
+}
+
 .evo-status {
   font-family: var(--font-flap);
   font-size: 0.68em;
@@ -209,6 +235,13 @@
   font-family: var(--font-ui);
   font-size: 0.68em;
   color: var(--steel-400);
+}
+
+.evo-autor {
+  font-family: var(--font-flap);
+  font-size: 0.58em;
+  letter-spacing: 0.14em;
+  color: var(--steel-500);
 }
 
 .evo-txt {

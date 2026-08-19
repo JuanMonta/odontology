@@ -7,6 +7,7 @@ import api.dto.WaitingPatientDto;
 import api.services.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,6 +69,11 @@ public class DashboardController {
     @PatchMapping("/appointments/{id}/no-show")
     public AppointmentDto markNoShow(@PathVariable String id) {
         return dashboardService.markNoShow(id);
+    }
+
+    @DeleteMapping("/appointments/{id}")
+    public void deleteAppointment(@PathVariable String id) {
+        dashboardService.deleteAppointment(id);
     }
 
     /** Cierre de día: auto-marca no-show todas las on-time restantes. */
