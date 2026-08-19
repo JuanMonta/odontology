@@ -2,6 +2,7 @@ package api.controllers;
 
 import api.dto.AbonoDto;
 import api.dto.AccountEntryDto;
+import api.dto.EvolucionDto;
 import api.dto.HclDto;
 import api.dto.PacienteDetailDto;
 import api.dto.PacienteDto;
@@ -66,6 +67,17 @@ public class PacientesController {
     @GetMapping("/{id}/hclinica/hojas")
     public List<HclDto.HojaResumenDto> hojas(@PathVariable String id) {
         return pacientesService.listarHojas(id);
+    }
+
+    @GetMapping("/{id}/evolucion")
+    public List<EvolucionDto> evolucion(@PathVariable String id) {
+        return pacientesService.listarEvolucion(id);
+    }
+
+    @PostMapping("/{id}/evolucion")
+    public EvolucionDto addEvolucion(@PathVariable String id,
+                                     @RequestBody EvolucionDto.EvolucionDraftDto dto) {
+        return pacientesService.guardarEvolucion(id, dto);
     }
 
     @GetMapping("/{id}/hclinica/{hoja}")

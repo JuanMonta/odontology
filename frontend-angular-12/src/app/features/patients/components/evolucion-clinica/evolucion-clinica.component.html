@@ -1,0 +1,74 @@
+<div class="evo">
+  <div class="evo-head">
+    <span class="evo-kicker">EXPEDIENTE · APPEND-ONLY</span>
+    <span class="evo-title">HOJA DE EVOLUCIÓN</span>
+  </div>
+
+  <button class="evo-add" type="button" (click)="abrirFormulario()">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+      <path d="M8 3v10"></path>
+      <path d="M3 8h10"></path>
+    </svg>
+    REGISTRAR EVOLUCIÓN
+  </button>
+
+  <div class="evo-form" *ngIf="formularioAbierto">
+    <div class="evo-grid">
+      <label class="evo-field">
+        <span class="evo-label">FECHA</span>
+        <input class="evo-input" type="date" [(ngModel)]="draft.fecha" autocomplete="off" />
+      </label>
+      <label class="evo-field">
+        <span class="evo-label">HORA</span>
+        <input class="evo-input" type="time" [(ngModel)]="draft.hora" autocomplete="off" />
+      </label>
+      <label class="evo-field">
+        <span class="evo-label">ODONTÓLOGO</span>
+        <input class="evo-input" type="text" [(ngModel)]="draft.odontologo" placeholder="NOMBRE DEL PROFESIONAL" autocomplete="off" />
+      </label>
+    </div>
+    <label class="evo-field">
+      <span class="evo-label">MOTIVO DE LA EVOLUCIÓN</span>
+      <input class="evo-input" type="text" [(ngModel)]="draft.motivo" placeholder="CONTROL, POST-OPERATORIO, OBSERVACIÓN…" autocomplete="off" />
+    </label>
+    <label class="evo-field">
+      <span class="evo-label">EVOLUCIÓN Y OBSERVACIONES</span>
+      <textarea class="evo-input evo-textarea" rows="3" [(ngModel)]="draft.evolucion" placeholder="EVOLUCIÓN CLÍNICA DEL PACIENTE…"></textarea>
+    </label>
+    <label class="evo-field">
+      <span class="evo-label">PLAN INMEDIATO</span>
+      <textarea class="evo-input evo-textarea" rows="2" [(ngModel)]="draft.plan" placeholder="INDICACIONES, SEGUIMIENTO…"></textarea>
+    </label>
+    <label class="evo-field">
+      <span class="evo-label">PRÓXIMA CITA</span>
+      <input class="evo-input" type="date" [(ngModel)]="draft.proximaCita" autocomplete="off" />
+    </label>
+    <div class="evo-actions">
+      <button class="evo-btn-amber" type="button" [disabled]="guardando" (click)="guardar()">CONFIRMAR</button>
+      <button class="evo-btn-ghost" type="button" (click)="cancelar()">CANCELAR</button>
+    </div>
+  </div>
+
+  <span class="evo-status" *ngIf="mensaje" role="status">{{ mensaje }}</span>
+
+  <ng-container *ngIf="!cargando">
+    <div class="evo-list" *ngIf="lista.length; else sinEvoluciones">
+      <div class="evo-row" *ngFor="let e of lista">
+        <span class="evo-date">
+          <span class="evo-date-day">{{ fmtFecha(e.fecha) }}</span>
+          <span class="evo-date-time" *ngIf="e.hora">{{ fmtHora(e.hora) }}</span>
+        </span>
+        <span class="evo-main">
+          <span class="evo-motivo" *ngIf="e.motivo">{{ e.motivo }}</span>
+          <span class="evo-dentist" *ngIf="e.odontologo">{{ e.odontologo }}</span>
+          <span class="evo-txt" *ngIf="e.evolucion">{{ e.evolucion }}</span>
+          <span class="evo-plan" *ngIf="e.plan">PLAN: {{ e.plan }}</span>
+          <span class="evo-cita" *ngIf="e.proximaCita">PRÓXIMA CITA: {{ fmtFecha(e.proximaCita) }}</span>
+        </span>
+      </div>
+    </div>
+    <ng-template #sinEvoluciones>
+      <div class="evo-empty">SIN EVOLUCIONES REGISTRADAS</div>
+    </ng-template>
+  </ng-container>
+</div>

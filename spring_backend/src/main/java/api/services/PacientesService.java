@@ -2,6 +2,7 @@ package api.services;
 
 import api.dto.AbonoDto;
 import api.dto.AccountEntryDto;
+import api.dto.EvolucionDto;
 import api.dto.HclDto;
 import api.dto.PacienteDetailDto;
 import api.dto.PacienteDto;
@@ -12,6 +13,7 @@ import api.dto.ToothConditionDto;
 import api.dto.ToothDto;
 import api.dto.ToothFaceDto;
 import api.entities.AccountEntry;
+import api.entities.EvolucionClinica;
 import api.entities.HistoriaClinica;
 import api.entities.Paciente;
 import api.entities.PatientAlert;
@@ -23,6 +25,7 @@ import api.entities.VistaPaciente;
 import api.entities.converter.CondicionDentalConverter;
 import api.entities.converter.PatientAppointmentEstadoConverter;
 import api.repositories.AccountEntryRepository;
+import api.repositories.EvolucionClinicaRepository;
 import api.repositories.HistoriaClinicaRepository;
 import api.repositories.PacienteRepository;
 import api.repositories.PatientAlertRepository;
@@ -86,6 +89,7 @@ public class PacientesService {
     private final PatientToothFaceRepository faceRepository;
     private final PatientAlertRepository alertRepository;
     private final HistoriaClinicaRepository hclRepository;
+    private final EvolucionClinicaRepository evolucionRepository;
     private final CodigoService codigoService;
     private final ObjectMapper objectMapper;
 
@@ -215,6 +219,54 @@ public class PacientesService {
                 .orElseThrow(() -> new IllegalArgumentException("Alerta no encontrada: " + alertId));
         alert.setAtendida(true);
         return toAlertDto(alertRepository.save(alert));
+    }
+
+    @Transactional(readOnly = true)
+    public List<EvolucionDto> listarEvolucion(String id) {
+        return evolucionRepository.findByPacienteIdOrderByFechaDescIdDesc(id).stream()
+                .map(this::toEvolucionDto)
+                .toList();
+    }
+
+    /** Alta de una hoja de evolución: append-only, no admite edición ni borrado. */
+    @Transactional
+    public EvolucionDto guardarEvolucion(String id, EvolucionDto.EvolucionDraftDto dto) {
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado: " + id));
+        EvolucionClinica ev = EvolucionClinica.builder()
+                .pacienteId(paciente.getId())
+                .fecha(dto.fecha() != null ? dto.fecha() : LocalDate.now())
+                .hora(dto.hora())
+                .odontologo(normalizar(dto.odontologo()))
+                .motivo(normalizar(dto.motivo()))
+                .evolucion(normalizar(dto.evolucion()))
+                .plan(normalizar(dto.plan()))
+                .proximaCita(dto.proximaCita())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        return toEvolucionDto(evolucionRepository.saveAndFlush(ev));
+    }
+
+    private EvolucionDto toEvolucionDto(EvolucionClinica ev) {
+        return new EvolucionDto(
+                ev.getId(),
+                ev.getPacienteId(),
+                ev.getFecha(),
+                ev.getHora(),
+                ev.getOdontologo(),
+                ev.getMotivo(),
+                ev.getEvolucion(),
+                ev.getPlan(),
+                ev.getProximaCita(),
+                ev.getCreatedAt() == null ? null : ev.getCreatedAt().toString());
+    }
+
+    private String normalizar(String s) {
+        if (s == null || s.isBlank()) {
+            return null;
+        }
+        return s.trim();
     }
 
     @Transactional(readOnly = true)
@@ -379,7 +431,7 @@ public class PacientesService {
         if (hc.isProgramado() != dto.programado()) {
             cambios.add("TIPO DE CITA");
         }
-        if (!strIgual(hc.getFechaApertura(), dto.fechaApertura())) {
+        if (!Objects.equals(hc.getFechaApertura(), dto.fechaApertura())) {
             cambios.add("FECHA DE APERTURA");
         }
         if (!strIgual(hc.getNumeroHoja(), dto.numeroHoja())) {

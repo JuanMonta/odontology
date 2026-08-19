@@ -58,6 +58,44 @@ export interface HclSesion {
   codigo: string;
 }
 
+/** Hoja de evolución clínica: registro cronológico append-only del expediente. */
+export interface Evolucion {
+  id: number;
+  pacienteId: string;
+  fecha: string;
+  hora: string | null;
+  odontologo: string | null;
+  motivo: string | null;
+  evolucion: string | null;
+  plan: string | null;
+  proximaCita: string | null;
+  createdAt: string | null;
+}
+
+/** Borrador para el alta de una hoja de evolución. */
+export interface EvolucionDraft {
+  fecha: string;
+  hora: string | null;
+  odontologo: string | null;
+  motivo: string | null;
+  evolucion: string | null;
+  plan: string | null;
+  proximaCita: string | null;
+}
+
+export function crearEvolucionVacia(): EvolucionDraft {
+  const hoy = new Date().toISOString().slice(0, 10);
+  return {
+    fecha: hoy,
+    hora: null,
+    odontologo: null,
+    motivo: null,
+    evolucion: null,
+    plan: null,
+    proximaCita: null
+  };
+}
+
 export interface Hcl {
   pacienteId: string;
   hoja: number;

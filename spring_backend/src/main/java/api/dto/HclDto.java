@@ -1,5 +1,6 @@
 package api.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -49,13 +50,12 @@ public record HclDto(
         String planOtrosTexto,
         String planTerapeutico,
         String planEducacional,
-        String fechaApertura,
-        String fechaControl,
+        LocalDate fechaApertura,
+        LocalDate fechaControl,
         String numeroHoja,
         String profesionalNombre,
-        String profesionalFecha,
-        String profesionalFirma,
-        List<DiagnosticoCieDto> diagnosticosCie,
+        LocalDate profesionalFecha,
+        String profesionalFirma,        List<DiagnosticoCieDto> diagnosticosCie,
         List<SesionTratamientoDto> sesiones,
         String actualizadaEn
 ) {
@@ -81,7 +81,7 @@ public record HclDto(
     }
 
     /** Encabezado: resumen de cada hoja (continuación) de la misma historia clínica. */
-    public record HojaResumenDto(int hoja, String fechaApertura, String fechaControl, String actualizadaEn) {
+    public record HojaResumenDto(int hoja, LocalDate fechaApertura, LocalDate fechaControl, String actualizadaEn) {
     }
 
     /** 11 · Diagnóstico CIE: código, presuntivo (PRE) y definitivo (DEF). */

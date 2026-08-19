@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -151,11 +152,11 @@ public class HistoriaClinica {
     @Column(name = "plan_educacional", columnDefinition = "TEXT")
     private String planEducacional;
 
-    @Column(name = "fecha_apertura", length = 10)
-    private String fechaApertura;
+    @Column(name = "fecha_apertura")
+    private LocalDate fechaApertura;
 
-    @Column(name = "fecha_control", length = 10)
-    private String fechaControl;
+    @Column(name = "fecha_control")
+    private LocalDate fechaControl;
 
     @Column(name = "numero_hoja", length = 16)
     private String numeroHoja;
@@ -163,8 +164,8 @@ public class HistoriaClinica {
     @Column(name = "profesional_nombre", length = 120)
     private String profesionalNombre;
 
-    @Column(name = "profesional_fecha", length = 10)
-    private String profesionalFecha;
+    @Column(name = "profesional_fecha")
+    private LocalDate profesionalFecha;
 
     @Column(name = "profesional_firma", length = 120)
     private String profesionalFirma;

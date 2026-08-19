@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE } from '../../../core/config/api.config';
-import { Hcl, HojaResumen } from '../../../core/models/hcl.model';
+import { Evolucion, EvolucionDraft, Hcl, HojaResumen } from '../../../core/models/hcl.model';
 
 /**
  * Persistencia REST de la historia clínica Formulario 033.
@@ -28,5 +28,14 @@ export class HclHttpService {
 
   save(pacienteId: string, hc: Hcl): Observable<Hcl> {
     return this.http.put<Hcl>(`${API_BASE}/pacientes/${pacienteId}/hclinica/${hc.hoja}`, hc);
+  }
+
+  /** Hoja de evolución: solo lectura y alta (append-only). */
+  listarEvolucion(pacienteId: string): Observable<Evolucion[]> {
+    return this.http.get<Evolucion[]>(`${API_BASE}/pacientes/${pacienteId}/evolucion`);
+  }
+
+  guardarEvolucion(pacienteId: string, dto: EvolucionDraft): Observable<Evolucion> {
+    return this.http.post<Evolucion>(`${API_BASE}/pacientes/${pacienteId}/evolucion`, dto);
   }
 }
