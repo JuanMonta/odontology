@@ -93,17 +93,9 @@ export class ConsultorioCatalogosService {
   refresh(): void {
     this.http.get<ConsultorioCatalogos>(`${API_BASE}/consultorios/catalogos`).subscribe({
       next: data => {
-        console.log('[ConsultorioCatalogosService] Catalogos loaded:', {
-          unidades: data.unidades.length,
-          ubicaciones: data.ubicaciones.length,
-          equipos: data.equipos.length,
-          tratamientos: data.tratamientos.length
-        });
         this.subject.next(data);
       },
-      error: err => {
-        console.error('[ConsultorioCatalogosService] Failed to load catalogos:', err);
-      }
+      error: () => {}
     });
   }
 

@@ -136,9 +136,7 @@ export class ConsultorioFormComponent implements OnChanges, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Fuerza refresh si los catálogos no tienen tratamientos (ej. backend tardó en arrancar)
     if (!this.catalogosLoaded) {
-      console.log('[ConsultorioForm] Catálogos vacíos, forzando refresh...');
       this.catalogos.refresh();
     }
   }

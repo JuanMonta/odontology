@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 import {
   Treatment,
   TreatmentCategory,
@@ -18,7 +18,7 @@ type CategoryFilter = string | 'all';
   styleUrls: ['./treatments-page.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreatmentsPageComponent implements OnInit {
+export class TreatmentsPageComponent implements OnInit, OnDestroy {
   categories$: Observable<Categoria[]>;
   treatments$: Observable<Treatment[]>;
   selected$: Observable<Treatment | null>;
@@ -29,6 +29,7 @@ export class TreatmentsPageComponent implements OnInit {
   private readonly search$ = new BehaviorSubject<string>('');
   private readonly category$ = new BehaviorSubject<CategoryFilter>('all');
   private readonly selectedId$ = new BehaviorSubject<string | null>(null);
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private service: TreatmentsHttpService,
@@ -59,11 +60,16 @@ export class TreatmentsPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe(params => {
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       if (params.get('nuevo')) {
         this.startCreate();
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onSearch(q: string): void {
