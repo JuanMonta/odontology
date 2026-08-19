@@ -6,13 +6,40 @@
     </label>
 
     <label class="field">
-      <span class="field-label">EDAD</span>
-      <input class="field-input" type="number" min="0" max="120" [(ngModel)]="age" name="age" (ngModelChange)="persistDraft()" />
+      <span class="field-label">CÉDULA</span>
+      <input class="field-input" type="text" [(ngModel)]="cedula" name="cedula" placeholder="1045678901" maxlength="13" autocomplete="off" (ngModelChange)="persistDraft()" />
+    </label>
+
+    <div class="field">
+      <span class="field-label">SEXO</span>
+      <div class="seg" role="radiogroup" aria-label="Sexo del paciente">
+        <button
+          class="seg-btn"
+          [class.is-active]="sexo === 'F'"
+          type="button"
+          role="radio"
+          [attr.aria-checked]="sexo === 'F'"
+          (click)="setSexo('F')"
+        >FEMENINO</button>
+        <button
+          class="seg-btn"
+          [class.is-active]="sexo === 'M'"
+          type="button"
+          role="radio"
+          [attr.aria-checked]="sexo === 'M'"
+          (click)="setSexo('M')"
+        >MASCULINO</button>
+      </div>
+    </div>
+
+    <label class="field">
+      <span class="field-label">FECHA DE NACIMIENTO</span>
+      <input class="field-input" type="date" [(ngModel)]="birthDate" name="birthDate" (ngModelChange)="onBirthDateChange()" autocomplete="off" />
     </label>
 
     <label class="field">
-      <span class="field-label">CUMPLEAÑOS (DD/MM)</span>
-      <input class="field-input" type="text" [(ngModel)]="birthday" name="birthday" placeholder="12/08" autocomplete="off" (ngModelChange)="persistDraft()" />
+      <span class="field-label">EDAD</span>
+      <input class="field-input" type="number" min="0" max="120" [value]="age" name="age" readonly aria-readonly="true" title="Calculada desde la fecha de nacimiento" />
     </label>
 
     <label class="field">

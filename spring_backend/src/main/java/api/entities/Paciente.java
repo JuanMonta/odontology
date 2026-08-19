@@ -33,9 +33,18 @@ public class Paciente {
 
     public enum Estado { active, inactive }
 
+    public enum Sexo { M, F }
+
     @Id
     @Column(name = "id", length = 8)
     private String id;
+
+    @Column(name = "cedula", length = 13)
+    private String cedula;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sexo")
+    private Sexo sexo;
 
     @Column(name = "nombre", nullable = false, length = 80)
     private String nombre;

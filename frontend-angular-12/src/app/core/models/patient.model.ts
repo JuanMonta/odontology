@@ -18,6 +18,9 @@ export type PatientAlertType = 'birthday' | 'debt' | 'followup';
 export interface Patient {
   id: string;            // "HC-0001" historia clínica
   name: string;
+  cedula: string;        // cédula o RUC (10-13 dígitos); "—" si no hay
+  sexo: string;          // 'M' | 'F' | '—'
+  birthDate: string;     // ISO "YYYY-MM-DD" (fecha_nacimiento); "" si no hay
   age: number;
   phone: string;
   email: string;
@@ -74,7 +77,7 @@ export interface PatientAlert {
   handled: boolean;
 }
 
-export type PatientDraft = Omit<Patient, 'id' | 'debt'>;
+export type PatientDraft = Omit<Patient, 'id' | 'debt'> & { fechaNacimiento?: string | null };
 
 export interface PatientDetail {
   appointments: PatientAppointment[];

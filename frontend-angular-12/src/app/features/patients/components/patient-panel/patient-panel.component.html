@@ -111,6 +111,18 @@
           <ng-container *ngIf="!editMode; else editForm">
             <div class="ficha-grid">
               <div class="ficha-row">
+                <span class="ficha-label">CÉDULA</span>
+                <span class="ficha-value">{{ patient.cedula }}</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">SEXO</span>
+                <span class="ficha-value">{{ patient.sexo === 'M' ? 'MASCULINO' : patient.sexo === 'F' ? 'FEMENINO' : patient.sexo }}</span>
+              </div>
+              <div class="ficha-row">
+                <span class="ficha-label">FECHA DE NACIMIENTO</span>
+                <span class="ficha-value">{{ fmtIsoFecha(patient.birthDate) }}</span>
+              </div>
+              <div class="ficha-row">
                 <span class="ficha-label">EDAD</span>
                 <span class="ficha-value">{{ patient.age }} AÑOS</span>
               </div>
