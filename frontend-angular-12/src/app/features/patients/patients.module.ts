@@ -9,13 +9,15 @@ import { PatientsPageComponent } from './pages/patients-page/patients-page.compo
 import { PatientDirectoryComponent } from './components/patient-directory/patient-directory.component';
 import { PatientPanelComponent } from './components/patient-panel/patient-panel.component';
 import { Hcl033Component } from './components/hcl-033/hcl-033.component';
+import { EvolucionClinicaComponent } from './components/evolucion-clinica/evolucion-clinica.component';
 
 @NgModule({
   declarations: [
     PatientsPageComponent,
     PatientDirectoryComponent,
     PatientPanelComponent,
-    Hcl033Component
+    Hcl033Component,
+    EvolucionClinicaComponent
   ],
   imports: [
     CommonModule,

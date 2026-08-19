@@ -1,0 +1,248 @@
+.evo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.evo-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.evo-kicker {
+  font-family: var(--font-flap);
+  font-size: 0.62em;
+  letter-spacing: 0.22em;
+  color: var(--amber);
+}
+
+.evo-title {
+  font-family: var(--font-flap);
+  font-weight: 500;
+  font-size: 1em;
+  letter-spacing: 0.1em;
+  color: var(--flap-ink);
+}
+
+.evo-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 16px;
+  font-family: var(--font-flap);
+  font-size: 0.8em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--flap-black);
+  background: var(--amber);
+  border: 1px solid var(--amber);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: filter 0.18s var(--ease-out);
+}
+
+.evo-add:hover {
+  filter: brightness(1.08);
+}
+
+.evo-add svg {
+  width: 14px;
+  height: 14px;
+}
+
+.evo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--flap-black-2);
+  border: 1px solid rgba(255, 176, 32, 0.3);
+  border-radius: var(--radius-sm);
+}
+
+.evo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 10px;
+}
+
+.evo-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.evo-label {
+  font-family: var(--font-flap);
+  font-size: 0.64em;
+  letter-spacing: 0.2em;
+  color: var(--steel-400);
+}
+
+.evo-input {
+  padding: 10px 12px;
+  font-family: var(--font-flap);
+  font-size: 0.8em;
+  letter-spacing: 0.06em;
+  color: var(--flap-ink);
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+}
+
+.evo-input:focus {
+  outline: none;
+  border-color: var(--amber-line);
+}
+
+.evo-textarea {
+  font-family: var(--font-ui);
+  font-size: 0.76em;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.evo-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.evo-btn-amber {
+  padding: 10px 14px;
+  font-family: var(--font-flap);
+  font-size: 0.74em;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--flap-black);
+  background: var(--amber);
+  border: 1px solid var(--amber);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.evo-btn-amber:hover {
+  filter: brightness(1.08);
+}
+
+.evo-btn-amber:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.evo-btn-ghost {
+  padding: 10px 14px;
+  font-family: var(--font-flap);
+  font-size: 0.74em;
+  letter-spacing: 0.14em;
+  color: var(--steel-300);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.evo-btn-ghost:hover {
+  color: var(--flap-ink);
+  border-color: rgba(255, 176, 32, 0.5);
+}
+
+.evo-status {
+  font-family: var(--font-flap);
+  font-size: 0.68em;
+  letter-spacing: 0.16em;
+  color: var(--green);
+}
+
+.evo-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.evo-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 12px 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.evo-date {
+  display: flex;
+  flex-direction: column;
+}
+
+.evo-date-day {
+  font-family: var(--font-flap);
+  font-size: 0.74em;
+  letter-spacing: 0.08em;
+  color: var(--steel-200);
+}
+
+.evo-date-time {
+  font-family: var(--font-flap);
+  font-size: 0.64em;
+  letter-spacing: 0.14em;
+  color: var(--steel-500);
+}
+
+.evo-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.evo-motivo {
+  font-family: var(--font-flap);
+  font-size: 0.8em;
+  letter-spacing: 0.08em;
+  color: var(--flap-ink);
+}
+
+.evo-dentist {
+  font-family: var(--font-ui);
+  font-size: 0.68em;
+  color: var(--steel-400);
+}
+
+.evo-txt {
+  font-family: var(--font-ui);
+  font-size: 0.72em;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--steel-200);
+  background: var(--flap-black-2);
+  border-left: 2px solid var(--amber);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 8px 12px;
+  width: 100%;
+}
+
+.evo-plan {
+  font-family: var(--font-flap);
+  font-size: 0.66em;
+  letter-spacing: 0.1em;
+  color: var(--steel-300);
+}
+
+.evo-cita {
+  font-family: var(--font-flap);
+  font-size: 0.66em;
+  letter-spacing: 0.1em;
+  color: var(--amber);
+}
+
+.evo-empty {
+  padding: 28px;
+  text-align: center;
+  font-family: var(--font-flap);
+  font-size: 0.72em;
+  letter-spacing: 0.18em;
+  color: var(--steel-500);
+}

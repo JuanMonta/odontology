@@ -32,7 +32,7 @@
           (click)="abrirHoja(h.hoja)"
         >
           <span class="hc-hoja-chip-n">HOJA {{ h.hoja }}</span>
-          <span *ngIf="h.fechaApertura" class="hc-hoja-chip-d">{{ h.fechaApertura }}</span>
+          <span *ngIf="h.fechaApertura" class="hc-hoja-chip-d">{{ fmtFecha(h.fechaApertura) }}</span>
         </button>
       </div>
       <button class="hc-hoja-nueva" type="button" (click)="nuevaHoja()">+ NUEVA HOJA</button>
@@ -367,11 +367,11 @@
       <div class="grid-3">
         <label class="fld">
           <span class="fld-label">FECHA DE APERTURA</span>
-          <input class="fld-input" type="text" [(ngModel)]="hc.fechaApertura" [readonly]="sellada" placeholder="DD/MM/AAAA" autocomplete="off" [attr.aria-readonly]="sellada" />
+          <input class="fld-input" type="date" [(ngModel)]="hc.fechaApertura" [readonly]="sellada" autocomplete="off" [attr.aria-readonly]="sellada" />
         </label>
         <label class="fld">
           <span class="fld-label">FECHA DE CONTROL</span>
-          <input class="fld-input" type="text" [(ngModel)]="hc.fechaControl" placeholder="DD/MM/AAAA" autocomplete="off" />
+          <input class="fld-input" type="date" [(ngModel)]="hc.fechaControl" autocomplete="off" />
         </label>
         <label class="fld">
           <span class="fld-label">NÚMERO DE HOJA</span>
@@ -409,7 +409,7 @@
         </label>
         <label class="fld">
           <span class="fld-label">FECHA</span>
-          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalFecha" placeholder="DD/MM/AAAA" autocomplete="off" />
+          <input class="fld-input" type="date" [(ngModel)]="hc.profesionalFecha" autocomplete="off" />
         </label>
         <label class="fld">
           <span class="fld-label">FIRMA</span>

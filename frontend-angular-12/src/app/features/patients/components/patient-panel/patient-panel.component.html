@@ -69,6 +69,11 @@
           <app-hcl-033 [patient]="patient" [teeth]="detail.teeth" (toothChange)="onToothChange($event)"></app-hcl-033>
         </div>
 
+        <!-- HOJA DE EVOLUCIÓN CLÍNICA (append-only) -->
+        <div class="tab-pane" *ngIf="tab === 'evolucion'">
+          <app-evolucion-clinica [patient]="patient"></app-evolucion-clinica>
+        </div>
+
         <!-- HISTORIAL clínico con notas -->
         <div class="tab-pane" *ngIf="tab === 'historial'">
           <ng-container *ngIf="detail.appointments.length; else noHistory">

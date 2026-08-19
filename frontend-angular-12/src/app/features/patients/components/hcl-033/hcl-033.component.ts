@@ -316,6 +316,15 @@ export class Hcl033Component implements OnInit, OnDestroy {
     return grupoEtario(this.patient?.age ?? 0);
   }
 
+  /** ISO (yyyy-MM-dd) del backend DATE → DD/MM/AAAA para presentación. */
+  fmtFecha(iso: string | null | undefined): string {
+    if (!iso) {
+      return '';
+    }
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+    return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
+  }
+
   /** Totales por columna del índice CPO-ceo. */
   cpoTotales(): { c: number; p: number; o: number; ce: number; ee: number; oe: number } {
     const suma = (arr: (number | null)[]): number => arr.reduce<number>((s, v) => s + (v ?? 0), 0);
