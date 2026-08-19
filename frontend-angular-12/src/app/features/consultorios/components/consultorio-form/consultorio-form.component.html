@@ -11,7 +11,7 @@
       />
     </ui-field>
 
-    <ui-field label="SILLÓN / UNIDAD" [required]="true">
+    <ui-field label="SILLÓN / UNIDAD" [required]="true" [full]="true">
       <div class="cat-row">
         <select class="field-select cat-select" [(ngModel)]="unit" name="unit" aria-label="Sillón o unidad">
           <option value="" disabled selected hidden>— SELECCIONAR UNIDAD —</option>
@@ -119,7 +119,7 @@
       </ui-cat-card>
     </ui-field>
 
-    <ui-field label="UBICACIÓN" [required]="true">
+    <ui-field label="UBICACIÓN" [required]="true" [full]="true">
       <div class="cat-row">
         <select class="field-select cat-select" [(ngModel)]="location" name="location" aria-label="Ubicación">
           <option value="" disabled selected hidden>— SELECCIONAR UBICACIÓN —</option>
@@ -191,32 +191,6 @@
       </select>
     </ui-field>
 
-    <ui-field label="EQUIPOS E INSTRUMENTAL" [full]="true">
-      <span fieldSuffix class="equip-count" *ngIf="equipment.length">{{ equipment.length }} ASIGNADOS</span>
-      <div class="equip-assigned" *ngIf="equipment.length">
-        <label class="equip-chip is-on" *ngFor="let e of equipment">
-          <input
-            class="equip-input"
-            type="checkbox"
-            [checked]="true"
-            (change)="removeEquipo(e)"
-            [attr.aria-label]="'Quitar ' + e"
-          />
-          <span class="equip-lamp" aria-hidden="true"></span>
-          <span class="equip-name">{{ e }}</span>
-        </label>
-        <button class="equip-add" type="button" (click)="openPicker()">+ AGREGAR</button>
-      </div>
-      <button
-        class="equip-add equip-add--empty"
-        type="button"
-        *ngIf="!equipment.length"
-        (click)="openPicker()"
-      >
-        + AGREGAR EQUIPOS E INSTRUMENTAL
-      </button>
-    </ui-field>
-
     <ui-field label="TRATAMIENTOS SOPORTADOS" [full]="true">
       <span fieldSuffix class="equip-count" *ngIf="tratamientos.length">{{ tratamientos.length }} ASIGNADOS</span>
       <div class="equip-assigned" *ngIf="tratamientos.length">
@@ -279,6 +253,32 @@
           </button>
         </ng-container>
       </ng-container>
+    </ui-field>
+
+    <ui-field label="EQUIPOS E INSTRUMENTAL" [full]="true">
+      <span fieldSuffix class="equip-count" *ngIf="equipment.length">{{ equipment.length }} ASIGNADOS</span>
+      <div class="equip-assigned" *ngIf="equipment.length">
+        <label class="equip-chip is-on" *ngFor="let e of equipment">
+          <input
+            class="equip-input"
+            type="checkbox"
+            [checked]="true"
+            (change)="removeEquipo(e)"
+            [attr.aria-label]="'Quitar ' + e"
+          />
+          <span class="equip-lamp" aria-hidden="true"></span>
+          <span class="equip-name">{{ e }}</span>
+        </label>
+        <button class="equip-add" type="button" (click)="openPicker()">+ AGREGAR</button>
+      </div>
+      <button
+        class="equip-add equip-add--empty"
+        type="button"
+        *ngIf="!equipment.length"
+        (click)="openPicker()"
+      >
+        + AGREGAR EQUIPOS E INSTRUMENTAL
+      </button>
     </ui-field>
   </div>
 
