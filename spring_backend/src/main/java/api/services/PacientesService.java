@@ -15,18 +15,21 @@ import api.dto.ToothFaceDto;
 import api.entities.AccountEntry;
 import api.entities.EvolucionClinica;
 import api.entities.HistoriaClinica;
+import api.entities.Odontologo;
 import api.entities.Paciente;
 import api.entities.PatientAlert;
 import api.entities.PatientAppointment;
 import api.entities.PatientTooth;
 import api.entities.PatientToothCondition;
 import api.entities.PatientToothFace;
+import api.entities.Usuario;
 import api.entities.VistaPaciente;
 import api.entities.converter.CondicionDentalConverter;
 import api.entities.converter.PatientAppointmentEstadoConverter;
 import api.repositories.AccountEntryRepository;
 import api.repositories.EvolucionClinicaRepository;
 import api.repositories.HistoriaClinicaRepository;
+import api.repositories.OdontologoRepository;
 import api.repositories.PacienteRepository;
 import api.repositories.PatientAlertRepository;
 import api.repositories.PatientAppointmentRepository;
@@ -43,9 +46,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -90,6 +95,7 @@ public class PacientesService {
     private final PatientAlertRepository alertRepository;
     private final HistoriaClinicaRepository hclRepository;
     private final EvolucionClinicaRepository evolucionRepository;
+    private final OdontologoRepository odontologoRepository;
     private final CodigoService codigoService;
     private final ObjectMapper objectMapper;
 
@@ -233,11 +239,30 @@ public class PacientesService {
     public EvolucionDto guardarEvolucion(String id, EvolucionDto.EvolucionDraftDto dto) {
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado: " + id));
+
+        String odontologoCodigo = normalizar(dto.odontologoCodigo());
+        String odontologoNombre = null;
+        if (odontologoCodigo != null) {
+            Odontologo odontologo = odontologoRepository.findById(odontologoCodigo)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "Odontólogo no registrado: " + odontologoCodigo));
+            odontologoNombre = odontologo.getNombre();
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof Usuario usuario)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "Se requiere iniciar sesión para registrar una evolución clínica");
+        }
+
         EvolucionClinica ev = EvolucionClinica.builder()
                 .pacienteId(paciente.getId())
                 .fecha(dto.fecha() != null ? dto.fecha() : LocalDate.now())
                 .hora(dto.hora())
-                .odontologo(normalizar(dto.odontologo()))
+                .odontologo(odontologoNombre)
+                .odontologoCodigo(odontologoCodigo)
+                .registradoPor(usuario.getCodigo())
+                .registradoPorNombre(usuario.getNombre())
                 .motivo(normalizar(dto.motivo()))
                 .evolucion(normalizar(dto.evolucion()))
                 .plan(normalizar(dto.plan()))
@@ -255,6 +280,9 @@ public class PacientesService {
                 ev.getFecha(),
                 ev.getHora(),
                 ev.getOdontologo(),
+                ev.getOdontologoCodigo(),
+                ev.getRegistradoPor(),
+                ev.getRegistradoPorNombre(),
                 ev.getMotivo(),
                 ev.getEvolucion(),
                 ev.getPlan(),
@@ -763,6 +791,7 @@ public class PacientesService {
                 FormatoUtil.hora(a.getHora()),
                 a.getTratamiento(),
                 a.getOdontologo(),
+                a.getOdontologoCodigo(),
                 a.getEstado() == null ? null : CITA_ESTADO_CONVERTER.convertToDatabaseColumn(a.getEstado()),
                 a.getNota());
     }

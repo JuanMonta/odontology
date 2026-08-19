@@ -14,6 +14,7 @@ import api.repositories.WaitingQueueRepository;
 import api.util.FormatoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -69,8 +70,11 @@ public class DashboardService {
      * Política de tolerancia por reloj: una cita {@code on-time} cuya hora ya
      * pasó la tolerancia configurada (y no ha hecho check-in) pasa
      * automáticamente a {@code no-show}.
+     * <p>{@code REQUIRES_NEW}: se ejecuta en su propia transacción de
+     * lectura/escritura porque se invoca desde consultas {@code readOnly}
+     * (p. ej. {@link #appointments(LocalDate)}) que no pueden escribir.
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public int aplicarPoliticaTolerancia(LocalDate fecha) {
         int tolerancia = toleranciaMinutos();
         LocalTime ahora = LocalTime.now();
@@ -494,6 +498,21 @@ public class DashboardService {
         return cambiarEstado(id, Appointment.Estado.NO_SHOW);
     }
 
+    /**
+     * Eliminar una cita del tablero que aún no se volcó al expediente del
+     * paciente. Si la cita ya generó historia clínica (patient_appointments),
+     * no se borra: se protege el registro clínico.
+     */
+    @Transactional
+    public void deleteAppointment(String id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada: " + id));
+        if (patientAppointmentRepository.existsByAppointmentId(id)) {
+            throw new IllegalArgumentException("La cita ya forma parte del expediente y no puede eliminarse");
+        }
+        appointmentRepository.delete(appointment);
+    }
+
     private AppointmentDto cambiarEstado(String id, Appointment.Estado estado) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada: " + id));
@@ -631,6 +650,7 @@ public class DashboardService {
                 .hora(appointment.getHora())
                 .tratamiento(appointment.getTratamiento())
                 .odontologo(appointment.getOdontologo())
+                .odontologoCodigo(appointment.getOdontologoCodigo())
                 .estado(estado)
                 .build());
     }

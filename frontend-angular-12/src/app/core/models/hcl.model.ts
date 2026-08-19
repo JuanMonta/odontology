@@ -65,6 +65,9 @@ export interface Evolucion {
   fecha: string;
   hora: string | null;
   odontologo: string | null;
+  odontologoCodigo: string | null;
+  registradoPor: string | null;
+  registradoPorNombre: string | null;
   motivo: string | null;
   evolucion: string | null;
   plan: string | null;
@@ -76,7 +79,7 @@ export interface Evolucion {
 export interface EvolucionDraft {
   fecha: string;
   hora: string | null;
-  odontologo: string | null;
+  odontologoCodigo: string | null;
   motivo: string | null;
   evolucion: string | null;
   plan: string | null;
@@ -88,7 +91,7 @@ export function crearEvolucionVacia(): EvolucionDraft {
   return {
     fecha: hoy,
     hora: null,
-    odontologo: null,
+    odontologoCodigo: null,
     motivo: null,
     evolucion: null,
     plan: null,

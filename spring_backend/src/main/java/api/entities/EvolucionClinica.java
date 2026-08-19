@@ -48,6 +48,15 @@ public class EvolucionClinica {
     @Column(name = "odontologo", length = 120)
     private String odontologo;
 
+    @Column(name = "odontologo_codigo", length = 12)
+    private String odontologoCodigo;
+
+    @Column(name = "registrado_por", length = 8)
+    private String registradoPor;
+
+    @Column(name = "registrado_por_nombre", length = 80)
+    private String registradoPorNombre;
+
     @Column(name = "motivo", columnDefinition = "TEXT")
     private String motivo;
 

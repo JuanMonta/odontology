@@ -36,6 +36,7 @@ export interface PatientAppointment {
   time: string;          // "09:00"
   treatment: string;
   dentist: string;
+  dentistCode?: string | null; // código del profesional que atendió
   status: 'done' | 'cancelled' | 'scheduled' | 'no-show';
   note?: string;         // nota clínica de la sesión (expediente)
 }

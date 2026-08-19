@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,7 +21,9 @@ import java.util.List;
 /**
  * Seguridad de la API REST + WebSocket.
  *
- * <p>Protegidas con JWT: {@code /api/v1/chat/**} y {@code /api/v1/auth/me}.
+ * <p>Protegidas con JWT: {@code /api/v1/chat/**}, {@code /api/v1/auth/me} y el
+ * alta de hoja de evolución (POST /api/v1/pacientes/{id}/evolucion), que
+ * exige sesión autenticada para firmar el autor del registro clínico.
  * Todo lo demás sigue {@code permitAll} (la bandeja, pacientes, catálogos…)
  * para no romper el contrato actual de la app; el login y el chat son la
  * superficie que exige identidad por ahora.
@@ -40,6 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/login", "/api/v1/health", "/ws/**", "/error").permitAll()
                         .requestMatchers("/api/v1/auth/me", "/api/v1/chat/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pacientes/*/evolucion").authenticated()
                         .anyRequest().permitAll())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

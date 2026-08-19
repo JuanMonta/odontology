@@ -57,6 +57,9 @@ public class PatientAppointment {
     @Column(name = "odontologo", nullable = false, length = 60)
     private String odontologo;
 
+    @Column(name = "odontologo_codigo", length = 12)
+    private String odontologoCodigo;
+
     @Convert(converter = PatientAppointmentEstadoConverter.class)
     @Column(name = "estado", nullable = false)
     private Estado estado;
