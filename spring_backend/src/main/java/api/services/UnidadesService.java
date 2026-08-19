@@ -33,6 +33,7 @@ public class UnidadesService {
     private final UnidadRepository unidadRepository;
     private final ConsultorioRepository consultorioRepository;
     private final CodigoService codigoService;
+    private final CatalogSnapshotService snapshots;
 
     @Transactional(readOnly = true)
     public List<UnidadDto> list() {
@@ -62,7 +63,10 @@ public class UnidadesService {
                 .tipo(tipo)
                 .activo(true)
                 .build();
-        return toDto(unidadRepository.save(unidad));
+        UnidadDto creada = toDto(unidadRepository.save(unidad));
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_UNIDAD, creada.code(),
+                CatalogSnapshotService.ACCION_CREAR, null, texto(unidad), null);
+        return creada;
     }
 
     /**
@@ -96,6 +100,13 @@ public class UnidadesService {
                     unidad.getNombre(), textoAnterior));
             afectados.forEach(c -> c.setUnidad(textoNuevo));
             consultorioRepository.saveAll(afectados);
+            snapshots.registrar(CatalogSnapshotService.ENTIDAD_UNIDAD, unidad.getCodigo(),
+                    CatalogSnapshotService.ACCION_RENOMBRAR, textoAnterior, textoNuevo,
+                    "SALAS ACTUALIZADAS: " + afectados.size());
+        }
+        if (!Boolean.TRUE.equals(unidad.getActivo())) {
+            snapshots.registrar(CatalogSnapshotService.ENTIDAD_UNIDAD, unidad.getCodigo(),
+                    CatalogSnapshotService.ACCION_DESACTIVAR, textoAnterior, textoNuevo, null);
         }
         return toDto(unidad);
     }
@@ -106,8 +117,14 @@ public class UnidadesService {
         if (Boolean.TRUE.equals(unidad.getActivo())) {
             validarVacia(unidad);
         }
+        boolean ibaActiva = Boolean.TRUE.equals(unidad.getActivo());
         unidad.setActivo(!unidad.getActivo());
-        return toDto(unidadRepository.save(unidad));
+        UnidadDto actualizada = toDto(unidadRepository.save(unidad));
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_UNIDAD, unidad.getCodigo(),
+                ibaActiva ? CatalogSnapshotService.ACCION_DESACTIVAR
+                        : CatalogSnapshotService.ACCION_ACTIVAR,
+                texto(unidad), texto(unidad), null);
+        return actualizada;
     }
 
     private Unidad find(String code) {

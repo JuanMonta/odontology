@@ -22,6 +22,7 @@ public class EspecialidadesService {
 
     private final EspecialidadRepository especialidadRepository;
     private final CodigoService codigoService;
+    private final CatalogSnapshotService snapshots;
 
     @Transactional(readOnly = true)
     public List<EspecialidadDto> list() {
@@ -49,7 +50,10 @@ public class EspecialidadesService {
                 .nombre(nombre)
                 .activo(true)
                 .build();
-        return toDto(especialidadRepository.save(especialidad));
+        EspecialidadDto creada = toDto(especialidadRepository.save(especialidad));
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_ESPECIALIDAD, creada.code(),
+                CatalogSnapshotService.ACCION_CREAR, null, nombre, null);
+        return creada;
     }
 
     @Transactional
@@ -62,16 +66,28 @@ public class EspecialidadesService {
                 .ifPresent(existente -> {
                     throw new IllegalArgumentException("LA ESPECIALIDAD YA EXISTE: " + nombre);
                 });
+        String anterior = especialidad.getNombre();
         especialidad.setNombre(nombre);
-        return toDto(especialidadRepository.save(especialidad));
+        EspecialidadDto actualizada = toDto(especialidadRepository.save(especialidad));
+        if (!anterior.equals(nombre)) {
+            snapshots.registrar(CatalogSnapshotService.ENTIDAD_ESPECIALIDAD, especialidad.getCodigo(),
+                    CatalogSnapshotService.ACCION_RENOMBRAR, anterior, nombre, null);
+        }
+        return actualizada;
     }
 
     @Transactional
     public EspecialidadDto toggleStatus(String code) {
         Especialidad especialidad = especialidadRepository.findById(code)
                 .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada: " + code));
-        especialidad.setActivo(!Boolean.TRUE.equals(especialidad.getActivo()));
-        return toDto(especialidadRepository.save(especialidad));
+        boolean ibaActiva = Boolean.TRUE.equals(especialidad.getActivo());
+        especialidad.setActivo(!especialidad.getActivo());
+        EspecialidadDto actualizada = toDto(especialidadRepository.save(especialidad));
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_ESPECIALIDAD, especialidad.getCodigo(),
+                ibaActiva ? CatalogSnapshotService.ACCION_DESACTIVAR
+                        : CatalogSnapshotService.ACCION_ACTIVAR,
+                especialidad.getNombre(), especialidad.getNombre(), null);
+        return actualizada;
     }
 
     private static String normalizar(String valor) {

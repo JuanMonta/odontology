@@ -29,6 +29,7 @@ public class UbicacionesService {
     private final UbicacionRepository ubicacionRepository;
     private final ConsultorioRepository consultorioRepository;
     private final CodigoService codigoService;
+    private final CatalogSnapshotService snapshots;
 
     @Transactional(readOnly = true)
     public List<UbicacionDto> list() {
@@ -56,7 +57,10 @@ public class UbicacionesService {
                 .nombre(nombre)
                 .activo(true)
                 .build();
-        return toDto(ubicacionRepository.save(ubicacion));
+        UbicacionDto creada = toDto(ubicacionRepository.save(ubicacion));
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_UBICACION, creada.code(),
+                CatalogSnapshotService.ACCION_CREAR, null, nombre, null);
+        return creada;
     }
 
     /**
@@ -85,6 +89,13 @@ public class UbicacionesService {
             List<Consultorio> afectados = consultorioRepository.findByUbicacion(anterior);
             afectados.forEach(c -> c.setUbicacion(nombre));
             consultorioRepository.saveAll(afectados);
+            snapshots.registrar(CatalogSnapshotService.ENTIDAD_UBICACION, ubicacion.getCodigo(),
+                    CatalogSnapshotService.ACCION_RENOMBRAR, anterior, nombre,
+                    "SALAS ACTUALIZADAS: " + afectados.size());
+        }
+        if (!Boolean.TRUE.equals(ubicacion.getActivo())) {
+            snapshots.registrar(CatalogSnapshotService.ENTIDAD_UBICACION, ubicacion.getCodigo(),
+                    CatalogSnapshotService.ACCION_DESACTIVAR, anterior, nombre, null);
         }
         return toDto(ubicacion);
     }
@@ -95,8 +106,14 @@ public class UbicacionesService {
         if (Boolean.TRUE.equals(ubicacion.getActivo())) {
             validarVacia(ubicacion);
         }
+        boolean ibaActiva = Boolean.TRUE.equals(ubicacion.getActivo());
         ubicacion.setActivo(!ubicacion.getActivo());
-        return toDto(ubicacionRepository.save(ubicacion));
+        UbicacionDto actualizada = toDto(ubicacionRepository.save(ubicacion));
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_UBICACION, ubicacion.getCodigo(),
+                ibaActiva ? CatalogSnapshotService.ACCION_DESACTIVAR
+                        : CatalogSnapshotService.ACCION_ACTIVAR,
+                ubicacion.getNombre(), ubicacion.getNombre(), null);
+        return actualizada;
     }
 
     private Ubicacion find(String code) {

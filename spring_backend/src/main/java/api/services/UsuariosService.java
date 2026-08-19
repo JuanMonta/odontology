@@ -35,6 +35,7 @@ public class UsuariosService {
     private final UsuarioRolRepository rolRepository;
     private final UsuarioEstadoRepository estadoRepository;
     private final CodigoService codigoService;
+    private final CatalogSnapshotService snapshots;
 
     @Transactional(readOnly = true)
     public List<UsuarioDto> list() {
@@ -116,6 +117,8 @@ public class UsuariosService {
                 .activo(true)
                 .build();
         rolRepository.save(rol);
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_ROL, rol.getCodigo(),
+                CatalogSnapshotService.ACCION_CREAR, null, rol.getNombre(), null);
         return toRolDto(rol);
     }
 
@@ -145,6 +148,13 @@ public class UsuariosService {
             List<Usuario> afectados = usuarioRepository.findByRol(nombreAnterior);
             afectados.forEach(u -> u.setRol(nombre));
             usuarioRepository.saveAll(afectados);
+            snapshots.registrar(CatalogSnapshotService.ENTIDAD_ROL, rol.getCodigo(),
+                    CatalogSnapshotService.ACCION_RENOMBRAR, nombreAnterior, nombre,
+                    "CUENTAS ACTUALIZADAS: " + afectados.size());
+        }
+        if (!Boolean.TRUE.equals(rol.getActivo())) {
+            snapshots.registrar(CatalogSnapshotService.ENTIDAD_ROL, rol.getCodigo(),
+                    CatalogSnapshotService.ACCION_DESACTIVAR, nombreAnterior, nombre, null);
         }
         return toRolDto(rol);
     }
@@ -155,8 +165,13 @@ public class UsuariosService {
         if (Boolean.TRUE.equals(rol.getActivo())) {
             validarVacio(rol);
         }
+        boolean ibaActivo = Boolean.TRUE.equals(rol.getActivo());
         rol.setActivo(!rol.getActivo());
         rolRepository.save(rol);
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_ROL, rol.getCodigo(),
+                ibaActivo ? CatalogSnapshotService.ACCION_DESACTIVAR
+                        : CatalogSnapshotService.ACCION_ACTIVAR,
+                rol.getNombre(), rol.getNombre(), null);
         return toRolDto(rol);
     }
 
