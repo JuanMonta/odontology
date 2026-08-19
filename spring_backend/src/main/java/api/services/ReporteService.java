@@ -2,17 +2,25 @@ package api.services;
 
 import api.dto.ReporteCarteraDto;
 import api.dto.ReporteCarteraItemDto;
+import api.dto.ReporteCitaPerdidaDto;
+import api.dto.ReporteCitasPerdidasDto;
 import api.dto.ReporteFlujoDto;
 import api.dto.ReporteFlujoItemDto;
+import api.dto.ReporteOperacionDto;
+import api.dto.ReporteOperacionItemDto;
+import api.dto.ReportePacienteAtendidoDto;
+import api.dto.ReportePacientesAtendidosDto;
 import api.dto.ReporteProduccionDto;
 import api.dto.ReporteProduccionItemDto;
 import api.entities.AccountEntry;
+import api.entities.Appointment;
 import api.entities.Categoria;
 import api.entities.Consultorio;
 import api.entities.Odontologo;
 import api.entities.Tratamiento;
 import api.entities.VistaPaciente;
 import api.repositories.AccountEntryRepository;
+import api.repositories.AppointmentRepository;
 import api.repositories.CategoriaRepository;
 import api.repositories.ConsultorioRepository;
 import api.repositories.OdontologoRepository;
@@ -36,9 +44,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Reportes financieros (Fase 1). Todos read-only: el backend agrega
- * {@code account_entries} y devuelve filas + totales ya calculados. El rango
- * por defecto es el mes en curso (lo aplica el controller cuando no se envía).
+ * Reportes financieros (Fase 1) y de operación clínica (Fase 2). Todos read-only:
+ * el backend agrega y devuelve filas + totales ya calculados. El rango por defecto
+ * es el mes en curso (lo aplica el controller cuando no se envía).
  */
 @Service
 @RequiredArgsConstructor
@@ -47,6 +55,7 @@ public class ReporteService {
     private static final BigDecimal CIEN = new BigDecimal("100");
 
     private final AccountEntryRepository accountRepository;
+    private final AppointmentRepository appointmentRepository;
     private final TratamientoRepository tratamientoRepository;
     private final CategoriaRepository categoriaRepository;
     private final OdontologoRepository odontologoRepository;
@@ -182,6 +191,116 @@ public class ReporteService {
     }
 
     // ------------------------------------------------------------------
+    //  OPERACIÓN CLÍNICA (Fase 2) · citas por consultorio / odontólogo
+    // ------------------------------------------------------------------
+
+    @Transactional(readOnly = true)
+    public ReporteOperacionDto citasPorConsultorio(LocalDate desde, LocalDate hasta) {
+        validarRango(desde, hasta);
+        Map<String, Consultorio> consultorios = indexar(consultorioRepository.findAll(), Consultorio::getCodigo);
+
+        List<Appointment> citas = appointmentRepository.findByFechaBetweenOrderByFechaAscHoraAsc(desde, hasta);
+        Map<String, List<Appointment>> grupos = citas.stream()
+                .collect(Collectors.groupingBy(
+                        a -> a.getConsultorioCodigo() == null ? "" : a.getConsultorioCodigo(),
+                        LinkedHashMap::new,
+                        Collectors.toList()));
+
+        List<ReporteOperacionItemDto> items = new ArrayList<>();
+        for (Map.Entry<String, List<Appointment>> g : grupos.entrySet()) {
+            String codigo = g.getKey().isBlank() ? null : g.getKey();
+            Consultorio c = codigo == null ? null : consultorios.get(codigo);
+            items.add(filaOperacion(codigo,
+                    c != null ? c.getNombre() : "SIN CONSULTORIO",
+                    "—",
+                    g.getValue()));
+        }
+        return armarOperacion(items, desde, hasta);
+    }
+
+    @Transactional(readOnly = true)
+    public ReporteOperacionDto citasPorOdontologo(LocalDate desde, LocalDate hasta) {
+        validarRango(desde, hasta);
+        Map<String, Odontologo> odontologos = indexar(odontologoRepository.findAll(), Odontologo::getCodigo);
+
+        List<Appointment> citas = appointmentRepository.findByFechaBetweenOrderByFechaAscHoraAsc(desde, hasta);
+        Map<String, List<Appointment>> grupos = citas.stream()
+                .collect(Collectors.groupingBy(
+                        a -> a.getOdontologoCodigo() == null ? "" : a.getOdontologoCodigo(),
+                        LinkedHashMap::new,
+                        Collectors.toList()));
+
+        List<ReporteOperacionItemDto> items = new ArrayList<>();
+        for (Map.Entry<String, List<Appointment>> g : grupos.entrySet()) {
+            String codigo = g.getKey().isBlank() ? null : g.getKey();
+            Odontologo o = codigo == null ? null : odontologos.get(codigo);
+            items.add(filaOperacion(codigo,
+                    o != null ? o.getNombre() : "SIN ODONTÓLOGO",
+                    o != null && o.getEspecialidad() != null ? o.getEspecialidad() : "—",
+                    g.getValue()));
+        }
+        return armarOperacion(items, desde, hasta);
+    }
+
+    // ------------------------------------------------------------------
+    //  OPERACIÓN CLÍNICA (Fase 2) · citas perdidas y pacientes atendidos
+    // ------------------------------------------------------------------
+
+    @Transactional(readOnly = true)
+    public ReporteCitasPerdidasDto citasPerdidas(LocalDate desde, LocalDate hasta) {
+        validarRango(desde, hasta);
+        List<Appointment> perdidas = appointmentRepository.findByFechaBetweenOrderByFechaAscHoraAsc(desde, hasta)
+                .stream()
+                .filter(a -> a.getEstado() == Appointment.Estado.NO_SHOW
+                        || a.getEstado() == Appointment.Estado.CANCELLED)
+                .toList();
+
+        List<ReporteCitaPerdidaDto> items = perdidas.stream()
+                .map(a -> new ReporteCitaPerdidaDto(
+                        a.getId(),
+                        a.getPacienteId(),
+                        a.getPacienteNombre(),
+                        a.getFecha(),
+                        a.getHora(),
+                        a.getTratamiento(),
+                        a.getConsultorio(),
+                        a.getOdontologo(),
+                        a.getEstado() == Appointment.Estado.NO_SHOW ? "NO-SHOW" : "CANCELADA"))
+                .toList();
+
+        long noShow = items.stream().filter(i -> i.estado().equals("NO-SHOW")).count();
+        long canceladas = items.size() - noShow;
+        return new ReporteCitasPerdidasDto(items, noShow, canceladas, items.size(), desde, hasta);
+    }
+
+    @Transactional(readOnly = true)
+    public ReportePacientesAtendidosDto pacientesAtendidos(LocalDate desde, LocalDate hasta) {
+        validarRango(desde, hasta);
+        Map<String, List<Appointment>> porPaciente = appointmentRepository
+                .findByFechaBetweenOrderByFechaAscHoraAsc(desde, hasta)
+                .stream()
+                .filter(a -> a.getEstado() == Appointment.Estado.DONE)
+                .collect(Collectors.groupingBy(
+                        a -> a.getPacienteId() == null ? "__SN_" + a.getPacienteNombre() : a.getPacienteId(),
+                        LinkedHashMap::new,
+                        Collectors.toList()));
+
+        List<ReportePacienteAtendidoDto> items = new ArrayList<>();
+        for (Map.Entry<String, List<Appointment>> e : porPaciente.entrySet()) {
+            List<Appointment> atenciones = e.getValue();
+            Appointment ultima = atenciones.get(atenciones.size() - 1);
+            items.add(new ReportePacienteAtendidoDto(
+                    e.getKey().startsWith("__SN_") ? null : e.getKey(),
+                    ultima.getPacienteNombre(),
+                    atenciones.size(),
+                    ultima.getFecha()));
+        }
+        items.sort(Comparator.comparing(ReportePacienteAtendidoDto::atenciones).reversed());
+        long total = items.stream().mapToLong(ReportePacienteAtendidoDto::atenciones).sum();
+        return new ReportePacientesAtendidosDto(items, items.size(), total, desde, hasta);
+    }
+
+    // ------------------------------------------------------------------
     //  HELPERS
     // ------------------------------------------------------------------
 
@@ -203,6 +322,35 @@ public class ReporteService {
 
     private ReporteProduccionItemDto fila(String codigo, String nombre, String grupo, List<AccountEntry> movs) {
         return new ReporteProduccionItemDto(codigo, nombre, grupo, movs.size(), sumar(movs), BigDecimal.ZERO);
+    }
+
+    private ReporteOperacionItemDto filaOperacion(String codigo, String nombre, String grupo, List<Appointment> citas) {
+        long programadas = citas.size();
+        long atendidas = citas.stream().filter(a -> a.getEstado() == Appointment.Estado.DONE).count();
+        long noShow = citas.stream().filter(a -> a.getEstado() == Appointment.Estado.NO_SHOW).count();
+        long canceladas = citas.stream().filter(a -> a.getEstado() == Appointment.Estado.CANCELLED).count();
+        long enProceso = programadas - atendidas - noShow - canceladas;
+        BigDecimal ocupacion = programadas == 0 ? BigDecimal.ZERO
+                : BigDecimal.valueOf(atendidas)
+                        .multiply(CIEN)
+                        .divide(BigDecimal.valueOf(programadas), 1, RoundingMode.HALF_UP);
+        return new ReporteOperacionItemDto(codigo, nombre, grupo, programadas, atendidas,
+                noShow, canceladas, enProceso, ocupacion);
+    }
+
+    private ReporteOperacionDto armarOperacion(List<ReporteOperacionItemDto> items, LocalDate desde, LocalDate hasta) {
+        items.sort(Comparator.comparing(ReporteOperacionItemDto::programadas).reversed());
+        long programadas = items.stream().mapToLong(ReporteOperacionItemDto::programadas).sum();
+        long atendidas = items.stream().mapToLong(ReporteOperacionItemDto::atendidas).sum();
+        long noShow = items.stream().mapToLong(ReporteOperacionItemDto::noShow).sum();
+        long canceladas = items.stream().mapToLong(ReporteOperacionItemDto::canceladas).sum();
+        long enProceso = items.stream().mapToLong(ReporteOperacionItemDto::enProceso).sum();
+        BigDecimal ocupacion = programadas == 0 ? BigDecimal.ZERO
+                : BigDecimal.valueOf(atendidas)
+                        .multiply(CIEN)
+                        .divide(BigDecimal.valueOf(programadas), 1, RoundingMode.HALF_UP);
+        return new ReporteOperacionDto(items, programadas, atendidas, noShow, canceladas,
+                enProceso, ocupacion, desde, hasta);
     }
 
     private ReporteProduccionDto armarProduccion(List<ReporteProduccionItemDto> items, LocalDate desde, LocalDate hasta) {
