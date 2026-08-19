@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 public record PacienteDraftDto(
         String name,
+        String cedula,
+        String sexo,
         Integer age,
         String birthday,
         String phone,

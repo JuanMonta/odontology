@@ -136,6 +136,10 @@ public class PacientesService {
     public PacienteDto add(PacienteDraftDto draft) {
         Paciente paciente = Paciente.builder()
                 .id(codigoService.nextCodigo("HC", "HC-%04d"))
+                .cedula(draft.cedula() == null || draft.cedula().isBlank() ? null : draft.cedula().trim())
+                .sexo(draft.sexo() == null || draft.sexo().isBlank()
+                        ? null
+                        : Paciente.Sexo.valueOf(draft.sexo()))
                 .nombre(draft.name())
                 .fechaNacimiento(draft.fechaNacimiento() != null
                         ? draft.fechaNacimiento()
@@ -161,6 +165,12 @@ public class PacientesService {
                 .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado: " + id));
         if (draft.name() != null) {
             paciente.setNombre(draft.name());
+        }
+        if (draft.cedula() != null) {
+            paciente.setCedula(draft.cedula().isBlank() ? null : draft.cedula().trim());
+        }
+        if (draft.sexo() != null) {
+            paciente.setSexo(draft.sexo().isBlank() ? null : Paciente.Sexo.valueOf(draft.sexo()));
         }
         if (draft.fechaNacimiento() != null) {
             paciente.setFechaNacimiento(draft.fechaNacimiento());
@@ -772,6 +782,9 @@ public class PacientesService {
         return new PacienteDto(
                 v.getId(),
                 v.getNombre(),
+                v.getCedula() == null ? "—" : v.getCedula(),
+                v.getSexo() == null ? "—" : v.getSexo().name(),
+                v.getFechaNacimiento() == null ? null : v.getFechaNacimiento().toString(),
                 v.getEdad() == null ? 0 : v.getEdad(),
                 v.getCumpleanios() == null ? "—" : v.getCumpleanios(),
                 v.getTelefono() == null ? "—" : v.getTelefono(),

@@ -66,6 +66,15 @@ export class PatientPanelComponent implements OnChanges {
       .join('');
   }
 
+  /** ISO (yyyy-MM-dd) → DD/MM/AAAA para presentación. */
+  fmtIsoFecha(iso: string | null | undefined): string {
+    if (!iso) {
+      return '—';
+    }
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+    return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
+  }
+
   hasAllergies(p: Patient): boolean {
     return p.allergies.toUpperCase() !== 'NINGUNA';
   }

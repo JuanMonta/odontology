@@ -26,6 +26,9 @@ export class PatientFormComponent implements OnInit {
   @Output() cancel = new EventEmitter<void>();
 
   name = '';
+  cedula = '';
+  sexo = '';
+  birthDate = '';
   age = 30;
   phone = '';
   email = '';
@@ -39,14 +42,16 @@ export class PatientFormComponent implements OnInit {
   ngOnInit(): void {
     if (this.patient) {
       this.name = this.patient.name;
-      this.age = this.patient.age;
+      this.cedula = this.patient.cedula === '—' ? '' : this.patient.cedula;
+      this.sexo = this.patient.sexo === '—' ? '' : this.patient.sexo;
+      this.birthDate = this.patient.birthDate;
+      this.recalcularDesdeNacimiento();
       this.phone = this.patient.phone;
       this.email = this.patient.email;
       this.address = this.patient.address;
       this.allergies = this.patient.allergies;
       this.treatment = this.patient.treatment;
       this.status = this.patient.status;
-      this.birthday = this.patient.birthday;
     } else {
       this.restoreDraft();
     }
@@ -58,8 +63,12 @@ export class PatientFormComponent implements OnInit {
       return;
     }
     this.error = false;
+    this.recalcularDesdeNacimiento();
     const draft: PatientDraft = {
       name: this.name.trim().toUpperCase(),
+      cedula: this.cedula.trim(),
+      sexo: this.sexo,
+      birthDate: this.birthDate,
       age: this.age,
       phone: this.phone.trim(),
       email: this.email.trim(),
@@ -67,8 +76,9 @@ export class PatientFormComponent implements OnInit {
       allergies: this.allergies.trim().toUpperCase() || 'NINGUNA',
       treatment: this.treatment.trim().toUpperCase(),
       status: this.status,
-      birthday: this.birthday.trim(),
-      lastVisit: this.patient ? this.patient.lastVisit : this.todayLabel()
+      birthday: this.birthday,
+      lastVisit: this.patient ? this.patient.lastVisit : this.todayLabel(),
+      fechaNacimiento: this.birthDate || null
     };
     if (!this.patient) {
       clearPatientFormDraft();
@@ -86,6 +96,40 @@ export class PatientFormComponent implements OnInit {
     this.persistDraft();
   }
 
+  setSexo(sexo: string): void {
+    this.sexo = sexo;
+    this.persistDraft();
+  }
+
+  onBirthDateChange(): void {
+    this.recalcularDesdeNacimiento();
+    this.persistDraft();
+  }
+
+  /** Deriva edad (años cumplidos) y cumpleaños (DD/MM) desde birthDate ISO. */
+  private recalcularDesdeNacimiento(): void {
+    if (!this.birthDate) {
+      this.age = 0;
+      this.birthday = '';
+      return;
+    }
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(this.birthDate);
+    if (!m) {
+      this.age = 0;
+      this.birthday = '';
+      return;
+    }
+    const nacimiento = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const aniversario = new Date(hoy.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
+    if (hoy < aniversario) {
+      edad--;
+    }
+    this.age = Math.max(0, edad);
+    this.birthday = `${m[3]}/${m[2]}`;
+  }
+
   persistDraft(): void {
     if (this.patient) {
       return;
@@ -95,6 +139,9 @@ export class PatientFormComponent implements OnInit {
         borradorKey(PATIENT_FORM_DRAFT_KEY),
         JSON.stringify({
           name: this.name,
+          cedula: this.cedula,
+          sexo: this.sexo,
+          birthDate: this.birthDate,
           age: this.age,
           phone: this.phone,
           email: this.email,
@@ -121,6 +168,9 @@ export class PatientFormComponent implements OnInit {
         return;
       }
       this.name = typeof saved.name === 'string' ? saved.name : this.name;
+      this.cedula = typeof saved.cedula === 'string' ? saved.cedula : this.cedula;
+      this.sexo = typeof saved.sexo === 'string' ? saved.sexo : this.sexo;
+      this.birthDate = typeof saved.birthDate === 'string' ? saved.birthDate : this.birthDate;
       this.age = Number.isFinite(saved.age) ? saved.age : this.age;
       this.phone = typeof saved.phone === 'string' ? saved.phone : this.phone;
       this.email = typeof saved.email === 'string' ? saved.email : this.email;

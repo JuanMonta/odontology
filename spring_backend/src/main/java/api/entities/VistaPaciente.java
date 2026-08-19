@@ -29,6 +29,13 @@ public class VistaPaciente {
     @Column(name = "id")
     private String id;
 
+    @Column(name = "cedula")
+    private String cedula;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sexo")
+    private Paciente.Sexo sexo;
+
     @Column(name = "nombre")
     private String nombre;
 
