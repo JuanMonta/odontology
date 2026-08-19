@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, Subject, timer } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 import {
   Consultorio,
   ConsultorioSaveEvent,
@@ -25,7 +25,7 @@ const STATE_RANK: Record<StaffShiftState, number> = { turno: 0, descanso: 1, fue
   styleUrls: ['./consultorios-page.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ConsultoriosPageComponent implements OnInit {
+export class ConsultoriosPageComponent implements OnInit, OnDestroy {
   consultorios$: Observable<Consultorio[]>;
   selected$: Observable<Consultorio | null>;
 
@@ -36,6 +36,7 @@ export class ConsultoriosPageComponent implements OnInit {
   private readonly status$ = new BehaviorSubject<StatusFilter>('all');
   private readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly now$ = timer(0, 30_000).pipe(map(() => new Date()));
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private service: ConsultoriosHttpService,
@@ -72,11 +73,16 @@ export class ConsultoriosPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe(params => {
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       if (params.get('nuevo')) {
         this.startCreate();
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onSearch(q: string): void {
