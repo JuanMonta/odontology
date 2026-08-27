@@ -7,27 +7,34 @@
 export interface HclRegionExamen {
   region: number;
   descripcion: string;
+  marcado: boolean;
 }
 
-export interface HclCpoItem {
-  sextante: string;
-  c: number | null;
-  p: number | null;
-  o: number | null;
-}
-
-export interface HclCeoItem {
-  sextante: string;
-  c: number | null;
-  e: number | null;
-  o: number | null;
+/**
+ * Índices CPO-ceo (Sección 8 del Formulario 033).
+ * El formulario real solo tiene 2 filas:
+ *   D (permanentes): C, P, O, Total
+ *   d (deciduos):    c, e, o, Total
+ */
+export interface HclIndicesCpo {
+  c_perma: number | null;
+  p_perma: number | null;
+  o_perma: number | null;
+  total_perma: number | null;
+  c_deci: number | null;
+  e_deci: number | null;
+  o_deci: number | null;
+  total_deci: number | null;
 }
 
 export interface HclHigieneSextante {
   sextante: string;
-  placa: number | null; // 0-3
-  calculo: number | null; // 0-3
-  gingivitis: number | null; // 0-1 (ausencia/presencia de sangrado)
+  d1_evaluado: boolean;
+  d2_evaluado: boolean;
+  d3_evaluado: boolean;
+  placa: number | null;
+  calculo: number | null;
+  gingivitis: number | null;
 }
 
 export interface HojaResumen {
@@ -35,11 +42,6 @@ export interface HojaResumen {
   fechaApertura: string | null;
   fechaControl: string | null;
   actualizadaEn: string | null;
-}
-
-export interface HclIndicesCpo {
-  permanente: HclCpoItem[];
-  deciduo: HclCeoItem[];
 }
 
 export interface HclDiagnosticoCie {
@@ -189,6 +191,15 @@ export const ANTECEDENTES_033 = [
 
 export const DIENTES_IHOS = [16, 11, 26, 36, 31, 46] as const;
 
+export const DIENTES_POR_SEXTANTE: ReadonlyArray<readonly [number, number, number]> = [
+  [16, 17, 55],
+  [11, 21, 51],
+  [26, 27, 65],
+  [36, 37, 75],
+  [31, 41, 71],
+  [46, 47, 85],
+] as const;
+
 export function crearHclVacia(pacienteId: string, hoja = 1): Hcl {
   return {
     pacienteId,
@@ -214,7 +225,7 @@ export function crearHclVacia(pacienteId: string, hoja = 1): Hcl {
     frecuenciaCardiaca: null,
     temperatura: null,
     frecuenciaRespiratoria: null,
-    examenRegiones: REGIONES_ESTOMATOGNATICAS.map(r => ({ region: r.region, descripcion: '' })),
+    examenRegiones: REGIONES_ESTOMATOGNATICAS.map(r => ({ region: r.region, descripcion: '', marcado: false })),
     higienePlaca: null,
     higieneCalculo: null,
     gingivitis: null,
@@ -222,10 +233,10 @@ export function crearHclVacia(pacienteId: string, hoja = 1): Hcl {
     fluorosis: null,
     enfermedadPeriodontal: null,
     indicesCpo: {
-      permanente: SEXTO_SECTANTES.map(s => ({ sextante: s, c: null, p: null, o: null })),
-      deciduo: SEXTO_SECTANTES.map(s => ({ sextante: s, c: null, e: null, o: null }))
+      c_perma: null, p_perma: null, o_perma: null, total_perma: null,
+      c_deci: null, e_deci: null, o_deci: null, total_deci: null
     },
-    higieneSextantes: SEXTO_SECTANTES.map(s => ({ sextante: s, placa: null, calculo: null, gingivitis: null })),
+    higieneSextantes: SEXTO_SECTANTES.map(s => ({ sextante: s, d1_evaluado: false, d2_evaluado: false, d3_evaluado: false, placa: null, calculo: null, gingivitis: null })),
     planBiometria: false,
     planRayosX: false,
     planQuimicaSanguinea: false,
@@ -266,16 +277,16 @@ export function hclCompleta(pacienteId: string, hc: Partial<Hcl> | null): Hcl {
     examenRegiones: (hc.examenRegiones && hc.examenRegiones.length
       ? hc.examenRegiones
       : base.examenRegiones
-    ).map(r => ({ region: r.region, descripcion: r.descripcion ?? '' })),
+    ).map(r => ({ region: r.region, descripcion: r.descripcion ?? '', marcado: r.marcado ?? false })),
     indicesCpo: {
-      permanente: (hc.indicesCpo?.permanente?.length
-        ? hc.indicesCpo.permanente
-        : base.indicesCpo.permanente
-      ).map(i => ({ sextante: i.sextante, c: i.c ?? null, p: i.p ?? null, o: i.o ?? null })),
-      deciduo: (hc.indicesCpo?.deciduo?.length
-        ? hc.indicesCpo.deciduo
-        : base.indicesCpo.deciduo
-      ).map(i => ({ sextante: i.sextante, c: i.c ?? null, e: i.e ?? null, o: i.o ?? null }))
+      c_perma: hc.indicesCpo?.c_perma ?? null,
+      p_perma: hc.indicesCpo?.p_perma ?? null,
+      o_perma: hc.indicesCpo?.o_perma ?? null,
+      total_perma: hc.indicesCpo?.total_perma ?? null,
+      c_deci: hc.indicesCpo?.c_deci ?? null,
+      e_deci: hc.indicesCpo?.e_deci ?? null,
+      o_deci: hc.indicesCpo?.o_deci ?? null,
+      total_deci: hc.indicesCpo?.total_deci ?? null,
     },
     diagnosticosCie: (hc.diagnosticosCie && hc.diagnosticosCie.length
       ? hc.diagnosticosCie
@@ -286,6 +297,9 @@ export function hclCompleta(pacienteId: string, hc: Partial<Hcl> | null): Hcl {
       : base.higieneSextantes
     ).map(h => ({
       sextante: h.sextante,
+      d1_evaluado: h.d1_evaluado ?? false,
+      d2_evaluado: h.d2_evaluado ?? false,
+      d3_evaluado: h.d3_evaluado ?? false,
       placa: h.placa ?? null,
       calculo: h.calculo ?? null,
       gingivitis: h.gingivitis ?? null

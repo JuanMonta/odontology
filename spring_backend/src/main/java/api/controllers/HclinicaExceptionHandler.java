@@ -9,11 +9,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
-/**
- * Expone el mensaje de errores de negocio en el body JSON para que el frontend
- * pueda mostrarlo: el sello del Formulario 033 y los conflictos del tablero
- * (solapamiento de horario) como 409 CONFLICT.
- */
 @RestControllerAdvice
 public class HclinicaExceptionHandler {
 

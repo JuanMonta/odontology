@@ -32,6 +32,10 @@ AGENTS.md
 
 # ---------- Tools ----------
 /database
+/tools
+
+# ---------- Tests ----------
+/test-results
 
 # ---------- Logs ----------
 **/logs/
@@ -49,6 +53,7 @@ yarn-error.log*
 !.vscode/settings.json
 *.swp
 *.swo
+/node_modules
 
 # ---------- OS ----------
 .DS_Store

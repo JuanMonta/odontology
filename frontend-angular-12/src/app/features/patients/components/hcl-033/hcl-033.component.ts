@@ -1,15 +1,14 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subscription, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Patient, Tooth } from '../../../../core/models/patient.model';
 import {
   ANTECEDENTES_033,
   DIENTES_IHOS,
+  DIENTES_POR_SEXTANTE,
   Hcl,
-  HclDiagnosticoCie,
-  HclRegionExamen,
-  HclSesion,
   HojaResumen,
+  HclSesion,
   REGIONES_ESTOMATOGNATICAS,
   SEXTO_SECTANTES,
   crearHclVacia,
@@ -17,7 +16,10 @@ import {
   hclCompleta
 } from '../../../../core/models/hcl.model';
 import { HclHttpService } from '../../services/hcl-http.service';
+import { Form033PdfService } from '../../services/form033-pdf.service';
 import { PROCEDIMIENTOS_ODONTOLOGICOS } from '../../../../core/models/procedimientos-odontologicos';
+import { ClinicaSettings } from '../../../../core/models/clinica-settings.model';
+import { ConfiguracionHttpService } from '../../../configuracion/services/configuracion-http.service';
 
 interface Seccion033 {
   n: number;
@@ -31,7 +33,8 @@ type EstadoGuardado = 'idle' | 'ok' | 'error';
   templateUrl: './hcl-033.component.html',
   styleUrls: ['./hcl-033.component.css']
 })
-export class Hcl033Component implements OnInit, OnDestroy {
+export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
+  Math = Math;
   @Input() patient: Patient | null = null;
   @Input() teeth: Tooth[] = [];
   @Output() toothChange = new EventEmitter<Tooth[]>();
@@ -51,7 +54,7 @@ export class Hcl033Component implements OnInit, OnDestroy {
   private snapshot: Hcl | null = null;
 
   get sellada(): boolean {
-    const s1 = this.snapshot?.sesiones?.[0];
+    const s1 = this.hc?.sesiones?.[0] ?? this.snapshot?.sesiones?.[0];
     return !!s1 && this.sesionTieneDatos(s1);
   }
 
@@ -93,16 +96,33 @@ export class Hcl033Component implements OnInit, OnDestroy {
   readonly antecedentes = ANTECEDENTES_033;
   readonly sextantes = SEXTO_SECTANTES;
   readonly dientesIhos = DIENTES_IHOS;
+  readonly dientesPorSextante = DIENTES_POR_SEXTANTE;
   readonly procedimientosOdontologicos = PROCEDIMIENTOS_ODONTOLOGICOS;
+
+  settings: ClinicaSettings | null = null;
 
   private readonly sub = new Subscription();
 
   constructor(
     private readonly hclService: HclHttpService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly settingsService: ConfiguracionHttpService,
+    private readonly pdfService: Form033PdfService
   ) {}
 
   ngOnInit(): void {
+    if (this.patient) {
+      this.cargar();
+    }
+    this.sub.add(
+      this.settingsService.settings$.subscribe(s => {
+        this.settings = s;
+        this.cdr.markForCheck();
+      })
+    );
+  }
+
+  ngOnChanges(): void {
     if (this.patient) {
       this.cargar();
     }
@@ -242,9 +262,13 @@ export class Hcl033Component implements OnInit, OnDestroy {
       hc.sesiones.some(s => !!(s.fecha || s.diagnosticos || s.procedimientos || s.prescripciones || s.proximaCita || s.codigo)) ||
       (hc.examenRegiones ?? []).some(r => !!r.descripcion) ||
       (hc.diagnosticosCie ?? []).some(d => !!d.codigo) ||
-      (hc.higieneSextantes ?? []).some(h => h.placa !== null || h.calculo !== null || h.gingivitis !== null) ||
-      (hc.indicesCpo?.permanente ?? []).some(i => i.c !== null || i.p !== null || i.o !== null) ||
-      (hc.indicesCpo?.deciduo ?? []).some(i => i.c !== null || i.e !== null || i.o !== null)
+      (hc.higieneSextantes ?? []).some(h => h.d1_evaluado || h.d2_evaluado || h.d3_evaluado || h.placa !== null || h.calculo !== null || h.gingivitis !== null) ||
+      (hc.indicesCpo?.c_perma !== null && hc.indicesCpo?.c_perma !== undefined) ||
+      (hc.indicesCpo?.p_perma !== null && hc.indicesCpo?.p_perma !== undefined) ||
+      (hc.indicesCpo?.o_perma !== null && hc.indicesCpo?.o_perma !== undefined) ||
+      (hc.indicesCpo?.c_deci !== null && hc.indicesCpo?.c_deci !== undefined) ||
+      (hc.indicesCpo?.e_deci !== null && hc.indicesCpo?.e_deci !== undefined) ||
+      (hc.indicesCpo?.o_deci !== null && hc.indicesCpo?.o_deci !== undefined)
     );
   }
 
@@ -297,19 +321,23 @@ export class Hcl033Component implements OnInit, OnDestroy {
     return this.antecedentes.some(a => a.key !== 'otroAntecedente' && this.antVal(a.key));
   }
 
-  ihosPromedios(): { placa: string; calculo: string; gingivitis: string } {
-    const prom = (vals: (number | null)[]): string => {
-      const n = vals.filter((v): v is number => v !== null && v !== undefined);
-      if (!n.length) {
-        return '—';
-      }
-      return (n.reduce((s, v) => s + v, 0) / n.length).toFixed(1);
+  ihosTotales(): { placa: string; calculo: string; gingivitis: string } {
+    const sumPlaca = (): string => {
+      let t = 0;
+      for (const h of this.hc.higieneSextantes) { if (h.placa != null && h.placa >= 0 && h.placa <= 3) t += h.placa; }
+      return String(t);
     };
-    return {
-      placa: prom(this.hc.higieneSextantes.map(h => h.placa)),
-      calculo: prom(this.hc.higieneSextantes.map(h => h.calculo)),
-      gingivitis: prom(this.hc.higieneSextantes.map(h => h.gingivitis))
+    const sumCalculo = (): string => {
+      let t = 0;
+      for (const h of this.hc.higieneSextantes) { if (h.calculo != null && h.calculo >= 0 && h.calculo <= 3) t += h.calculo; }
+      return String(t);
     };
+    const sumGing = (): string => {
+      let t = 0;
+      for (const h of this.hc.higieneSextantes) { if (h.gingivitis === 0 || h.gingivitis === 1) t += h.gingivitis; }
+      return String(t);
+    };
+    return { placa: sumPlaca(), calculo: sumCalculo(), gingivitis: sumGing() };
   }
 
   grupo(): string {
@@ -325,18 +353,60 @@ export class Hcl033Component implements OnInit, OnDestroy {
     return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
   }
 
-  /** Totales por columna del índice CPO-ceo. */
-  cpoTotales(): { c: number; p: number; o: number; ce: number; ee: number; oe: number } {
-    const suma = (arr: (number | null)[]): number => arr.reduce<number>((s, v) => s + (v ?? 0), 0);
-    const perm = this.hc.indicesCpo?.permanente ?? [];
-    const dec = this.hc.indicesCpo?.deciduo ?? [];
+  /** Totales del índice CPO-ceo (2 filas: D y d). */
+  cpoTotales(): { perma: number; deci: number } {
+    const cpo = this.hc.indicesCpo;
     return {
-      c: suma(perm.map(i => i.c)),
-      p: suma(perm.map(i => i.p)),
-      o: suma(perm.map(i => i.o)),
-      ce: suma(dec.map(i => i.c)),
-      ee: suma(dec.map(i => i.e)),
-      oe: suma(dec.map(i => i.o))
+      perma: (cpo?.c_perma ?? 0) + (cpo?.p_perma ?? 0) + (cpo?.o_perma ?? 0),
+      deci: (cpo?.c_deci ?? 0) + (cpo?.e_deci ?? 0) + (cpo?.o_deci ?? 0)
     };
+  }
+
+  // ============ Impresión del Formulario 033 (imagen + superposición) ============
+
+  imprimir(): void {
+    if (!this.patient) { return; }
+    this.mensaje = 'GENERANDO PDF…';
+    this.cdr.markForCheck();
+    this.pdfService.generate(this.hc, this.patient, this.settings, this.teeth).then(pdfBytes => {
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      this.mensaje = 'PDF GENERADO';
+      this.estado = 'ok';
+      this.cdr.markForCheck();
+    }).catch(err => {
+      console.error('Error generando PDF:', err);
+      this.mensaje = 'ERROR AL GENERAR PDF';
+      this.estado = 'error';
+      this.cdr.markForCheck();
+    });
+  }
+
+  hoyPrint(): string {
+    const d = new Date();
+    const meses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+    return `${String(d.getDate()).padStart(2, '0')} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  /** Grupo etario según la edad del paciente (para la fila de checkboxes del Form 033). */
+  ageGroup(): string {
+    const age = this.patient?.age ?? 0;
+    if (age < 1) { return 'menor1'; }
+    if (age <= 4) { return '1a4'; }
+    if (age <= 9) { return '5a9'; }
+    if (age <= 14) { return '10a14'; }
+    if (age <= 19) { return '15a19'; }
+    return 'mayor20';
+  }
+
+  /** Nombre y apellido separados para el encabezado del Form 033. */
+  nombreSplit(): { nombre: string; apellido: string } {
+    const full = this.patient?.name?.trim() ?? '';
+    if (!full) { return { nombre: '—', apellido: '—' }; }
+    const parts = full.split(/\s+/);
+    if (parts.length === 1) { return { nombre: parts[0], apellido: '' }; }
+    return { nombre: parts[0], apellido: parts.slice(1).join(' ') };
   }
 }

@@ -342,7 +342,7 @@ public class PacientesService {
                 List.of(),
                 null, null, null, null, null,
                 null,
-                new HclDto.IndicesCpoDto(List.of(), List.of()),
+                new HclDto.IndicesCpoDto(null, null, null, null, null, null, null, null),
                 List.of(),
                 false, false, false, false,
                 null, null, null,

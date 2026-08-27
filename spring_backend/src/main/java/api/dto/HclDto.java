@@ -1,5 +1,6 @@
 package api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -60,24 +61,28 @@ public record HclDto(
         String actualizadaEn
 ) {
 
-    /** 5 · Región del sistema estomatognático examinada con su descripción. */
-    public record RegionExamenDto(int region, String descripcion) {
+    /** 5 · Región del sistema estomatognático examinada: casilla marcada + descripción. */
+    public record RegionExamenDto(
+            int region,
+            String descripcion,
+            @JsonProperty(defaultValue = "false") Boolean marcado
+    ) {
+        public RegionExamenDto { if (marcado == null) marcado = false; }
     }
 
-    /** 8 · Índice CPO (permanentes) por sextante: C = caries, P = perdido, O = obturado. */
-    public record CpoItemDto(String sextante, Integer c, Integer p, Integer o) {
+    /** 8 · Índices CPO-ceo (Formulario 033): 2 filas × 4 columnas. */
+    public record IndicesCpoDto(
+            Integer cPerma, Integer pPerma, Integer oPerma, Integer totalPerma,
+            Integer cDeci, Integer eDeci, Integer oDeci, Integer totalDeci
+    ) {
     }
 
-    /** 8 · Índice ceo (deciduos) por sextante: c = caries, e = extraído, o = obturado. */
-    public record CeoItemDto(String sextante, Integer c, Integer e, Integer o) {
-    }
-
-    /** 8 · Pares de listas: permanente (CPO) y deciduo (ceo). */
-    public record IndicesCpoDto(List<CpoItemDto> permanente, List<CeoItemDto> deciduo) {
-    }
-
-    /** 7 · Indicadores de higiene oral simplificada por sextante (IHOS). */
-    public record HigieneSextanteDto(String sextante, Integer placa, Integer calculo, Integer gingivitis) {
+    /** 7 · Indicadores de higiene oral simplificada por sextante (IHOS) + piezas dentales. */
+    public record HigieneSextanteDto(
+            String sextante,
+            boolean d1Evaluado, boolean d2Evaluado, boolean d3Evaluado,
+            Integer placa, Integer calculo, Integer gingivitis
+    ) {
     }
 
     /** Encabezado: resumen de cada hoja (continuación) de la misma historia clínica. */
