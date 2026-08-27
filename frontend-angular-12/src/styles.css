@@ -285,3 +285,60 @@ p {
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Impresión: aislar el Formulario 033 (expediente) del chrome de la app --- */
+@media print {
+  body {
+    background: #fff !important;
+  }
+
+  .drawer,
+  .backdrop,
+  .topbar,
+  .toast-stack,
+  .page-head,
+  .directory,
+  .panel-head,
+  .panel-tabs {
+    display: none !important;
+  }
+
+  .page,
+  .page-body,
+  .detail,
+  .panel,
+  .panel-scroll,
+  .tab-pane,
+  .hc,
+  .hc-body {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+    gap: 0 !important;
+    color: #000 !important;
+  }
+
+  .print-view {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-view .f33-page {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+}

@@ -173,13 +173,22 @@
     <section class="sec" *ngIf="seccion === 5">
       <span class="sec-num">5</span>
       <h3 class="sec-title">EXAMEN DEL SISTEMA ESTOMATOGNÁTICO <span *ngIf="sellada" class="sec-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>SELLADA</span></h3>
-      <p class="sec-hint">DESCRIBIR ABAJO LA PATOLOGÍA DE LA REGIÓN AFECTADA ANOTANDO EL NÚMERO</p>
+      <p class="sec-hint">MARCAR CON X LA REGIÓN CON PATOLOGÍA · DESCRIBIR LA PATOLOGÍA OBSERVADA</p>
       <fieldset class="sec-fields" [disabled]="sellada">
         <div class="region-list">
           <div class="region-row" *ngFor="let r of regiones; let i = index">
+            <button class="region-chk"
+              [class.is-active]="hc.examenRegiones[i].marcado"
+              type="button"
+              [attr.aria-pressed]="hc.examenRegiones[i].marcado"
+              (click)="hc.examenRegiones[i].marcado = !hc.examenRegiones[i].marcado">
+              <span class="region-chk-box" aria-hidden="true">{{ hc.examenRegiones[i].marcado ? '×' : '' }}</span>
+            </button>
             <span class="region-idx">{{ r.region }}</span>
             <span class="region-lbl">{{ r.label }}</span>
-            <input class="fld-input" type="text" [(ngModel)]="hc.examenRegiones[i].descripcion" placeholder="PATOLOGÍA OBSERVADA…" autocomplete="off" />
+            <input class="fld-input" type="text" [(ngModel)]="hc.examenRegiones[i].descripcion"
+              [disabled]="!hc.examenRegiones[i].marcado"
+              placeholder="PATOLOGÍA OBSERVADA…" autocomplete="off" />
           </div>
         </div>
       </fieldset>
@@ -201,12 +210,12 @@
 
         <div class="sec-block">
           <span class="sec-block-t">HIGIENE ORAL SIMPLIFICADA</span>
-          <span class="sec-block-s">SEXTANTES: 16·17 · 11·21 · 26·27 / 36·37 · 31·41 · 46·47</span>
+          <span class="sec-block-s">SEXTANTES: 16·17·55 · 11·21·51 · 26·27·65 / 36·37·75 · 31·41·71 · 46·47·85</span>
           <div class="table-wrap">
             <table class="idx ihos">
               <thead>
                 <tr>
-                  <th scope="col">SEXTANTE</th>
+                  <th scope="col" colspan="3">PIEZAS DENTALES</th>
                   <th scope="col">PLACA<br /><span class="idx-sub">0-1-2-3</span></th>
                   <th scope="col">CÁLCULO<br /><span class="idx-sub">0-1-2-3</span></th>
                   <th scope="col">GINGIVITIS<br /><span class="idx-sub">0-1</span></th>
@@ -214,7 +223,9 @@
               </thead>
               <tbody>
                 <tr *ngFor="let h of hc.higieneSextantes; let i = index">
-                  <th scope="row" class="idx-sext">{{ h.sextante }}</th>
+                  <td class="ihos-tooth"><label><input type="checkbox" [(ngModel)]="hc.higieneSextantes[i].d1_evaluado" [attr.aria-label]="'Pieza ' + dientesPorSextante[i][0] + ' evaluada'" /> {{ dientesPorSextante[i][0] }}</label></td>
+                  <td class="ihos-tooth"><label><input type="checkbox" [(ngModel)]="hc.higieneSextantes[i].d2_evaluado" [attr.aria-label]="'Pieza ' + dientesPorSextante[i][1] + ' evaluada'" /> {{ dientesPorSextante[i][1] }}</label></td>
+                  <td class="ihos-tooth"><label><input type="checkbox" [(ngModel)]="hc.higieneSextantes[i].d3_evaluado" [attr.aria-label]="'Pieza ' + dientesPorSextante[i][2] + ' evaluada'" /> {{ dientesPorSextante[i][2] }}</label></td>
                   <td>
                     <select class="fld-select fld-select--mini" [(ngModel)]="hc.higieneSextantes[i].placa" [attr.aria-label]="'Placa sextante ' + h.sextante">
                       <option [ngValue]="null">—</option>
@@ -244,10 +255,10 @@
               </tbody>
               <tfoot>
                 <tr>
-                  <th scope="row" class="idx-sext">PROMEDIO</th>
-                  <td>{{ ihosPromedios().placa }}</td>
-                  <td>{{ ihosPromedios().calculo }}</td>
-                  <td>{{ ihosPromedios().gingivitis }}</td>
+                  <th scope="row" class="idx-sext" colspan="3">TOTALES</th>
+                  <td>{{ ihosTotales().placa }}</td>
+                  <td>{{ ihosTotales().calculo }}</td>
+                  <td>{{ ihosTotales().gingivitis }}</td>
                 </tr>
               </tfoot>
             </table>
@@ -293,42 +304,29 @@
           <table class="idx">
             <thead>
               <tr>
-                <th scope="col">SEXTANTE</th>
-                <th scope="col" colspan="3">CPO (PERMANENTES)</th>
-                <th scope="col" colspan="3">ceo (DECIDUOS)</th>
-              </tr>
-              <tr>
                 <th scope="col"></th>
                 <th scope="col">C</th>
                 <th scope="col">P</th>
                 <th scope="col">O</th>
-                <th scope="col">c</th>
-                <th scope="col">e</th>
-                <th scope="col">o</th>
+                <th scope="col">TOTAL</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let s of sextantes; let i = index">
-                <th scope="row" class="idx-sext">{{ s }}</th>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.permanente[i].c" [attr.aria-label]="'Caries sextante ' + s" /></td>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.permanente[i].p" [attr.aria-label]="'Perdido sextante ' + s" /></td>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.permanente[i].o" [attr.aria-label]="'Obturado sextante ' + s" /></td>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.deciduo[i].c" [attr.aria-label]="'Carie deciduo sextante ' + s" /></td>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.deciduo[i].e" [attr.aria-label]="'Extraído sextante ' + s" /></td>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="9" [(ngModel)]="hc.indicesCpo.deciduo[i].o" [attr.aria-label]="'Obturado deciduo sextante ' + s" /></td>
+              <tr>
+                <th scope="row" class="idx-sext">D</th>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.c_perma" aria-label="Caries permanentes" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.p_perma" aria-label="Perdidos permanentes" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.o_perma" aria-label="Obturados permanentes" /></td>
+                <td class="cpo-total-cell">{{ cpoTotales().perma }}</td>
+              </tr>
+              <tr>
+                <th scope="row" class="idx-sext">d</th>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.c_deci" aria-label="Caries deciduos" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.e_deci" aria-label="Extraídos deciduos" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.o_deci" aria-label="Obturados deciduos" /></td>
+                <td class="cpo-total-cell">{{ cpoTotales().deci }}</td>
               </tr>
             </tbody>
-            <tfoot>
-              <tr>
-                <th scope="row" class="idx-sext">TOTALES</th>
-                <td>{{ cpoTotales().c }}</td>
-                <td>{{ cpoTotales().p }}</td>
-                <td>{{ cpoTotales().o }}</td>
-                <td>{{ cpoTotales().ce }}</td>
-                <td>{{ cpoTotales().ee }}</td>
-                <td>{{ cpoTotales().oe }}</td>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </fieldset>
@@ -364,20 +362,6 @@
         <span class="fld-label">PLAN EDUCACIONAL</span>
         <textarea class="fld-input fld-textarea" rows="3" [(ngModel)]="hc.planEducacional" placeholder="TÉCNICA DE CEPILLADO, DIETA, CONTROL DE PLACA…"></textarea>
       </label>
-      <div class="grid-3">
-        <label class="fld">
-          <span class="fld-label">FECHA DE APERTURA</span>
-          <input class="fld-input" type="date" [(ngModel)]="hc.fechaApertura" [readonly]="sellada" autocomplete="off" [attr.aria-readonly]="sellada" />
-        </label>
-        <label class="fld">
-          <span class="fld-label">FECHA DE CONTROL</span>
-          <input class="fld-input" type="date" [(ngModel)]="hc.fechaControl" autocomplete="off" />
-        </label>
-        <label class="fld">
-          <span class="fld-label">NÚMERO DE HOJA</span>
-          <input class="fld-input" type="text" [value]="hc.hoja" readonly aria-readonly="true" title="Se asigna automáticamente al abrir una nueva hoja" />
-        </label>
-      </div>
     </section>
 
     <!-- 11 · DIAGNÓSTICO CIE -->
@@ -404,16 +388,30 @@
       </div>
       <div class="grid-3">
         <label class="fld">
+          <span class="fld-label">FECHA DE APERTURA</span>
+          <input class="fld-input" type="date" [(ngModel)]="hc.fechaApertura" [readonly]="sellada" autocomplete="off" [attr.aria-readonly]="sellada" />
+        </label>
+        <label class="fld">
+          <span class="fld-label">FECHA DE CONTROL</span>
+          <input class="fld-input" type="date" [(ngModel)]="hc.fechaControl" autocomplete="off" />
+        </label>
+        <label class="fld">
           <span class="fld-label">PROFESIONAL</span>
           <input class="fld-input" type="text" [(ngModel)]="hc.profesionalNombre" placeholder="NOMBRE DEL ODONTÓLOGO" autocomplete="off" />
         </label>
+      </div>
+      <div class="grid-3">
         <label class="fld">
-          <span class="fld-label">FECHA</span>
-          <input class="fld-input" type="date" [(ngModel)]="hc.profesionalFecha" autocomplete="off" />
+          <span class="fld-label">CÓDIGO</span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalFecha" placeholder="CÓDIGO MSP" autocomplete="off" />
         </label>
         <label class="fld">
           <span class="fld-label">FIRMA</span>
           <input class="fld-input" type="text" [(ngModel)]="hc.profesionalFirma" placeholder="FIRMA / RÚBRICA" autocomplete="off" />
+        </label>
+        <label class="fld">
+          <span class="fld-label">NÚMERO DE HOJA</span>
+          <input class="fld-input" type="text" [value]="hc.hoja" readonly aria-readonly="true" title="Se asigna automáticamente al abrir una nueva hoja" />
         </label>
       </div>
     </section>
@@ -469,16 +467,26 @@
       </datalist>
     </section>
 
-    <!-- Pie: guardar -->
+    <!-- Pie: imprimir + guardar -->
     <footer class="hc-foot">
       <span class="hc-status" [class.is-ok]="estado === 'ok'" [class.is-err]="estado === 'error'" role="status">
         <span class="hc-lamp" aria-hidden="true"></span>
         {{ mensaje || (hc.actualizadaEn ? 'ÚLTIMA ACTUALIZACIÓN ' + hc.actualizadaEn : 'SIN GUARDAR') }}
       </span>
-      <button class="btn-save" type="button" [disabled]="guardando" (click)="guardar()">
-        <span class="btn-save-lamp" aria-hidden="true"></span>
-        {{ guardando ? 'GUARDANDO…' : 'GUARDAR HISTORIA CLÍNICA' }}
-      </button>
+      <div class="hc-foot-actions">
+        <button class="btn-print" type="button" (click)="imprimir()">
+          <svg class="btn-print-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 5.5V2h8v3.5"></path>
+            <path d="M4 11H2.5v-4A1.5 1.5 0 0 1 4 5.5h8a1.5 1.5 0 0 1 1.5 1.5v4H12"></path>
+            <rect x="4" y="10.5" width="8" height="3.5" rx="0.8"></rect>
+          </svg>
+          IMPRIMIR
+        </button>
+        <button class="btn-save" type="button" [disabled]="guardando" (click)="guardar()">
+          <span class="btn-save-lamp" aria-hidden="true"></span>
+          {{ guardando ? 'GUARDANDO…' : 'GUARDAR HISTORIA CLÍNICA' }}
+        </button>
+      </div>
     </footer>
 
   </div>
@@ -489,4 +497,136 @@
       <span>CARGANDO HISTORIA CLÍNICA…</span>
     </div>
   </ng-template>
+
+  <!-- ====================================================================
+       Vista de impresión: Formulario 033 oficial como imagen + datos superpuestos
+       Visible solo en @media print.
+       ==================================================================== -->
+  <div class="print-view" *ngIf="patient">
+
+    <!-- ═══ PÁGINA 1 ═══ -->
+    <div class="f33-page f33-page--1">
+      <!-- Encabezado (fila verde) -->
+      <div class="f33-field f33-f establishment">{{ settings?.nombre || hc.establecimiento || '' }}</div>
+      <div class="f33-field f33-f nombre">{{ nombreSplit().nombre }}</div>
+      <div class="f33-field f33-f apellido">{{ nombreSplit().apellido }}</div>
+      <div class="f33-field f33-f sexo">{{ hc.sexo || patient.sexo || '' }}</div>
+      <div class="f33-field f33-f edad">{{ patient.age }}</div>
+      <div class="f33-field f33-f nhc">{{ patient.id }}</div>
+
+      <!-- Grupo etario (solo el checkbox correcto) -->
+      <div class="f33-field f33-f age-check" *ngIf="ageGroup() === 'menor1'">X</div>
+      <div class="f33-field f33-f age-check" *ngIf="ageGroup() === '1a4'" style="left:21%">X</div>
+      <div class="f33-field f33-f age-check" *ngIf="ageGroup() === '5a9'" style="left:30%">X</div>
+      <div class="f33-field f33-f age-check" *ngIf="ageGroup() === '10a14'" style="left:42%">X</div>
+      <div class="f33-field f33-f age-check" *ngIf="ageGroup() === '15a19'" style="left:55%">X</div>
+      <div class="f33-field f33-f age-check" *ngIf="ageGroup() === 'mayor20'" style="left:67%">X</div>
+
+      <!-- Sección 1 · Motivo de consulta -->
+      <div class="f33-field f33-f s1-text">{{ hc.motivoConsulta || '' }}</div>
+
+      <!-- Sección 2 · Problema actual -->
+      <div class="f33-field f33-f s2-text">{{ hc.problemaActual || '' }}</div>
+
+      <!-- Sección 3 · Antecedentes (checkboxes) -->
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('alergiaAntibiotico')" style="left:13%">X</div>
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('alergiaAnestesia')" style="left:21%">X</div>
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('hemorragias')" style="left:29%">X</div>
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('vihSida')" style="left:37%">X</div>
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('tuberculosis')" style="left:45%">X</div>
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('asma')" style="left:52%">X</div>
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('diabetes')" style="left:58%">X</div>
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('hipertension')" style="left:65%">X</div>
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('enfCardiaca')" style="left:72%">X</div>
+      <div class="f33-field f33-f ant-check" *ngIf="antVal('otroAntecedente')" style="left:88%">X</div>
+      <div class="f33-field f33-f ant-text" *ngIf="hc.otroAntecedenteTexto">{{ hc.otroAntecedenteTexto }}</div>
+
+      <!-- Sección 4 · Signos vitales -->
+      <div class="f33-field f33-f sv-pa">{{ hc.presionArterial || '' }}</div>
+      <div class="f33-field f33-f sv-fc">{{ hc.frecuenciaCardiaca ?? '' }}</div>
+      <div class="f33-field f33-f sv-temp">{{ hc.temperatura || '' }}</div>
+      <div class="f33-field f33-f sv-fr">{{ hc.frecuenciaRespiratoria ?? '' }}</div>
+
+      <!-- Sección 5 · Examen estomatognático (12 regiones) -->
+      <ng-container *ngFor="let r of hc.examenRegiones">
+        <div class="f33-field f33-f reg-desc" [style.left]="((r.region - 1) % 4 * 22 + 13) + '%'"
+             [style.top]="(37 + Math.floor((r.region - 1) / 4) * 1.2) + '%'">
+          {{ r.descripcion }}
+        </div>
+      </ng-container>
+
+      <!-- Sección 6 · Odontograma (tabla de texto) -->
+      <div class="f33-field f33-f odonto-table" *ngIf="teeth.length">
+        <table>
+          <tr *ngFor="let t of teeth">
+            <td class="od-num">{{ t.number }}</td>
+            <td class="od-cond">
+              <ng-container *ngFor="let c of t.conditions">{{ c }} </ng-container>
+              <ng-container *ngFor="let f of t.faces">{{ f.condition }}-{{ f.face.slice(0,3).toUpperCase() }} </ng-container>
+            </td>
+            <td class="od-mov">{{ t.movilidad || '' }}</td>
+            <td class="od-rec">{{ t.recesion || '' }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Sección 7 · IHOS (solo valores) -->
+      <ng-container *ngFor="let h of hc.higieneSextantes; let i = index">
+        <div class="f33-field f33-f ihos-placa" [style.top]="(76 + i * 1.8) + '%'">{{ h.placa ?? '' }}</div>
+        <div class="f33-field f33-f ihos-calculo" [style.top]="(76 + i * 1.8) + '%'">{{ h.calculo ?? '' }}</div>
+        <div class="f33-field f33-f ihos-gingivitis" [style.top]="(76 + i * 1.8) + '%'">{{ h.gingivitis ?? '' }}</div>
+      </ng-container>
+
+      <!-- Sección 8 · CPO-ceo (valores) — 2 filas: D y d -->
+      <div class="f33-field f33-f cpo-c">{{ hc.indicesCpo?.c_perma ?? '' }}</div>
+      <div class="f33-field f33-f cpo-p">{{ hc.indicesCpo?.p_perma ?? '' }}</div>
+      <div class="f33-field f33-f cpo-o">{{ hc.indicesCpo?.o_perma ?? '' }}</div>
+      <div class="f33-field f33-f cpo-total-d">{{ cpoTotales().perma }}</div>
+      <div class="f33-field f33-f ceo-c">{{ hc.indicesCpo?.c_deci ?? '' }}</div>
+      <div class="f33-field f33-f ceo-e">{{ hc.indicesCpo?.e_deci ?? '' }}</div>
+      <div class="f33-field f33-f ceo-o">{{ hc.indicesCpo?.o_deci ?? '' }}</div>
+      <div class="f33-field f33-f cpo-total-dd">{{ cpoTotales().deci }}</div>
+    </div>
+
+    <!-- ═══ PÁGINA 2 ═══ -->
+    <div class="f33-page f33-page--2">
+      <!-- Sección 10 · Planes (checkboxes) -->
+      <div class="f33-field f33-f plan-check" *ngIf="hc.planBiometria" style="left:17%">X</div>
+      <div class="f33-field f33-f plan-check" *ngIf="hc.planQuimicaSanguinea" style="left:32%">X</div>
+      <div class="f33-field f33-f plan-check" *ngIf="hc.planRayosX" style="left:48%">X</div>
+      <div class="f33-field f33-f plan-check" *ngIf="hc.planOtros" style="left:62%">X</div>
+      <div class="f33-field f33-f plan-text">{{ hc.planTerapeutico || hc.planEducacional || hc.planOtrosTexto || '' }}</div>
+
+      <!-- Sección 11 · Diagnóstico CIE (2 columnas × 4 filas) -->
+      <ng-container *ngFor="let d of [0,1,2,3]">
+        <div class="f33-field f33-f cie-codigo" [style.top]="(14.5 + d * 1.8) + '%'">{{ hc.diagnosticosCie?.[d]?.codigo || '' }}</div>
+        <div class="f33-field f33-f cie-pre" [style.top]="(14.5 + d * 1.8) + '%'" style="left:53%">{{ hc.diagnosticosCie?.[d]?.presuntivo ? 'X' : '' }}</div>
+        <div class="f33-field f33-f cie-def" [style.top]="(14.5 + d * 1.8) + '%'" style="left:56%">{{ hc.diagnosticosCie?.[d]?.definitivo ? 'X' : '' }}</div>
+        <div class="f33-field f33-f cie-codigo" [style.top]="(14.5 + d * 1.8) + '%'" style="left:65%">{{ hc.diagnosticosCie?.[d + 4]?.codigo || '' }}</div>
+        <div class="f33-field f33-f cie-pre" [style.top]="(14.5 + d * 1.8) + '%'" style="left:90%">{{ hc.diagnosticosCie?.[d + 4]?.presuntivo ? 'X' : '' }}</div>
+        <div class="f33-field f33-f cie-def" [style.top]="(14.5 + d * 1.8) + '%'" style="left:93%">{{ hc.diagnosticosCie?.[d + 4]?.definitivo ? 'X' : '' }}</div>
+      </ng-container>
+
+      <!-- Fila metadatos (verde) -->
+      <div class="f33-field f33-f meta-aper">{{ fmtFecha(hc.fechaApertura) || '' }}</div>
+      <div class="f33-field f33-f meta-control">{{ fmtFecha(hc.fechaControl) || '' }}</div>
+      <div class="f33-field f33-f meta-prof">{{ hc.profesionalNombre || '' }}</div>
+      <div class="f33-field f33-f meta-codigo">{{ settings?.ruc || '' }}</div>
+      <div class="f33-field f33-f meta-hoja">{{ hc.hoja }}</div>
+
+      <!-- Sección 12 · Tratamiento (9 sesiones) -->
+      <ng-container *ngFor="let s of [0,1,2,3,4,5,6,7,8]">
+        <div class="f33-field f33-f trat-fecha" [style.top]="(28 + s * 7.8) + '%'">{{ fmtFecha(hc.sesiones?.[s]?.fecha) || '' }}</div>
+        <div class="f33-field f33-f trat-dx" [style.top]="(28 + s * 7.8) + '%'">{{ hc.sesiones?.[s]?.diagnosticos || '' }}</div>
+        <div class="f33-field f33-f trat-proc" [style.top]="(28 + s * 7.8) + '%'">{{ hc.sesiones?.[s]?.procedimientos || '' }}</div>
+        <div class="f33-field f33-f trat-presc" [style.top]="(28 + s * 7.8) + '%'">{{ hc.sesiones?.[s]?.prescripciones || '' }}</div>
+        <div class="f33-field f33-f trat-codigo" [style.top]="(28 + s * 7.8) + '%'">{{ hc.sesiones?.[s]?.codigo || '' }}</div>
+      </ng-container>
+    </div>
+
+    <!-- Confidencialidad -->
+    <div class="f33-confid">
+      DOCUMENTO CONFIDENCIAL · PROTEGIDO POR LA LEY ORGÁNICA DE SALUD (ART. 63) · CONSERVAR MÍNIMO 15 AÑOS
+    </div>
+  </div>
 </div>

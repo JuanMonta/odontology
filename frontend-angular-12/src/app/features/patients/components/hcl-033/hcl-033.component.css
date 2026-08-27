@@ -641,7 +641,7 @@
 
 .region-row {
   display: grid;
-  grid-template-columns: 34px 150px minmax(0, 1fr);
+  grid-template-columns: 28px 34px 150px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
 }
@@ -666,6 +666,40 @@
   letter-spacing: 0.1em;
   color: var(--steel-300);
   text-transform: uppercase;
+}
+
+/* ============ Checkbox inline por región ============ */
+.region-chk {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--flap-black);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  color: var(--steel-300);
+  font-size: 1em;
+  line-height: 1;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.region-chk:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.region-chk.is-active {
+  border-color: var(--amber);
+  background: rgba(255, 193, 7, 0.10);
+  color: var(--amber);
+}
+
+.region-chk-box {
+  font-size: 1.1em;
+  line-height: 1;
 }
 
 /* ============ Tablas (CPO-ceo, CIE) ============ */
@@ -989,11 +1023,11 @@
   }
 
   .region-row {
-    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-columns: 28px 34px minmax(0, 1fr);
   }
 
   .region-lbl {
-    grid-column: 2;
+    grid-column: 3;
     margin-top: -6px;
   }
 
@@ -1001,4 +1035,333 @@
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+/* ============ Acciones del pie ============ */
+.hc-foot-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-print {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  font-family: var(--font-flap);
+  font-size: 0.76em;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--steel-500);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.18s var(--ease-out), border-color 0.18s var(--ease-out);
+}
+
+.btn-print:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--amber);
+}
+
+.btn-print-ico {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* ============ Vista de impresión: imagen + superposición ============ */
+.print-view {
+  display: none;
+}
+
+@media print {
+  .print-view {
+    display: block !important;
+  }
+
+  .hc-head,
+  .hc-hojas,
+  .hc-prog,
+  .hc-seal,
+  .rail,
+  .sec,
+  .hc-foot,
+  .hc-loading {
+    display: none !important;
+  }
+}
+
+/* === Página del formulario === */
+.f33-page {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 0.7067; /* 1653/2339 = A4 */
+  background-size: 100% 100%;
+  background-position: top left;
+  background-repeat: no-repeat;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  page-break-after: always;
+  overflow: hidden;
+}
+
+.f33-page--1 {
+  background-image: url('/assets/odontograma-document/odontograma-01.png');
+}
+
+.f33-page--2 {
+  background-image: url('/assets/odontograma-document/odontograma-02.png');
+}
+
+/* === Campo de datos superpuesto === */
+.f33-field {
+  position: absolute;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 7.5pt;
+  color: #000;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.f33-f {
+  font-weight: 400;
+}
+
+/* === Página 1 · Coordenadas (calibradas con grid + offset del formulario) === */
+/* Form image starts at ~5% from left edge, content area is 5%-95% */
+
+/* Encabezado — white data cells at y≈8.5% */
+.establishment { left: 13%; top: 8.5%; width: 14%; text-align: center; }
+.nombre        { left: 27%; top: 8.5%; width: 11%; text-align: center; }
+.apellido      { left: 38%; top: 8.5%; width: 12%; text-align: center; }
+.sexo          { left: 50%; top: 8.5%; width: 6%; text-align: center; }
+.edad          { left: 56%; top: 8.5%; width: 6%; text-align: center; }
+.nhc           { left: 62%; top: 8.5%; width: 31%; text-align: center; }
+
+/* Grupo etario — yellow row at y≈11% */
+.age-check {
+  left: 13%;
+  top: 11%;
+  width: 3%;
+  text-align: center;
+  font-weight: 700;
+  font-size: 8pt;
+}
+
+/* Sección 1 · Motivo — body at y≈13% */
+.s1-text {
+  left: 13%;
+  top: 13%;
+  width: 82%;
+  height: 3.5%;
+  font-size: 7pt;
+  white-space: normal;
+}
+
+/* Sección 2 · Problema — body at y≈18.5% */
+.s2-text {
+  left: 13%;
+  top: 18.5%;
+  width: 82%;
+  height: 5%;
+  font-size: 7pt;
+  white-space: normal;
+}
+
+/* Sección 3 · Antecedentes — checkboxes at y≈28% */
+.ant-check {
+  top: 28%;
+  width: 3%;
+  text-align: center;
+  font-weight: 700;
+  font-size: 8pt;
+}
+
+.ant-text {
+  left: 13%;
+  top: 29.5%;
+  width: 82%;
+  font-size: 6.5pt;
+  font-style: italic;
+}
+
+/* Sección 4 · Signos vitales — data at y≈34% */
+.sv-pa   { left: 15%; top: 34%; width: 12%; }
+.sv-fc   { left: 33%; top: 34%; width: 12%; }
+.sv-temp { left: 53%; top: 34%; width: 10%; }
+.sv-fr   { left: 70%; top: 34%; width: 12%; }
+
+/* Sección 5 · Regiones (descripción) — rows at y≈39% */
+.reg-desc {
+  width: 20%;
+  height: 1.5%;
+  font-size: 6pt;
+  white-space: normal;
+}
+
+/* Sección 6 · Odontograma — starts at y≈50% */
+.odonto-table {
+  left: 13%;
+  top: 52%;
+  width: 82%;
+  height: 21%;
+  font-size: 6pt;
+  overflow: visible;
+}
+
+/* Sección 7 · IHOS — left side at y≈76% */
+.ihos-placa     { left: 21%; width: 6%; text-align: center; }
+.ihos-calculo   { left: 27%; width: 6%; text-align: center; }
+.ihos-gingivitis { left: 33%; width: 6%; text-align: center; }
+
+/* Sección 8 · CPO-ceo — right side at y≈76% */
+.cpo-c { left: 62%; width: 5%; text-align: center; }
+.cpo-p { left: 67%; width: 5%; text-align: center; }
+.cpo-o { left: 72%; width: 5%; text-align: center; }
+.ceo-c { left: 78%; width: 5%; text-align: center; }
+.ceo-e { left: 83%; width: 5%; text-align: center; }
+.ceo-o { left: 88%; width: 5%; text-align: center; }
+.cpo-total-d  { left: 72%; width: 10%; text-align: center; top: 83%; }
+.cpo-total-dd { left: 88%; width: 10%; text-align: center; top: 83%; }
+
+.odonto-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.odonto-table td {
+  padding: 1px 3px;
+  border-bottom: 1px solid #ddd;
+  vertical-align: top;
+}
+
+.od-num  { font-weight: 700; width: 35px; text-align: center; }
+.od-cond { width: auto; }
+.od-mov  { width: 40px; text-align: center; }
+.od-rec  { width: 40px; text-align: center; }
+
+/* Sección 7 · IHOS (valores) */
+.ihos-placa,
+.ihos-calculo,
+.ihos-gingivitis {
+  width: 5%;
+  text-align: center;
+  font-size: 6.5pt;
+}
+
+.ihos-placa     { left: 27%; }
+.ihos-calculo   { left: 32%; }
+.ihos-gingivitis { left: 37%; }
+
+/* Sección 8 · CPO-ceo (valores) */
+.cpo-c, .cpo-p, .cpo-o,
+.ceo-c, .ceo-e, .ceo-o {
+  width: 4%;
+  text-align: center;
+  font-size: 6.5pt;
+}
+
+.cpo-c  { left: 82%; }
+.cpo-p  { left: 86%; }
+.cpo-o  { left: 90%; }
+.ceo-c  { left: 82%; }
+.ceo-e  { left: 86%; }
+.ceo-o  { left: 90%; }
+
+.cpo-total-d  { left: 94%; top: 78%; width: 5%; text-align: center; font-weight: 700; font-size: 7pt; }
+.cpo-total-dd { left: 94%; top: 84%; width: 5%; text-align: center; font-weight: 700; font-size: 7pt; }
+
+/* === Página 2 · Coordenadas === */
+
+/* Sección 10 · Planes (checkboxes) */
+.plan-check {
+  top: 4.5%;
+  width: 3%;
+  text-align: center;
+  font-weight: 700;
+  font-size: 8pt;
+}
+
+.plan-text {
+  left: 13%;
+  top: 7%;
+  width: 82%;
+  height: 3%;
+  font-size: 7pt;
+  white-space: normal;
+}
+
+/* Sección 11 · Diagnóstico CIE */
+.cie-codigo {
+  left: 19%;
+  width: 30%;
+  font-size: 6.5pt;
+}
+
+.cie-pre, .cie-def {
+  width: 2.5%;
+  text-align: center;
+  font-weight: 700;
+  font-size: 7pt;
+}
+
+/* Fila metadatos (verde) */
+.meta-aper   { left: 10%; top: 21%; width: 12%; font-size: 6.5pt; }
+.meta-control { left: 24%; top: 21%; width: 12%; font-size: 6.5pt; }
+.meta-prof   { left: 38%; top: 21%; width: 20%; font-size: 6.5pt; }
+.meta-codigo { left: 65%; top: 21%; width: 15%; font-size: 6.5pt; }
+.meta-hoja   { left: 90%; top: 21%; width: 8%; text-align: center; font-size: 6.5pt; }
+
+/* Sección 12 · Tratamiento */
+.trat-fecha {
+  left: 10%;
+  width: 10%;
+  font-size: 6pt;
+}
+
+.trat-dx {
+  left: 21%;
+  width: 25%;
+  height: 6%;
+  font-size: 6pt;
+  white-space: normal;
+}
+
+.trat-proc {
+  left: 47%;
+  width: 25%;
+  height: 6%;
+  font-size: 6pt;
+  white-space: normal;
+}
+
+.trat-presc {
+  left: 73%;
+  width: 16%;
+  height: 6%;
+  font-size: 6pt;
+  white-space: normal;
+}
+
+.trat-codigo {
+  left: 90%;
+  width: 10%;
+  font-size: 6pt;
+}
+
+/* === Confidencialidad === */
+.f33-confid {
+  margin-top: 8px;
+  padding: 4px 8px;
+  border: 1px solid #999;
+  font-size: 7pt;
+  text-align: center;
+  letter-spacing: 0.04em;
+  color: #333;
 }
