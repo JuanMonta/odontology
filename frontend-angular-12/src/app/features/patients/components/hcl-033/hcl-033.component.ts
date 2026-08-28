@@ -258,7 +258,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
       hc.otroAntecedenteTexto || hc.presionArterial || hc.frecuenciaCardiaca || hc.temperatura ||
       hc.frecuenciaRespiratoria || hc.enfermedadPeriodontal || hc.higienePlaca || hc.higieneCalculo ||
       hc.gingivitis || hc.malOclusion || hc.fluorosis || hc.planOtrosTexto || hc.planTerapeutico ||
-      hc.planEducacional || hc.profesionalNombre || hc.profesionalFecha || hc.profesionalFirma ||
+      hc.planEducacional || hc.profesionalNombre || hc.profesionalCodigo || hc.profesionalFirma ||
       hc.sesiones.some(s => !!(s.fecha || s.diagnosticos || s.procedimientos || s.prescripciones || s.proximaCita || s.codigo)) ||
       (hc.examenRegiones ?? []).some(r => !!r.descripcion) ||
       (hc.diagnosticosCie ?? []).some(d => !!d.codigo) ||

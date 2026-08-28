@@ -145,7 +145,7 @@ export interface Hcl {
   fechaControl: string | null;
   numeroHoja: string | null;
   profesionalNombre: string | null;
-  profesionalFecha: string | null;
+  profesionalCodigo: string | null;
   profesionalFirma: string | null;
   diagnosticosCie: HclDiagnosticoCie[];
   sesiones: HclSesion[];
@@ -248,7 +248,7 @@ export function crearHclVacia(pacienteId: string, hoja = 1): Hcl {
     fechaControl: null,
     numeroHoja: null,
     profesionalNombre: null,
-    profesionalFecha: null,
+    profesionalCodigo: null,
     profesionalFirma: null,
     diagnosticosCie: [1, 2, 3, 4].map(() => ({ codigo: '', presuntivo: '', definitivo: '' })),
     sesiones: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => ({

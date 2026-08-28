@@ -1677,7 +1677,7 @@
           "label": "meta_codigo",
           "type": "text",
           "sampleValue": "DR-COD-0123",
-          "dbField": "hcl.profesionalFecha"
+          "dbField": "hcl.profesionalCodigo"
         },
         "meta_firma": {
           "page": 2,

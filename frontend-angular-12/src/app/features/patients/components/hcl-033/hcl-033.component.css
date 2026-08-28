@@ -445,6 +445,24 @@
   font-size: 0.62em;
   letter-spacing: 0.16em;
   color: var(--steel-500);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.fld-chars {
+  font-size: 0.82em;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--steel-400);
+}
+
+.fld-chars.fld-chars--warn {
+  color: var(--amber);
+}
+
+.fld-chars.fld-chars--full {
+  color: #f87171;
 }
 
 .fld-input {
@@ -641,9 +659,14 @@
 
 .region-row {
   display: grid;
-  grid-template-columns: 28px 34px 150px minmax(0, 1fr);
+  grid-template-columns: 28px 34px 150px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
+}
+
+.region-count {
+  white-space: nowrap;
+  font-size: 0.72em;
 }
 
 .region-idx {
