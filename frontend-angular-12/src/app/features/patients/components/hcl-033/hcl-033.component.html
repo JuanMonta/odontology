@@ -6,7 +6,7 @@
       <span class="hc-title">HISTORIA CLÍNICA</span>
     </div>
     <div class="hc-head-meta" *ngIf="patient">
-      <span class="hc-meta hc-meta--edit"><span class="hc-meta-lbl">ESTABLECIMIENTO</span><input class="fld-input hc-meta-input" type="text" [(ngModel)]="hc.establecimiento" [readonly]="sellada" placeholder="NOMBRE DEL ESTABLECIMIENTO" autocomplete="off" [attr.aria-readonly]="sellada" /></span>
+      <span class="hc-meta hc-meta--edit"><span class="hc-meta-lbl">ESTABLECIMIENTO <span class="fld-chars" [class.fld-chars--warn]="(hc.establecimiento?.length||0) >= 80" [class.fld-chars--full]="(hc.establecimiento?.length||0) >= 100">{{(hc.establecimiento?.length||0)}}/100</span></span><input class="fld-input hc-meta-input" type="text" [(ngModel)]="hc.establecimiento" [readonly]="sellada" maxlength="100" placeholder="NOMBRE DEL ESTABLECIMIENTO" autocomplete="off" [attr.aria-readonly]="sellada" /></span>
       <span class="hc-meta"><span class="hc-meta-lbl">PACIENTE</span><span class="hc-meta-val">{{ patient.name }}</span></span>
       <span class="hc-meta"><span class="hc-meta-lbl">Nº HISTORIA</span><span class="hc-meta-val">{{ patient.id }}</span></span>
       <span class="hc-meta"><span class="hc-meta-lbl">EDAD</span><span class="hc-meta-val">{{ patient.age }}</span></span>
@@ -95,8 +95,8 @@
       <p class="sec-hint">ANOTAR LA CAUSA DEL PROBLEMA EN LA VERSIÓN DEL INFORMANTE</p>
       <fieldset class="sec-fields" [disabled]="sellada">
         <label class="fld">
-          <span class="fld-label">MOTIVO</span>
-          <textarea class="fld-input fld-textarea" rows="5" [(ngModel)]="hc.motivoConsulta" placeholder="DESCRIBA EL MOTIVO EN PALABRAS DEL PACIENTE / ACOMPAÑANTE"></textarea>
+          <span class="fld-label">1. MOTIVO DE CONSULTA <span class="fld-chars" [class.fld-chars--warn]="(hc.motivoConsulta?.length||0) >= 120" [class.fld-chars--full]="(hc.motivoConsulta?.length||0) >= 150">{{(hc.motivoConsulta?.length||0)}}/150</span></span>
+          <textarea class="fld-input fld-textarea" rows="2" [(ngModel)]="hc.motivoConsulta" maxlength="150" placeholder="DESCRIBA BREVEMENTE EL MOTIVO PRINCIPAL DE LA CONSULTA…"></textarea>
         </label>
       </fieldset>
     </section>
@@ -108,8 +108,8 @@
       <p class="sec-hint">REGISTRAR: CRONOLOGÍA · LOCALIZACIÓN · CARACTERÍSTICAS · INTENSIDAD · CAUSA APARENTE · SÍNTOMAS ASOCIADOS · EVOLUCIÓN · ESTADO ACTUAL</p>
       <fieldset class="sec-fields" [disabled]="sellada">
         <label class="fld">
-          <span class="fld-label">PROBLEMA ACTUAL</span>
-          <textarea class="fld-input fld-textarea" rows="6" [(ngModel)]="hc.problemaActual" placeholder="DESCRIBA LA ENFERMEDAD O PROBLEMA ACTUAL"></textarea>
+          <span class="fld-label">2. PROBLEMA ACTUAL <span class="fld-chars" [class.fld-chars--warn]="(hc.problemaActual?.length||0) >= 400" [class.fld-chars--full]="(hc.problemaActual?.length||0) >= 500">{{(hc.problemaActual?.length||0)}}/500</span></span>
+          <textarea class="fld-input fld-textarea" rows="5" [(ngModel)]="hc.problemaActual" maxlength="500" placeholder="DESCRIBA SÍNTOMAS, EVOLUCIÓN Y TRATAMIENTOS PREVIOS…"></textarea>
         </label>
       </fieldset>
     </section>
@@ -133,12 +133,12 @@
           </button>
         </div>
         <div *ngIf="hc.otroAntecedente" class="fld">
-          <span class="fld-label">DESCRIBE EL ANTECEDENTE</span>
-          <input class="fld-input" type="text" [(ngModel)]="hc.otroAntecedenteTexto" placeholder="Especificar antecedente" autocomplete="off" />
+          <span class="fld-label">DESCRIBE EL ANTECEDENTE <span class="fld-chars" [class.fld-chars--warn]="(hc.otroAntecedenteTexto?.length||0) >= 200" [class.fld-chars--full]="(hc.otroAntecedenteTexto?.length||0) >= 255">{{(hc.otroAntecedenteTexto?.length||0)}}/255</span></span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.otroAntecedenteTexto" maxlength="255" placeholder="Especificar antecedente" autocomplete="off" />
         </div>
         <div *ngIf="algunaAntecedente()" class="fld">
-          <span class="fld-label">PARENTESCO (HASTA 3ER GRADO DE CONSANGUINIDAD / 1RO DE AFINIDAD)</span>
-          <input class="fld-input" type="text" [(ngModel)]="hc.parentesco" placeholder="Especificar parentesco del informante…" autocomplete="off" />
+          <span class="fld-label">PARENTESCO (HASTA 3ER GRADO DE CONSANGUINIDAD / 1RO DE AFINIDAD) <span class="fld-chars" [class.fld-chars--warn]="(hc.parentesco?.length||0) >= 96" [class.fld-chars--full]="(hc.parentesco?.length||0) >= 120">{{(hc.parentesco?.length||0)}}/120</span></span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.parentesco" maxlength="120" placeholder="Especificar parentesco del informante…" autocomplete="off" />
         </div>
       </fieldset>
     </section>
@@ -150,20 +150,20 @@
       <fieldset class="sec-fields" [disabled]="sellada">
         <div class="grid-4">
           <label class="fld">
-            <span class="fld-label">PRESIÓN ARTERIAL</span>
-            <input class="fld-input" type="text" [(ngModel)]="hc.presionArterial" placeholder="120/80" autocomplete="off" />
+            <span class="fld-label">PRESIÓN ARTERIAL <span class="fld-chars" [class.fld-chars--full]="(hc.presionArterial?.length||0) >= 7">{{(hc.presionArterial?.length||0)}}/7</span></span>
+            <input class="fld-input" type="text" [(ngModel)]="hc.presionArterial" maxlength="7" placeholder="120/80" autocomplete="off" />
           </label>
           <label class="fld">
             <span class="fld-label">F. CARDÍACA / MIN</span>
-            <input class="fld-input" type="number" min="0" [(ngModel)]="hc.frecuenciaCardiaca" placeholder="72" />
+            <input class="fld-input" type="number" min="0" max="999" [(ngModel)]="hc.frecuenciaCardiaca" placeholder="72" />
           </label>
           <label class="fld">
-            <span class="fld-label">TEMPERATURA °C</span>
-            <input class="fld-input" type="text" [(ngModel)]="hc.temperatura" placeholder="36.5" autocomplete="off" />
+            <span class="fld-label">TEMPERATURA °C <span class="fld-chars" [class.fld-chars--full]="(hc.temperatura?.length||0) >= 4">{{(hc.temperatura?.length||0)}}/4</span></span>
+            <input class="fld-input" type="text" [(ngModel)]="hc.temperatura" maxlength="4" placeholder="36.5" autocomplete="off" />
           </label>
           <label class="fld">
             <span class="fld-label">F. RESPIRAT. / MIN</span>
-            <input class="fld-input" type="number" min="0" [(ngModel)]="hc.frecuenciaRespiratoria" placeholder="16" />
+            <input class="fld-input" type="number" min="0" max="999" [(ngModel)]="hc.frecuenciaRespiratoria" placeholder="16" />
           </label>
         </div>
       </fieldset>
@@ -188,7 +188,9 @@
             <span class="region-lbl">{{ r.label }}</span>
             <input class="fld-input" type="text" [(ngModel)]="hc.examenRegiones[i].descripcion"
               [disabled]="!hc.examenRegiones[i].marcado"
+              maxlength="700"
               placeholder="PATOLOGÍA OBSERVADA…" autocomplete="off" />
+            <span class="fld-chars region-count" [class.fld-chars--warn]="(hc.examenRegiones[i].descripcion?.length||0) >= 560" [class.fld-chars--full]="(hc.examenRegiones[i].descripcion?.length||0) >= 700">{{(hc.examenRegiones[i].descripcion?.length||0)}}/700</span>
           </div>
         </div>
       </fieldset>
@@ -351,16 +353,16 @@
         </button>
       </div>
       <div *ngIf="hc.planOtros" class="fld">
-        <span class="fld-label">ESPECIFICA OTRO PLAN</span>
-        <input class="fld-input" type="text" [(ngModel)]="hc.planOtrosTexto" placeholder="Especificar plan" autocomplete="off" />
+        <span class="fld-label">ESPECIFICA OTRO PLAN <span class="fld-chars" [class.fld-chars--warn]="(hc.planOtrosTexto?.length||0) >= 560" [class.fld-chars--full]="(hc.planOtrosTexto?.length||0) >= 700">{{(hc.planOtrosTexto?.length||0)}}/700</span></span>
+        <input class="fld-input" type="text" [(ngModel)]="hc.planOtrosTexto" maxlength="700" placeholder="Especificar plan" autocomplete="off" />
       </div>
       <label class="fld">
-        <span class="fld-label">PLAN TERAPÉUTICO</span>
-        <textarea class="fld-input fld-textarea" rows="3" [(ngModel)]="hc.planTerapeutico" placeholder="PROFILAXIS, SELLANTE, RESTAURACIONES, TRATAMIENTO PERIODONTAL…"></textarea>
+        <span class="fld-label">PLAN TERAPÉUTICO <span class="fld-chars" [class.fld-chars--warn]="(hc.planTerapeutico?.length||0) >= 560" [class.fld-chars--full]="(hc.planTerapeutico?.length||0) >= 700">{{(hc.planTerapeutico?.length||0)}}/700</span></span>
+        <textarea class="fld-input fld-textarea" rows="3" [(ngModel)]="hc.planTerapeutico" maxlength="700" placeholder="PROFILAXIS, SELLANTE, RESTAURACIONES, TRATAMIENTO PERIODONTAL…"></textarea>
       </label>
       <label class="fld">
-        <span class="fld-label">PLAN EDUCACIONAL</span>
-        <textarea class="fld-input fld-textarea" rows="3" [(ngModel)]="hc.planEducacional" placeholder="TÉCNICA DE CEPILLADO, DIETA, CONTROL DE PLACA…"></textarea>
+        <span class="fld-label">PLAN EDUCACIONAL <span class="fld-chars" [class.fld-chars--warn]="(hc.planEducacional?.length||0) >= 560" [class.fld-chars--full]="(hc.planEducacional?.length||0) >= 700">{{(hc.planEducacional?.length||0)}}/700</span></span>
+        <textarea class="fld-input fld-textarea" rows="3" [(ngModel)]="hc.planEducacional" maxlength="700" placeholder="TÉCNICA DE CEPILLADO, DIETA, CONTROL DE PLACA…"></textarea>
       </label>
     </section>
 
@@ -379,9 +381,9 @@
           </thead>
           <tbody>
             <tr *ngFor="let d of hc.diagnosticosCie; let i = index">
-              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].codigo" placeholder="K02.9" autocomplete="off" /></td>
-              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].presuntivo" placeholder="DIAGNÓSTICO PRESUNTIVO" autocomplete="off" /></td>
-              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].definitivo" placeholder="DIAGNÓSTICO DEFINITIVO" autocomplete="off" /></td>
+              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].codigo" maxlength="6" placeholder="K02.9" autocomplete="off" /></td>
+              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].presuntivo" maxlength="100" placeholder="DIAGNÓSTICO PRESUNTIVO" autocomplete="off" /></td>
+              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].definitivo" maxlength="100" placeholder="DIAGNÓSTICO DEFINITIVO" autocomplete="off" /></td>
             </tr>
           </tbody>
         </table>
@@ -396,18 +398,18 @@
           <input class="fld-input" type="date" [(ngModel)]="hc.fechaControl" autocomplete="off" />
         </label>
         <label class="fld">
-          <span class="fld-label">PROFESIONAL</span>
-          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalNombre" placeholder="NOMBRE DEL ODONTÓLOGO" autocomplete="off" />
+          <span class="fld-label">PROFESIONAL <span class="fld-chars" [class.fld-chars--warn]="(hc.profesionalNombre?.length||0) >= 80" [class.fld-chars--full]="(hc.profesionalNombre?.length||0) >= 100">{{(hc.profesionalNombre?.length||0)}}/100</span></span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalNombre" maxlength="100" placeholder="NOMBRE DEL ODONTÓLOGO" autocomplete="off" />
         </label>
       </div>
       <div class="grid-3">
         <label class="fld">
-          <span class="fld-label">CÓDIGO</span>
-          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalFecha" placeholder="CÓDIGO MSP" autocomplete="off" />
+          <span class="fld-label">CÓDIGO <span class="fld-chars" [class.fld-chars--warn]="(hc.profesionalCodigo?.length||0) >= 12" [class.fld-chars--full]="(hc.profesionalCodigo?.length||0) >= 15">{{(hc.profesionalCodigo?.length||0)}}/15</span></span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalCodigo" maxlength="15" placeholder="CÓDIGO MSP" autocomplete="off" />
         </label>
         <label class="fld">
-          <span class="fld-label">FIRMA</span>
-          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalFirma" placeholder="FIRMA / RÚBRICA" autocomplete="off" />
+          <span class="fld-label">FIRMA <span class="fld-chars" [class.fld-chars--warn]="(hc.profesionalFirma?.length||0) >= 96" [class.fld-chars--full]="(hc.profesionalFirma?.length||0) >= 120">{{(hc.profesionalFirma?.length||0)}}/120</span></span>
+          <input class="fld-input" type="text" [(ngModel)]="hc.profesionalFirma" maxlength="120" placeholder="FIRMA / RÚBRICA" autocomplete="off" />
         </label>
         <label class="fld">
           <span class="fld-label">NÚMERO DE HOJA</span>
@@ -427,31 +429,31 @@
             <span class="ses-tag">SESIÓN</span>
             <span *ngIf="sesionBloqueada(s.sesion)" class="ses-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>REGISTRADA</span>
             <label class="fld ses-date">
-              <span class="fld-label">FECHA</span>
-              <input class="fld-input" type="text" [(ngModel)]="s.fecha" placeholder="DD/MM/AAAA" autocomplete="off" [disabled]="sesionBloqueada(s.sesion)" />
+              <span class="fld-label">FECHA <span class="fld-chars" [class.fld-chars--full]="(s.fecha?.length||0) >= 10">{{(s.fecha?.length||0)}}/10</span></span>
+              <input class="fld-input" type="text" [(ngModel)]="s.fecha" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off" [disabled]="sesionBloqueada(s.sesion)" />
             </label>
           </div>
           <fieldset class="ses-fields" [disabled]="sesionBloqueada(s.sesion)">
             <div class="ses-grid">
               <label class="fld">
-                <span class="fld-label">DIAGNÓSTICOS Y COMPLICACIONES</span>
-                <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="s.diagnosticos" placeholder="DIAGNÓSTICO Y/O COMPLICACIÓN DE LA SESIÓN" autocomplete="off"></textarea>
+                <span class="fld-label">DIAGNÓSTICOS Y COMPLICACIONES <span class="fld-chars" [class.fld-chars--warn]="(s.diagnosticos?.length||0) >= 160" [class.fld-chars--full]="(s.diagnosticos?.length||0) >= 200">{{(s.diagnosticos?.length||0)}}/200</span></span>
+                <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="s.diagnosticos" maxlength="200" placeholder="DIAGNÓSTICO Y/O COMPLICACIÓN DE LA SESIÓN" autocomplete="off"></textarea>
               </label>
               <label class="fld">
-                <span class="fld-label">PROCEDIMIENTOS</span>
-                <input class="fld-input" type="text" list="proc-odontologicos" [(ngModel)]="s.procedimientos" placeholder="CÓDIGO ANEXO 2 O PROCEDIMIENTO" autocomplete="off" />
+                <span class="fld-label">PROCEDIMIENTOS <span class="fld-chars" [class.fld-chars--full]="(s.procedimientos?.length||0) >= 10">{{(s.procedimientos?.length||0)}}/10</span></span>
+                <input class="fld-input" type="text" list="proc-odontologicos" [(ngModel)]="s.procedimientos" maxlength="10" placeholder="CÓDIGO ANEXO 2 O PROCEDIMIENTO" autocomplete="off" />
               </label>
               <label class="fld ses-wide">
-                <span class="fld-label">PRESCRIPCIONES — INDICACIONES, INSUMOS, FÁRMACOS (DOSIS, TIEMPO, VÍA)</span>
-                <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="s.prescripciones" placeholder="MEDICACIÓN / RECETAS" autocomplete="off"></textarea>
+                <span class="fld-label">PRESCRIPCIONES — INDICACIONES, INSUMOS, FÁRMACOS (DOSIS, TIEMPO, VÍA) <span class="fld-chars" [class.fld-chars--warn]="(s.prescripciones?.length||0) >= 320" [class.fld-chars--full]="(s.prescripciones?.length||0) >= 400">{{(s.prescripciones?.length||0)}}/400</span></span>
+                <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="s.prescripciones" maxlength="400" placeholder="MEDICACIÓN / RECETAS" autocomplete="off"></textarea>
               </label>
               <label class="fld">
-                <span class="fld-label">PRÓXIMA CITA / ALTA</span>
-                <input class="fld-input" type="text" [(ngModel)]="s.proximaCita" placeholder="FECHA PRÓXIMA CITA O «ALTA»" autocomplete="off" />
+                <span class="fld-label">PRÓXIMA CITA / ALTA <span class="fld-chars" [class.fld-chars--warn]="(s.proximaCita?.length||0) >= 16" [class.fld-chars--full]="(s.proximaCita?.length||0) >= 20">{{(s.proximaCita?.length||0)}}/20</span></span>
+                <input class="fld-input" type="text" [(ngModel)]="s.proximaCita" maxlength="20" placeholder="FECHA PRÓXIMA CITA O «ALTA»" autocomplete="off" />
               </label>
               <label class="fld">
-                <span class="fld-label">CÓDIGO Y FIRMA</span>
-                <input class="fld-input" type="text" [(ngModel)]="s.codigo" placeholder="CÓDIGO DEL ODONTÓLOGO" autocomplete="off" />
+                <span class="fld-label">CÓDIGO Y FIRMA <span class="fld-chars" [class.fld-chars--warn]="(s.codigo?.length||0) >= 12" [class.fld-chars--full]="(s.codigo?.length||0) >= 15">{{(s.codigo?.length||0)}}/15</span></span>
+                <input class="fld-input" type="text" [(ngModel)]="s.codigo" maxlength="15" placeholder="CÓDIGO DEL ODONTÓLOGO" autocomplete="off" />
               </label>
             </div>
           </fieldset>

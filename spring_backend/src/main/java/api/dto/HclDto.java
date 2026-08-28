@@ -55,7 +55,7 @@ public record HclDto(
         LocalDate fechaControl,
         String numeroHoja,
         String profesionalNombre,
-        LocalDate profesionalFecha,
+        String profesionalCodigo,
         String profesionalFirma,        List<DiagnosticoCieDto> diagnosticosCie,
         List<SesionTratamientoDto> sesiones,
         String actualizadaEn

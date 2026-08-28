@@ -403,7 +403,7 @@ public class PacientesService {
         hc.setFechaControl(dto.fechaControl());
         hc.setNumeroHoja(dto.numeroHoja());
         hc.setProfesionalNombre(dto.profesionalNombre());
-        hc.setProfesionalFecha(dto.profesionalFecha());
+        hc.setProfesionalCodigo(dto.profesionalCodigo());
         hc.setProfesionalFirma(dto.profesionalFirma());
         hc.setDiagnosticosCie(toJson(dto.diagnosticosCie()));
         hc.setSesiones(toJson(dto.sesiones()));
@@ -661,7 +661,7 @@ public class PacientesService {
                 hc.getFechaControl(),
                 hc.getNumeroHoja(),
                 hc.getProfesionalNombre(),
-                hc.getProfesionalFecha(),
+                hc.getProfesionalCodigo(),
                 hc.getProfesionalFirma(),
                 fromJson(hc.getDiagnosticosCie(), new TypeReference<List<HclDto.DiagnosticoCieDto>>() {
                 }),

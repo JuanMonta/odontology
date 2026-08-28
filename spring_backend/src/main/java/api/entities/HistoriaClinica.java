@@ -164,8 +164,8 @@ public class HistoriaClinica {
     @Column(name = "profesional_nombre", length = 120)
     private String profesionalNombre;
 
-    @Column(name = "profesional_fecha")
-    private LocalDate profesionalFecha;
+    @Column(name = "profesional_codigo", length = 15)
+    private String profesionalCodigo;
 
     @Column(name = "profesional_firma", length = 120)
     private String profesionalFirma;
