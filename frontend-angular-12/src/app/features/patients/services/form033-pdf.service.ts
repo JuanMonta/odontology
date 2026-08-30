@@ -249,6 +249,7 @@ export class Form033PdfService {
     // ── Fila verde: datos del paciente ──
     this.drawAutoFitText(page, this.str('establecimiento'), 'establecimiento', 9, 7);
     this.drawAutoFitText(page, this.str('nombre'), 'nombre', 9, 7);
+    this.drawAutoFitText(page, this.str('apellido'), 'apellido', 9, 7);
     this.drawAutoFitText(page, this.str('sexo'), 'sexo', 9, 7);
     this.drawAutoFitText(page, this.str('edad'), 'edad', 9, 7);
     this.drawAutoFitText(page, this.str('nhc'), 'nhc', 9, 7);

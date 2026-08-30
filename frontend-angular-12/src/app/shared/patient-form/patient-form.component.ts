@@ -14,6 +14,19 @@ export function clearPatientFormDraft(): void {
   }
 }
 
+/** Divide un nombre completo "JOSÉ HUAMÁN" → ["JOSÉ", "HUAMÁN"] (último token como apellido). */
+export function splitNombreCompleto(full: string): [string, string] {
+  const trimmed = (full || '').trim();
+  if (!trimmed) {
+    return ['', ''];
+  }
+  const space = trimmed.lastIndexOf(' ');
+  if (space < 0) {
+    return [trimmed, ''];
+  }
+  return [trimmed.slice(0, space).trim(), trimmed.slice(space + 1).trim()];
+}
+
 @Component({
   selector: 'app-patient-form',
   templateUrl: './patient-form.component.html',
@@ -25,7 +38,8 @@ export class PatientFormComponent implements OnInit {
   @Output() saved = new EventEmitter<PatientDraft>();
   @Output() cancel = new EventEmitter<void>();
 
-  name = '';
+  firstName = '';
+  lastName = '';
   cedula = '';
   sexo = '';
   birthDate = '';
@@ -41,7 +55,11 @@ export class PatientFormComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.patient) {
-      this.name = this.patient.name;
+      const parts = this.patient.apellido
+        ? [this.patient.nombre, this.patient.apellido]
+        : splitNombreCompleto(this.patient.name);
+      this.firstName = parts[0];
+      this.lastName = parts[1];
       this.cedula = this.patient.cedula === '—' ? '' : this.patient.cedula;
       this.sexo = this.patient.sexo === '—' ? '' : this.patient.sexo;
       this.birthDate = this.patient.birthDate;
@@ -58,14 +76,18 @@ export class PatientFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.name.trim()) {
+    if (!this.firstName.trim() || !this.lastName.trim()) {
       this.error = true;
       return;
     }
     this.error = false;
     this.recalcularDesdeNacimiento();
+    const nombre = this.firstName.trim().toUpperCase();
+    const apellido = this.lastName.trim().toUpperCase();
     const draft: PatientDraft = {
-      name: this.name.trim().toUpperCase(),
+      nombre,
+      apellido,
+      name: [nombre, apellido].filter(Boolean).join(' '),
       cedula: this.cedula.trim(),
       sexo: this.sexo,
       birthDate: this.birthDate,
@@ -138,7 +160,8 @@ export class PatientFormComponent implements OnInit {
       localStorage.setItem(
         borradorKey(PATIENT_FORM_DRAFT_KEY),
         JSON.stringify({
-          name: this.name,
+          firstName: this.firstName,
+          lastName: this.lastName,
           cedula: this.cedula,
           sexo: this.sexo,
           birthDate: this.birthDate,
@@ -167,7 +190,14 @@ export class PatientFormComponent implements OnInit {
       if (typeof saved !== 'object' || saved === null) {
         return;
       }
-      this.name = typeof saved.name === 'string' ? saved.name : this.name;
+      if (typeof saved.firstName === 'string' || typeof saved.lastName === 'string') {
+        this.firstName = typeof saved.firstName === 'string' ? saved.firstName : this.firstName;
+        this.lastName = typeof saved.lastName === 'string' ? saved.lastName : this.lastName;
+      } else if (typeof saved.name === 'string') {
+        const [n, a] = splitNombreCompleto(saved.name);
+        this.firstName = n;
+        this.lastName = a;
+      }
       this.cedula = typeof saved.cedula === 'string' ? saved.cedula : this.cedula;
       this.sexo = typeof saved.sexo === 'string' ? saved.sexo : this.sexo;
       this.birthDate = typeof saved.birthDate === 'string' ? saved.birthDate : this.birthDate;

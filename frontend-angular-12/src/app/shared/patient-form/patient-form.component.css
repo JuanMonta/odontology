@@ -25,6 +25,25 @@
   font-size: 0.62em;
   letter-spacing: 0.2em;
   color: var(--steel-400);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fld-chars {
+  font-family: var(--font-ui);
+  font-size: 0.85em;
+  letter-spacing: 0;
+  color: var(--steel-500);
+}
+
+.fld-chars--warn {
+  color: #e8b64c;
+}
+
+.fld-chars--full {
+  color: #e06c5b;
 }
 
 .field-input {

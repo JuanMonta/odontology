@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 public record PacienteDto(
         String id,
         String name,
+        String nombre,
+        String apellido,
         String cedula,
         String sexo,
         String birthDate,

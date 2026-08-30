@@ -64,7 +64,8 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   }
 
   sesionTieneDatos(s: HclSesion): boolean {
-    return !!(s.fecha || s.diagnosticos || s.procedimientos || s.prescripciones || s.proximaCita || s.codigo);
+    const procs = s.procedimientosCodigos?.length || (s.procedimientos && s.procedimientos.trim().length > 0);
+    return !!(s.fecha || s.diagnosticos || procs || s.prescripciones || s.proximaCita || s.codigo);
   }
 
   get hojasSelector(): HojaResumen[] {
@@ -98,6 +99,51 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   readonly dientesIhos = DIENTES_IHOS;
   readonly dientesPorSextante = DIENTES_POR_SEXTANTE;
   readonly procedimientosOdontologicos = PROCEDIMIENTOS_ODONTOLOGICOS;
+
+  /** Texto temporal del input del selector de procedimientos. */
+  procInput = '';
+
+  onProcInput(e: Event): void {
+    this.procInput = (e.target as HTMLInputElement).value;
+  }
+
+  /** Descripción corta de un código CDT (viventa en el catálogo). */
+  descripcionProcedimiento(codigo: string): string {
+    const p = this.procedimientosOdontologicos.find(x => x.codigo === codigo.toUpperCase());
+    return p ? p.descripcion : '';
+  }
+
+  /** Agrega un procedimiento a la sesión desde el texto elegido (código o "código · descripción"). */
+  agregarProcedimientoPorTexto(s: HclSesion, e: Event): void {
+    e.preventDefault();
+    const texto = (this.procInput || '').trim();
+    if (!texto) { return; }
+    const codigo = this.normalizarCodigoProcedimiento(texto);
+    if (!codigo) { return; }
+    const lista = s.procedimientosCodigos || (s.procedimientosCodigos = []);
+    if (!lista.includes(codigo)) {
+      lista.push(codigo);
+    }
+    s.procedimientosCodigos = [...lista];
+    s.procedimientos = lista.map(c => c + (this.descripcionProcedimiento(c) ? ' · ' + this.descripcionProcedimiento(c) : '')).join('\n');
+    this.procInput = '';
+  }
+
+  quitarProcedimiento(s: HclSesion, codigo: string): void {
+    const lista = (s.procedimientosCodigos || []).filter(c => c !== codigo);
+    s.procedimientosCodigos = lista;
+    s.procedimientos = lista.map(c => c + (this.descripcionProcedimiento(c) ? ' · ' + this.descripcionProcedimiento(c) : '')).join('\n');
+    this.procInput = '';
+  }
+
+  private normalizarCodigoProcedimiento(texto: string): string {
+    const t = texto.trim();
+    const m = t.match(/^([D]\d{4})/i);
+    if (m) { return m[1].toUpperCase(); }
+    const p = this.procedimientosOdontologicos.find(x => t.toUpperCase().includes(x.codigo));
+    return p ? p.codigo : '';
+  }
+
 
   settings: ClinicaSettings | null = null;
 
@@ -403,10 +449,15 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
 
   /** Nombre y apellido separados para el encabezado del Form 033. */
   nombreSplit(): { nombre: string; apellido: string } {
-    const full = this.patient?.name?.trim() ?? '';
+    const p = this.patient;
+    if (!p) { return { nombre: '—', apellido: '—' }; }
+    if (p.nombre || p.apellido) {
+      return { nombre: p.nombre || '—', apellido: p.apellido || '—' };
+    }
+    const full = p.name?.trim() ?? '';
     if (!full) { return { nombre: '—', apellido: '—' }; }
     const parts = full.split(/\s+/);
-    if (parts.length === 1) { return { nombre: parts[0], apellido: '' }; }
+    if (parts.length === 1) { return { nombre: parts[0], apellido: '—' }; }
     return { nombre: parts[0], apellido: parts.slice(1).join(' ') };
   }
 }

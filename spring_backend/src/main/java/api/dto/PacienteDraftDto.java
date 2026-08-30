@@ -3,6 +3,8 @@ package api.dto;
 import java.time.LocalDate;
 
 public record PacienteDraftDto(
+        String nombre,
+        String apellido,
         String name,
         String cedula,
         String sexo,

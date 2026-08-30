@@ -17,7 +17,9 @@ export type PatientAlertType = 'birthday' | 'debt' | 'followup';
 
 export interface Patient {
   id: string;            // "HC-0001" historia clínica
-  name: string;
+  name: string;          // nombre completo (NOMBRES + APELLIDOS)
+  nombre: string;        // nombres del paciente
+  apellido: string;      // apellidos (paterno + materno)
   cedula: string;        // cédula o RUC (10-13 dígitos); "—" si no hay
   sexo: string;          // 'M' | 'F' | '—'
   birthDate: string;     // ISO "YYYY-MM-DD" (fecha_nacimiento); "" si no hay

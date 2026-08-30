@@ -1388,3 +1388,69 @@
   letter-spacing: 0.04em;
   color: #333;
 }
+
+/* === Selector múltiple de procedimientos (sección 12) === */
+.proc-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.fld-input--proc {
+  width: 100%;
+}
+
+.proc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.proc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 4px;
+  background: #eef4fb;
+  border: 1px solid #bcd3ec;
+  border-radius: 999px;
+  font-size: 10px;
+  color: #1d3c64;
+}
+
+.proc-chip-code {
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: #1d3c64;
+  color: #fff;
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.proc-chip-desc {
+  white-space: normal;
+  max-width: 52ch;
+  line-height: 1.25;
+}
+
+.proc-chip-x {
+  border: none;
+  background: transparent;
+  color: #8aa2c0;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.proc-chip-x:hover {
+  color: #c0392b;
+}
+
+@media print {
+  .proc-picker,
+  .proc-chip-x {
+    display: none;
+  }
+}

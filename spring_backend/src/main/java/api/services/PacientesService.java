@@ -14,6 +14,7 @@ import api.dto.ToothDto;
 import api.dto.ToothFaceDto;
 import api.entities.AccountEntry;
 import api.entities.EvolucionClinica;
+import api.entities.HcSesionProcedimiento;
 import api.entities.HistoriaClinica;
 import api.entities.Odontologo;
 import api.entities.Paciente;
@@ -22,6 +23,7 @@ import api.entities.PatientAppointment;
 import api.entities.PatientTooth;
 import api.entities.PatientToothCondition;
 import api.entities.PatientToothFace;
+import api.entities.Procedimiento;
 import api.entities.Usuario;
 import api.entities.VistaPaciente;
 import api.entities.converter.CondicionDentalConverter;
@@ -36,6 +38,8 @@ import api.repositories.PatientAppointmentRepository;
 import api.repositories.PatientToothConditionRepository;
 import api.repositories.PatientToothFaceRepository;
 import api.repositories.PatientToothRepository;
+import api.repositories.ProcedimientoRepository;
+import api.repositories.HcSesionProcedimientoRepository;
 import api.repositories.VistaPacienteRepository;
 import api.util.FormatoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -96,8 +100,28 @@ public class PacientesService {
     private final HistoriaClinicaRepository hclRepository;
     private final EvolucionClinicaRepository evolucionRepository;
     private final OdontologoRepository odontologoRepository;
+    private final ProcedimientoRepository procedimientoRepository;
+    private final HcSesionProcedimientoRepository hcSesionProcedimientoRepository;
     private final CodigoService codigoService;
     private final ObjectMapper objectMapper;
+
+    /** Divide nombre/apellido del draft. El fragmento legado {@code name} se reparte: último token → apellidos. */
+    private String[] splitNombreDraft(PacienteDraftDto draft) {
+        String nombre = draft.nombre() == null ? "" : draft.nombre().trim().toUpperCase();
+        String apellido = draft.apellido() == null ? "" : draft.apellido().trim().toUpperCase();
+        if (!nombre.isEmpty() || !apellido.isEmpty()) {
+            return new String[]{nombre, apellido};
+        }
+        String full = draft.name() == null ? "" : draft.name().trim().toUpperCase();
+        if (full.isEmpty()) {
+            return new String[]{"", ""};
+        }
+        int space = full.lastIndexOf(' ');
+        if (space < 0) {
+            return new String[]{full, ""};
+        }
+        return new String[]{full.substring(0, space).trim(), full.substring(space + 1).trim()};
+    }
 
     @Transactional(readOnly = true)
     public List<PacienteDto> list() {
@@ -134,13 +158,15 @@ public class PacientesService {
 
     @Transactional
     public PacienteDto add(PacienteDraftDto draft) {
+        String[] nombreApellido = splitNombreDraft(draft);
         Paciente paciente = Paciente.builder()
                 .id(codigoService.nextCodigo("HC", "HC-%04d"))
                 .cedula(draft.cedula() == null || draft.cedula().isBlank() ? null : draft.cedula().trim())
                 .sexo(draft.sexo() == null || draft.sexo().isBlank()
                         ? null
                         : Paciente.Sexo.valueOf(draft.sexo()))
-                .nombre(draft.name())
+                .nombres(nombreApellido[0])
+                .apellidos(nombreApellido[1])
                 .fechaNacimiento(draft.fechaNacimiento() != null
                         ? draft.fechaNacimiento()
                         : LocalDate.of(1990, 1, 1))
@@ -163,8 +189,19 @@ public class PacientesService {
     public PacienteDto update(String id, PacienteDraftDto draft) {
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado: " + id));
-        if (draft.name() != null) {
-            paciente.setNombre(draft.name());
+        if (draft.nombre() != null || draft.apellido() != null || draft.name() != null) {
+            if (draft.nombre() != null && draft.apellido() != null) {
+                paciente.setNombres(draft.nombre().trim().toUpperCase());
+                paciente.setApellidos(draft.apellido().trim().toUpperCase());
+            } else {
+                String[] nombreApellido = splitNombreDraft(draft);
+                if (draft.nombre() != null) {
+                    paciente.setNombres(nombreApellido[0]);
+                }
+                if (draft.apellido() != null) {
+                    paciente.setApellidos(nombreApellido[1]);
+                }
+            }
         }
         if (draft.cedula() != null) {
             paciente.setCedula(draft.cedula().isBlank() ? null : draft.cedula().trim());
@@ -409,7 +446,39 @@ public class PacientesService {
         hc.setSesiones(toJson(dto.sesiones()));
         hc.setActualizadaEn(LocalDateTime.now());
 
-        return toHclDto(hclRepository.saveAndFlush(hc));
+        HistoriaClinica guardada = hclRepository.saveAndFlush(hc);
+        persistirSesionProcedimientos(guardada.getPacienteId(), guardada.getHoja(), dto.sesiones());
+
+        return toHclDto(guardada);
+    }
+
+    /** Reemplaza la relación FK de procedimientos de una hoja de HC a partir de las sesiones del DTO. */
+    private void persistirSesionProcedimientos(String pacienteId, int hoja, List<HclDto.SesionTratamientoDto> sesiones) {
+        hcSesionProcedimientoRepository.deleteByPacienteIdAndHoja(pacienteId, hoja);
+        if (sesiones == null) {
+            return;
+        }
+        List<HcSesionProcedimiento> filas = new ArrayList<>();
+        for (HclDto.SesionTratamientoDto s : sesiones) {
+            if (s.procedimientosCodigos() == null) {
+                continue;
+            }
+            Set<String> unicos = new java.util.LinkedHashSet<>(s.procedimientosCodigos());
+            for (String codigo : unicos) {
+                if (codigo == null || codigo.isBlank()) {
+                    continue;
+                }
+                filas.add(HcSesionProcedimiento.builder()
+                        .pacienteId(pacienteId)
+                        .hoja(hoja)
+                        .sesion(s.sesion())
+                        .procedimientoCodigo(codigo.trim().toUpperCase())
+                        .build());
+            }
+        }
+        if (!filas.isEmpty()) {
+            hcSesionProcedimientoRepository.saveAll(filas);
+        }
     }
 
     /**
@@ -588,7 +657,7 @@ public class PacientesService {
     }
 
     private boolean sesionTieneDatos(HclDto.SesionTratamientoDto s) {
-        return s != null && !(blanco(s.fecha()) && blanco(s.diagnosticos()) && blanco(s.procedimientos())
+        return s != null && !(blanco(s.fecha()) && blanco(s.diagnosticos()) && listaVacia(s.procedimientosCodigos())
                 && blanco(s.prescripciones()) && blanco(s.proximaCita()) && blanco(s.codigo()));
     }
 
@@ -599,10 +668,21 @@ public class PacientesService {
         }
         return strIgual(previa.fecha(), entrante.fecha())
                 && strIgual(previa.diagnosticos(), entrante.diagnosticos())
-                && strIgual(previa.procedimientos(), entrante.procedimientos())
+                && listasIguales(previa.procedimientosCodigos(), entrante.procedimientosCodigos())
                 && strIgual(previa.prescripciones(), entrante.prescripciones())
                 && strIgual(previa.proximaCita(), entrante.proximaCita())
                 && strIgual(previa.codigo(), entrante.codigo());
+    }
+
+    private boolean listaVacia(java.util.List<String> l) {
+        return l == null || l.isEmpty();
+    }
+
+    private boolean listasIguales(java.util.List<String> a, java.util.List<String> b) {
+        if (a == null || b == null) {
+            return (a == null || a.isEmpty()) && (b == null || b.isEmpty());
+        }
+        return a.equals(b);
     }
 
     private boolean strIgual(String a, String b) {
@@ -665,9 +745,53 @@ public class PacientesService {
                 hc.getProfesionalFirma(),
                 fromJson(hc.getDiagnosticosCie(), new TypeReference<List<HclDto.DiagnosticoCieDto>>() {
                 }),
-                fromJson(hc.getSesiones(), new TypeReference<List<HclDto.SesionTratamientoDto>>() {
-                }),
+                enriquecerSesiones(hc.getPacienteId(), hc.getHoja(),
+                        fromJson(hc.getSesiones(), new TypeReference<List<HclDto.SesionTratamientoDto>>() {
+                        })),
                 hc.getActualizadaEn() == null ? null : hc.getActualizadaEn().toString());
+    }
+
+    /**
+     * Deriva el texto {@code procedimientos} de cada sesión («D1110 · profilaxis»)
+     * viajando por la relación FK {@code hc_sesion_procedimientos} y uniéndolo con el
+     * catálogo de procedimientos. Mantiene los códigos en {@code procedimientosCodigos}.
+     */
+    private List<HclDto.SesionTratamientoDto> enriquecerSesiones(String pacienteId, int hoja,
+            List<HclDto.SesionTratamientoDto> sesiones) {
+        if (sesiones == null) {
+            return null;
+        }
+        List<HcSesionProcedimiento> rel = hcSesionProcedimientoRepository
+                .findByPacienteIdAndHojaOrderBySesion(pacienteId, hoja);
+        if (rel.isEmpty()) {
+            return sesiones;
+        }
+        Map<Integer, List<String>> porSesion = new LinkedHashMap<>();
+        for (HcSesionProcedimiento r : rel) {
+            porSesion.computeIfAbsent(r.getSesion(), k -> new ArrayList<>()).add(r.getProcedimientoCodigo());
+        }
+        Map<String, String> descripcionPorCodigo = new HashMap<>();
+        List<Procedimiento> catalogo = procedimientoRepository.findAll();
+        for (Procedimiento p : catalogo) {
+            descripcionPorCodigo.put(p.getCodigo(), p.getDescripcion());
+        }
+        List<HclDto.SesionTratamientoDto> resultado = new ArrayList<>();
+        for (HclDto.SesionTratamientoDto s : sesiones) {
+            List<String> codigos = porSesion.get(s.sesion());
+            if (codigos == null || codigos.isEmpty()) {
+                resultado.add(s);
+                continue;
+            }
+            List<String> lineas = new ArrayList<>();
+            for (String c : codigos) {
+                String d = descripcionPorCodigo.get(c);
+                lineas.add(d == null ? c : c + " · " + d);
+            }
+            resultado.add(new HclDto.SesionTratamientoDto(
+                    s.sesion(), s.fecha(), s.diagnosticos(),
+                    codigos, String.join("\n", lineas), s.prescripciones(), s.proximaCita(), s.codigo()));
+        }
+        return resultado;
     }
 
     private <T> String toJson(T value) {
@@ -782,6 +906,8 @@ public class PacientesService {
         return new PacienteDto(
                 v.getId(),
                 v.getNombre(),
+                v.getNombres() == null ? "—" : v.getNombres(),
+                v.getApellidos() == null ? "—" : v.getApellidos(),
                 v.getCedula() == null ? "—" : v.getCedula(),
                 v.getSexo() == null ? "—" : v.getSexo().name(),
                 v.getFechaNacimiento() == null ? null : v.getFechaNacimiento().toString(),

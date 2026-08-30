@@ -439,9 +439,20 @@
                 <span class="fld-label">DIAGNÓSTICOS Y COMPLICACIONES <span class="fld-chars" [class.fld-chars--warn]="(s.diagnosticos?.length||0) >= 160" [class.fld-chars--full]="(s.diagnosticos?.length||0) >= 200">{{(s.diagnosticos?.length||0)}}/200</span></span>
                 <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="s.diagnosticos" maxlength="200" placeholder="DIAGNÓSTICO Y/O COMPLICACIÓN DE LA SESIÓN" autocomplete="off"></textarea>
               </label>
-              <label class="fld">
-                <span class="fld-label">PROCEDIMIENTOS <span class="fld-chars" [class.fld-chars--full]="(s.procedimientos?.length||0) >= 10">{{(s.procedimientos?.length||0)}}/10</span></span>
-                <input class="fld-input" type="text" list="proc-odontologicos" [(ngModel)]="s.procedimientos" maxlength="10" placeholder="CÓDIGO ANEXO 2 O PROCEDIMIENTO" autocomplete="off" />
+              <label class="fld ses-wide">
+                <span class="fld-label">PROCEDIMIENTOS <span class="fld-chars" [class.fld-chars--warn]="(s.procedimientosCodigos?.length||0) >= 5">{{s.procedimientosCodigos?.length || 0}} SELECC.</span></span>
+                <div class="proc-picker">
+                  <input class="fld-input fld-input--proc" type="text" list="proc-odontologicos"
+                    [value]="procInput" [placeholder]="'ESCRIBE EL CÓDIGO (D1110) O PROCEDIMIENTO…'" autocomplete="off"
+                    (input)="onProcInput($event)" (keydown.enter)="agregarProcedimientoPorTexto(s, $event)"
+                    (change)="agregarProcedimientoPorTexto(s, $event)" />
+                  <div class="proc-chips" *ngIf="s.procedimientosCodigos?.length">
+                    <span class="proc-chip" *ngFor="let c of s.procedimientosCodigos">
+                      <span class="proc-chip-code">{{ c }}</span><span class="proc-chip-desc">{{ descripcionProcedimiento(c) }}</span>
+                      <button class="proc-chip-x" type="button" [attr.aria-label]="'Quitar ' + c" (click)="quitarProcedimiento(s, c)">×</button>
+                    </span>
+                  </div>
+                </div>
               </label>
               <label class="fld ses-wide">
                 <span class="fld-label">PRESCRIPCIONES — INDICACIONES, INSUMOS, FÁRMACOS (DOSIS, TIEMPO, VÍA) <span class="fld-chars" [class.fld-chars--warn]="(s.prescripciones?.length||0) >= 320" [class.fld-chars--full]="(s.prescripciones?.length||0) >= 400">{{(s.prescripciones?.length||0)}}/400</span></span>
