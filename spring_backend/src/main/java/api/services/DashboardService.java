@@ -375,7 +375,8 @@ public class DashboardService {
 
     /** Id de paciente existente cuyo nombre coincide (para ligar check-in â†’ boarding). */
     private String lookupPacienteId(String nombre) {
-        return pacienteRepository.findByNombreContainingIgnoreCase(nombre.trim())
+        return pacienteRepository
+                .findByNombresContainingIgnoreCaseOrApellidosContainingIgnoreCase(nombre.trim(), nombre.trim())
                 .stream().findFirst().map(api.entities.Paciente::getId).orElse(null);
     }
 

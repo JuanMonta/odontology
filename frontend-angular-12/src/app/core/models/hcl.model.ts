@@ -54,6 +54,9 @@ export interface HclSesion {
   sesion: number;
   fecha: string;
   diagnosticos: string;
+  /** Códigos CDT (D1110, D2140…) persistidos por FK en hc_sesion_procedimientos. */
+  procedimientosCodigos: string[];
+  /** Texto derivado «D1110 · profilaxis» (lo arma el backend/catálogo para imprimir). */
   procedimientos: string;
   prescripciones: string;
   proximaCita: string;
@@ -255,6 +258,7 @@ export function crearHclVacia(pacienteId: string, hoja = 1): Hcl {
       sesion: n,
       fecha: '',
       diagnosticos: '',
+      procedimientosCodigos: [],
       procedimientos: '',
       prescripciones: '',
       proximaCita: '',
@@ -308,6 +312,7 @@ export function hclCompleta(pacienteId: string, hc: Partial<Hcl> | null): Hcl {
       sesion: s.sesion,
       fecha: s.fecha ?? '',
       diagnosticos: s.diagnosticos ?? '',
+      procedimientosCodigos: s.procedimientosCodigos ?? [],
       procedimientos: s.procedimientos ?? '',
       prescripciones: s.prescripciones ?? '',
       proximaCita: s.proximaCita ?? '',

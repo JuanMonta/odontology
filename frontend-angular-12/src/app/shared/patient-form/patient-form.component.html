@@ -1,8 +1,13 @@
 <form class="form" (ngSubmit)="onSubmit()" novalidate>
   <div class="form-grid">
-    <label class="field field--full">
-      <span class="field-label">NOMBRE COMPLETO *</span>
-      <input class="field-input" type="text" [(ngModel)]="name" name="name" placeholder="NOMBRE Y APELLIDO" autocomplete="off" (ngModelChange)="persistDraft()" />
+    <label class="field">
+      <span class="field-label">NOMBRE(S) * <span class="fld-chars" [class.fld-chars--warn]="(firstName?.length||0) >= 80" [class.fld-chars--full]="(firstName?.length||0) >= 100">{{(firstName?.length||0)}}/100</span></span>
+      <input class="field-input" type="text" [(ngModel)]="firstName" name="firstName" placeholder="NOMBRES DEL PACIENTE" maxlength="100" autocomplete="off" (ngModelChange)="persistDraft()" />
+    </label>
+
+    <label class="field">
+      <span class="field-label">APELLIDO(S) * <span class="fld-chars" [class.fld-chars--warn]="(lastName?.length||0) >= 80" [class.fld-chars--full]="(lastName?.length||0) >= 100">{{(lastName?.length||0)}}/100</span></span>
+      <input class="field-input" type="text" [(ngModel)]="lastName" name="lastName" placeholder="APELLIDOS DEL PACIENTE" maxlength="100" autocomplete="off" (ngModelChange)="persistDraft()" />
     </label>
 
     <label class="field">
@@ -90,7 +95,7 @@
     </div>
   </div>
 
-  <p class="form-error" *ngIf="error" role="alert">EL NOMBRE DEL PACIENTE ES OBLIGATORIO</p>
+  <p class="form-error" *ngIf="error" role="alert">NOMBRE(S) Y APELLIDO(S) DEL PACIENTE SON OBLIGATORIOS</p>
 
   <div class="form-actions">
     <button class="btn-ghost" type="button" (click)="onCancel()">CANCELAR</button>

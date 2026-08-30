@@ -1,5 +1,6 @@
 package api.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.List;
@@ -98,6 +99,16 @@ public record HclDto(
             int sesion,
             String fecha,
             String diagnosticos,
+            /**
+             * Códigos de los procedimientos (CDT) ejecutados en esta sesión.
+             * Se persisten por FK en hc_sesion_procedimientos; al leer, el backend
+             * une el catálogo y expone {@code procedimientos} como «D1110 · profilaxis».
+             * Acepta deserialización tanto desde "procedimientosCodigos" como del campo
+             * legado "procedimientos" para compatibilidad con datos antiguos.
+             */
+            @JsonAlias("procedimientos")
+            java.util.List<String> procedimientosCodigos,
+            /** Texto derivado «D1110 · profilaxis\nD1204 · fluoruro» para PDF y visualización. */
             String procedimientos,
             String prescripciones,
             String proximaCita,

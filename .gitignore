@@ -28,6 +28,7 @@ AGENTS.md
 /spring_backend/src/test/
 /spring_backend/.mvn/
 /spring_backend/logs/
+/spring_backend/run_backend.bat
 /spring_backend/src/main/resources/application-local.yaml
 
 # ---------- Tools ----------
@@ -36,6 +37,7 @@ AGENTS.md
 
 # ---------- Tests ----------
 /test-results
+/tests
 
 # ---------- Logs ----------
 **/logs/

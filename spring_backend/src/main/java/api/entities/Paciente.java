@@ -16,6 +16,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Paciente (tabla {@code pacientes}). La columna generada {@code cumpleanios}
@@ -46,8 +47,19 @@ public class Paciente {
     @Column(name = "sexo")
     private Sexo sexo;
 
-    @Column(name = "nombre", nullable = false, length = 100)
-    private String nombre;
+    @Column(name = "nombres", nullable = false, length = 100)
+    private String nombres;
+
+    @Column(name = "apellidos", nullable = false, length = 100)
+    private String apellidos;
+
+    /** Nombre completo derivado: NOMBRES + APELLIDOS. */
+    public String getNombreCompleto() {
+        return String.join(" ",
+                List.of((nombres == null ? "" : nombres.trim()),
+                        (apellidos == null ? "" : apellidos.trim()))
+                        .stream().filter(s -> !s.isEmpty()).toList());
+    }
 
     @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;

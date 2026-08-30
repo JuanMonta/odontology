@@ -36,6 +36,12 @@ public class VistaPaciente {
     @Column(name = "sexo")
     private Paciente.Sexo sexo;
 
+    @Column(name = "nombres")
+    private String nombres;
+
+    @Column(name = "apellidos")
+    private String apellidos;
+
     @Column(name = "nombre")
     private String nombre;
 
