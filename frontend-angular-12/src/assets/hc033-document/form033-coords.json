@@ -24,8 +24,8 @@
           "h": 35,
           "label": "nombre",
           "type": "text",
-          "sampleValue": "JOSÉ",
-          "dbField": "patient.name"
+          "sampleValue": "MARÍA",
+          "dbField": "patient.nombre"
         },
         "apellido": {
           "page": 1,
