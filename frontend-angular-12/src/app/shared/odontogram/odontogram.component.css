@@ -45,13 +45,32 @@
   transition: stroke 0.15s var(--ease-out);
 }
 
-.perio-val {
+.perio-input {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: none;
+  background: transparent;
+  color: var(--flap-ink);
   font-family: var(--font-flap);
   font-size: 11px;
   font-weight: 600;
-  text-anchor: middle;
-  fill: var(--flap-ink);
-  pointer-events: none;
+  text-align: center;
+  padding: 0;
+  outline: none;
+  caret-color: var(--amber);
+}
+
+.perio-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+g:not(.perio--off) .perio-box {
+  cursor: pointer;
+}
+
+g:not(.perio--off):hover .perio-box {
+  stroke: var(--amber);
 }
 
 .perio--off {
@@ -63,17 +82,8 @@
   opacity: 0.28;
 }
 
-g[role='button']:not(.perio--off):hover .perio-box {
-  stroke: var(--amber);
-}
-
-g[role='button']:not(.perio--off):focus-visible {
-  outline: none;
-}
-
-g[role='button']:not(.perio--off):focus-visible .perio-box {
-  stroke: var(--amber);
-  stroke-width: 2;
+.perio--off .perio-input {
+  color: transparent;
 }
 
 /* ============ Dientes ============ */

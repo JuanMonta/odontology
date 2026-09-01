@@ -244,13 +244,27 @@ export class OdontogramComponent implements OnInit, OnChanges, OnDestroy {
     return mark ? SYMBOLS[mark.condition].color : '';
   }
 
-  clickPerio(tv: ToothView, kind: 'movilidad' | 'recesion'): void {
+  onPerioInput(event: Event, tv: ToothView, kind: 'movilidad' | 'recesion'): void {
     if (tv.missing) {
       return;
     }
-    const cur = tv.tooth[kind] ?? '';
-    const next = PERIO_CYCLE[(PERIO_CYCLE.indexOf(cur) + 1) % PERIO_CYCLE.length];
-    this.change.emit([{ ...tv.tooth, [kind]: next }]);
+    const input = event.target as HTMLInputElement;
+    let value = input.value.toUpperCase();
+    if (value.length > 1) {
+      value = value[value.length - 1];
+    }
+    if (value !== '' && !PERIO_CYCLE.includes(value)) {
+      value = input.value = tv.tooth[kind] ?? '';
+      return;
+    }
+    if (value === (tv.tooth[kind] ?? '')) {
+      return;
+    }
+    this.change.emit([{ ...tv.tooth, [kind]: value }]);
+  }
+
+  blurPerio(event: Event): void {
+    (event.target as HTMLInputElement | null)?.blur();
   }
 
   colorOf(c: ToothCondition | 'clear' | null): string {
