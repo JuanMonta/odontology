@@ -172,12 +172,8 @@
           >{{ row.label }}</text>
           <g
             *ngFor="let tv of row.views; let i = index"
-            role="button"
-            tabindex="0"
             [class.perio--off]="tv.missing"
             [attr.aria-label]="row.aria + ' pieza ' + tv.number"
-            (click)="clickPerio(tv, row.kind)"
-            (keydown.enter)="clickPerio(tv, row.kind)"
           >
             <rect
               [attr.x]="tv.x"
@@ -186,11 +182,26 @@
               height="18"
               class="perio-box"
             ></rect>
-            <text
-              [attr.x]="tv.x + 17.5"
-              [attr.y]="row.boxY + 13"
-              class="perio-val"
-            >{{ row.values[i] }}</text>
+            <foreignObject
+              [attr.x]="tv.x"
+              [attr.y]="row.boxY"
+              width="35"
+              height="18"
+            >
+              <input
+                xmlns="http://www.w3.org/1999/xhtml"
+                class="perio-input"
+                type="text"
+                maxlength="1"
+                [value]="row.values[i]"
+                [attr.data-tooth]="tv.number"
+                [attr.data-kind]="row.kind"
+                [attr.aria-label]="row.aria + ' pieza ' + tv.number"
+                [disabled]="tv.missing"
+                (input)="onPerioInput($event, tv, row.kind)"
+                (keydown.enter)="blurPerio($event)"
+              />
+            </foreignObject>
           </g>
         </ng-template>
 
