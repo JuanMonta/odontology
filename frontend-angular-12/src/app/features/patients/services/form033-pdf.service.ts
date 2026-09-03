@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PDFDocument, StandardFonts, rgb, PDFPage } from 'pdf-lib';
 import { Hcl, DIENTES_POR_SEXTANTE } from '../../../core/models/hcl.model';
-import { Patient } from '../../../core/models/patient.model';
+import { Patient, Tooth } from '../../../core/models/patient.model';
 
 export interface CoordField {
   page: number; x: number; y: number; w: number; h: number;
@@ -16,6 +16,7 @@ export class Form033PdfService {
   private font: any;
   private hcl!: Hcl;
   private patient!: Patient;
+  private teeth: Tooth[] = [];
 
   async loadCoords(): Promise<void> {
     const resp = await fetch('assets/hc033-document/form033-coords.json?v=' + Date.now());
@@ -419,6 +420,7 @@ export class Form033PdfService {
     await this.loadCoords();
     this.hcl = hcl;
     this.patient = patient;
+    this.teeth = (teeth as Tooth[]) || [];
 
     const doc = await PDFDocument.create();
     this.font = await doc.embedFont(StandardFonts.Helvetica);
@@ -442,6 +444,161 @@ export class Form033PdfService {
     this.drawPage1(page1);
     this.drawPage2(page2);
 
+    this.drawOdontogramTeeth(page1);
+    this.drawOdontogramPerio(page1);
+
     return doc.save();
+  }
+
+  // ────────────── ODONTOGRAMA · MOVILIDAD / RESECIÓN ──────────────
+  private drawOdontogramPerio(page: PDFPage): void {
+    for (const tooth of this.teeth) {
+      if (!tooth || tooth.number == null) { continue; }
+      if (tooth.movilidad) {
+        this.drawText(page, String(tooth.movilidad), `od_${tooth.number}_mov`, 9);
+      }
+      if (tooth.recesion) {
+        this.drawText(page, String(tooth.recesion), `od_${tooth.number}_rec`, 9);
+      }
+    }
+  }
+
+  // ────────────── ODONTOGRAMA · TOOTH SVG ──────────────
+  private static readonly ODO_NEEDED = rgb(1.0, 0.42, 0.37);
+  private static readonly ODO_DONE   = rgb(0.345, 0.651, 0.91);
+  private static readonly ODO_BORDER = rgb(0.55, 0.55, 0.55);
+  private static readonly ODO_INNER  = rgb(0.7, 0.7, 0.7);
+
+  private isDeciduousTooth(n: number): boolean {
+    return (n >= 51 && n <= 55) || (n >= 61 && n <= 65) ||
+           (n >= 71 && n <= 75) || (n >= 81 && n <= 85);
+  }
+
+  private toothArch(n: number): 'top' | 'bottom' {
+    return (n >= 11 && n <= 29) || (n >= 51 && n <= 65) ? 'top' : 'bottom';
+  }
+
+  private toothSide(n: number): 'left' | 'right' {
+    const d = Math.floor(n / 10);
+    return (d === 1 || d === 4 || d === 5 || d === 8) ? 'left' : 'right';
+  }
+
+  private faceColor(condition: string): any {
+    const needed = ['caries', 'endodoncia', 'extraccion', 'sellante-necesario'];
+    return needed.includes(condition)
+      ? Form033PdfService.ODO_NEEDED
+      : Form033PdfService.ODO_DONE;
+  }
+
+  private drawOdontogramTeeth(page: PDFPage): void {
+    const STRIP = 9 / 35;
+    const ALPHA = 0.55;
+
+    for (const tooth of this.teeth) {
+      if (!tooth || tooth.number == null) { continue; }
+      const n = tooth.number;
+      const f = this.c(`od_${n}`);
+      if (!f) { continue; }
+
+      const dec    = this.isDeciduousTooth(n);
+      const arch   = this.toothArch(n);
+      const side   = this.toothSide(n);
+      const missing = tooth.conditions.some(c => c === 'perdida-por-caries' || c === 'perdida-otra-causa');
+
+      const bx = this.pxToPdfX(f.x);
+      const by = 841.89 - (f.y + f.h) * 0.3599;
+      const bw = f.w * 0.3601;
+      const bh = f.h * 0.3599;
+      const cx = bx + bw / 2;
+      const cy = by + bh / 2;
+
+      // ── outline ──
+      if (!dec) {
+        page.drawRectangle({ x: bx, y: by, width: bw, height: bh, borderColor: Form033PdfService.ODO_BORDER, borderWidth: 0.5 });
+        page.drawLine({ start: { x: bx, y: cy }, end: { x: bx + bw, y: cy }, color: Form033PdfService.ODO_INNER, thickness: 0.3 });
+        page.drawLine({ start: { x: cx, y: by }, end: { x: cx, y: by + bh }, color: Form033PdfService.ODO_INNER, thickness: 0.3 });
+      } else {
+        const r = Math.min(bw, bh) / 2 - 1;
+        page.drawEllipse({ x: cx, y: cy, xScale: r, yScale: r, borderColor: Form033PdfService.ODO_BORDER, borderWidth: 0.5 });
+        page.drawLine({ start: { x: cx - r, y: cy }, end: { x: cx + r, y: cy }, color: Form033PdfService.ODO_INNER, thickness: 0.3 });
+        page.drawLine({ start: { x: cx, y: cy - r }, end: { x: cx, y: cy + r }, color: Form033PdfService.ODO_INNER, thickness: 0.3 });
+      }
+
+      // ── face overlays ──
+      for (const face of (tooth.faces || [])) {
+        const color = this.faceColor(face.condition);
+
+        if (!dec) {
+          const s = STRIP;
+          let fx: number; let fy: number; let fw: number; let fh: number;
+
+          switch (face.face) {
+            case 'oclusal':
+              fx = bx + bw * s; fy = by + bh * s;
+              fw = bw * (1 - 2 * s); fh = bh * (1 - 2 * s);
+              break;
+            case 'vestibular':
+              fx = bx; fw = bw; fh = bh * s;
+              fy = arch === 'top' ? by + bh * (1 - s) : by;
+              break;
+            case 'lingual':
+              fx = bx; fw = bw; fh = bh * s;
+              fy = arch === 'top' ? by : by + bh * (1 - s);
+              break;
+            case 'mesial':
+              fy = by; fh = bh; fw = bw * s;
+              fx = side === 'left' ? bx + bw * (1 - s) : bx;
+              break;
+            default:
+              fy = by; fh = bh; fw = bw * s;
+              fx = side === 'left' ? bx : bx + bw * (1 - s);
+              break;
+          }
+
+          page.drawRectangle({ x: fx, y: fy, width: fw, height: fh, color, opacity: ALPHA });
+        } else {
+          const r = Math.min(bw, bh) / 2 - 2;
+          const off = r * 0.35;
+
+          switch (face.face) {
+            case 'oclusal':
+              page.drawEllipse({ x: cx, y: cy, xScale: r * 0.4, yScale: r * 0.4, color, opacity: ALPHA });
+              break;
+            case 'vestibular':
+              page.drawEllipse({ x: cx, y: cy + (arch === 'top' ? off : -off), xScale: r * 0.8, yScale: r * 0.5, color, opacity: ALPHA });
+              break;
+            case 'lingual':
+              page.drawEllipse({ x: cx, y: cy + (arch === 'top' ? -off : off), xScale: r * 0.8, yScale: r * 0.5, color, opacity: ALPHA });
+              break;
+            case 'mesial':
+              page.drawEllipse({ x: cx + (side === 'left' ? off : -off), y: cy, xScale: r * 0.5, yScale: r * 0.8, color, opacity: ALPHA });
+              break;
+            default:
+              page.drawEllipse({ x: cx + (side === 'left' ? -off : off), y: cy, xScale: r * 0.5, yScale: r * 0.8, color, opacity: ALPHA });
+              break;
+          }
+        }
+      }
+
+      // ── whole-tooth marks ──
+      if (missing) {
+        const m = bw * 0.2;
+        page.drawLine({ start: { x: bx + m, y: by + m }, end: { x: bx + bw - m, y: by + bh - m }, color: Form033PdfService.ODO_DONE, thickness: 1.5 });
+        page.drawLine({ start: { x: bx + bw - m, y: by + m }, end: { x: bx + m, y: by + bh - m }, color: Form033PdfService.ODO_DONE, thickness: 1.5 });
+      }
+      if (tooth.conditions.includes('corona')) {
+        const m = 3;
+        page.drawRectangle({ x: bx - m, y: by - m, width: bw + m * 2, height: bh + m * 2, borderColor: Form033PdfService.ODO_DONE, borderWidth: 1.5 });
+      }
+      if (tooth.conditions.includes('extraccion')) {
+        const m = bw * 0.15;
+        page.drawLine({ start: { x: bx + m, y: by + m }, end: { x: bx + bw - m, y: by + bh - m }, color: Form033PdfService.ODO_NEEDED, thickness: 1.5 });
+        page.drawLine({ start: { x: bx + bw - m, y: by + m }, end: { x: bx + m, y: by + bh - m }, color: Form033PdfService.ODO_NEEDED, thickness: 1.5 });
+      }
+      if (tooth.conditions.includes('endodoncia') || tooth.conditions.includes('endodoncia-realizada')) {
+        const col = tooth.conditions.includes('endodoncia') ? Form033PdfService.ODO_NEEDED : Form033PdfService.ODO_DONE;
+        page.drawLine({ start: { x: cx, y: by + bh * 0.15 }, end: { x: cx, y: by + bh * 0.85 }, color: col, thickness: 1.5 });
+      }
+    }
   }
 }
