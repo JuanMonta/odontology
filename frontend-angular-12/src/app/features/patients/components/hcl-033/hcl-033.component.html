@@ -7,17 +7,19 @@
     </div>
     <div class="hc-head-meta" *ngIf="patient">
       <span class="hc-meta hc-meta--edit"><span class="hc-meta-lbl">ESTABLECIMIENTO <span class="fld-chars" [class.fld-chars--warn]="(hc.establecimiento?.length||0) >= 80" [class.fld-chars--full]="(hc.establecimiento?.length||0) >= 100">{{(hc.establecimiento?.length||0)}}/100</span></span><input class="fld-input hc-meta-input" type="text" [(ngModel)]="hc.establecimiento" [readonly]="sellada" maxlength="100" placeholder="NOMBRE DEL ESTABLECIMIENTO" autocomplete="off" [attr.aria-readonly]="sellada" /></span>
-      <span class="hc-meta"><span class="hc-meta-lbl">PACIENTE</span><span class="hc-meta-val">{{ patient.name }}</span></span>
-      <span class="hc-meta"><span class="hc-meta-lbl">Nº HISTORIA</span><span class="hc-meta-val">{{ patient.id }}</span></span>
-      <span class="hc-meta"><span class="hc-meta-lbl">EDAD</span><span class="hc-meta-val">{{ patient.age }}</span></span>
-      <span class="hc-meta"><span class="hc-meta-lbl">SEXO</span>
-        <select class="fld-select fld-select--mini" [(ngModel)]="hc.sexo" [disabled]="sellada" aria-label="Sexo">
-          <option [ngValue]="null" selected>—</option>
-          <option value="M">M</option>
-          <option value="F">F</option>
-        </select>
-      </span>
-      <span class="hc-meta"><span class="hc-meta-lbl">GRUPO ETARIO</span><span class="hc-meta-val">{{ grupo() }}</span></span>
+      <div class="hc-head-data">
+        <span class="hc-meta"><span class="hc-meta-lbl">PACIENTE</span><span class="hc-meta-val">{{ patient.name }}</span></span>
+        <span class="hc-meta"><span class="hc-meta-lbl">Nº HISTORIA</span><span class="hc-meta-val">{{ patient.id }}</span></span>
+        <span class="hc-meta"><span class="hc-meta-lbl">EDAD</span><span class="hc-meta-val">{{ patient.age }}</span></span>
+        <span class="hc-meta"><span class="hc-meta-lbl">SEXO</span>
+          <select class="fld-select fld-select--mini" [(ngModel)]="hc.sexo" [disabled]="sellada" aria-label="Sexo">
+            <option [ngValue]="null" selected>—</option>
+            <option value="M">M</option>
+            <option value="F">F</option>
+          </select>
+        </span>
+        <span class="hc-meta"><span class="hc-meta-lbl">GRUPO ETARIO</span><span class="hc-meta-val">{{ grupo() }}</span></span>
+      </div>
     </div>
     <div class="hc-hojas" *ngIf="patient">
       <span class="hc-hojas-lbl">HOJAS</span>
