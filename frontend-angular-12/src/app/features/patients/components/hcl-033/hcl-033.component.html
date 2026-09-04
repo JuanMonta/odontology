@@ -495,6 +495,13 @@
           </svg>
           IMPRIMIR
         </button>
+        <button class="btn-retry" type="button" *ngIf="estado === 'error'" (click)="guardar()">
+          <svg class="btn-retry-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M13 8a5 5 0 1 1-1.2-3.2"></path>
+            <path d="M13 2.5V5h-2.5"></path>
+          </svg>
+          REINTENTAR
+        </button>
         <button class="btn-save" type="button" [disabled]="guardando" (click)="guardar()">
           <span class="btn-save-lamp" aria-hidden="true"></span>
           {{ guardando ? 'GUARDANDO…' : 'GUARDAR HISTORIA CLÍNICA' }}
@@ -647,7 +654,7 @@
        Patrón "acción segura primero, destructiva después". -->
   <div class="hc-modal" *ngIf="modal" role="dialog" aria-modal="true" aria-labelledby="hc-modal-title">
     <div class="hc-modal-backdrop" (click)="modalCancelar()"></div>
-    <div class="hc-modal-panel">
+    <div class="hc-modal-panel" (keydown)="onModalKeydown($event)">
       <div class="hc-modal-ico" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 3a9 9 0 1 0 9 9"></path>
@@ -655,13 +662,13 @@
         </svg>
       </div>
       <span class="hc-modal-t" id="hc-modal-title">CAMBIOS SIN GUARDAR</span>
-      <span class="hc-modal-s">
+      <span class="hc-modal-s" aria-live="polite">
         La hoja actual tiene datos que aún no se guardan. Para {{ modal?.accion === 'nueva' ? 'abrir una nueva hoja' : 'cambiar de hoja' }} primero guarda tu trabajo, o descarta los cambios y continúa.
       </span>
       <div class="hc-modal-actions">
         <button class="hc-modal-btn hc-modal-btn--ghost" type="button" (click)="modalCancelar()">CANCELAR</button>
         <button class="hc-modal-btn hc-modal-btn--danger" type="button" (click)="modalDescartar()">DESCARTAR CAMBIOS</button>
-        <button class="hc-modal-btn hc-modal-btn--primary" type="button" (click)="modalGuardar()">GUARDAR<span class="hc-modal-sub" *ngIf="modal?.accion === 'abrir'"> Y CAMBIAR</span><span class="hc-modal-sub" *ngIf="modal?.accion === 'nueva'"> Y ABRIR</span></button>
+        <button class="hc-modal-btn hc-modal-btn--primary" #modalPrimary type="button" (click)="modalGuardar()">GUARDAR<span class="hc-modal-sub" *ngIf="modal?.accion === 'abrir'"> Y CAMBIAR</span><span class="hc-modal-sub" *ngIf="modal?.accion === 'nueva'"> Y ABRIR</span></button>
       </div>
     </div>
   </div>
