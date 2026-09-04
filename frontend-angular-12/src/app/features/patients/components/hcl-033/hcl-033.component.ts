@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Subscription, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Patient, Tooth } from '../../../../core/models/patient.model';
@@ -53,7 +53,30 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   mensaje: string | null = null;
   /** Confirmación pendiente por cambios sin guardar. Sustituye al window.confirm
    *  nativo por un modal del sistema con "acción segura primero, destructiva después". */
-  modal: ModalAccion | null = null;
+  private _modal: ModalAccion | null = null;
+  @ViewChild('modalPrimary') private modalPrimaryRef?: ElementRef<HTMLButtonElement>;
+
+  get modal(): ModalAccion | null { return this._modal; }
+  set modal(m: ModalAccion | null) {
+    this._modal = m;
+    if (m) {
+      setTimeout(() => this.modalPrimaryRef?.nativeElement.focus());
+    } else {
+      this.restaurarFoco();
+    }
+  }
+
+  /** Mantiene el elemento con foco previo para restaurarlo al cerrar el modal. */
+  private focusPrevio: HTMLElement | null = null;
+
+  private restaurarFoco(): void {
+    if (this.focusPrevio) { this.focusPrevio.focus(); }
+    this.focusPrevio = null;
+  }
+
+  onModalKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Escape') { this.modalCancelar(); }
+  }
 
   /** Estado persistido de la última carga/guardado: de él derivan los sellos,
    *  no del modelo vivo {@link hc}. Al iniciar el tratamiento (sesión 1 con
@@ -224,6 +247,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
       return;
     }
     if (this.tieneContenido(this.hc) && this.estado !== 'ok') {
+      this.focusPrevio = document.activeElement as HTMLElement;
       this.modal = { accion: 'abrir', hoja: n };
       return;
     }
@@ -258,6 +282,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
       return;
     }
     if (this.tieneContenido(this.hc) && this.estado !== 'ok') {
+      this.focusPrevio = document.activeElement as HTMLElement;
       this.modal = { accion: 'nueva', hoja: this.hc.hoja + 1 };
       return;
     }
