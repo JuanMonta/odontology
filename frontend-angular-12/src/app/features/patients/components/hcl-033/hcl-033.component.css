@@ -448,13 +448,19 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 10px;
+  line-height: 1.4;
 }
 
 .fld-chars {
-  font-size: 0.82em;
-  font-weight: 400;
+  font-size: 0.94em;
+  font-weight: 500;
   letter-spacing: 0;
   color: var(--steel-400);
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-left: auto;
+  font-family: var(--font-flap);
 }
 
 .fld-chars.fld-chars--warn {
@@ -480,8 +486,9 @@
 }
 
 .fld-input::placeholder {
-  color: var(--steel-600);
+  color: var(--steel-500);
   letter-spacing: 0.1em;
+  opacity: 1;
 }
 
 .fld-input:focus {
@@ -526,6 +533,7 @@
   border-radius: var(--radius-sm);
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
   transition: border-color 0.18s var(--ease-out);
+  min-height: 39px;
 }
 
 .fld-select:focus {
@@ -689,6 +697,9 @@
   letter-spacing: 0.1em;
   color: var(--steel-300);
   text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ============ Checkbox inline por región ============ */
@@ -1452,5 +1463,133 @@
   .proc-picker,
   .proc-chip-x {
     display: none;
+  }
+}
+
+/* ============ Modal de confirmación (cambios sin guardar) ============ */
+.hc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.hc-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 5, 7, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+.hc-modal-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(440px, 100%);
+  padding: 22px 22px 18px;
+  background:
+    linear-gradient(160deg, #1a2026 0%, #14181d 60%, #0f1215 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.hc-modal-ico {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--amber);
+  background: rgba(255, 176, 32, 0.1);
+  border: 1px solid rgba(255, 176, 32, 0.3);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.hc-modal-ico svg {
+  width: 18px;
+  height: 18px;
+}
+
+.hc-modal-t {
+  font-family: var(--font-flap);
+  font-size: 0.82em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--amber);
+}
+
+.hc-modal-s {
+  font-size: 0.8em;
+  letter-spacing: 0.02em;
+  line-height: 1.55;
+  color: var(--steel-300);
+}
+
+.hc-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.hc-modal-btn {
+  padding: 11px 14px;
+  font-family: var(--font-flap);
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s var(--ease-out), border-color 0.18s var(--ease-out), color 0.18s var(--ease-out), filter 0.18s var(--ease-out);
+}
+
+.hc-modal-btn--ghost {
+  color: var(--steel-300);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.hc-modal-btn--ghost:hover {
+  border-color: var(--steel-400);
+  color: var(--flap-ink);
+}
+
+.hc-modal-btn--danger {
+  color: color-mix(in srgb, var(--red-dim) 28%, var(--flap-ink));
+  background: rgba(207, 90, 84, 0.14);
+  border: 1px solid rgba(207, 90, 84, 0.5);
+}
+
+.hc-modal-btn--danger:hover {
+  background: rgba(207, 90, 84, 0.24);
+}
+
+.hc-modal-btn--primary {
+  color: var(--flap-black);
+  background: var(--amber);
+  border: 1px solid var(--amber);
+}
+
+.hc-modal-btn--primary:hover {
+  filter: brightness(1.08);
+}
+
+.hc-modal-sub {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+@media (max-width: 480px) {
+  .hc-modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
 }

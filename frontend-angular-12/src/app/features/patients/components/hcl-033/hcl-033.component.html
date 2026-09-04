@@ -642,4 +642,27 @@
       DOCUMENTO CONFIDENCIAL · PROTEGIDO POR LA LEY ORGÁNICA DE SALUD (ART. 63) · CONSERVAR MÍNIMO 15 AÑOS
     </div>
   </div>
+
+  <!-- Confirmación de cambios sin guardar (abrir / nueva hoja).
+       Patrón "acción segura primero, destructiva después". -->
+  <div class="hc-modal" *ngIf="modal" role="dialog" aria-modal="true" aria-labelledby="hc-modal-title">
+    <div class="hc-modal-backdrop" (click)="modalCancelar()"></div>
+    <div class="hc-modal-panel">
+      <div class="hc-modal-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3a9 9 0 1 0 9 9"></path>
+          <path d="M12 8v5l3 2"></path>
+        </svg>
+      </div>
+      <span class="hc-modal-t" id="hc-modal-title">CAMBIOS SIN GUARDAR</span>
+      <span class="hc-modal-s">
+        La hoja actual tiene datos que aún no se guardan. Para {{ modal?.accion === 'nueva' ? 'abrir una nueva hoja' : 'cambiar de hoja' }} primero guarda tu trabajo, o descarta los cambios y continúa.
+      </span>
+      <div class="hc-modal-actions">
+        <button class="hc-modal-btn hc-modal-btn--ghost" type="button" (click)="modalCancelar()">CANCELAR</button>
+        <button class="hc-modal-btn hc-modal-btn--danger" type="button" (click)="modalDescartar()">DESCARTAR CAMBIOS</button>
+        <button class="hc-modal-btn hc-modal-btn--primary" type="button" (click)="modalGuardar()">GUARDAR<span class="hc-modal-sub" *ngIf="modal?.accion === 'abrir'"> Y CAMBIAR</span><span class="hc-modal-sub" *ngIf="modal?.accion === 'nueva'"> Y ABRIR</span></button>
+      </div>
+    </div>
+  </div>
 </div>

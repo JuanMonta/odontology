@@ -28,6 +28,11 @@ interface Seccion033 {
 
 type EstadoGuardado = 'idle' | 'ok' | 'error';
 
+interface ModalAccion {
+  accion: 'abrir' | 'nueva';
+  hoja: number;
+}
+
 @Component({
   selector: 'app-hcl-033',
   templateUrl: './hcl-033.component.html',
@@ -46,6 +51,9 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   guardando = false;
   estado: EstadoGuardado = 'idle';
   mensaje: string | null = null;
+  /** Confirmación pendiente por cambios sin guardar. Sustituye al window.confirm
+   *  nativo por un modal del sistema con "acción segura primero, destructiva después". */
+  modal: ModalAccion | null = null;
 
   /** Estado persistido de la última carga/guardado: de él derivan los sellos,
    *  no del modelo vivo {@link hc}. Al iniciar el tratamiento (sesión 1 con
@@ -215,10 +223,15 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     if (!this.patient || n === this.hc.hoja || this.cargando || this.guardando) {
       return;
     }
-    if (this.tieneContenido(this.hc) && this.estado !== 'ok' &&
-        !window.confirm('La hoja actual tiene datos sin guardar. ¿Cambiar de hoja? Los cambios no guardados se perderán.')) {
+    if (this.tieneContenido(this.hc) && this.estado !== 'ok') {
+      this.modal = { accion: 'abrir', hoja: n };
       return;
     }
+    this.ejecutarAbrirHoja(n);
+  }
+
+  private ejecutarAbrirHoja(n: number): void {
+    if (!this.patient) { return; }
     this.cargando = true;
     this.mensaje = null;
     this.sub.add(
@@ -244,10 +257,15 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     if (!this.patient || this.cargando || this.guardando) {
       return;
     }
-    if (this.tieneContenido(this.hc) && this.estado !== 'ok' &&
-        !window.confirm('La hoja actual tiene datos sin guardar. ¿Abrir una nueva hoja? Los cambios no guardados se perderán.')) {
+    if (this.tieneContenido(this.hc) && this.estado !== 'ok') {
+      this.modal = { accion: 'nueva', hoja: this.hc.hoja + 1 };
       return;
     }
+    this.ejecutarNuevaHoja();
+  }
+
+  private ejecutarNuevaHoja(): void {
+    if (!this.patient) { return; }
     const siguiente = Math.max(1, ...this.hojas.map(h => h.hoja), this.hc.hoja) + 1;
     this.hc = crearHclVacia(this.patient.id, siguiente);
     this.snapshot = null;
@@ -260,6 +278,32 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     this.estado = 'idle';
     this.mensaje = null;
     this.cdr.markForCheck();
+  }
+
+  /** Acción segura del modal: guarda antes de continuar (abrir/nueva hoja). */
+  modalGuardar(): void {
+    const accion = this.modal;
+    if (!accion) { return; }
+    this.modal = null;
+    this.guardarAhora(() => {
+      if (accion.accion === 'abrir') { this.ejecutarAbrirHoja(accion.hoja); }
+      else { this.ejecutarNuevaHoja(); }
+    });
+  }
+
+  /** Acción destructiva del modal: descarta los cambios no guardados y continúa. */
+  modalDescartar(): void {
+    const accion = this.modal;
+    if (!accion) { return; }
+    this.modal = null;
+    this.estado = 'idle';
+    this.mensaje = null;
+    if (accion.accion === 'abrir') { this.ejecutarAbrirHoja(accion.hoja); }
+    else { this.ejecutarNuevaHoja(); }
+  }
+
+  modalCancelar(): void {
+    this.modal = null;
   }
 
   sesionNueveLlena(): boolean {
@@ -319,6 +363,10 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   }
 
   guardar(): void {
+    this.guardarAhora();
+  }
+
+  private guardarAhora(continuar?: () => void): void {
     if (!this.patient || this.guardando) {
       return;
     }
@@ -335,6 +383,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
           this.mensaje = 'HISTORIA CLÍNICA GUARDADA';
           this.refrescarHojas();
           this.cdr.markForCheck();
+          if (continuar) { continuar(); }
         },
         error: (err: unknown) => {
           this.guardando = false;
