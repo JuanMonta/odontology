@@ -15,7 +15,7 @@
           >
             <span class="alert-lamp" aria-hidden="true"></span>
             ALERTAS
-            <span class="alert-badge" *ngIf="(pending$ | async)">{{ pending$ | async }}</span>
+            <span class="alert-badge" *ngIf="(pending$ | async) as pending">{{ pending }}</span>
           </button>
           <div class="alerts-pop" *ngIf="alertsOpen">
             <div class="alerts-pop-head">
@@ -64,7 +64,7 @@
           type="search"
           placeholder="BUSCAR PACIENTE · NOMBRE / HC / TRATAMIENTO"
           aria-label="Buscar paciente"
-          (input)="onSearch($any($event.target).value)"
+          (input)="onSearch($event)"
         />
       </label>
       <div class="filter">
@@ -72,7 +72,7 @@
         <select
           class="filter-select"
           aria-label="Filtrar por estado"
-          (change)="onFilter($any($event.target).value)"
+          (change)="onFilter($event)"
         >
           <option value="all">TODOS</option>
           <option value="active">ACTIVOS</option>

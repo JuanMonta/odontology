@@ -64,12 +64,12 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(q: string): void {
-    this.search$.next(q);
+  onSearch(q: Event): void {
+    this.search$.next((q.target as HTMLInputElement).value);
   }
 
-  onFilter(f: PatientFilter): void {
-    this.filter$.next(f);
+  onFilter(f: Event): void {
+    this.filter$.next((f.target as HTMLSelectElement).value as PatientFilter);
   }
 
   onSelect(patient: Patient): void {
@@ -108,8 +108,7 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
     this.alertsOpen = false;
     const found = this.service.findPatient(id);
     if (found) {
-      this.selected = found;
-      this.creating = false;
+      this.onSelect(found);
     }
   }
 }
