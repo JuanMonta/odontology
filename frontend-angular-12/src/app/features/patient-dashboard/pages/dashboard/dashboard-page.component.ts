@@ -2,8 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  OnDestroy,
-  OnInit
+  OnDestroy
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
@@ -42,7 +41,7 @@ function pad(n: number): string {
   styleUrls: ['./dashboard-page.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DashboardPageComponent implements OnInit, OnDestroy {
+export class DashboardPageComponent implements OnDestroy {
   private static readonly DRAFT_KEY = 'saas.clinica.appointment-form.draft';
 
   private get draftKey(): string {
@@ -87,12 +86,15 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
       map(list => list.map(p => p.patient.toUpperCase())),
       takeUntil(this.destroy$)
     );
-    this.totals$ = this.mock.appointments$.pipe(
-      map(list => this.computeTotals(list)),
+    this.totals$ = this.mock.totals$;
+    this.patientOptions$ = patients.patients$.pipe(
+      map(list => list.map(p => p.name)),
       takeUntil(this.destroy$)
     );
-    this.patientOptions$ = patients.patients$.pipe(map(list => list.map(p => p.name)));
-    this.treatmentOptions$ = treatments.treatments$.pipe(map(list => list.map(t => t.name)));
+    this.treatmentOptions$ = treatments.treatments$.pipe(
+      map(list => list.map(t => t.name)),
+      takeUntil(this.destroy$)
+    );
 
     // Cascada: los consultorios se restringen a los que soportan el tratamiento elegido.
     this.consultorioOptions$ = combineLatest([
@@ -107,7 +109,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
           .filter(c => c.status !== 'inactivo')
           .filter(c => !allowed || allowed.includes(c.code))
           .map(c => c.name);
-      })
+      }),
+      takeUntil(this.destroy$)
     );
 
     // Cascada: los odontólogos se restringen a los asignados al consultorio elegido.
@@ -122,7 +125,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
           .filter(o => o.status === 'activo')
           .filter(o => !consObj || o.consultorio === consObj.code)
           .map(o => o.name);
-      })
+      }),
+      takeUntil(this.destroy$)
     );
 
     // Cascada: la hora se restringe a la jornada del odontólogo elegido.
@@ -141,7 +145,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
           return [];
         }
         return this.hourRange(turno.horaInicio, turno.horaFin);
-      })
+      }),
+      takeUntil(this.destroy$)
     );
   }
 
@@ -161,8 +166,6 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     return out;
   }
 
-  ngOnInit(): void {}
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -170,7 +173,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   onCallNext(): void {
     this.waitingError = '';
-    this.mock.callWaitingPatient().subscribe({
+    this.mock.callWaitingPatient().pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.waitingError = '';
         this.refreshBoards();
@@ -308,14 +311,5 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     } catch {
       // almacenamiento no disponible
     }
-  }
-
-  private computeTotals(list: Appointment[]): BoardTotals {
-    return {
-      total: list.length,
-      waiting: list.filter(a => a.status === 'arrived' || a.status === 'delayed').length,
-      delayed: list.filter(a => a.status === 'delayed').length,
-      done: list.filter(a => a.status === 'done').length
-    };
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { Appointment, BoardTotals, WaitingPatient } from '../../../core/models/appointment.model';
 import { API_BASE } from '../../../core/config/api.config';
 import { BackendStatusService } from '../../../core/services/backend-status.service';
@@ -17,6 +17,14 @@ export class DashboardHttpService {
 
   readonly appointments$: Observable<Appointment[]> = this.appointmentsSubject.asObservable();
   readonly waiting$: Observable<WaitingPatient[]> = this.waitingSubject.asObservable();
+  readonly totals$: Observable<BoardTotals> = this.appointmentsSubject.pipe(
+    map(list => ({
+      total: list.length,
+      waiting: list.filter(a => a.status === 'arrived' || a.status === 'delayed').length,
+      delayed: list.filter(a => a.status === 'delayed').length,
+      done: list.filter(a => a.status === 'done').length
+    }))
+  );
 
   constructor(private readonly http: HttpClient, status: BackendStatusService) {
     this.refresh();
@@ -50,16 +58,6 @@ export class DashboardHttpService {
    */
   checkIn(payload: { appointmentId?: string; pacienteNombre?: string; motivo?: string }): void {
     this.http.post(`${API_BASE}/dashboard/waiting`, payload).subscribe(() => this.refresh());
-  }
-
-  get totals(): BoardTotals {
-    const list = this.appointmentsSubject.getValue();
-    return {
-      total: list.length,
-      waiting: list.filter(a => a.status === 'arrived' || a.status === 'delayed').length,
-      delayed: list.filter(a => a.status === 'delayed').length,
-      done: list.filter(a => a.status === 'done').length
-    };
   }
 
   /** Cierre de día: marca no-show todas las on-time restantes del backend. */
