@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Subscription, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Patient, Tooth } from '../../../../core/models/patient.model';
@@ -13,8 +13,10 @@ import {
   SEXTO_SECTANTES,
   crearHclVacia,
   grupoEtario,
+  grupoEtarioKey,
   hclCompleta
 } from '../../../../core/models/hcl.model';
+import type { GrupoEtarioKey, HclHigieneSextante } from '../../../../core/models/hcl.model';
 import { HclHttpService } from '../../services/hcl-http.service';
 import { Form033PdfService } from '../../services/form033-pdf.service';
 import { PROCEDIMIENTOS_ODONTOLOGICOS } from '../../../../core/models/procedimientos-odontologicos';
@@ -28,6 +30,8 @@ interface Seccion033 {
 
 type EstadoGuardado = 'idle' | 'ok' | 'error';
 
+type AntecedenteKey = (typeof ANTECEDENTES_033)[number]['key'];
+
 interface ModalAccion {
   accion: 'abrir' | 'nueva';
   hoja: number;
@@ -36,7 +40,8 @@ interface ModalAccion {
 @Component({
   selector: 'app-hcl-033',
   templateUrl: './hcl-033.component.html',
-  styleUrls: ['./hcl-033.component.css']
+  styleUrls: ['./hcl-033.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   Math = Math;
@@ -57,13 +62,17 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   @ViewChild('modalPrimary') private modalPrimaryRef?: ElementRef<HTMLButtonElement>;
 
   get modal(): ModalAccion | null { return this._modal; }
-  set modal(m: ModalAccion | null) {
+
+  /** Abre el modal de confirmación y captura el foco previo para restaurarlo al cerrar. */
+  private abrirModal(m: ModalAccion): void {
+    this.focusPrevio = document.activeElement as HTMLElement;
     this._modal = m;
-    if (m) {
-      setTimeout(() => this.modalPrimaryRef?.nativeElement.focus());
-    } else {
-      this.restaurarFoco();
-    }
+    setTimeout(() => this.modalPrimaryRef?.nativeElement.focus());
+  }
+
+  private cerrarModal(): void {
+    this._modal = null;
+    this.restaurarFoco();
   }
 
   /** Mantiene el elemento con foco previo para restaurarlo al cerrar el modal. */
@@ -75,7 +84,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   }
 
   onModalKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') { this.modalCancelar(); }
+    if (e.key === 'Escape') { this.cerrarModal(); }
   }
 
   /** Estado persistido de la última carga/guardado: de él derivan los sellos,
@@ -138,10 +147,16 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     this.procInput = (e.target as HTMLInputElement).value;
   }
 
-  /** Descripción corta de un código CDT (viventa en el catálogo). */
+  /** Descripción corta de un código CDT (vive en el catálogo). */
   descripcionProcedimiento(codigo: string): string {
     const p = this.procedimientosOdontologicos.find(x => x.codigo === codigo.toUpperCase());
     return p ? p.descripcion : '';
+  }
+
+  private serializarProcedimientos(codigos: string[]): string {
+    return codigos
+      .map(c => c + (this.descripcionProcedimiento(c) ? ' · ' + this.descripcionProcedimiento(c) : ''))
+      .join('\n');
   }
 
   /** Agrega un procedimiento a la sesión desde el texto elegido (código o "código · descripción"). */
@@ -156,14 +171,14 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
       lista.push(codigo);
     }
     s.procedimientosCodigos = [...lista];
-    s.procedimientos = lista.map(c => c + (this.descripcionProcedimiento(c) ? ' · ' + this.descripcionProcedimiento(c) : '')).join('\n');
+    s.procedimientos = this.serializarProcedimientos(lista);
     this.procInput = '';
   }
 
   quitarProcedimiento(s: HclSesion, codigo: string): void {
     const lista = (s.procedimientosCodigos || []).filter(c => c !== codigo);
     s.procedimientosCodigos = lista;
-    s.procedimientos = lista.map(c => c + (this.descripcionProcedimiento(c) ? ' · ' + this.descripcionProcedimiento(c) : '')).join('\n');
+    s.procedimientos = this.serializarProcedimientos(lista);
     this.procInput = '';
   }
 
@@ -247,8 +262,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
       return;
     }
     if (this.tieneContenido(this.hc) && this.estado !== 'ok') {
-      this.focusPrevio = document.activeElement as HTMLElement;
-      this.modal = { accion: 'abrir', hoja: n };
+      this.abrirModal({ accion: 'abrir', hoja: n });
       return;
     }
     this.ejecutarAbrirHoja(n);
@@ -282,8 +296,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
       return;
     }
     if (this.tieneContenido(this.hc) && this.estado !== 'ok') {
-      this.focusPrevio = document.activeElement as HTMLElement;
-      this.modal = { accion: 'nueva', hoja: this.hc.hoja + 1 };
+      this.abrirModal({ accion: 'nueva', hoja: this.hc.hoja + 1 });
       return;
     }
     this.ejecutarNuevaHoja();
@@ -309,7 +322,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   modalGuardar(): void {
     const accion = this.modal;
     if (!accion) { return; }
-    this.modal = null;
+    this.cerrarModal();
     this.guardarAhora(() => {
       if (accion.accion === 'abrir') { this.ejecutarAbrirHoja(accion.hoja); }
       else { this.ejecutarNuevaHoja(); }
@@ -320,7 +333,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   modalDescartar(): void {
     const accion = this.modal;
     if (!accion) { return; }
-    this.modal = null;
+    this.cerrarModal();
     this.estado = 'idle';
     this.mensaje = null;
     if (accion.accion === 'abrir') { this.ejecutarAbrirHoja(accion.hoja); }
@@ -328,7 +341,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   }
 
   modalCancelar(): void {
-    this.modal = null;
+    this.cerrarModal();
   }
 
   sesionNueveLlena(): boolean {
@@ -428,13 +441,12 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     this.seccion = n;
   }
 
-  antVal(key: string): boolean {
-    return (this.hc as unknown as Record<string, boolean>)[key] ?? false;
+  antVal(key: AntecedenteKey): boolean {
+    return this.hc[key] ?? false;
   }
 
-  toggleAnt(key: string): void {
-    const target = this.hc as unknown as Record<string, boolean>;
-    target[key] = !(target[key] ?? false);
+  toggleAnt(key: AntecedenteKey): void {
+    this.hc[key] = !(this.hc[key] ?? false);
   }
 
   algunaAntecedente(): boolean {
@@ -442,22 +454,19 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   }
 
   ihosTotales(): { placa: string; calculo: string; gingivitis: string } {
-    const sumPlaca = (): string => {
+    const sum = (get: (h: HclHigieneSextante) => number | null, valida: (v: number) => boolean): string => {
       let t = 0;
-      for (const h of this.hc.higieneSextantes) { if (h.placa != null && h.placa >= 0 && h.placa <= 3) t += h.placa; }
+      for (const h of this.hc.higieneSextantes) {
+        const v = get(h);
+        if (v != null && valida(v)) { t += v; }
+      }
       return String(t);
     };
-    const sumCalculo = (): string => {
-      let t = 0;
-      for (const h of this.hc.higieneSextantes) { if (h.calculo != null && h.calculo >= 0 && h.calculo <= 3) t += h.calculo; }
-      return String(t);
+    return {
+      placa: sum(h => h.placa, v => v >= 0 && v <= 3),
+      calculo: sum(h => h.calculo, v => v >= 0 && v <= 3),
+      gingivitis: sum(h => h.gingivitis, v => v === 0 || v === 1)
     };
-    const sumGing = (): string => {
-      let t = 0;
-      for (const h of this.hc.higieneSextantes) { if (h.gingivitis === 0 || h.gingivitis === 1) t += h.gingivitis; }
-      return String(t);
-    };
-    return { placa: sumPlaca(), calculo: sumCalculo(), gingivitis: sumGing() };
   }
 
   grupo(): string {
@@ -496,8 +505,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
       this.mensaje = 'PDF GENERADO';
       this.estado = 'ok';
       this.cdr.markForCheck();
-    }).catch(err => {
-      console.error('Error generando PDF:', err);
+    }).catch(() => {
       this.mensaje = 'ERROR AL GENERAR PDF';
       this.estado = 'error';
       this.cdr.markForCheck();
@@ -511,14 +519,8 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   }
 
   /** Grupo etario según la edad del paciente (para la fila de checkboxes del Form 033). */
-  ageGroup(): string {
-    const age = this.patient?.age ?? 0;
-    if (age < 1) { return 'menor1'; }
-    if (age <= 4) { return '1a4'; }
-    if (age <= 9) { return '5a9'; }
-    if (age <= 14) { return '10a14'; }
-    if (age <= 19) { return '15a19'; }
-    return 'mayor20';
+  ageGroup(): GrupoEtarioKey {
+    return grupoEtarioKey(this.patient?.age ?? 0);
   }
 
   /** Nombre y apellido separados para el encabezado del Form 033. */

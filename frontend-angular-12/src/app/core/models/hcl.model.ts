@@ -321,21 +321,36 @@ export function hclCompleta(pacienteId: string, hc: Partial<Hcl> | null): Hcl {
   };
 }
 
-export function grupoEtario(edad: number): string {
+export type GrupoEtarioKey = 'menor1' | '1a4' | '5a9' | '10a14' | '15a19' | 'mayor20';
+
+const GRUPO_ETARIO_LABELS: Record<GrupoEtarioKey, string> = {
+  menor1: 'MENOR DE 1 AÑO',
+  '1a4': '1 - 4 AÑOS',
+  '5a9': '5 - 9 AÑOS',
+  '10a14': '10 - 14 AÑOS',
+  '15a19': '15 - 19 AÑOS',
+  mayor20: 'MAYOR DE 20 AÑOS'
+};
+
+export function grupoEtarioKey(edad: number): GrupoEtarioKey {
   if (edad < 1) {
-    return 'MENOR DE 1 AÑO';
+    return 'menor1';
   }
   if (edad <= 4) {
-    return '1 - 4 AÑOS';
+    return '1a4';
   }
   if (edad <= 9) {
-    return '5 - 9 AÑOS';
+    return '5a9';
   }
   if (edad <= 14) {
-    return '10 - 14 AÑOS';
+    return '10a14';
   }
   if (edad <= 19) {
-    return '15 - 19 AÑOS';
+    return '15a19';
   }
-  return 'MAYOR DE 20 AÑOS';
+  return 'mayor20';
+}
+
+export function grupoEtario(edad: number): string {
+  return GRUPO_ETARIO_LABELS[grupoEtarioKey(edad)];
 }
