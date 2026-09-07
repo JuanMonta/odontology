@@ -10,6 +10,7 @@ import {
 } from '../../../../core/models/patient.model';
 import { PatientsHttpService } from '../../services/patients-http.service';
 import { clearPatientFormDraft } from '../../../../shared/patient-form/patient-form.component';
+import { formatMoney } from '../../../../core/utils/format';
 
 type Tab = 'odonto' | 'hcl033' | 'historial' | 'ficha' | 'cuentas' | 'evolucion';
 
@@ -86,8 +87,7 @@ export class PatientPanelComponent implements OnChanges {
   }
 
   fmtMoney(n: number): string {
-    const abs = Math.abs(n).toLocaleString('en-US');
-    return n < 0 ? `-$ ${abs}` : `$ ${abs}`;
+    return formatMoney(n, { sign: true });
   }
 
   onToothChange(teeth: Tooth[]): void {

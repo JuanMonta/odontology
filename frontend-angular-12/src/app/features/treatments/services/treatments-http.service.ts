@@ -49,8 +49,4 @@ export class TreatmentsHttpService {
       this.subjects.next(this.subjects.getValue().map(t => (t.id === updated.id ? updated : t)));
     });
   }
-
-  money(price: number): string {
-    return `$ ${price.toLocaleString('en-US')}`;
-  }
 }

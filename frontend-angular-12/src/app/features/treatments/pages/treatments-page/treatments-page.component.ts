@@ -72,12 +72,12 @@ export class TreatmentsPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(q: string): void {
-    this.search$.next(q);
+  onSearch(q: Event): void {
+    this.search$.next((q.target as HTMLInputElement).value);
   }
 
-  onCategory(cat: CategoryFilter): void {
-    this.category$.next(cat);
+  onCategory(cat: Event): void {
+    this.category$.next((cat.target as HTMLSelectElement).value);
   }
 
   onSelect(treatment: Treatment): void {
@@ -119,9 +119,5 @@ export class TreatmentsPageComponent implements OnInit, OnDestroy {
 
   onToggleActive(id: string): void {
     this.service.toggleActive(id);
-  }
-
-  money(price: number): string {
-    return this.service.money(price);
   }
 }

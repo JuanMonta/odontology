@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Patient } from '../../../../core/models/patient.model';
 import { PaginatedListComponent } from '../../../../shared/components/pagination/paginated-list.component';
+import { formatMoney } from '../../../../core/utils/format';
 
 @Component({
   selector: 'app-patient-directory',
@@ -22,7 +23,7 @@ export class PatientDirectoryComponent extends PaginatedListComponent {
   }
 
   fmtMoney(n: number): string {
-    return n > 0 ? `$ ${n.toLocaleString('en-US')}` : 'AL DÍA';
+    return n > 0 ? formatMoney(n) : 'AL DÍA';
   }
 
   trackById(_: number, p: Patient): string {

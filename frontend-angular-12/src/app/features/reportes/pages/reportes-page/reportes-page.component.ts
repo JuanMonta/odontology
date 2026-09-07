@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ReportesHttpService } from '../../services/reportes-http.service';
+import { formatMoney } from '../../../../core/utils/format';
 import {
   ReporteCartera,
   ReporteCitasPerdidas,
@@ -177,7 +178,7 @@ export class ReportesPageComponent {
   }
 
   money(n: number): string {
-    return `$ ${(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return formatMoney(n || 0, { decimals: 2 });
   }
 
   pct(n: number): string {

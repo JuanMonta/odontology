@@ -4,6 +4,7 @@ import { map } from 'rxjs/operators';
 import { Treatment, TreatmentDraft } from '../../../../core/models/treatment.model';
 import { Consultorio } from '../../../../core/models/consultorio.model';
 import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
+import { formatMoney } from '../../../../core/utils/format';
 
 @Component({
   selector: 'app-treatment-panel',
@@ -50,7 +51,7 @@ export class TreatmentPanelComponent implements OnChanges, OnInit {
   }
 
   money(price: number): string {
-    return `$ ${price.toLocaleString('en-US')}`;
+    return formatMoney(price);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
