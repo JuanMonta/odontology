@@ -20,7 +20,7 @@
           type="search"
           placeholder="BUSCAR ESPECIALIDAD · NOMBRE / CÓDIGO"
           aria-label="Buscar especialidad"
-          (input)="onSearch($any($event.target).value)"
+          (input)="onSearch($event)"
         />
       </label>
       <div class="filter">
@@ -28,11 +28,11 @@
         <select
           class="filter-select"
           aria-label="Filtrar por estado"
-          (change)="onFilter($any($event.target).value)"
+          (change)="onFilter($event)"
         >
           <option value="all">TODAS</option>
-          <option [value]="true">ACTIVAS</option>
-          <option [value]="false">INACTIVAS</option>
+          <option value="true">ACTIVAS</option>
+          <option value="false">INACTIVAS</option>
         </select>
       </div>
     </div>
@@ -42,7 +42,7 @@
     <section class="directory" aria-label="Especialidades clínicas">
       <app-especialidad-directory
         [especialidades]="(especialidades$ | async) ?? []"
-        [selectedId]="selectedId"
+        [selectedId]="(selectedId$ | async) ?? null"
         (select)="onSelect($event)"
       ></app-especialidad-directory>
     </section>
