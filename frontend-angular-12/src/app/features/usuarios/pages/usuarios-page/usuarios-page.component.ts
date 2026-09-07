@@ -26,12 +26,11 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
   estados$: Observable<CatalogoItem[]>;
   esAdmin$: Observable<boolean>;
 
-  selectedId: string | null = null;
   creating = false;
 
   private readonly search$ = new BehaviorSubject<string>('');
   private readonly status$ = new BehaviorSubject<StatusFilter>('all');
-  private readonly selectedId$ = new BehaviorSubject<string | null>(null);
+  readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly destroy$ = new Subject<void>();
 
   constructor(
@@ -76,35 +75,33 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(q: string): void {
-    this.search$.next(q);
+  onSearch(ev: Event): void {
+    this.search$.next((ev.target as HTMLInputElement).value);
   }
 
-  onFilter(f: StatusFilter): void {
-    this.status$.next(f);
+  onFilter(ev: Event): void {
+    this.status$.next((ev.target as HTMLSelectElement).value as StatusFilter);
   }
 
   onSelect(usuario: Usuario): void {
-    this.selectedId = usuario.id;
     this.selectedId$.next(usuario.id);
     this.creating = false;
   }
 
   startCreate(): void {
     this.creating = true;
-    this.selectedId = null;
     this.selectedId$.next(null);
   }
 
   onSaved(draft: UsuarioDraft): void {
-    if (this.selectedId) {
-      const current = this.service.snapshot().find(u => u.id === this.selectedId);
+    const selectedId = this.selectedId$.getValue();
+    if (selectedId) {
+      const current = this.service.snapshot().find(u => u.id === selectedId);
       if (current) {
         this.service.updateUsuario({ ...current, ...draft });
       }
     } else {
       this.service.addUsuario(draft).subscribe(created => {
-        this.selectedId = created.id;
         this.selectedId$.next(created.id);
       });
     }
@@ -117,7 +114,6 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
   }
 
   onClosePanel(): void {
-    this.selectedId = null;
     this.selectedId$.next(null);
   }
 

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Treatment } from '../../../../core/models/treatment.model';
 import { PaginatedListComponent } from '../../../../shared/components/pagination/paginated-list.component';
+import { formatMoney } from '../../../../core/utils/format';
 
 @Component({
   selector: 'app-treatment-directory',
@@ -22,6 +23,6 @@ export class TreatmentDirectoryComponent extends PaginatedListComponent {
   }
 
   money(price: number): string {
-    return `$ ${price.toLocaleString('en-US')}`;
+    return formatMoney(price);
   }
 }

@@ -32,7 +32,7 @@
           type="search"
           placeholder="BUSCAR SALA · NOMBRE / CÓDIGO / PERSONAL EN TURNO"
           aria-label="Buscar consultorio"
-          (input)="onSearch($any($event.target).value)"
+          (input)="onSearch($event)"
         />
       </label>
       <div class="filter">
@@ -40,7 +40,7 @@
         <select
           class="filter-select"
           aria-label="Filtrar por estado"
-          (change)="onFilter($any($event.target).value)"
+          (change)="onFilter($event)"
         >
           <option value="all">TODAS</option>
           <option value="operativo">OPERATIVAS</option>
@@ -55,7 +55,7 @@
     <section class="directory" aria-label="Mapeo de consultorios">
       <app-consultorio-directory
         [consultorios]="(consultorios$ | async) ?? []"
-        [selectedId]="selectedId"
+        [selectedId]="(selectedId$ | async) ?? null"
         (select)="onSelect($event)"
       ></app-consultorio-directory>
     </section>

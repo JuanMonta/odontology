@@ -96,19 +96,15 @@
 .rail {
   width: 260px;
   flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  background:
-    radial-gradient(120% 100% at 50% 0%, #1c2229 0%, #14181d 55%, #0c0f12 100%);
-  border: 1px solid rgba(255, 255, 255, 0.055);
-  border-radius: var(--radius-md);
-  box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.7);
-  overflow: hidden;
 }
 
 .panel-wrap {
   flex: 1;
   min-width: 0;
+}
+
+.rail,
+.panel-wrap {
   display: flex;
   flex-direction: column;
   background:

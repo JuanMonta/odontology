@@ -21,12 +21,11 @@ export class OdontologosPageComponent implements OnInit, OnDestroy {
   odontologos$: Observable<Odontologo[]>;
   selected$: Observable<Odontologo | null>;
 
-  selectedId: string | null = null;
   creating = false;
 
   private readonly search$ = new BehaviorSubject<string>('');
   private readonly status$ = new BehaviorSubject<StatusFilter>('all');
-  private readonly selectedId$ = new BehaviorSubject<string | null>(null);
+  readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly destroy$ = new Subject<void>();
 
   constructor(
@@ -67,35 +66,33 @@ export class OdontologosPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(q: string): void {
-    this.search$.next(q);
+  onSearch(ev: Event): void {
+    this.search$.next((ev.target as HTMLInputElement).value);
   }
 
-  onFilter(f: StatusFilter): void {
-    this.status$.next(f);
+  onFilter(ev: Event): void {
+    this.status$.next((ev.target as HTMLSelectElement).value as StatusFilter);
   }
 
   onSelect(odontologo: Odontologo): void {
-    this.selectedId = odontologo.id;
     this.selectedId$.next(odontologo.id);
     this.creating = false;
   }
 
   startCreate(): void {
     this.creating = true;
-    this.selectedId = null;
     this.selectedId$.next(null);
   }
 
   onSaved(draft: OdontologoDraft): void {
-    if (this.selectedId) {
-      const current = this.service.snapshot().find(o => o.id === this.selectedId);
+    const selectedId = this.selectedId$.getValue();
+    if (selectedId) {
+      const current = this.service.snapshot().find(o => o.id === selectedId);
       if (current) {
         this.service.updateOdontologo({ ...current, ...draft });
       }
     } else {
       this.service.addOdontologo(draft).subscribe(created => {
-        this.selectedId = created.id;
         this.selectedId$.next(created.id);
       });
     }
@@ -108,7 +105,6 @@ export class OdontologosPageComponent implements OnInit, OnDestroy {
   }
 
   onClosePanel(): void {
-    this.selectedId = null;
     this.selectedId$.next(null);
   }
 

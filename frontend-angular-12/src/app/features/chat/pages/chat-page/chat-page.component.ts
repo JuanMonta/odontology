@@ -45,7 +45,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   dmOpen = false;
   canalOpen = false;
   rosterOpen = false;
-  dmSeleccion: string | null = null;
   canalNombre = '';
   canalMiembros: string[] = [];
   canalRename = '';
@@ -135,6 +134,9 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     if (this.typingNotificado && this.composerConvId != null) {
       this.socket.notificarEscritura(this.composerConvId, false);
     }
+    for (const timer of this.typingTimers.values()) {
+      clearTimeout(timer);
+    }
     this.destroy$.next();
     this.destroy$.complete();
     this.socket.desconectar();
@@ -181,6 +183,9 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     }
 
     this.chat.historial(conv.id).subscribe(msgs => {
+      if (this.activa?.id !== conv.id) {
+        return;
+      }
       this.mensajes = msgs;
       this.cdr.markForCheck();
       setTimeout(() => this.scrollToBottom(), 0);
@@ -204,14 +209,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   }
 
   abrirDmModal(): void {
-    this.dmSeleccion = null;
-    this.usuarios = [];
     this.dmOpen = true;
-    this.cdr.markForCheck();
-    this.chat.usuariosActivos().subscribe(lista => {
-      this.usuarios = lista;
-      this.cdr.markForCheck();
-    });
+    this.cargarUsuarios();
   }
 
   elegirDm(codigo: string): void {
@@ -229,13 +228,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   abrirCanalModal(): void {
     this.canalNombre = '';
     this.canalMiembros = [];
-    this.usuarios = [];
     this.canalOpen = true;
-    this.cdr.markForCheck();
-    this.chat.usuariosActivos().subscribe(lista => {
-      this.usuarios = lista;
-      this.cdr.markForCheck();
-    });
+    this.cargarUsuarios();
   }
 
   toggleMiembro(codigo: string): void {
@@ -269,13 +263,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       return;
     }
     this.canalRename = this.activa.nombre ?? '';
-    this.usuarios = [];
     this.rosterOpen = true;
-    this.cdr.markForCheck();
-    this.chat.usuariosActivos().subscribe(lista => {
-      this.usuarios = lista;
-      this.cdr.markForCheck();
-    });
+    this.cargarUsuarios();
   }
 
   cerrarRoster(): void {
@@ -345,9 +334,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   }
 
   onComposerInput(value: string): void {
-    if (this.composerConvId !== (this.activa?.id ?? null)) {
-      this.composerConvId = this.activa?.id ?? null;
-    }
+    this.composerConvId = this.activa?.id ?? null;
     this.input$.next(value);
   }
 
@@ -380,6 +367,15 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   trackPorCodigo(index: number, item: { codigo: string }): string {
     return item.codigo;
+  }
+
+  private cargarUsuarios(): void {
+    this.usuarios = [];
+    this.cdr.markForCheck();
+    this.chat.usuariosActivos().subscribe(lista => {
+      this.usuarios = lista;
+      this.cdr.markForCheck();
+    });
   }
 
   private cargarConversaciones(): void {

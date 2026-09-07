@@ -32,7 +32,7 @@
           type="search"
           placeholder="BUSCAR CUENTA · USUARIO / NOMBRE / ROL"
           aria-label="Buscar usuario"
-          (input)="onSearch($any($event.target).value)"
+          (input)="onSearch($event)"
         />
       </label>
       <div class="filter">
@@ -40,7 +40,7 @@
         <select
           class="filter-select"
           aria-label="Filtrar por estado"
-          (change)="onFilter($any($event.target).value)"
+          (change)="onFilter($event)"
         >
           <option value="all">TODOS</option>
           <option *ngFor="let e of estados$ | async" [value]="e.nombre">{{ e.nombre | uppercase }}</option>
@@ -53,7 +53,7 @@
     <section class="directory" aria-label="Control de usuarios">
       <app-usuario-directory
         [usuarios]="(usuarios$ | async) ?? []"
-        [selectedId]="selectedId"
+        [selectedId]="(selectedId$ | async) ?? null"
         (select)="onSelect($event)"
       ></app-usuario-directory>
     </section>

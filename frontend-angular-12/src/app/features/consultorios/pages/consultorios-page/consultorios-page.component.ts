@@ -10,6 +10,7 @@ import {
   StaffShiftState
 } from '../../../../core/models/consultorio.model';
 import { Turno } from '../../../../core/models/turno.model';
+import { Odontologo } from '../../../../core/models/odontologo.model';
 import { ConsultoriosHttpService } from '../../services/consultorios-http.service';
 import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
 import { TurnosHttpService } from '../../../turnos/services/turnos-http.service';
@@ -29,12 +30,11 @@ export class ConsultoriosPageComponent implements OnInit, OnDestroy {
   consultorios$: Observable<Consultorio[]>;
   selected$: Observable<Consultorio | null>;
 
-  selectedId: string | null = null;
   creating = false;
 
   private readonly search$ = new BehaviorSubject<string>('');
   private readonly status$ = new BehaviorSubject<StatusFilter>('all');
-  private readonly selectedId$ = new BehaviorSubject<string | null>(null);
+  readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly now$ = timer(0, 30_000).pipe(map(() => new Date()));
   private readonly destroy$ = new Subject<void>();
 
@@ -85,37 +85,35 @@ export class ConsultoriosPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(q: string): void {
-    this.search$.next(q);
+  onSearch(ev: Event): void {
+    this.search$.next((ev.target as HTMLInputElement).value);
   }
 
-  onFilter(f: StatusFilter): void {
-    this.status$.next(f);
+  onFilter(ev: Event): void {
+    this.status$.next((ev.target as HTMLSelectElement).value as StatusFilter);
   }
 
   onSelect(consultorio: Consultorio): void {
-    this.selectedId = consultorio.id;
     this.selectedId$.next(consultorio.id);
     this.creating = false;
   }
 
   startCreate(): void {
     this.creating = true;
-    this.selectedId = null;
     this.selectedId$.next(null);
   }
 
   onSaved(ev: ConsultorioSaveEvent): void {
     const { draft, assigned } = ev;
-    if (this.selectedId) {
-      const current = this.service.snapshot().find(c => c.id === this.selectedId);
+    const selectedId = this.selectedId$.getValue();
+    if (selectedId) {
+      const current = this.service.snapshot().find(c => c.id === selectedId);
       if (current) {
         this.service.updateConsultorio({ ...current, ...draft });
         this.applyAssignment(current.code, assigned);
       }
     } else {
       this.service.addConsultorio(draft).subscribe(created => {
-        this.selectedId = created.id;
         this.selectedId$.next(created.id);
         this.applyAssignment(created.code, assigned);
       });
@@ -145,7 +143,6 @@ export class ConsultoriosPageComponent implements OnInit, OnDestroy {
   }
 
   onClosePanel(): void {
-    this.selectedId = null;
     this.selectedId$.next(null);
   }
 
@@ -160,7 +157,7 @@ export class ConsultoriosPageComponent implements OnInit, OnDestroy {
    */
   private applyStaff(
     list: Consultorio[],
-    odontologos: { code: string; name: string; specialty: string; turno: string; consultorio: string; status: string }[],
+    odontologos: Odontologo[],
     turnos: Turno[],
     now: Date
   ): Consultorio[] {
