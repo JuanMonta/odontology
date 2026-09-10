@@ -18,7 +18,7 @@
 
 .roles-count {
   font-family: var(--font-flap);
-  font-size: 0.62em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.2em;
   color: var(--flap-dim);
 }
@@ -79,7 +79,7 @@
 
 .rol-sys-chip {
   font-family: var(--font-flap);
-  font-size: 0.56em;
+  font-size: var(--fs-micro);
   letter-spacing: 0.14em;
   color: var(--amber);
   padding: 3px 7px;
@@ -91,7 +91,7 @@
 
 .rol-del {
   font-family: var(--font-flap);
-  font-size: 0.6em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.12em;
   color: var(--steel-500);
   background: transparent;
@@ -117,7 +117,7 @@
 
 .rol-del-q {
   font-family: var(--font-flap);
-  font-size: 0.6em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.12em;
   color: var(--red-dim);
   white-space: nowrap;
@@ -126,7 +126,7 @@
 .rol-del-no,
 .rol-del-yes {
   font-family: var(--font-flap);
-  font-size: 0.6em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.1em;
   padding: 6px 10px;
   border-radius: var(--radius-sm);
@@ -165,7 +165,7 @@
   align-self: flex-start;
   padding: 9px 14px;
   font-family: var(--font-flap);
-  font-size: 0.68em;
+  font-size: var(--fs-body);
   font-weight: 500;
   letter-spacing: 0.14em;
   color: var(--flap-black);
@@ -195,7 +195,7 @@
 
 .rol-name {
   font-family: var(--font-flap);
-  font-size: 1.05em;
+  font-size: var(--fs-section);
   font-weight: 500;
   letter-spacing: 0.06em;
   color: var(--flap-ink);
@@ -208,7 +208,7 @@
 
 .rol-code {
   font-family: var(--font-flap);
-  font-size: 0.68em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.14em;
   color: var(--steel-400);
   flex-shrink: 0;
@@ -216,7 +216,7 @@
 
 .rol-state {
   font-family: var(--font-flap);
-  font-size: 0.58em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.14em;
   color: var(--green);
   padding: 4px 8px;
@@ -226,7 +226,7 @@
 }
 
 .rol-state.is-off {
-  color: var(--steel-500);
+  color: var(--steel-400);
   border-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -234,9 +234,9 @@
   padding: 22px 14px;
   text-align: center;
   font-family: var(--font-flap);
-  font-size: 0.66em;
+  font-size: var(--fs-label);
   letter-spacing: 0.18em;
-  color: var(--steel-500);
+  color: var(--steel-400);
   border: 1px dashed rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
 }
@@ -251,7 +251,7 @@
   flex: 1;
   padding: 11px 12px;
   font-family: var(--font-flap);
-  font-size: 0.7em;
+  font-size: var(--fs-label);
   letter-spacing: 0.14em;
   color: var(--steel-400);
   background: var(--steel-900);
@@ -273,14 +273,14 @@
 
 .rol-sys {
   font-family: var(--font-flap);
-  font-size: 0.58em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.14em;
   color: var(--amber);
 }
 
 .cat-error {
   font-family: var(--font-flap);
-  font-size: 0.62em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.1em;
   color: var(--red-dim);
 }
@@ -295,21 +295,21 @@
 
 .matrix-t {
   font-family: var(--font-flap);
-  font-size: 0.72em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.16em;
   color: var(--steel-300);
 }
 
 .matrix-err {
   font-family: var(--font-flap);
-  font-size: 0.62em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.1em;
   color: var(--red-dim);
 }
 
 .matrix-ok {
   font-family: var(--font-flap);
-  font-size: 0.62em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.1em;
   color: var(--green);
 }
@@ -326,7 +326,7 @@
 
 .matrix-cat-t {
   font-family: var(--font-flap);
-  font-size: 0.76em;
+  font-size: var(--fs-label);
   font-weight: 500;
   letter-spacing: 0.14em;
   color: var(--steel-200);
@@ -385,7 +385,7 @@
 }
 
 .perm-lbl {
-  font-size: 1em;
+  font-size: var(--fs-body);
   font-weight: 600;
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -393,7 +393,7 @@
 }
 
 .perm-desc {
-  font-size: 0.9em;
+  font-size: var(--fs-label);
   letter-spacing: 0.01em;
   color: var(--steel-200);
   overflow: hidden;
@@ -404,7 +404,7 @@
 .matrix-save {
   padding: 11px 12px;
   font-family: var(--font-flap);
-  font-size: 0.7em;
+  font-size: var(--fs-body);
   font-weight: 500;
   letter-spacing: 0.14em;
   color: var(--flap-black);

@@ -5,8 +5,8 @@
   gap: 6px;
   padding: 10px 14px;
   font-family: var(--font-flap);
-  font-size: 0.72em;
-  letter-spacing: 0.12em;
+  font-size: var(--fs-label);
+  letter-spacing: 0.1em;
   color: var(--amber);
   background: transparent;
   border: 1px dashed rgba(255, 176, 32, 0.55);

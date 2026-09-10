@@ -17,7 +17,7 @@
   align-items: center;
   gap: 10px;
   font-family: var(--font-flap);
-  font-size: 0.62em;
-  letter-spacing: 0.2em;
-  color: var(--steel-400);
+  font-size: var(--fs-label);
+  letter-spacing: 0.1em;
+  color: var(--steel-300);
 }

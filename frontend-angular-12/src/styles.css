@@ -55,6 +55,17 @@
   --font-flap: 'Oswald', 'Arial Narrow', 'Segoe UI', sans-serif;
   --font-ui: 'Inter', 'Segoe UI', system-ui, sans-serif;
 
+  /* Type scale — única fuente de tamaños. Los componentes heredan estos
+     tokens; el ajuste por usuario multiplica la base sin tocarlos. */
+  --fs-display: 1.7em;    /* títulos de página */
+  --fs-title: 1.14em;     /* títulos de panel */
+  --fs-section: 0.95em;   /* nombres de rol, toggles, items de rail */
+  --fs-body: 1em;         /* botones, acciones, lectura normal */
+  --fs-label: 0.85em;     /* labels de campo, inputs, chips */
+  --fs-caption: 0.74em;   /* ayudas, subtítulos, contadores */
+  --fs-micro: 0.66em;     /* códigos y metadatos mínimos */
+  --fs-metric: 1.3em;     /* valores numéricos destacados */
+
   /* Shape */
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -71,6 +82,11 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* Multiplicador de escala tipográfica por usuario (1 = NORMAL). */
+  --uiscale: 1;
+}
+
 html,
 body {
   height: 100%;
@@ -79,7 +95,7 @@ body {
 
 body {
   font-family: var(--font-ui);
-  font-size: 15px;
+  font-size: calc(15px * var(--uiscale));
   line-height: 1.5;
   color: var(--steel-200);
   background: var(--steel-950);
