@@ -31,6 +31,8 @@ export class UsuarioPanelComponent implements OnChanges {
   @Input() roles: CatalogoItem[] = [];
   @Input() estados: CatalogoItem[] = [];
   @Input() esAdmin = false;
+  @Input() puedeEditar = false;
+  @Input() puedeSuspender = false;
   @Output() close = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
   @Output() saved = new EventEmitter<UsuarioDraft>();

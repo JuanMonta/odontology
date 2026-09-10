@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter, tap } from 'rxjs/operators';
-import { CatalogoItem, RolItem, Usuario, UsuarioDraft } from '../../../core/models/usuario.model';
+import { CatalogoItem, Permiso, RolItem, RolPermisos, Usuario, UsuarioDraft } from '../../../core/models/usuario.model';
 import { API_BASE } from '../../../core/config/api.config';
 import { BackendStatusService } from '../../../core/services/backend-status.service';
 
@@ -88,6 +88,27 @@ export class UsuariosHttpService {
         this.refreshRoles();
       })
     );
+  }
+
+  eliminarRol(code: string): Observable<void> {
+    return this.http.delete<void>(`${API_BASE}/usuarios/roles/${code}`).pipe(
+      tap(() => {
+        this.rolesTodosSub.next(this.rolesTodosSub.getValue().filter(r => r.code !== code));
+        this.refreshRoles();
+      })
+    );
+  }
+
+  listarPermisos(): Observable<Permiso[]> {
+    return this.http.get<Permiso[]>(`${API_BASE}/usuarios/permisos`);
+  }
+
+  rolPermisos(code: string): Observable<RolPermisos> {
+    return this.http.get<RolPermisos>(`${API_BASE}/usuarios/roles/${code}/permisos`);
+  }
+
+  guardarRolPermisos(code: string, permisos: string[]): Observable<RolPermisos> {
+    return this.http.put<RolPermisos>(`${API_BASE}/usuarios/roles/${code}/permisos`, { rolCode: code, permisos });
   }
 
   crearEstado(nombre: string): Observable<CatalogoItem> {

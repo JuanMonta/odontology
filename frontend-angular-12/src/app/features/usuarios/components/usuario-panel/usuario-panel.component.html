@@ -61,8 +61,8 @@
   </div>
 
   <div panelActions class="panel-actions">
-    <ui-button (click)="startEdit()">EDITAR CUENTA</ui-button>
-    <ui-button variant="ghost" (click)="toggle.emit(usuario!.id)">
+    <ui-button *ngIf="puedeEditar" (click)="startEdit()">EDITAR CUENTA</ui-button>
+    <ui-button variant="ghost" *ngIf="puedeSuspender" (click)="toggle.emit(usuario!.id)">
       {{ usuario.status === 'activo' ? 'SUSPENDER' : 'REACTIVAR' }}
     </ui-button>
   </div>

@@ -38,6 +38,10 @@ public class UsuarioRol {
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
+    @Column(name = "sistema", nullable = false)
+    @Builder.Default
+    private Boolean sistema = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

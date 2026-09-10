@@ -62,6 +62,10 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
     this.esAdmin$ = this.auth.esAdmin();
   }
 
+  puede(permiso: string): boolean {
+    return this.auth.tienePermiso(permiso);
+  }
+
   ngOnInit(): void {
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       if (params.get('nuevo')) {

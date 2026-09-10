@@ -2,25 +2,35 @@ package api.services;
 
 import api.dto.CatalogoDraftDto;
 import api.dto.CatalogoDto;
+import api.dto.PermisoDto;
 import api.dto.RolDto;
+import api.dto.RolPermisosDto;
 import api.dto.UsuarioDto;
 import api.dto.UsuarioDraftDto;
+import api.entities.Permiso;
+import api.entities.RolPermiso;
+import api.entities.RolPermisoId;
 import api.entities.Usuario;
 import api.entities.UsuarioEstado;
 import api.entities.UsuarioRol;
+import api.repositories.PermisoRepository;
+import api.repositories.RolPermisoRepository;
 import api.repositories.UsuarioEstadoRepository;
 import api.repositories.UsuarioRepository;
 import api.repositories.UsuarioRolRepository;
 import api.util.FormatoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Cuentas del sistema (usuarios del backend) y sus catálogos de rol/estado.
@@ -34,6 +44,8 @@ public class UsuariosService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioRolRepository rolRepository;
     private final UsuarioEstadoRepository estadoRepository;
+    private final PermisoRepository permisoRepository;
+    private final RolPermisoRepository rolPermisoRepository;
     private final CodigoService codigoService;
     private final CatalogSnapshotService snapshots;
 
@@ -66,10 +78,22 @@ public class UsuariosService {
     public UsuarioDto update(UsuarioDto dto) {
         Usuario usuario = usuarioRepository.findById(dto.code())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + dto.code()));
+        String rolNuevo = validarRol(dto.role());
+        String estadoNuevo = validarEstado(dto.status());
+        // Regla último super-admin: ni democión ni suspensión que deje cero.
+        if ("activo".equals(usuario.getEstado()) && "activo".equals(estadoNuevo)
+                && esSuperAdminPorNombre(usuario.getRol()) && !esSuperAdminPorNombre(rolNuevo)
+                && contarSuperAdminsActivos() <= 1) {
+            throw conflicto("NO SE PUEDE DEMOVER: ES EL ÚLTIMO SUPER-ADMINISTRADOR ACTIVO");
+        }
+        if ("activo".equals(usuario.getEstado()) && !"activo".equals(estadoNuevo)
+                && esSuperAdminPorNombre(usuario.getRol()) && contarSuperAdminsActivos() <= 1) {
+            throw conflicto("NO SE PUEDE SUSPENDER: ES EL ÚLTIMO SUPER-ADMINISTRADOR ACTIVO");
+        }
         usuario.setUsername(dto.username());
         usuario.setNombre(dto.name());
-        usuario.setRol(validarRol(dto.role()));
-        usuario.setEstado(validarEstado(dto.status()));
+        usuario.setRol(rolNuevo);
+        usuario.setEstado(estadoNuevo);
         usuario.setTelefono(dto.phone());
         return toDto(usuarioRepository.save(usuario));
     }
@@ -79,6 +103,10 @@ public class UsuariosService {
         Usuario usuario = usuarioRepository.findById(code)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + code));
         String siguiente = "activo".equals(usuario.getEstado()) ? "suspendido" : "activo";
+        if ("activo".equals(usuario.getEstado()) && esSuperAdminPorNombre(usuario.getRol())
+                && contarSuperAdminsActivos() <= 1) {
+            throw conflicto("NO SE PUEDE SUSPENDER: ES EL ÚLTIMO SUPER-ADMINISTRADOR ACTIVO");
+        }
         usuario.setEstado(validarEstado(siguiente));
         return toDto(usuarioRepository.save(usuario));
     }
@@ -131,6 +159,9 @@ public class UsuariosService {
     @Transactional
     public RolDto updateRol(RolDto dto) {
         UsuarioRol rol = findRol(dto.code());
+        if (Boolean.TRUE.equals(rol.getSistema())) {
+            throw conflicto("ROL PROTEGIDO POR SISTEMA: NO SE PUEDE RENOMBRAR NI DESACTIVAR");
+        }
         String nombre = normalizar(dto.nombre());
         rolRepository.findByNombre(nombre)
                 .filter(existente -> !existente.getCodigo().equals(rol.getCodigo()))
@@ -139,6 +170,7 @@ public class UsuariosService {
                 });
         if (Boolean.FALSE.equals(dto.activo()) && Boolean.TRUE.equals(rol.getActivo())) {
             validarVacio(rol);
+            validarCoberturaSuperAdmin(rol);
         }
         String nombreAnterior = rol.getNombre();
         rol.setNombre(nombre);
@@ -162,8 +194,12 @@ public class UsuariosService {
     @Transactional
     public RolDto toggleRolStatus(String code) {
         UsuarioRol rol = findRol(code);
+        if (Boolean.TRUE.equals(rol.getSistema())) {
+            throw conflicto("ROL PROTEGIDO POR SISTEMA: NO SE PUEDE DESACTIVAR");
+        }
         if (Boolean.TRUE.equals(rol.getActivo())) {
             validarVacio(rol);
+            validarCoberturaSuperAdmin(rol);
         }
         boolean ibaActivo = Boolean.TRUE.equals(rol.getActivo());
         rol.setActivo(!rol.getActivo());
@@ -173,6 +209,144 @@ public class UsuariosService {
                         : CatalogSnapshotService.ACCION_ACTIVAR,
                 rol.getNombre(), rol.getNombre(), null);
         return toRolDto(rol);
+    }
+
+    // ────────────── RBAC · catálogo y matriz de permisos ──────────────
+
+    @Transactional(readOnly = true)
+    public List<PermisoDto> listPermisos() {
+        return permisoRepository.findAllByOrderByCategoriaAscCodigoAsc().stream()
+                .map(p -> new PermisoDto(p.getCodigo(), p.getCategoria(), p.getAccion(), p.getDescripcion()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public RolPermisosDto getRolPermisos(String code) {
+        findRol(code);
+        return new RolPermisosDto(code, rolPermisoRepository.findPermisosByRol(code));
+    }
+
+    /**
+     * Reemplaza la matriz de un rol (toggles del editor). Reglas:
+     * - el rol sistema no pierde SUPER_ADMIN;
+     * - solo super-admin concede SUPER_ADMIN;
+     * - revocar el último SUPER_ADMIN efectivo se rechaza con 409.
+     */
+    @Transactional
+    public RolPermisosDto setRolPermisos(String code, List<String> permisos) {
+        UsuarioRol rol = findRol(code);
+        Set<String> pedido = new LinkedHashSet<>(permisos == null ? List.of() : permisos);
+        // Códigos inexistentes se rechazan (nada silencioso).
+        for (String p : pedido) {
+            if (!permisoRepository.existsById(p)) {
+                throw new IllegalArgumentException("PERMISO NO VÁLIDO: " + p);
+            }
+        }
+        if (Boolean.TRUE.equals(rol.getSistema()) && !pedido.contains("SUPER_ADMIN")) {
+            throw conflicto("ROL PROTEGIDO POR SISTEMA: NO SE PUEDE REVOCAR SUPER_ADMIN");
+        }
+        if (pedido.contains("SUPER_ADMIN") && !rolTieneSuperAdmin(code) && !callerEsSuperAdmin()) {
+            throw conflicto("SOLO UN SUPER-ADMINISTRADOR PUEDE CONCEDER SUPER_ADMIN");
+        }
+        boolean pierdeSuper = rolTieneSuperAdmin(code) && !pedido.contains("SUPER_ADMIN");
+        if (pierdeSuper && coberturaSuperAdminSin(code) <= 0) {
+            throw conflicto("NO SE PUEDE REVOCAR: ES EL ÚLTIMO SUPER-ADMINISTRADOR EFECTIVO");
+        }
+        rolPermisoRepository.deleteByIdRolCodigo(code);
+        for (String p : pedido) {
+            rolPermisoRepository.save(RolPermiso.builder()
+                    .id(new RolPermisoId(code, p)).build());
+        }
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_ROL, rol.getCodigo(),
+                CatalogSnapshotService.ACCION_EDITAR, rol.getNombre(), rol.getNombre(),
+                "PERMISOS: " + pedido.size());
+        return new RolPermisosDto(code, rolPermisoRepository.findPermisosByRol(code));
+    }
+
+    /** Permisos efectivos del rol por nombre (para JWT y filtros). */
+    @Transactional(readOnly = true)
+    public List<String> permisosDeRol(String nombreRol) {
+        return rolRepository.findByNombre(normalizar(nombreRol))
+                .map(r -> rolPermisoRepository.findPermisosByRol(r.getCodigo()))
+                .orElse(List.of());
+    }
+
+    // ────────────── Guards último super-admin ──────────────
+
+    private boolean rolTieneSuperAdmin(String rolCodigo) {
+        return rolPermisoRepository.findPermisosByRol(rolCodigo).contains("SUPER_ADMIN");
+    }
+
+    private boolean esSuperAdminPorNombre(String nombreRol) {
+        if (nombreRol == null) {
+            return false;
+        }
+        return rolRepository.findByNombre(nombreRol).map(r ->
+                rolPermisoRepository.findPermisosByRol(r.getCodigo()).contains("SUPER_ADMIN"))
+                .orElse(false);
+    }
+
+    /** Cuentas activas cuyo rol concede SUPER_ADMIN. */
+    private long contarSuperAdminsActivos() {
+        List<String> roles = rolPermisoRepository.findNombresRolesSuperAdmin();
+        if (roles.isEmpty()) {
+            return 0;
+        }
+        return usuarioRepository.countByRolInAndEstado(roles, "activo");
+    }
+
+    /** Super-admins activos que NO dependen del rol indicado. */
+    private long coberturaSuperAdminSin(String rolCodigo) {
+        UsuarioRol rol = findRol(rolCodigo);
+        List<String> roles = rolPermisoRepository.findNombresRolesSuperAdmin().stream()
+                .filter(n -> !n.equals(rol.getNombre())).toList();
+        if (roles.isEmpty()) {
+            return 0;
+        }
+        return usuarioRepository.countByRolInAndEstado(roles, "activo");
+    }
+
+    /** Desactivar un rol con SUPER_ADMIN no deja cero cobertura efectiva. */
+    private void validarCoberturaSuperAdmin(UsuarioRol rol) {
+        if (rolTieneSuperAdmin(rol.getCodigo()) && coberturaSuperAdminSin(rol.getCodigo()) <= 0
+                && usuarioRepository.countByRolAndEstado(rol.getNombre(), "activo") > 0) {
+            throw conflicto("NO SE PUEDE DESACTIVAR: DEJARÍA SIN SUPER-ADMINISTRADOR AL SISTEMA");
+        }
+    }
+
+    private boolean callerEsSuperAdmin() {
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication() == null
+                    ? null
+                    : SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof Usuario u) {
+                return esSuperAdminPorNombre(u.getRol());
+            }
+        } catch (Exception ignored) {
+            // Sin contexto (tests, seed): se niega por defecto.
+        }
+        return false;
+    }
+
+    /**
+     * Eliminación física de un rol. Reglas: nunca un rol de sistema, nunca un
+     * rol con cuentas asignadas (cualquier estado). La matriz se va en cascada.
+     */
+    @Transactional
+    public void eliminarRol(String code) {
+        UsuarioRol rol = findRol(code);
+        if (Boolean.TRUE.equals(rol.getSistema())) {
+            throw conflicto("ROL PROTEGIDO POR SISTEMA: NO SE PUEDE ELIMINAR");
+        }
+        long cuentas = usuarioRepository.findByRol(rol.getNombre()).size();
+        if (cuentas > 0) {
+            throw conflicto("NO SE PUEDE ELIMINAR: EL ROL TIENE " + cuentas + " CUENTA(S) ASIGNADA(S). "
+                    + "REASIGNA PRIMERO LOS USUARIOS");
+        }
+        rolPermisoRepository.deleteByIdRolCodigo(code);
+        rolRepository.delete(rol);
+        snapshots.registrar(CatalogSnapshotService.ENTIDAD_ROL, rol.getCodigo(),
+                CatalogSnapshotService.ACCION_ELIMINAR, rol.getNombre(), null, null);
     }
 
     @Transactional
@@ -234,7 +408,8 @@ public class UsuariosService {
     }
 
     private RolDto toRolDto(UsuarioRol rol) {
-        return new RolDto(rol.getCodigo(), rol.getCodigo(), rol.getNombre(), rol.getActivo());
+        return new RolDto(rol.getCodigo(), rol.getCodigo(), rol.getNombre(), rol.getActivo(),
+                Boolean.TRUE.equals(rol.getSistema()));
     }
 
     public UsuarioDto toDto(Usuario u) {

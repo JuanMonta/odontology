@@ -40,6 +40,34 @@ export class AuthStore {
     return this.user$.pipe(map(u => !!u && u.role === 'administrador'));
   }
 
+  /** Permisos RBAC del JWT (claim `perms`, separado por espacios). */
+  permisos(): string[] {
+    const token = this.token;
+    if (!token) {
+      return [];
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      const raw = String(payload.perms || '').trim();
+      return raw ? raw.split(/\s+/) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  tienePermiso(permiso: string): boolean {
+    const perms = this.permisos();
+    return perms.includes('SUPER_ADMIN') || perms.includes(permiso);
+  }
+
+  tienePermiso$(permiso: string): Observable<boolean> {
+    return this.user$.pipe(map(() => this.tienePermiso(permiso)));
+  }
+
+  esSuperAdmin(): boolean {
+    return this.permisos().includes('SUPER_ADMIN');
+  }
+
   async login(username: string, password: string): Promise<void> {
     const res = await this.authApi.login(username, password).toPromise();
     localStorage.setItem(TOKEN_KEY, res.token);

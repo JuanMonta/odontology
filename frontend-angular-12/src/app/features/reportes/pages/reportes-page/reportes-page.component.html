@@ -10,7 +10,7 @@
           <span class="btn-print" aria-hidden="true"></span>
           IMPRIMIR
         </button>
-        <button class="btn-ghost" type="button" (click)="csv()" [disabled]="!resultado">
+        <button class="btn-ghost" type="button" *ngIf="puede('REP_EXPORTAR')" (click)="csv()" [disabled]="!resultado">
           <span class="btn-csv" aria-hidden="true"></span>
           EXPORTAR CSV
         </button>

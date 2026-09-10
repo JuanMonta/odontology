@@ -24,6 +24,7 @@ interface NavItem {
   title?: string;
   active: boolean;
   badge?: number;
+  permiso?: string;
 }
 
 interface NavSection {
@@ -66,32 +67,42 @@ export class MainLayoutComponent {
     {
       label: 'OPERACIÓN',
       items: [
-        { label: 'AGENDA', route: APP_ROUTES.dashboard, title: 'AGENDA DEL DÍA', active: false },
-        { label: 'PACIENTES', route: APP_ROUTES.pacientes, title: 'PACIENTES', active: false },
-        { label: 'TRATAMIENTOS', route: APP_ROUTES.tratamientos, title: 'TRATAMIENTOS', active: false }
+        { label: 'AGENDA', route: APP_ROUTES.dashboard, title: 'AGENDA DEL DÍA', active: false, permiso: 'AGENDA_VER' },
+        { label: 'PACIENTES', route: APP_ROUTES.pacientes, title: 'PACIENTES', active: false, permiso: 'PAC_VER' },
+        { label: 'TRATAMIENTOS', route: APP_ROUTES.tratamientos, title: 'TRATAMIENTOS', active: false, permiso: 'TRA_VER' }
       ]
     },
     {
       label: 'GESTIÓN',
       items: [
         { label: 'FACTURACIÓN', active: false },
-        { label: 'REPORTES', route: APP_ROUTES.reportes, title: 'REPORTES FINANCIEROS', active: false },
-        { label: 'CONSULTORIOS', route: APP_ROUTES.consultorios, title: 'MAPEO DE CONSULTORIOS', active: false },
-        { label: 'MENSAJES', route: APP_ROUTES.mensajes, title: 'BANDEJA DE MENSAJES', active: false },
-        { label: 'CHAT EN VIVO', route: APP_ROUTES.chat, title: 'ESTACIONES Y TRANSMISIONES', active: false }
+        { label: 'REPORTES', route: APP_ROUTES.reportes, title: 'REPORTES FINANCIEROS', active: false, permiso: 'REP_VER' },
+        { label: 'CONSULTORIOS', route: APP_ROUTES.consultorios, title: 'MAPEO DE CONSULTORIOS', active: false, permiso: 'CON_VER' },
+        { label: 'MENSAJES', route: APP_ROUTES.mensajes, title: 'BANDEJA DE MENSAJES', active: false, permiso: 'MSG_VER' },
+        { label: 'CHAT EN VIVO', route: APP_ROUTES.chat, title: 'ESTACIONES Y TRANSMISIONES', active: false, permiso: 'CHAT_VER' }
       ]
     },
     {
       label: 'SISTEMA',
       items: [
-        { label: 'PERSONAL CLÍNICO', route: APP_ROUTES.odontologos, title: 'PERSONAL CLÍNICO', active: false },
-        { label: 'ESPECIALIDADES', route: APP_ROUTES.especialidades, title: 'ESPECIALIDADES', active: false },
-        { label: 'TURNOS Y HORARIOS', route: APP_ROUTES.turnos, title: 'TURNOS Y HORARIOS', active: false },
-        { label: 'USUARIOS', route: APP_ROUTES.usuarios, title: 'CONTROL DE USUARIOS', active: false },
-        { label: 'CONFIGURACIÓN', route: APP_ROUTES.configuracion, title: 'CONFIGURACIÓN DE LA CLÍNICA', active: false }
+        { label: 'PERSONAL CLÍNICO', route: APP_ROUTES.odontologos, title: 'PERSONAL CLÍNICO', active: false, permiso: 'ODO_VER' },
+        { label: 'ESPECIALIDADES', route: APP_ROUTES.especialidades, title: 'ESPECIALIDADES', active: false, permiso: 'ESP_VER' },
+        { label: 'TURNOS Y HORARIOS', route: APP_ROUTES.turnos, title: 'TURNOS Y HORARIOS', active: false, permiso: 'TUR_VER' },
+        { label: 'USUARIOS', route: APP_ROUTES.usuarios, title: 'CONTROL DE USUARIOS', active: false, permiso: 'USU_VER' },
+        { label: 'CONFIGURACIÓN', route: APP_ROUTES.configuracion, title: 'CONFIGURACIÓN DE LA CLÍNICA', active: false, permiso: 'CFG_VER' }
       ]
     }
   ];
+
+  puedeVer(item: NavItem): boolean {
+    return !item.permiso || this.auth.tienePermiso(item.permiso);
+  }
+
+  seccionesVisibles(): NavSection[] {
+    return this.sections
+      .map(s => ({ ...s, items: s.items.filter(i => this.puedeVer(i)) }))
+      .filter(s => s.items.length > 0);
+  }
 
   get activeItem(): NavItem {
     const items = this.sections.reduce((acc, s) => acc.concat(s.items), [] as NavItem[]);

@@ -19,6 +19,7 @@ import {
 import type { GrupoEtarioKey, HclHigieneSextante } from '../../../../core/models/hcl.model';
 import { HclHttpService } from '../../services/hcl-http.service';
 import { Form033PdfService } from '../../services/form033-pdf.service';
+import { AuthStore } from '../../../../core/auth/auth.store';
 import { PROCEDIMIENTOS_ODONTOLOGICOS } from '../../../../core/models/procedimientos-odontologicos';
 import { ClinicaSettings } from '../../../../core/models/clinica-settings.model';
 import { ConfiguracionHttpService } from '../../../configuracion/services/configuracion-http.service';
@@ -199,8 +200,13 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     private readonly hclService: HclHttpService,
     private readonly cdr: ChangeDetectorRef,
     private readonly settingsService: ConfiguracionHttpService,
-    private readonly pdfService: Form033PdfService
+    private readonly pdfService: Form033PdfService,
+    private readonly auth: AuthStore
   ) {}
+
+  puede(permiso: string): boolean {
+    return this.auth.tienePermiso(permiso);
+  }
 
   ngOnInit(): void {
     if (this.patient) {

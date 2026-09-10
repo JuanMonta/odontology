@@ -13,7 +13,9 @@ import java.util.Map;
  * Emisor/validador de JWT HS256 sin dependencias externas.
  * Header y payload van en Base64URL JSON; la firma es HMAC-SHA256 sobre
  * {@code header.payload}. Claims: {@code sub} (codigo de usuario), {@code name},
- * {@code rol}, {@code iat} y {@code exp}.
+ * {@code rol}, {@code perms} (permisos RBAC separados por espacio) y
+ * {@code iat} / {@code exp}. {@code perms} viaja como string plano porque el
+ * parser mínimo solo maneja escalares.
  */
 public final class JwtUtil {
 
@@ -30,11 +32,16 @@ public final class JwtUtil {
     }
 
     public String create(String subject, String name, String rol, long ttlMillis) {
+        return create(subject, name, rol, "", ttlMillis);
+    }
+
+    public String create(String subject, String name, String rol, String perms, long ttlMillis) {
         long now = Instant.now().getEpochSecond();
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", subject);
         claims.put("name", name);
         claims.put("rol", rol);
+        claims.put("perms", perms == null ? "" : perms);
         claims.put("iat", now);
         claims.put("exp", now + ttlMillis / 1000);
         String payload = Base64.getUrlEncoder().withoutPadding()
