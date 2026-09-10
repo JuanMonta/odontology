@@ -35,16 +35,16 @@
 
 .chip-name {
   font-family: var(--font-flap);
-  font-size: 0.74em;
-  letter-spacing: 0.08em;
+  font-size: var(--fs-label);
+  letter-spacing: 0.06em;
   color: var(--flap-ink);
   line-height: 1.25;
 }
 
 .chip-sub {
   font-family: var(--font-flap);
-  font-size: 0.58em;
-  letter-spacing: 0.12em;
-  color: var(--steel-500);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.1em;
+  color: var(--steel-400);
   margin-top: 2px;
 }

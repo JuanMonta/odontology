@@ -28,7 +28,7 @@
   gap: 8px;
   padding: 10px 14px;
   font-family: var(--font-flap);
-  font-size: 0.85em;
+  font-size: var(--fs-label);
   letter-spacing: 0.1em;
   color: var(--steel-200);
   background: var(--steel-900);
@@ -101,14 +101,14 @@
 
 .toggle-label {
   font-family: var(--font-flap);
-  font-size: 0.95em;
+  font-size: var(--fs-section);
   letter-spacing: 0.08em;
   color: var(--steel-100);
 }
 
 .toggle-hint {
   font-family: var(--font-flap);
-  font-size: 0.76em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.08em;
   color: var(--steel-400);
   margin-top: 2px;
@@ -121,12 +121,30 @@
   height: 0;
 }
 
-/* ============ Legibilidad de labels (override acotado al panel) ============ */
-:host ::ng-deep .field-label {
-  font-size: 1em;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+/* ============ Segmentado (tamaño de texto) ============ */
+.seg {
+  display: flex;
+  gap: 6px;
+}
+
+.seg-btn {
+  flex: 1;
+  padding: 11px 12px;
+  font-family: var(--font-flap);
+  font-size: var(--fs-label);
+  letter-spacing: 0.12em;
+  color: var(--steel-300);
+  background: var(--steel-900);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 0.18s var(--ease-out), border-color 0.18s var(--ease-out), background 0.18s var(--ease-out);
+}
+
+.seg-btn.is-active {
   color: var(--flap-ink);
+  background: rgba(255, 176, 32, 0.1);
+  border-color: rgba(255, 176, 32, 0.45);
 }
 
 /* ============ Error / actions padding overrides ============ */

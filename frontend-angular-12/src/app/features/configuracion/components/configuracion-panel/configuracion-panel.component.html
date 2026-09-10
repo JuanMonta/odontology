@@ -171,6 +171,24 @@
           <input class="toggle-input" type="checkbox" [(ngModel)]="avisoVencimiento" name="avisoVencimiento" aria-label="Aviso de vencimiento" />
         </label>
       </div>
+
+      <div class="toggles field--full">
+        <span class="toggle-info">
+          <span class="toggle-label">TAMAÑO DE TEXTO</span>
+          <span class="toggle-hint">PREFERENCIA PERSONAL DEL OPERADOR · SE APLICA AL INSTANTE</span>
+        </span>
+        <div class="seg" role="radiogroup" aria-label="Tamaño de texto">
+          <button
+            *ngFor="let t of tamanos"
+            class="seg-btn"
+            [class.is-active]="ajusteVisual.nivel === t.id"
+            type="button"
+            role="radio"
+            [attr.aria-checked]="ajusteVisual.nivel === t.id"
+            (click)="fijarTamano(t.id)"
+          >{{ t.label }}</button>
+        </div>
+      </div>
     </div>
 
     <p class="form-error" *ngIf="error" role="alert">NOMBRE Y RUC SON OBLIGATORIOS</p>

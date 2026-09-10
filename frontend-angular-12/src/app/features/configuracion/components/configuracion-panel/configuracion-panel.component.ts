@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ClinicaSettings, ConfigSection } from '../../../../core/models/clinica-settings.model';
 import { CONFIG_SECTIONS } from '../../services/configuracion-http.service';
+import { AjusteVisualService, TamanoTexto } from '../../../../core/services/ajuste-visual.service';
 
 export const WEEKDAYS: string[] = ['LU', 'MA', 'MI', 'JU', 'VI', 'SA'];
 
@@ -16,6 +17,18 @@ export class ConfiguracionPanelComponent implements OnChanges {
   @Output() save = new EventEmitter<ClinicaSettings>();
 
   weekdays = WEEKDAYS;
+
+  readonly tamanos: { id: TamanoTexto; label: string }[] = [
+    { id: 'normal', label: 'NORMAL' },
+    { id: 'grande', label: 'GRANDE' },
+    { id: 'muy-grande', label: 'MUY GRANDE' }
+  ];
+
+  constructor(public readonly ajusteVisual: AjusteVisualService) {}
+
+  fijarTamano(t: TamanoTexto): void {
+    this.ajusteVisual.fijar(t);
+  }
 
   nombre = '';
   ruc = '';

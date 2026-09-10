@@ -62,30 +62,30 @@
 }
 
 .empty-text {
-  font-size: 0.7em;
-  letter-spacing: 0.16em;
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
   color: var(--steel-300);
 }
 
 .empty--bare .empty-text {
-  font-size: 0.82em;
+  font-size: var(--fs-label);
   letter-spacing: 0.16em;
   color: var(--steel-400);
 }
 
 .empty--panel .empty-text {
-  font-size: 0.86em;
+  font-size: var(--fs-body);
   letter-spacing: 0.16em;
   color: var(--steel-300);
 }
 
 .empty-hint {
-  font-size: 0.58em;
-  letter-spacing: 0.18em;
-  color: var(--steel-500);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.14em;
+  color: var(--steel-400);
 }
 
 .empty--bare .empty-hint,
 .empty--panel .empty-hint {
-  font-size: 0.66em;
+  font-size: var(--fs-caption);
 }

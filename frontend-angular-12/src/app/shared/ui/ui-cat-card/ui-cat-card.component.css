@@ -23,16 +23,16 @@
 
 .cat-card-title {
   font-family: var(--font-flap);
-  font-size: 0.64em;
-  letter-spacing: 0.18em;
+  font-size: var(--fs-caption);
+  letter-spacing: 0.14em;
   color: var(--amber);
 }
 
 .cat-code {
   margin-left: auto;
   font-family: var(--font-flap);
-  font-size: 0.6em;
-  letter-spacing: 0.16em;
+  font-size: var(--fs-caption);
+  letter-spacing: 0.12em;
   color: var(--steel-400);
 }
 

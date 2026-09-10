@@ -79,7 +79,7 @@
 
 .rail-label {
   font-family: var(--font-flap);
-  font-size: 0.95em;
+  font-size: var(--fs-section);
   letter-spacing: 0.08em;
   color: var(--steel-100);
   white-space: nowrap;
@@ -94,7 +94,7 @@
 
 .rail-sub {
   font-family: var(--font-flap);
-  font-size: 0.74em;
+  font-size: var(--fs-caption);
   letter-spacing: 0.1em;
   color: var(--steel-400);
   margin-top: 2px;

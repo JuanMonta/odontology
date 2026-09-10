@@ -10,6 +10,6 @@
 }
 
 .cat-input {
-  font-size: 0.76em;
+  font-size: var(--fs-label);
   text-transform: uppercase;
 }
