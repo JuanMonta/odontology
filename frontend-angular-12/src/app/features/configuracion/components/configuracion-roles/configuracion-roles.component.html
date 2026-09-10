@@ -22,50 +22,129 @@
   </ui-cat-card>
 
   <div class="roles-list" *ngIf="(roles$ | async)?.length">
-    <div class="rol-row" *ngFor="let rol of roles$ | async; trackBy: trackRol">
-      <span class="rol-lamp" [class.is-on]="rol.activo" aria-hidden="true"></span>
-      <span class="rol-name">{{ rol.nombre }}</span>
-      <span class="rol-code">{{ rol.code }}</span>
-      <span class="rol-state" [class.is-off]="!rol.activo">{{ rol.activo ? 'ACTIVO' : 'INACTIVO' }}</span>
-      <ui-cat-act icon="pencil" [open]="editandoCode === rol.code" (click)="onEditarRol(rol)">EDITAR</ui-cat-act>
+    <div class="rol-item" *ngFor="let rol of roles$ | async; trackBy: trackRol" [class.is-open]="estaExpandido(rol)">
+      <div class="rol-stick">
+        <div
+          class="rol-row"
+          role="button"
+          tabindex="0"
+          [attr.aria-expanded]="estaExpandido(rol) ? 'true' : 'false'"
+          [attr.aria-label]="'Ver permisos de ' + rol.nombre"
+          (click)="onVerRol(rol)"
+          (keydown.enter)="onVerRol(rol)"
+        >
+          <span class="rol-lamp" [class.is-on]="rol.activo" aria-hidden="true"></span>
+          <span class="rol-name">{{ rol.nombre }}</span>
+          <span class="rol-code">{{ rol.code }}</span>
+          <span class="rol-state" [class.is-off]="!rol.activo">{{ rol.activo ? 'ACTIVO' : 'INACTIVO' }}</span>
+          <span class="rol-sys-chip" *ngIf="rol.sistema">SISTEMA</span>
+          <ui-cat-act
+            icon="pencil"
+            [open]="editando && estaExpandido(rol)"
+            (click)="onEditarRol(rol); $event.stopPropagation()"
+            (keydown.enter)="$event.stopPropagation()"
+            [attr.aria-expanded]="editando && estaExpandido(rol) ? 'true' : 'false'"
+          >EDITAR</ui-cat-act>
+          <button
+            class="rol-del"
+            type="button"
+            *ngIf="!rol.sistema && confirmarEliminarCode !== rol.code"
+            (click)="pedirEliminar(rol); $event.stopPropagation()"
+            (keydown.enter)="$event.stopPropagation()"
+            aria-label="Eliminar rol"
+          >ELIMINAR</button>
+          <span class="rol-del-confirm" *ngIf="confirmarEliminarCode === rol.code" (click)="$event.stopPropagation()">
+            <span class="rol-del-q">¿ELIMINAR?</span>
+            <button class="rol-del-no" type="button" (click)="cancelarEliminar()">NO</button>
+            <button
+              class="rol-del-yes"
+              type="button"
+              [disabled]="eliminandoRol"
+              (click)="confirmarEliminar(rol)"
+            >{{ eliminandoRol ? '…' : 'SÍ' }}</button>
+          </span>
+        </div>
+        <span class="cat-error" *ngIf="confirmarEliminarCode === rol.code && eliminarError" role="alert">{{ eliminarError }}</span>
+
+        <div class="rol-sub-edit" *ngIf="estaExpandido(rol) && editando">
+          <input
+            class="field-input cat-input"
+            type="text"
+            [(ngModel)]="editarNombre"
+            name="editarNombre"
+            placeholder="NOMBRE DEL ROL"
+            autocomplete="off"
+            [disabled]="!!rol.sistema"
+          />
+          <div class="seg" role="radiogroup" aria-label="Estado del rol">
+            <button
+              class="seg-btn"
+              [class.is-active]="editarActivo"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="editarActivo"
+              [disabled]="!!rol.sistema"
+              (click)="editarActivo = true"
+            >ACTIVO</button>
+            <button
+              class="seg-btn"
+              [class.is-active]="!editarActivo"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="!editarActivo"
+              [disabled]="!!rol.sistema"
+              (click)="editarActivo = false"
+            >INACTIVO</button>
+          </div>
+          <span class="cat-error" *ngIf="editarError" role="alert">{{ editarError }}</span>
+          <span class="rol-sys" *ngIf="rol.sistema">ROL PROTEGIDO POR SISTEMA · SUPER-ADMINISTRADOR</span>
+          <button
+            class="rol-sub-save"
+            type="button"
+            *ngIf="!rol.sistema"
+            (click)="guardarRol()"
+          >GUARDAR</button>
+        </div>
+      </div>
+
+      <div class="rol-sub" *ngIf="estaExpandido(rol)">
+
+        <div class="matrix" aria-label="Matriz de permisos por categoría">
+          <span class="matrix-t">PERMISOS POR CATEGORÍA · {{ permisosSel.size }} ACTIVOS</span>
+          <span class="matrix-s" *ngIf="cargandoPermisos">CARGANDO MATRIZ…</span>
+          <span class="matrix-err" *ngIf="permsError" role="alert">{{ permsError }}</span>
+          <span class="matrix-ok" *ngIf="permsOk" role="status">MATRIZ GUARDADA</span>
+          <div class="matrix-cat" *ngFor="let cat of categoriasPermisos">
+            <span class="matrix-cat-t">{{ cat }}</span>
+            <button
+              *ngFor="let p of permisosDe(cat)"
+              class="perm"
+              [class.is-on]="tienePermisoSel(p.codigo)"
+              [class.is-locked]="esToggleBloqueado(p)"
+              type="button"
+              role="switch"
+              [attr.aria-checked]="tienePermisoSel(p.codigo)"
+              [attr.aria-label]="p.descripcion"
+              [disabled]="esToggleBloqueado(p) || guardandoPermisos"
+              [title]="p.descripcion"
+              (click)="togglePermiso(p)"
+            >
+              <span class="perm-box" aria-hidden="true">{{ tienePermisoSel(p.codigo) ? '×' : '' }}</span>
+              <span class="perm-lbl">{{ p.accion }}</span>
+              <span class="perm-desc">{{ p.descripcion }}</span>
+            </button>
+          </div>
+          <button
+            class="matrix-save"
+            type="button"
+            *ngIf="editando"
+            [disabled]="guardandoPermisos || cargandoPermisos"
+            (click)="guardarPermisos()"
+          >{{ guardandoPermisos ? 'GUARDANDO…' : 'GUARDAR MATRIZ' }}</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <p class="roles-empty" *ngIf="!(roles$ | async)?.length" role="status">SIN ROLES REGISTRADOS</p>
-
-  <ui-cat-card
-    *ngIf="editandoCode"
-    title="EDITAR ROL"
-    [code]="editandoCode"
-    [error]="editarError"
-    (save)="guardarRol()"
-    (cancel)="cancelarEdicion()"
-  >
-    <input
-      class="field-input cat-input"
-      type="text"
-      [(ngModel)]="editarNombre"
-      name="editarNombre"
-      placeholder="NOMBRE DEL ROL"
-      autocomplete="off"
-    />
-    <div class="seg" role="radiogroup" aria-label="Estado del rol">
-      <button
-        class="seg-btn"
-        [class.is-active]="editarActivo"
-        type="button"
-        role="radio"
-        [attr.aria-checked]="editarActivo"
-        (click)="editarActivo = true"
-      >ACTIVO</button>
-      <button
-        class="seg-btn"
-        [class.is-active]="!editarActivo"
-        type="button"
-        role="radio"
-        [attr.aria-checked]="!editarActivo"
-        (click)="editarActivo = false"
-      >INACTIVO</button>
-    </div>
-  </ui-cat-card>
 </div>

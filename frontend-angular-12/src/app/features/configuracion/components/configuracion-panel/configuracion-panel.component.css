@@ -28,9 +28,9 @@
   gap: 8px;
   padding: 10px 14px;
   font-family: var(--font-flap);
-  font-size: 0.74em;
-  letter-spacing: 0.14em;
-  color: var(--steel-300);
+  font-size: 0.85em;
+  letter-spacing: 0.1em;
+  color: var(--steel-200);
   background: var(--steel-900);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--radius-sm);
@@ -101,16 +101,16 @@
 
 .toggle-label {
   font-family: var(--font-flap);
-  font-size: 0.78em;
-  letter-spacing: 0.12em;
-  color: var(--steel-200);
+  font-size: 0.95em;
+  letter-spacing: 0.08em;
+  color: var(--steel-100);
 }
 
 .toggle-hint {
   font-family: var(--font-flap);
-  font-size: 0.62em;
-  letter-spacing: 0.14em;
-  color: var(--steel-500);
+  font-size: 0.76em;
+  letter-spacing: 0.08em;
+  color: var(--steel-400);
   margin-top: 2px;
 }
 
@@ -119,6 +119,14 @@
   opacity: 0;
   width: 0;
   height: 0;
+}
+
+/* ============ Legibilidad de labels (override acotado al panel) ============ */
+:host ::ng-deep .field-label {
+  font-size: 1em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--flap-ink);
 }
 
 /* ============ Error / actions padding overrides ============ */

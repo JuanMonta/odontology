@@ -46,7 +46,7 @@
     </div>
 
     <nav class="drawer-nav" aria-label="Navegación principal">
-      <ng-container *ngFor="let section of sections">
+      <ng-container *ngFor="let section of seccionesVisibles()">
         <span class="nav-kicker">{{ section.label }}</span>
         <a
           *ngFor="let item of section.items"

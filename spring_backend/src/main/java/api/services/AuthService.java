@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final UsuariosService usuariosService;
     private final JwtUtil jwtUtil;
 
     public AuthResponseDto login(AuthLoginDto login) {
@@ -31,8 +32,14 @@ public class AuthService {
         if (hash == null || hash.isEmpty() || !BCrypt.checkpw(login.password(), hash)) {
             throw new IllegalArgumentException("USUARIO O CONTRASEÑA INCORRECTOS");
         }
+        // Permisos efectivos RBAC: SUPER_ADMIN implica el catálogo completo.
+        java.util.List<String> perms = usuariosService.permisosDeRol(usuario.getRol());
+        if (perms.contains("SUPER_ADMIN")) {
+            perms = usuariosService.listPermisos().stream().map(api.dto.PermisoDto::codigo).toList();
+        }
         String token = jwtUtil.create(
-                usuario.getCodigo(), usuario.getNombre(), usuario.getRol(), 86_400_000L);
+                usuario.getCodigo(), usuario.getNombre(), usuario.getRol(),
+                String.join(" ", perms), 86_400_000L);
         return new AuthResponseDto(
                 token, usuario.getCodigo(), usuario.getUsername(), usuario.getNombre(),
                 usuario.getRol());

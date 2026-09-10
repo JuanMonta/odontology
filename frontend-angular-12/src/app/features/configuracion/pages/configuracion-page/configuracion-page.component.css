@@ -36,9 +36,9 @@
 
 .page-sub {
   font-family: var(--font-flap);
-  font-size: 0.7em;
-  letter-spacing: 0.2em;
-  color: var(--flap-dim);
+  font-size: 0.78em;
+  letter-spacing: 0.16em;
+  color: var(--steel-400);
   display: block;
   margin-top: 6px;
 }
@@ -57,8 +57,8 @@
   gap: 9px;
   padding: 10px 14px;
   font-family: var(--font-flap);
-  font-size: 0.72em;
-  letter-spacing: 0.16em;
+  font-size: 0.82em;
+  letter-spacing: 0.12em;
   color: var(--green);
   background: rgba(86, 181, 127, 0.08);
   border: 1px solid rgba(86, 181, 127, 0.35);

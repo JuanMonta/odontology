@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ClinicaSettings, ConfigSection } from '../../../../core/models/clinica-settings.model';
+import { ClinicaSettings, ConfigSection, ConfigSectionMeta } from '../../../../core/models/clinica-settings.model';
 import { ConfiguracionHttpService, CONFIG_SECTIONS } from '../../services/configuracion-http.service';
+import { AuthStore } from '../../../../core/auth/auth.store';
 
 @Component({
   selector: 'app-configuracion-page',
@@ -20,10 +21,14 @@ export class ConfiguracionPageComponent implements OnDestroy {
   private readonly savedFlag = new BehaviorSubject<boolean>(false);
   private savedReset: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private service: ConfiguracionHttpService) {
+  constructor(private service: ConfiguracionHttpService, private auth: AuthStore) {
     this.settings$ = this.service.settings$;
     this.activeSection$ = this.activeSection.asObservable();
     this.saved$ = this.savedFlag.asObservable();
+  }
+
+  seccionesVisibles(): ConfigSectionMeta[] {
+    return this.sections.filter(s => s.id !== 'roles' || this.auth.tienePermiso('ROLES_GESTIONAR'));
   }
 
   ngOnDestroy(): void {

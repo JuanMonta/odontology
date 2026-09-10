@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ReportesHttpService } from '../../services/reportes-http.service';
+import { AuthStore } from '../../../../core/auth/auth.store';
 import { formatMoney } from '../../../../core/utils/format';
 import {
   ReporteCartera,
@@ -65,8 +66,13 @@ export class ReportesPageComponent {
 
   constructor(
     private readonly service: ReportesHttpService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly auth: AuthStore
   ) {}
+
+  puede(permiso: string): boolean {
+    return this.auth.tienePermiso(permiso);
+  }
 
   get option(): TipoReporteOption {
     return TIPOS.find(t => t.id === this.tipo) ?? TIPOS[0];

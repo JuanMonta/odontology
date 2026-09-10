@@ -11,6 +11,19 @@ export interface RolItem {
   code: string;         // "ROL-001"
   nombre: string;       // "administrador"
   activo: boolean;
+  sistema?: boolean;    // true = protegido (super-admin)
+}
+
+export interface Permiso {
+  codigo: string;       // "HC_EDITAR"
+  categoria: string;    // "HC033"
+  accion: string;       // "EDITAR"
+  descripcion: string;
+}
+
+export interface RolPermisos {
+  rolCode: string;
+  permisos: string[];
 }
 
 export interface Usuario {

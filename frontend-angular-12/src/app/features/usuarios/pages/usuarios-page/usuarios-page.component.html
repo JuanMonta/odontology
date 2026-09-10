@@ -18,7 +18,7 @@
         <span class="page-sub">CUENTAS Y ROLES · ACCESO AL SISTEMA · {{ (usuarios$ | async)?.length ?? 0 }} USUARIOS</span>
       </div>
       <div class="page-head-actions">
-        <button class="btn-amber" type="button" (click)="startCreate()">
+        <button class="btn-amber" type="button" *ngIf="puede('USU_CREAR')" (click)="startCreate()">
           <span class="btn-plus" aria-hidden="true"></span>
           NUEVO USUARIO
         </button>
@@ -65,6 +65,8 @@
         [roles]="(roles$ | async) ?? []"
         [estados]="(estados$ | async) ?? []"
         [esAdmin]="(esAdmin$ | async) ?? false"
+        [puedeEditar]="puede('USU_EDITAR')"
+        [puedeSuspender]="puede('USU_SUSPENDER')"
         (close)="onClosePanel()"
         (cancel)="cancelCreate()"
         (saved)="onSaved($event)"

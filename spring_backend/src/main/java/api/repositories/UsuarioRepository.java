@@ -18,5 +18,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
     long countByRolAndEstado(String rol, String estado);
 
+    long countByRolInAndEstado(java.util.Collection<String> roles, String estado);
+
     List<Usuario> findByRol(String rol);
 }

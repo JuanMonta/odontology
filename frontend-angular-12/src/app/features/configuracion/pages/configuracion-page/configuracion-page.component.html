@@ -28,7 +28,7 @@
   <div class="page-body">
     <aside class="rail" aria-label="Secciones de configuración">
       <app-configuracion-sections
-        [sections]="sections"
+        [sections]="seccionesVisibles()"
         [active]="(activeSection$ | async) ?? 'clinica'"
         (select)="onSection($event)"
       ></app-configuracion-sections>

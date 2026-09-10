@@ -26,6 +26,8 @@ public class CatalogSnapshotService {
     public static final String ENTIDAD_ESPECIALIDAD = "ESPECIALIDAD";
 
     public static final String ACCION_CREAR = "CREAR";
+    public static final String ACCION_EDITAR = "EDITAR";
+    public static final String ACCION_ELIMINAR = "ELIMINAR";
     public static final String ACCION_RENOMBRAR = "RENOMBRAR";
     public static final String ACCION_DESACTIVAR = "DESACTIVAR";
     public static final String ACCION_ACTIVAR = "ACTIVAR";
