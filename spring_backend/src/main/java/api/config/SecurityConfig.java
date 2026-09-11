@@ -83,10 +83,12 @@ public class SecurityConfig {
                                 "/api/v1/pacientes/*/hclinica/*", "/api/v1/pacientes/*/teeth/*")
                         .hasAuthority("HC_EDITAR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/pacientes/**").hasAuthority("PAC_VER")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/pacientes",
-                                "/api/v1/pacientes/*/abonos").hasAuthority("PAC_CREAR")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/pacientes/*",
-                                "/api/v1/pacientes/*/abonos").hasAuthority("PAC_EDITAR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pacientes").hasAuthority("PAC_CREAR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pacientes/*/abonos")
+                        .hasAuthority("COBROS_GESTIONAR")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/pacientes/*").hasAuthority("PAC_EDITAR")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/pacientes/*/abonos")
+                        .hasAuthority("COBROS_GESTIONAR")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/pacientes/alerts/*")
                         .hasAuthority("PAC_EDITAR")
                         // Tratamientos + categorías
