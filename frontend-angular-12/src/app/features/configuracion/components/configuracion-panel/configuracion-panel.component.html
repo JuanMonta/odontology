@@ -128,22 +128,9 @@
     </div>
 
     <!-- SISTEMA Y NOTIFICACIONES -->
-    <div class="form-grid" *ngIf="section === 'sistema'">
-      <ui-field label="MONEDA">
-        <select class="field-select" [ngModel]="'USD'" name="moneda" aria-label="Moneda" disabled>
-          <option value="USD">USD · DÓLAR AMERICANO</option>
-        </select>
-      </ui-field>
-
-      <ui-field label="FORMATO DE FECHA">
-        <select class="field-select" [(ngModel)]="formatoFecha" name="formatoFecha" aria-label="Formato de fecha">
-          <option value="DD MMM AAAA">DD MMM AAAA</option>
-          <option value="DD/MM/AAAA">DD/MM/AAAA</option>
-          <option value="AAAA-MM-DD">AAAA-MM-DD</option>
-        </select>
-      </ui-field>
-
-      <div class="toggles field--full">
+    <!-- Fila 1: toggles · Fila 2: moneda/fecha · Fila 3: tamaño de texto -->
+    <div class="form-grid form-grid--wide" *ngIf="section === 'sistema'">
+      <div class="toggles toggles--row field--full">
         <label class="toggle">
           <span class="toggle-lamp" [class.is-on]="recordatorioCitas" aria-hidden="true"></span>
           <span class="toggle-info">
@@ -172,7 +159,21 @@
         </label>
       </div>
 
-      <div class="toggles field--full">
+      <ui-field label="MONEDA">
+        <select class="field-select" [ngModel]="'USD'" name="moneda" aria-label="Moneda" disabled>
+          <option value="USD">USD · DÓLAR AMERICANO</option>
+        </select>
+      </ui-field>
+
+      <ui-field label="FORMATO DE FECHA">
+        <select class="field-select" [(ngModel)]="formatoFecha" name="formatoFecha" aria-label="Formato de fecha">
+          <option value="DD MMM AAAA">DD MMM AAAA</option>
+          <option value="DD/MM/AAAA">DD/MM/AAAA</option>
+          <option value="AAAA-MM-DD">AAAA-MM-DD</option>
+        </select>
+      </ui-field>
+
+      <div class="tamano-block field--full">
         <span class="toggle-info">
           <span class="toggle-label">TAMAÑO DE TEXTO</span>
           <span class="toggle-hint">PREFERENCIA PERSONAL DEL OPERADOR · SE APLICA AL INSTANTE</span>
