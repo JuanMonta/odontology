@@ -47,6 +47,13 @@
       </ui-cat-card>
     </ui-field>
 
+    <ui-field label="FICHA PROFESIONAL (OPCIONAL)">
+      <select class="field-select" [(ngModel)]="odontologoCodigo" name="odontologoCodigo" aria-label="Ficha profesional vinculada">
+        <option [ngValue]="null">— SIN VINCULAR —</option>
+        <option *ngFor="let o of odontologos" [ngValue]="o.code">{{ o.code }} · {{ o.name }}</option>
+      </select>
+    </ui-field>
+
     <ui-field label="ESTADO">
       <div class="cat-row">
         <select class="field-select cat-select" [(ngModel)]="status" name="status" aria-label="Estado del usuario">

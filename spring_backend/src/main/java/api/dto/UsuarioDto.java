@@ -8,5 +8,6 @@ public record UsuarioDto(
         String role,
         String status,
         String lastAccess,
-        String phone) {
+        String phone,
+        String odontologoCodigo) {
 }

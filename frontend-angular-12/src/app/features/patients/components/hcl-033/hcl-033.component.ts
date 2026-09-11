@@ -20,6 +20,7 @@ import type { GrupoEtarioKey, HclHigieneSextante } from '../../../../core/models
 import { HclHttpService } from '../../services/hcl-http.service';
 import { Form033PdfService } from '../../services/form033-pdf.service';
 import { AuthStore } from '../../../../core/auth/auth.store';
+import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
 import { PROCEDIMIENTOS_ODONTOLOGICOS } from '../../../../core/models/procedimientos-odontologicos';
 import { ClinicaSettings } from '../../../../core/models/clinica-settings.model';
 import { ConfiguracionHttpService } from '../../../configuracion/services/configuracion-http.service';
@@ -201,7 +202,8 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     private readonly cdr: ChangeDetectorRef,
     private readonly settingsService: ConfiguracionHttpService,
     private readonly pdfService: Form033PdfService,
-    private readonly auth: AuthStore
+    private readonly auth: AuthStore,
+    private readonly odontologos: OdontologosHttpService
   ) {}
 
   puede(permiso: string): boolean {
@@ -248,6 +250,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
           this.snapshot = hclCompleta(this.patient?.id ?? '', r.hc);
           this.hojas = r.hojas ?? [];
           this.cargando = false;
+          this.prefillFirmaVinculada();
           this.cdr.markForCheck();
         },
         error: () => {
@@ -410,6 +413,46 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     this.guardarAhora();
   }
 
+  /** Firma divergente pendiente de confirmación explícita. */
+  firmaDivergente: { firmado: string; propio: string } | null = null;
+
+  /**
+   * Puerta de guardado: si la cuenta tiene ficha vinculada y la hoja declara
+   * otro profesional, exige confirmación explícita antes de guardar. El
+   * servidor registra la divergencia de todos modos al persistir.
+   */
+  intentarGuardar(): void {
+    const ficha = this.auth.usuario?.odontologoCodigo;
+    const firmado = this.hc.profesionalNombre?.trim() || '';
+    if (!ficha || !firmado) {
+      this.guardar();
+      return;
+    }
+    this.sub.add(
+      this.odontologos.odontologos$.subscribe(list => {
+        const odo = (list || []).find(o => o.code === ficha);
+        const propio = odo?.name?.trim() || '';
+        if (propio && propio.toUpperCase().replace(/\s+/g, ' ')
+            !== firmado.toUpperCase().replace(/\s+/g, ' ')) {
+          this.firmaDivergente = { firmado, propio };
+          this.cdr.markForCheck();
+          return;
+        }
+        this.guardar();
+      })
+    );
+  }
+
+  confirmarFirmaDivergente(): void {
+    this.firmaDivergente = null;
+    this.guardar();
+  }
+
+  cancelarFirmaDivergente(): void {
+    this.firmaDivergente = null;
+    this.cdr.markForCheck();
+  }
+
   private guardarAhora(continuar?: () => void): void {
     if (!this.patient || this.guardando) {
       return;
@@ -441,6 +484,28 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
 
   onTooth(teeth: Tooth[]): void {
     this.toothChange.emit(teeth);
+  }
+
+  /**
+   * Identidad clínica: si la cuenta tiene ficha profesional vinculada y la
+   * hoja aún no declara profesional, se prellena con su nombre. El campo
+   * sigue editable (recepción registra por terceros); la auditoría real va
+   * por `registradoPor` del servidor, no por este texto.
+   */
+  private prefillFirmaVinculada(): void {
+    const ficha = this.auth.usuario?.odontologoCodigo;
+    if (!ficha || this.hc.profesionalNombre?.trim()) {
+      return;
+    }
+    this.sub.add(
+      this.odontologos.odontologos$.subscribe(list => {
+        const odo = (list || []).find(o => o.code === ficha);
+        if (odo && !this.hc.profesionalNombre?.trim()) {
+          this.hc.profesionalNombre = odo.name;
+          this.cdr.markForCheck();
+        }
+      })
+    );
   }
 
   cambiarSeccion(n: number): void {

@@ -54,6 +54,9 @@ public class Usuario {
     @Column(name = "telefono", length = 24)
     private String telefono;
 
+    @Column(name = "odontologo_codigo", length = 12)
+    private String odontologoCodigo;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

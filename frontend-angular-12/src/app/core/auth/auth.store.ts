@@ -71,16 +71,32 @@ export class AuthStore {
   async login(username: string, password: string): Promise<void> {
     const res = await this.authApi.login(username, password).toPromise();
     localStorage.setItem(TOKEN_KEY, res.token);
-    localStorage.setItem(
-      USER_KEY,
-      JSON.stringify({
-        code: res.code,
-        username: res.username,
-        name: res.name,
-        role: res.role
-      })
-    );
     this.token$.next(res.token);
+    // Enriquece con la ficha vinculada (odontologoCodigo) vía /me.
+    try {
+      const me = await this.authApi.me().toPromise();
+      localStorage.setItem(
+        USER_KEY,
+        JSON.stringify({
+          code: me?.code ?? res.code,
+          username: me?.username ?? res.username,
+          name: me?.name ?? res.name,
+          role: me?.role ?? res.role,
+          odontologoCodigo: me?.odontologoCodigo ?? null
+        })
+      );
+    } catch {
+      localStorage.setItem(
+        USER_KEY,
+        JSON.stringify({
+          code: res.code,
+          username: res.username,
+          name: res.name,
+          role: res.role,
+          odontologoCodigo: null
+        })
+      );
+    }
     this.user$.next(this.readUser());
   }
 
@@ -114,7 +130,8 @@ export class AuthStore {
         role: parsed.role as UsuarioRol,
         status: 'activo',
         lastAccess: '',
-        phone: ''
+        phone: '',
+        odontologoCodigo: parsed.odontologoCodigo ?? null
       };
     } catch {
       return null;

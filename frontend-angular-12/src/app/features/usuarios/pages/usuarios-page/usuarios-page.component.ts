@@ -9,7 +9,9 @@ import {
   UsuarioStatus
 } from '../../../../core/models/usuario.model';
 import { UsuariosHttpService } from '../../services/usuarios-http.service';
+import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
 import { AuthStore } from '../../../../core/auth/auth.store';
+import { Odontologo } from '../../../../core/models/odontologo.model';
 
 type StatusFilter = UsuarioStatus | 'all';
 
@@ -25,6 +27,7 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
   roles$: Observable<CatalogoItem[]>;
   estados$: Observable<CatalogoItem[]>;
   esAdmin$: Observable<boolean>;
+  odontologos$: Observable<Odontologo[]>;
 
   creating = false;
 
@@ -37,7 +40,8 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
     private service: UsuariosHttpService,
     private auth: AuthStore,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private odontologos: OdontologosHttpService
   ) {
     this.usuarios$ = combineLatest([this.service.usuarios$, this.search$, this.status$]).pipe(
       map(([list, q, filter]) => {
@@ -60,6 +64,7 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
     this.roles$ = this.service.roles$;
     this.estados$ = this.service.estados$;
     this.esAdmin$ = this.auth.esAdmin();
+    this.odontologos$ = this.odontologos.odontologos$;
   }
 
   puede(permiso: string): boolean {

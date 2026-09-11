@@ -497,14 +497,14 @@
           </svg>
           IMPRIMIR
         </button>
-        <button class="btn-retry" type="button" *ngIf="estado === 'error' && puede('HC_EDITAR')" (click)="guardar()">
+        <button class="btn-retry" type="button" *ngIf="estado === 'error' && puede('HC_EDITAR')" (click)="intentarGuardar()">
           <svg class="btn-retry-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M13 8a5 5 0 1 1-1.2-3.2"></path>
             <path d="M13 2.5V5h-2.5"></path>
           </svg>
           REINTENTAR
         </button>
-        <button class="btn-save" type="button" *ngIf="puede('HC_EDITAR')" [disabled]="guardando" (click)="guardar()">
+        <button class="btn-save" type="button" *ngIf="puede('HC_EDITAR')" [disabled]="guardando" (click)="intentarGuardar()">
           <span class="btn-save-lamp" aria-hidden="true"></span>
           {{ guardando ? 'GUARDANDO…' : 'GUARDAR HISTORIA CLÍNICA' }}
         </button>
@@ -671,6 +671,24 @@
         <button class="hc-modal-btn hc-modal-btn--ghost" type="button" (click)="modalCancelar()">CANCELAR</button>
         <button class="hc-modal-btn hc-modal-btn--danger" type="button" (click)="modalDescartar()">DESCARTAR CAMBIOS</button>
         <button class="hc-modal-btn hc-modal-btn--primary" #modalPrimary type="button" (click)="modalGuardar()">GUARDAR<span class="hc-modal-sub" *ngIf="modal?.accion === 'abrir'"> Y CAMBIAR</span><span class="hc-modal-sub" *ngIf="modal?.accion === 'nueva'"> Y ABRIR</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firma divergente: la cuenta tiene ficha vinculada pero la hoja declara
+       otro profesional. Acción segura primero, afirmación explícita después. -->
+  <div class="hc-modal" *ngIf="firmaDivergente" role="dialog" aria-modal="true" aria-labelledby="hc-firma-title">
+    <div class="hc-modal-backdrop" (click)="cancelarFirmaDivergente()"></div>
+    <div class="hc-modal-panel">
+      <span class="hc-modal-t" id="hc-firma-title">FIRMA DIVERGENTE</span>
+      <span class="hc-modal-s" aria-live="polite">
+        Tu ficha profesional es <strong>{{ firmaDivergente?.propio }}</strong>, pero la hoja
+        declara como profesional a <strong>{{ firmaDivergente?.firmado }}</strong>.
+        Guardar así deja constancia de auditoría (quién firmó como quién).
+      </span>
+      <div class="hc-modal-actions">
+        <button class="hc-modal-btn hc-modal-btn--ghost" type="button" (click)="cancelarFirmaDivergente()">CANCELAR</button>
+        <button class="hc-modal-btn hc-modal-btn--danger" type="button" (click)="confirmarFirmaDivergente()">SÍ, GUARDAR ASÍ</button>
       </div>
     </div>
   </div>

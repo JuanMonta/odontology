@@ -35,6 +35,7 @@ export interface Usuario {
   status: UsuarioStatus;
   lastAccess: string;   // "06 AGO 2026 · 14:32"
   phone: string;        // "+51 987 654 321"
+  odontologoCodigo?: string | null; // ficha profesional vinculada (ODO-001)
 }
 
 export interface UsuarioDraft {
@@ -42,4 +43,5 @@ export interface UsuarioDraft {
   name: string;
   role: UsuarioRol;
   status: UsuarioStatus;
+  odontologoCodigo?: string | null;
 }

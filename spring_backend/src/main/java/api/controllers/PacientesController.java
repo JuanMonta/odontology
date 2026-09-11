@@ -2,6 +2,7 @@ package api.controllers;
 
 import api.dto.AbonoDto;
 import api.dto.AccountEntryDto;
+import api.dto.AuditoriaFirmaDto;
 import api.dto.EvolucionDto;
 import api.dto.HclDto;
 import api.dto.PacienteDetailDto;
@@ -99,9 +100,14 @@ public class PacientesController {
 
     @PutMapping("/{id}/teeth/{number}")
     public ToothDto updateTooth(@PathVariable String id,
-                                @PathVariable int number,
-                                @RequestBody ToothDto tooth) {
+                               @PathVariable int number,
+                               @RequestBody ToothDto tooth) {
         return pacientesService.updateTooth(id, tooth);
+    }
+
+    @GetMapping("/{id}/firmas-divergentes")
+    public List<AuditoriaFirmaDto> firmasDivergentes(@PathVariable String id) {
+        return pacientesService.firmasDivergentes(id);
     }
 
     @GetMapping("/alerts")

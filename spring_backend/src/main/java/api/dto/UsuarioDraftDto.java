@@ -5,5 +5,6 @@ public record UsuarioDraftDto(
         String name,
         String role,
         String status,
-        String password) {
+        String password,
+        String odontologoCodigo) {
 }

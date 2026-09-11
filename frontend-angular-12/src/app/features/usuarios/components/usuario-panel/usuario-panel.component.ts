@@ -5,6 +5,7 @@ import {
   UsuarioDraft,
   UsuarioStatus
 } from '../../../../core/models/usuario.model';
+import { Odontologo } from '../../../../core/models/odontologo.model';
 
 export function usuarioStatusLabel(status: UsuarioStatus): string {
   switch (status) {
@@ -33,6 +34,7 @@ export class UsuarioPanelComponent implements OnChanges {
   @Input() esAdmin = false;
   @Input() puedeEditar = false;
   @Input() puedeSuspender = false;
+  @Input() odontologos: Odontologo[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
   @Output() saved = new EventEmitter<UsuarioDraft>();

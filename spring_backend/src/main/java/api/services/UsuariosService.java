@@ -13,6 +13,7 @@ import api.entities.RolPermisoId;
 import api.entities.Usuario;
 import api.entities.UsuarioEstado;
 import api.entities.UsuarioRol;
+import api.repositories.OdontologoRepository;
 import api.repositories.PermisoRepository;
 import api.repositories.RolPermisoRepository;
 import api.repositories.UsuarioEstadoRepository;
@@ -46,6 +47,7 @@ public class UsuariosService {
     private final UsuarioEstadoRepository estadoRepository;
     private final PermisoRepository permisoRepository;
     private final RolPermisoRepository rolPermisoRepository;
+    private final OdontologoRepository odontologoRepository;
     private final CodigoService codigoService;
     private final CatalogSnapshotService snapshots;
 
@@ -70,6 +72,7 @@ public class UsuariosService {
                 .rol(rol)
                 .estado(estado)
                 .telefono("—")
+                .odontologoCodigo(validarOdontologo(draft.odontologoCodigo()))
                 .build();
         return toDto(usuarioRepository.save(usuario));
     }
@@ -95,6 +98,7 @@ public class UsuariosService {
         usuario.setRol(rolNuevo);
         usuario.setEstado(estadoNuevo);
         usuario.setTelefono(dto.phone());
+        usuario.setOdontologoCodigo(validarOdontologo(dto.odontologoCodigo()));
         return toDto(usuarioRepository.save(usuario));
     }
 
@@ -421,7 +425,20 @@ public class UsuariosService {
                 u.getRol(),
                 u.getEstado(),
                 FormatoUtil.fechaHora(u.getUltimoAcceso()),
-                u.getTelefono());
+                u.getTelefono(),
+                u.getOdontologoCodigo());
+    }
+
+    /** Ficha profesional vinculada (opcional): debe existir en el roster. */
+    private String validarOdontologo(String codigo) {
+        if (codigo == null || codigo.isBlank()) {
+            return null;
+        }
+        String limpio = codigo.trim().toUpperCase();
+        if (odontologoRepository.findById(limpio).isEmpty()) {
+            throw new IllegalArgumentException("ODONTÓLOGO NO REGISTRADO: " + limpio);
+        }
+        return limpio;
     }
 
     private static String hashPassword(String password) {
