@@ -6,6 +6,7 @@ import {
   UsuarioRol,
   UsuarioStatus
 } from '../../../../core/models/usuario.model';
+import { Odontologo } from '../../../../core/models/odontologo.model';
 
 @Component({
   selector: 'app-usuario-form',
@@ -18,6 +19,7 @@ export class UsuarioFormComponent implements OnChanges {
   @Input() roles: CatalogoItem[] = [];
   @Input() estados: CatalogoItem[] = [];
   @Input() esAdmin = false;
+  @Input() odontologos: Odontologo[] = [];
   @Output() saved = new EventEmitter<UsuarioDraft>();
   @Output() cancel = new EventEmitter<void>();
   @Output() crearRol = new EventEmitter<string>();
@@ -27,6 +29,7 @@ export class UsuarioFormComponent implements OnChanges {
   name = '';
   role: UsuarioRol = '';
   status: UsuarioStatus = '';
+  odontologoCodigo: string | null = null;
   error = false;
 
   nuevoRol = '';
@@ -43,6 +46,7 @@ export class UsuarioFormComponent implements OnChanges {
       this.name = this.usuario.name;
       this.role = this.usuario.role;
       this.status = this.usuario.status;
+      this.odontologoCodigo = this.usuario.odontologoCodigo || null;
       this.error = false;
     }
     if (changes.roles) {
@@ -97,7 +101,8 @@ export class UsuarioFormComponent implements OnChanges {
       username: this.username.trim().toLowerCase().replace(/\s+/g, ''),
       name: this.name.trim().toUpperCase(),
       role: this.role,
-      status: this.status
+      status: this.status,
+      odontologoCodigo: this.odontologoCodigo
     };
     this.saved.emit(draft);
   }

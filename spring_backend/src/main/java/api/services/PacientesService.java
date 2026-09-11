@@ -2,6 +2,7 @@ package api.services;
 
 import api.dto.AbonoDto;
 import api.dto.AccountEntryDto;
+import api.dto.AuditoriaFirmaDto;
 import api.dto.EvolucionDto;
 import api.dto.HclDto;
 import api.dto.PacienteDetailDto;
@@ -13,6 +14,7 @@ import api.dto.ToothConditionDto;
 import api.dto.ToothDto;
 import api.dto.ToothFaceDto;
 import api.entities.AccountEntry;
+import api.entities.AuditoriaFirma;
 import api.entities.EvolucionClinica;
 import api.entities.HcSesionProcedimiento;
 import api.entities.HistoriaClinica;
@@ -29,6 +31,7 @@ import api.entities.VistaPaciente;
 import api.entities.converter.CondicionDentalConverter;
 import api.entities.converter.PatientAppointmentEstadoConverter;
 import api.repositories.AccountEntryRepository;
+import api.repositories.AuditoriaFirmaRepository;
 import api.repositories.EvolucionClinicaRepository;
 import api.repositories.HistoriaClinicaRepository;
 import api.repositories.OdontologoRepository;
@@ -102,6 +105,7 @@ public class PacientesService {
     private final OdontologoRepository odontologoRepository;
     private final ProcedimientoRepository procedimientoRepository;
     private final HcSesionProcedimientoRepository hcSesionProcedimientoRepository;
+    private final AuditoriaFirmaRepository auditoriaRepository;
     private final CodigoService codigoService;
     private final ObjectMapper objectMapper;
 
@@ -442,6 +446,7 @@ public class PacientesService {
         hc.setProfesionalNombre(dto.profesionalNombre());
         hc.setProfesionalCodigo(dto.profesionalCodigo());
         hc.setProfesionalFirma(dto.profesionalFirma());
+        auditarFirmaDivergente(id, hoja, dto.profesionalNombre(), dto.profesionalCodigo());
         hc.setDiagnosticosCie(toJson(dto.diagnosticosCie()));
         hc.setSesiones(toJson(dto.sesiones()));
         hc.setActualizadaEn(LocalDateTime.now());
@@ -450,6 +455,59 @@ public class PacientesService {
         persistirSesionProcedimientos(guardada.getPacienteId(), guardada.getHoja(), dto.sesiones());
 
         return toHclDto(guardada);
+    }
+
+    /**
+     * Firma divergente: la sesión tiene ficha vinculada pero la hoja declara
+     * otro profesional. Se registra rastro inmutable (quién, como quién,
+     * cuándo, dónde). Sin ficha vinculada no hay divergencia posible:
+     * recepción registra por terceros y queda cubierta por registradoPor.
+     */
+    private void auditarFirmaDivergente(String pacienteId, int hoja, String firmado, String firmadoCodigo) {
+        if (firmado == null || firmado.isBlank()) {
+            return;
+        }
+        Object principal = null;
+        try {
+            var auth = org.springframework.security.core.context.SecurityContextHolder
+                    .getContext().getAuthentication();
+            principal = auth == null ? null : auth.getPrincipal();
+        } catch (Exception ignored) {
+            return;
+        }
+        if (!(principal instanceof Usuario usuario) || usuario.getOdontologoCodigo() == null
+                || usuario.getOdontologoCodigo().isBlank()) {
+            return;
+        }
+        String propio = odontologoRepository.findById(usuario.getOdontologoCodigo())
+                .map(Odontologo::getNombre).orElse(null);
+        if (propio != null && normalizarNombre(propio).equals(normalizarNombre(firmado))) {
+            return;
+        }
+        auditoriaRepository.save(AuditoriaFirma.builder()
+                .usuarioCodigo(usuario.getCodigo())
+                .usuarioNombre(usuario.getNombre())
+                .odontologoCodigo(usuario.getOdontologoCodigo())
+                .firmadoNombre(firmado.trim())
+                .firmadoCodigo(firmadoCodigo == null || firmadoCodigo.isBlank() ? null : firmadoCodigo.trim())
+                .pacienteId(pacienteId)
+                .hoja(hoja)
+                .build());
+    }
+
+    private static String normalizarNombre(String nombre) {
+        return nombre == null ? "" : nombre.trim().toUpperCase().replaceAll("\\s+", " ");
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<AuditoriaFirmaDto> firmasDivergentes(String pacienteId) {
+        return auditoriaRepository.findByPacienteIdOrderByCreatedAtDesc(pacienteId).stream()
+                .map(f -> new AuditoriaFirmaDto(
+                        f.getId(),
+                        f.getCreatedAt() == null ? null : f.getCreatedAt().toString(),
+                        f.getUsuarioCodigo(), f.getUsuarioNombre(), f.getOdontologoCodigo(),
+                        f.getFirmadoNombre(), f.getFirmadoCodigo(), f.getPacienteId(), f.getHoja()))
+                .toList();
     }
 
     /** Reemplaza la relación FK de procedimientos de una hoja de HC a partir de las sesiones del DTO. */

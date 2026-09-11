@@ -76,7 +76,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/dashboard/**").hasAuthority("AGENDA_GESTIONAR")
                         // Pacientes + historia 033
                         .requestMatchers(HttpMethod.GET, "/api/v1/pacientes/*/hclinica/**",
-                                "/api/v1/pacientes/*/evolucion").hasAuthority("HC_VER")
+                                "/api/v1/pacientes/*/evolucion",
+                                "/api/v1/pacientes/*/firmas-divergentes").hasAuthority("HC_VER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/pacientes/*/evolucion")
                         .hasAuthority("HC_EDITAR")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/pacientes/*/hclinica",

@@ -67,6 +67,7 @@
         [esAdmin]="(esAdmin$ | async) ?? false"
         [puedeEditar]="puede('USU_EDITAR')"
         [puedeSuspender]="puede('USU_SUSPENDER')"
+        [odontologos]="(odontologos$ | async) ?? []"
         (close)="onClosePanel()"
         (cancel)="cancelCreate()"
         (saved)="onSaved($event)"
