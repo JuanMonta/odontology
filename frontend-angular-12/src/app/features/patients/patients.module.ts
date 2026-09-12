@@ -6,6 +6,7 @@ import { OdontogramModule } from '../../shared/odontogram/odontogram.module';
 import { PatientFormModule } from '../../shared/patient-form/patient-form.module';
 import { PaginationModule } from '../../shared/components/pagination/pagination.module';
 import { PatientsPageComponent } from './pages/patients-page/patients-page.component';
+import { PatientDetailPageComponent } from './pages/patient-detail-page/patient-detail-page.component';
 import { PatientDirectoryComponent } from './components/patient-directory/patient-directory.component';
 import { PatientPanelComponent } from './components/patient-panel/patient-panel.component';
 import { Hcl033Component } from './components/hcl-033/hcl-033.component';
@@ -15,6 +16,7 @@ import { EvolucionClinicaComponent } from './components/evolucion-clinica/evoluc
   declarations: [
     PatientsPageComponent,
     PatientDirectoryComponent,
+    PatientDetailPageComponent,
     PatientPanelComponent,
     Hcl033Component,
     EvolucionClinicaComponent

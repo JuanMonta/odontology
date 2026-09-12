@@ -77,6 +77,16 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
     this.creating = false;
   }
 
+  onOpen(patient: Patient): void {
+    this.router.navigate([patient.id], { relativeTo: this.route });
+  }
+
+  onOpenExpedient(): void {
+    if (this.selected) {
+      this.onOpen(this.selected);
+    }
+  }
+
   startCreate(): void {
     this.creating = true;
     this.selected = null;

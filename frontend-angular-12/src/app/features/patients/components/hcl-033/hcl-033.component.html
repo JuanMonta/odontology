@@ -69,7 +69,7 @@
     </svg>
     <div class="hc-seal-txt">
       <span class="hc-seal-t">TRATAMIENTO INICIADO · HOJA SELLADA</span>
-      <span class="hc-seal-s">La identidad y las secciones 1-5, 7 y 8 quedaron bloqueadas al registrar la primera sesión. Odontograma, planes, diagnóstico CIE y las sesiones nuevas siguen editables.</span>
+      <span class="hc-seal-s">La identidad y las secciones 1-5, 7 y 8 quedaron bloqueadas al registrar la primera sesión. El odontograma se edita en su pestaña dedicada; planes, diagnóstico CIE y las sesiones nuevas siguen editables aquí.</span>
     </div>
   </div>
 
@@ -202,8 +202,7 @@
     <section class="sec" *ngIf="seccion === 6">
       <span class="sec-num">6</span>
       <h3 class="sec-title">ODONTOGRAMA</h3>
-      <p class="sec-hint">PINTAR CON AZUL EL TRATAMIENTO REALIZADO Y CON ROJO LA PATOLOGÍA ACTUAL</p>
-      <app-odontogram [teeth]="teeth" (change)="onTooth($event)"></app-odontogram>
+      <p class="sec-hint">EL ODONTOGRAMA SE PINTA Y EDITA EN SU PESTAÑA DEDICADA — ODONTOGRAMA (ARRIBA). AQUÍ SOLO SE DEJA CONSTANCIA DE QUE FORMA PARTE DEL 033.</p>
     </section>
 
     <!-- 7 · INDICADORES DE SALUD BUCAL -->

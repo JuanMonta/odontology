@@ -396,7 +396,7 @@ g:not(.perio--off):hover .perio-box {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: min(1180px, 100%);
+  width: min(92vw, 1600px);
   max-height: calc(100vh - 48px);
   background:
     linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)),
