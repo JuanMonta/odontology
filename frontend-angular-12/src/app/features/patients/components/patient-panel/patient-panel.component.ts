@@ -5,14 +5,13 @@ import {
   Patient,
   PatientAppointment,
   PatientDraft,
-  PatientDetail,
-  Tooth
+  PatientDetail
 } from '../../../../core/models/patient.model';
 import { PatientsHttpService } from '../../services/patients-http.service';
 import { clearPatientFormDraft } from '../../../../shared/patient-form/patient-form.component';
 import { formatMoney } from '../../../../core/utils/format';
 
-type Tab = 'odonto' | 'hcl033' | 'historial' | 'ficha' | 'cuentas' | 'evolucion';
+type Tab = 'historial' | 'evolucion' | 'ficha' | 'cuentas';
 
 @Component({
   selector: 'app-patient-panel',
@@ -23,19 +22,19 @@ type Tab = 'odonto' | 'hcl033' | 'historial' | 'ficha' | 'cuentas' | 'evolucion'
 export class PatientPanelComponent implements OnChanges {
   @Input() patient: Patient | null = null;
   @Input() creating = false;
+  @Input() showActions = true;
   @Output() close = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
   @Output() saved = new EventEmitter<Patient>();
+  @Output() openExpedient = new EventEmitter<void>();
 
   detail$: Observable<PatientDetail> | null = null;
-  tab: Tab = 'odonto';
+  tab: Tab = 'ficha';
   editMode = false;
   abonoOpen = false;
   abonoAmount = 100;
 
   tabs: { id: Tab; label: string }[] = [
-    { id: 'odonto', label: 'ODONTOGRAMA' },
-    { id: 'hcl033', label: 'HISTORIA 033' },
     { id: 'historial', label: 'HISTORIAL' },
     { id: 'evolucion', label: 'EVOLUCIÓN' },
     { id: 'ficha', label: 'FICHA' },
@@ -88,12 +87,6 @@ export class PatientPanelComponent implements OnChanges {
 
   fmtMoney(n: number): string {
     return formatMoney(n, { sign: true });
-  }
-
-  onToothChange(teeth: Tooth[]): void {
-    if (this.patient) {
-      this.service.updateTeeth(this.patient.id, teeth);
-    }
   }
 
   statusLabel(s: string): string {

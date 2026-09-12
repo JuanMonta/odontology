@@ -73,7 +73,7 @@ export class OdontogramComponent implements OnInit, OnChanges, OnDestroy {
   activeTool: ToothCondition | 'clear' | null = null;
   faceTarget: ToothView | null = null;
   expanded = false;
-  zoom = 1;
+  zoom = 1.25;
   spriteHtml: SafeHtml | null = null;
 
   @HostListener('document:keydown', ['$event'])
@@ -131,7 +131,7 @@ export class OdontogramComponent implements OnInit, OnChanges, OnDestroy {
 
   openExpanded(): void {
     this.expanded = true;
-    this.zoom = 1;
+    this.zoom = 1.25;
     document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
     this.expandedPanel?.nativeElement.focus();

@@ -37,12 +37,20 @@
           <span class="panel-title">{{ patient.name }}</span>
         </div>
       </div>
-      <button class="icon-btn" type="button" aria-label="Cerrar" (click)="close.emit()">
-        <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <path d="M3 3l10 10"></path>
-          <path d="M13 3L3 13"></path>
-        </svg>
-      </button>
+      <div class="panel-head-actions" *ngIf="showActions">
+        <button class="btn-exp" type="button" (click)="openExpedient.emit()">
+          <svg class="icon-exp" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 3L5 8l5 5"></path>
+          </svg>
+          EXPEDIENTE
+        </button>
+        <button class="icon-btn" type="button" aria-label="Cerrar" (click)="close.emit()">
+          <svg class="icon-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+            <path d="M3 3l10 10"></path>
+            <path d="M13 3L3 13"></path>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="panel-tabs" role="tablist">
@@ -59,16 +67,6 @@
 
     <div class="panel-scroll">
       <ng-container *ngIf="detail$ | async as detail">
-        <!-- ODONTOGRAMA (pestaña principal) -->
-        <div class="tab-pane" *ngIf="tab === 'odonto'">
-          <app-odontogram [teeth]="detail.teeth" (change)="onToothChange($event)"></app-odontogram>
-        </div>
-
-        <!-- HISTORIA CLÍNICA FORMULARIO 033 (12 secciones) -->
-        <div class="tab-pane" *ngIf="tab === 'hcl033'">
-          <app-hcl-033 [patient]="patient" [teeth]="detail.teeth" (toothChange)="onToothChange($event)"></app-hcl-033>
-        </div>
-
         <!-- HOJA DE EVOLUCIÓN CLÍNICA (append-only) -->
         <div class="tab-pane" *ngIf="tab === 'evolucion'">
           <app-evolucion-clinica [patient]="patient" [contexto]="ultimoControlCita(detail.appointments)"></app-evolucion-clinica>

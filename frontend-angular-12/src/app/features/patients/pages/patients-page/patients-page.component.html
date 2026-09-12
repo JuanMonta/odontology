@@ -89,6 +89,7 @@
         [patients]="(patients$ | async) ?? []"
         [selectedId]="selected?.id ?? null"
         (select)="onSelect($event)"
+        (open)="onOpen($event)"
       ></app-patient-directory>
     </section>
 
@@ -99,6 +100,7 @@
         (close)="onClosePanel()"
         (cancel)="cancelCreate()"
         (saved)="onSaved($event)"
+        (openExpedient)="onOpenExpedient()"
       ></app-patient-panel>
     </aside>
   </div>

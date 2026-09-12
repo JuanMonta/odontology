@@ -1,0 +1,63 @@
+<div class="page detail-page">
+  <header class="detail-head">
+    <div class="detail-head-left">
+      <button class="btn-back" type="button" (click)="goBack()" aria-label="Volver al directorio">
+        <svg class="icon-chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10 3L5 8l5 5"></path>
+        </svg>
+        DIRECTORIO
+      </button>
+      <span class="head-sep" aria-hidden="true"></span>
+      <ng-container *ngIf="patient">
+        <span class="avatar" aria-hidden="true">{{ initials(patient.name) }}</span>
+        <div class="head-id">
+          <span class="head-hc">{{ patient.id }}</span>
+          <span class="head-name">{{ patient.name }}</span>
+        </div>
+      </ng-container>
+    </div>
+    <div class="detail-head-right" *ngIf="patient">
+      <span class="chip-status" [class.is-active]="patient.status === 'active'">
+        <span class="chip-lamp" aria-hidden="true"></span>
+        {{ patient.status === 'active' ? 'ACTIVO' : 'INACTIVO' }}
+      </span>
+    </div>
+  </header>
+
+  <div class="detail-body">
+    <section class="workspace" aria-label="Expediente clínico">
+      <div class="ws-tabs" role="tablist">
+        <button
+          class="ws-tab"
+          [class.is-active]="tab === 'odonto'"
+          type="button"
+          role="tab"
+          [attr.aria-selected]="tab === 'odonto'"
+          (click)="tab = 'odonto'"
+        >ODONTOGRAMA</button>
+        <button
+          class="ws-tab"
+          [class.is-active]="tab === 'hcl033'"
+          type="button"
+          role="tab"
+          [attr.aria-selected]="tab === 'hcl033'"
+          (click)="tab = 'hcl033'"
+        >HISTORIA 033</button>
+      </div>
+      <div class="ws-scroll">
+        <ng-container *ngIf="detail$ | async as detail">
+          <div class="ws-pane" *ngIf="tab === 'odonto'">
+            <app-odontogram [teeth]="detail.teeth" (change)="onToothChange($event)"></app-odontogram>
+          </div>
+          <div class="ws-pane" *ngIf="tab === 'hcl033'">
+            <app-hcl-033 *ngIf="patient" [patient]="patient" [teeth]="detail.teeth" (toothChange)="onToothChange($event)"></app-hcl-033>
+          </div>
+        </ng-container>
+      </div>
+    </section>
+
+    <aside class="reference" aria-label="Datos del paciente">
+      <app-patient-panel *ngIf="patient" [patient]="patient" [showActions]="false"></app-patient-panel>
+    </aside>
+  </div>
+</div>

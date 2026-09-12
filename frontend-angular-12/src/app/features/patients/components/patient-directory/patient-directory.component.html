@@ -16,7 +16,9 @@
         [class.is-selected]="p.id === selectedId"
         role="button"
         tabindex="0"
+        title="Doble clic para abrir el expediente"
         (click)="select.emit(p)"
+        (dblclick)="open.emit(p)"
         (keydown.enter)="select.emit(p)"
       >
         <span class="col col-id">{{ p.id }}</span>

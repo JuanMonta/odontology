@@ -13,6 +13,7 @@ export class PatientDirectoryComponent extends PaginatedListComponent {
   @Input() patients: Patient[] = [];
   @Input() selectedId: string | null = null;
   @Output() select = new EventEmitter<Patient>();
+  @Output() open = new EventEmitter<Patient>();
 
   protected get totalItems(): number {
     return this.patients.length;
