@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { Patient, PatientAlert } from '../../../../core/models/patient.model';
 import { PatientsHttpService } from '../../services/patients-http.service';
+import { PatientsSelectionService } from '../../services/patients-selection.service';
 
 type PatientFilter = 'all' | 'active' | 'inactive';
 
@@ -29,7 +30,9 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
   constructor(
     private service: PatientsHttpService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private selection: PatientsSelectionService,
+    private cd: ChangeDetectorRef
   ) {
     this.alerts$ = this.service.alerts$;
     this.pending$ = this.service.alerts$.pipe(
@@ -57,6 +60,22 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
         this.startCreate();
       }
     });
+
+    // Restaura la selección al volver desde el detalle (/pacientes/:id): la
+    // página se recrea y su estado local ya no existe, pero la sesión sí lo
+    // recuerda (PatientsSelectionService).
+    combineLatest([this.service.patients$, this.selection.selectedId$])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([list, id]) => {
+        if (this.selected || !id) {
+          return;
+        }
+        const found = list.find(p => p.id === id);
+        if (found) {
+          this.selected = found;
+          this.cd.markForCheck();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -75,9 +94,11 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
   onSelect(patient: Patient): void {
     this.selected = patient;
     this.creating = false;
+    this.selection.select(patient.id);
   }
 
   onOpen(patient: Patient): void {
+    this.selection.select(patient.id);
     this.router.navigate([patient.id], { relativeTo: this.route });
   }
 
@@ -90,11 +111,13 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
   startCreate(): void {
     this.creating = true;
     this.selected = null;
+    this.selection.select(null);
   }
 
   onSaved(patient: Patient): void {
     this.creating = false;
     this.selected = patient;
+    this.selection.select(patient.id);
     this.router.navigate([], { queryParams: {} });
   }
 
@@ -104,6 +127,7 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
 
   onClosePanel(): void {
     this.selected = null;
+    this.selection.select(null);
   }
 
   toggleAlerts(): void {
