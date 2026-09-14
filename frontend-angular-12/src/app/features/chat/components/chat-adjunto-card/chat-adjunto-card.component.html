@@ -1,0 +1,45 @@
+<div
+  class="adjunto"
+  *ngIf="adjunto"
+>
+  <div
+    class="adjunto-stage"
+    [class.is-img]="adjunto.categoria === 'imagen'"
+  >
+    <ng-container *ngIf="estado === 'cargando'">
+      <span class="adjunto-loading">CARGANDO…</span>
+    </ng-container>
+    <ng-container *ngIf="estado === 'error'">
+      <span class="adjunto-error">SIN ACCESO</span>
+    </ng-container>
+    <ng-container *ngIf="estado === 'listo'">
+      <img
+        *ngIf="adjunto.categoria === 'imagen' && previewUrl"
+        class="adjunto-preview"
+        [src]="previewUrl"
+        [alt]="adjunto.nombre"
+        (click)="abrir()"
+      />
+      <span
+        *ngIf="adjunto.categoria !== 'imagen'"
+        class="adjunto-fileicon"
+        aria-hidden="true"
+      >📄</span>
+    </ng-container>
+  </div>
+
+  <div class="adjunto-meta">
+    <span class="adjunto-badge">{{ categoriaEtiqueta }}</span>
+    <span class="adjunto-nombre">{{ adjunto.nombre }}</span>
+    <span class="adjunto-size">{{ tamanoFormateado }}</span>
+  </div>
+
+  <button
+    class="btn-amber adjunto-open"
+    type="button"
+    (click)="abrir()"
+    [disabled]="estado === 'cargando'"
+  >
+    {{ adjunto.categoria === 'imagen' ? 'VER' : 'ABRIR' }}
+  </button>
+</div>

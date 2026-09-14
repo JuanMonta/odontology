@@ -1,0 +1,9 @@
+package api.repositories;
+
+import api.entities.ChatAdjunto;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+@RepositoryRestResource(exported = false)
+public interface ChatAdjuntoRepository extends JpaRepository<ChatAdjunto, Long> {
+}

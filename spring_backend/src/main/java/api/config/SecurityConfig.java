@@ -143,6 +143,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/chat/**").hasAuthority("CHAT_VER")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/chat/conversaciones/*/leer")
                         .hasAuthority("CHAT_VER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/chat/adjuntos").hasAuthority("CHAT_VER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/chat/adjuntos/*").hasAuthority("CHAT_VER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/chat/**").hasAuthority("CHAT_ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/chat/conversaciones/*/nombre")
                         .hasAuthority("CHAT_ADMIN")

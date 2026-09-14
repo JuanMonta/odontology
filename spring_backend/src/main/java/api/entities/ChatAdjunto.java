@@ -16,18 +16,18 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * Mensaje de chat persistido (tabla {@code chat_mensajes}). Append-only: el
- * historial conversacional es el registro durable del consultorio y no se
- * edita ni borra (igual contrato que {@code clinic_messages}).
+ * Adjunto de un mensaje de chat (tabla {@code chat_adjuntos}). Los bytes se
+ * guardan fuera del webroot con nombre aleatorio UUID; aquí vive solo el
+ * metadato (nombre original saneado, tipo MIME verificado por firma, tamaño).
  */
 @Entity
-@Table(name = "chat_mensajes")
+@Table(name = "chat_adjuntos")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatMensaje {
+public class ChatAdjunto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,14 +37,23 @@ public class ChatMensaje {
     @Column(name = "conversacion_id", nullable = false)
     private Long conversacionId;
 
-    @Column(name = "remitente", nullable = false, length = 12)
-    private String remitente;
+    @Column(name = "subido_por", nullable = false, length = 12)
+    private String subidoPor;
 
-    @Column(name = "cuerpo", nullable = false, columnDefinition = "TEXT")
-    private String cuerpo;
+    @Column(name = "nombre_original", nullable = false, length = 120)
+    private String nombreOriginal;
 
-    @Column(name = "adjunto_id")
-    private Long adjuntoId;
+    @Column(name = "nombre_disco", nullable = false, unique = true, length = 96)
+    private String nombreDisco;
+
+    @Column(name = "tipo", nullable = false, length = 40)
+    private String tipo;
+
+    @Column(name = "categoria", nullable = false, length = 20)
+    private String categoria;
+
+    @Column(name = "tamano", nullable = false)
+    private Long tamano;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

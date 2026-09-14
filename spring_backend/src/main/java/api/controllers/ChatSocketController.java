@@ -30,23 +30,49 @@ public class ChatSocketController {
     private final PresenciaService presenciaService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    /** Payload {@code {conversacionId, cuerpo}}. */
+    /** Payload {@code {conversacionId, cuerpo, adjuntoId?}}. */
     @MessageMapping("/chat.enviar")
     public void enviar(Principal principal, Map<String, Object> payload) {
-        Usuario remitente = ((WebSocketConfig.UsuarioPrincipal) principal).usuario();
-        long conversacionId = ((Number) payload.get("conversacionId")).longValue();
-        String cuerpo = (String) payload.get("cuerpo");
-        ChatMensajeDto dto = chatService.send(conversacionId, remitente.getCodigo(), cuerpo);
-        messagingTemplate.convertAndSend("/topic/chat/" + conversacionId, (Object) dto);
-        actualizarPresenciaTopic();
+        if (principal == null || payload == null) {
+            return;
+        }
+        Usuario remitente = usuarioDe(principal);
+        if (remitente == null) {
+            return;
+        }
+        Object conv = payload.get("conversacionId");
+        if (!(conv instanceof Number)) {
+            return;
+        }
+        long conversacionId = ((Number) conv).longValue();
+        if (conversacionId <= 0) {
+            return;
+        }
+        String cuerpo = payload.get("cuerpo") instanceof String s ? s : null;
+        Long adjuntoId = payload.get("adjuntoId") instanceof Number an ? an.longValue() : null;
+        try {
+            ChatMensajeDto dto = chatService.send(conversacionId, remitente.getCodigo(), cuerpo, adjuntoId);
+            messagingTemplate.convertAndSend("/topic/chat/" + conversacionId, (Object) dto);
+            actualizarPresenciaTopic();
+        } catch (IllegalArgumentException ex) {
+            // Mensaje inválido (vacío, longitud, adjunto ajeno, no-miembro):
+            // se descarta sin tumbar la sesión STOMP ni romper la difusión.
+        }
     }
 
     /** Payload {@code {conversacionId, typing}}. */
     @MessageMapping("/chat.escribiendo")
     public void escribiendo(Principal principal, Map<String, Object> payload) {
+        if (principal == null || payload == null
+                || !(payload.get("conversacionId") instanceof Number)) {
+            return;
+        }
         long conversacionId = ((Number) payload.get("conversacionId")).longValue();
         boolean typing = Boolean.TRUE.equals(payload.get("typing"));
-        Usuario usuario = ((WebSocketConfig.UsuarioPrincipal) principal).usuario();
+        Usuario usuario = usuarioDe(principal);
+        if (usuario == null) {
+            return;
+        }
         messagingTemplate.convertAndSend("/topic/chat/" + conversacionId + "/typing",
                 (Object) Map.of("codigo", usuario.getCodigo(), "nombre", usuario.getNombre(), "typing", typing));
     }
@@ -73,5 +99,13 @@ public class ChatSocketController {
 
     private void actualizarPresenciaTopic() {
         messagingTemplate.convertAndSend("/topic/presencia", (Object) chatService.presencia());
+    }
+
+    /** Usuario del principal STOMP (normalizado por {@link WebSocketConfig}). */
+    private Usuario usuarioDe(Principal principal) {
+        if (principal instanceof WebSocketConfig.UsuarioPrincipal up) {
+            return up.usuario();
+        }
+        return null;
     }
 }

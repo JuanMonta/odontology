@@ -6,5 +6,6 @@ public record ChatMensajeDto(
         String remitente,
         String remitenteNombre,
         String cuerpo,
-        String fechaHora) {
+        String fechaHora,
+        ChatAdjuntoDto adjunto) {
 }

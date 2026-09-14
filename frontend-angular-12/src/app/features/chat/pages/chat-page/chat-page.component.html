@@ -187,7 +187,14 @@
           >
             <div class="msg-bubble">
               <span class="msg-from">{{ m.remitenteNombre }}</span>
-              <span class="msg-body">{{ m.cuerpo }}</span>
+              <span
+                class="msg-body"
+                *ngIf="m.cuerpo"
+              >{{ m.cuerpo }}</span>
+              <app-chat-adjunto-card
+                *ngIf="m.adjunto"
+                [adjunto]="m.adjunto"
+              ></app-chat-adjunto-card>
               <span class="msg-time">{{ m.fechaHora }}</span>
             </div>
           </div>
@@ -216,23 +223,89 @@
           (ngSubmit)="enviarMensaje()"
           novalidate
         >
-          <input
-            class="composer-input"
-            type="text"
-            [(ngModel)]="nuevoMensaje"
-            name="nuevoMensaje"
-            placeholder="ESCRIBIR TRANSMISIÓN…"
-            autocomplete="off"
-            (ngModelChange)="onComposerInput($event)"
-            (blur)="onBlurComposer()"
-          />
-          <button
-            class="btn-amber composer-send"
-            type="submit"
-            [disabled]="!nuevoMensaje.trim()"
+          <div
+            class="composer-pendiente"
+            *ngIf="pendiente"
           >
-            TRANSMITIR
-          </button>
+            <span class="pendiente-meta">
+              <span
+                class="pendiente-icon"
+                aria-hidden="true"
+              >📎</span>
+              <span
+                class="pendiente-nombre"
+                [title]="pendiente.nombre"
+              >{{ pendiente.nombre }}</span>
+            </span>
+            <button
+              class="pendiente-x"
+              type="button"
+              aria-label="Quitar adjunto"
+              (click)="quitarAdjuntoPendiente()"
+            >✕</button>
+          </div>
+
+          <div
+            class="emoji-sheet"
+            *ngIf="emojiAbierto"
+            role="listbox"
+            aria-label="Emojis"
+          >
+            <button
+              class="emoji-tile"
+              *ngFor="let e of emojis"
+              type="button"
+              (click)="insertarEmoji(e)"
+            >{{ e }}</button>
+          </div>
+
+          <div class="composer-row">
+            <button
+              class="composer-icon"
+              type="button"
+              aria-label="Adjuntar archivo"
+              [disabled]="!activa || subiendoAdjunto"
+              (click)="abrirAdjuntos()"
+            >📎</button>
+            <input
+              #archivoAdjunto
+              class="adjunto-input"
+              type="file"
+              hidden
+              [disabled]="!activa || subiendoAdjunto"
+              (change)="onArchivoSeleccionado($event)"
+            />
+            <button
+              class="composer-icon"
+              type="button"
+              aria-label="Emojis"
+              [class.is-on]="emojiAbierto"
+              (click)="alternarEmoji()"
+            >😊</button>
+            <input
+              #composerCampo
+              class="composer-input"
+              type="text"
+              [(ngModel)]="nuevoMensaje"
+              name="nuevoMensaje"
+              placeholder="ESCRIBIR TRANSMISIÓN…"
+              autocomplete="off"
+              (ngModelChange)="onComposerInput($event)"
+              (blur)="onBlurComposer()"
+            />
+            <button
+              class="btn-amber composer-send"
+              type="submit"
+              [disabled]="!activa || subiendoAdjunto || (!nuevoMensaje.trim() && !pendiente)"
+            >
+              TRANSMITIR
+            </button>
+          </div>
+
+          <span
+            class="composer-error"
+            *ngIf="adjuntoError"
+          >{{ adjuntoError }}</span>
         </form>
       </ng-container>
     </section>

@@ -11,6 +11,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { AuthStore } from '../../../../core/auth/auth.store';
 import {
+  ChatAdjunto,
   ChatCanalDraft,
   ChatConversacion,
   ChatMensaje,
@@ -30,6 +31,8 @@ type PresenciaEstacion = 'online' | 'mixta' | 'offline';
 })
 export class ChatPageComponent implements OnInit, OnDestroy {
   @ViewChild('feed') feed?: ElementRef<HTMLElement>;
+  @ViewChild('composerCampo') composerCampo?: ElementRef<HTMLInputElement>;
+  @ViewChild('archivoAdjunto') archivoAdjunto?: ElementRef<HTMLInputElement>;
 
   conversaciones: ChatConversacion[] = [];
   mensajes: ChatMensaje[] = [];
@@ -49,7 +52,21 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   canalMiembros: string[] = [];
   canalRename = '';
 
-  nuevoMensaje = '';
+nuevoMensaje = '';
+  pendiente: ChatAdjunto | null = null;
+  subiendoAdjunto = false;
+  adjuntoError: string | null = null;
+  emojiAbierto = false;
+
+  readonly emojis = [
+    '😀', '😄', '😁', '😊', '🙂', '😉', '😍', '🥰',
+    '😎', '🤗', '🤨', '😴', '🤔', '👍', '👎', '👏',
+    '🙌', '🤝', '🙏', '💪', '✌️', '🤘', '👌', '✋',
+    '💯', '🔥', '✨', '⚡', '🌟', '💡', '📌', '📎',
+    '🦷', '🔬', '💉', '🩺', '💊', '🧪', '🪞', '🦷💎',
+    '🩹', '🚑', '🏥', '👨‍⚕️', '👩‍⚕️', '🗓️', '⏰', '✅',
+    '❌', '⚠️', '❗', '📢', '🧠', '💚'
+  ];
 
   private readonly suscritas = new Set<number>();
   private readonly destroy$ = new Subject<void>();
@@ -175,6 +192,12 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     this.activa = conv;
     this.mensajes = [];
     this.typingNombre = null;
+    this.emojiAbierto = false;
+    this.adjuntoError = null;
+    if (this.pendiente && this.pendiente.conversacionId !== conv.id) {
+      this.pendiente = null;
+      this.limpiarInputArchivo();
+    }
     this.cdr.markForCheck();
 
     if (!this.suscritas.has(conv.id)) {
@@ -348,17 +371,82 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   enviarMensaje(): void {
     const cuerpo = this.nuevoMensaje.trim();
-    if (!this.activa || !cuerpo) {
+    if (!this.activa || (!cuerpo && !this.pendiente)) {
       return;
     }
-    this.socket.enviar(this.activa.id, cuerpo);
+    this.socket.enviar(this.activa.id, cuerpo, this.pendiente?.id);
     this.nuevoMensaje = '';
+    this.pendiente = null;
+    this.adjuntoError = null;
+    this.limpiarInputArchivo();
     if (this.typingNotificado && this.composerConvId != null) {
       this.socket.notificarEscritura(this.composerConvId, false);
       this.typingNotificado = false;
     }
     this.composerConvId = null;
     this.cdr.markForCheck();
+  }
+
+  abrirAdjuntos(): void {
+    this.adjuntoError = null;
+    this.archivoAdjunto?.nativeElement.click();
+  }
+
+  onArchivoSeleccionado(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !this.activa || this.subiendoAdjunto) {
+      return;
+    }
+    this.subiendoAdjunto = true;
+    this.adjuntoError = null;
+    this.cdr.markForCheck();
+    this.chat.subirAdjunto(this.activa.id, file).subscribe({
+      next: adjunto => {
+        this.subiendoAdjunto = false;
+        this.pendiente = adjunto;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.subiendoAdjunto = false;
+        this.adjuntoError = 'NO SE PUDO SUBIR EL ARCHIVO';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  quitarAdjuntoPendiente(): void {
+    this.pendiente = null;
+    this.limpiarInputArchivo();
+    this.cdr.markForCheck();
+  }
+
+  alternarEmoji(): void {
+    this.emojiAbierto = !this.emojiAbierto;
+    this.cdr.markForCheck();
+  }
+
+  insertarEmoji(emoji: string): void {
+    const campo = this.composerCampo?.nativeElement;
+    const posicion = campo ? (campo.selectionStart ?? this.nuevoMensaje.length) : this.nuevoMensaje.length;
+    const fin = campo ? (campo.selectionEnd ?? posicion) : posicion;
+    this.nuevoMensaje = this.nuevoMensaje.slice(0, posicion) + emoji + this.nuevoMensaje.slice(fin);
+    this.onComposerInput(this.nuevoMensaje);
+    this.emojiAbierto = false;
+    this.cdr.markForCheck();
+    if (campo) {
+      campo.focus();
+      const cursor = posicion + emoji.length;
+      campo.setSelectionRange(cursor, cursor);
+    }
+  }
+
+  private limpiarInputArchivo(): void {
+    const input = this.archivoAdjunto?.nativeElement;
+    if (input) {
+      input.value = '';
+    }
   }
 
   trackPorId(index: number, item: { id: number }): number {
@@ -388,7 +476,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   private onMensajeLlega(msg: ChatMensaje): void {
     const conv = this.conversaciones.find(c => c.id === msg.conversacionId);
     if (conv) {
-      conv.ultimoMensaje = msg.cuerpo;
+      conv.ultimoMensaje = msg.cuerpo
+        || (msg.adjunto ? '[ADJUNTO]' : '');
       conv.ultimoMensajeHora = msg.fechaHora;
     }
     if (this.activa && msg.conversacionId === this.activa.id) {
