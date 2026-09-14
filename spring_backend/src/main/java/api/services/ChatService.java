@@ -1,14 +1,17 @@
 package api.services;
 
 import api.dto.ChatCanalDraftDto;
+import api.dto.ChatAdjuntoDto;
 import api.dto.ChatConversacionDto;
 import api.dto.ChatMensajeDto;
 import api.dto.ChatParticipanteDto;
 import api.dto.ChatPresenciaDto;
+import api.entities.ChatAdjunto;
 import api.entities.ChatConversacion;
 import api.entities.ChatMensaje;
 import api.entities.ChatMiembro;
 import api.entities.Usuario;
+import api.repositories.ChatAdjuntoRepository;
 import api.repositories.ChatConversacionRepository;
 import api.repositories.ChatMensajeRepository;
 import api.repositories.ChatMiembroRepository;
@@ -34,9 +37,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatService {
 
+    private static final int MAX_CUERPO = 4000;
+
     private final ChatConversacionRepository conversacionRepository;
     private final ChatMiembroRepository miembroRepository;
     private final ChatMensajeRepository mensajeRepository;
+    private final ChatAdjuntoRepository adjuntoRepository;
     private final UsuarioRepository usuarioRepository;
     private final PresenciaService presenciaService;
 
@@ -137,16 +143,25 @@ public class ChatService {
     }
 
     @Transactional
-    public ChatMensajeDto send(Long conversacionId, String remitenteCodigo, String cuerpo) {
+    public ChatMensajeDto send(Long conversacionId, String remitenteCodigo, String cuerpo, Long adjuntoId) {
         verificarMiembro(conversacionId, remitenteCodigo);
-        String texto = cuerpo == null ? "" : cuerpo.trim();
-        if (texto.isEmpty()) {
+        String texto = sanearCuerpo(cuerpo);
+        if (texto.isEmpty() && adjuntoId == null) {
             throw new IllegalArgumentException("MENSAJE VACÍO");
+        }
+        Long adjunto = adjuntoId;
+        if (adjunto != null) {
+            ChatAdjunto a = adjuntoRepository.findById(adjunto)
+                    .orElseThrow(() -> new IllegalArgumentException("ADJUNTO NO ENCONTRADO"));
+            if (!a.getConversacionId().equals(conversacionId)) {
+                throw new IllegalArgumentException("ADJUNTO DE OTRA CONVERSACIÓN");
+            }
         }
         ChatMensaje mensaje = mensajeRepository.save(ChatMensaje.builder()
                 .conversacionId(conversacionId)
                 .remitente(remitenteCodigo)
                 .cuerpo(texto)
+                .adjuntoId(adjunto)
                 .build());
         return toMensajeDto(mensaje, nombresDeUsuarios());
     }
@@ -245,7 +260,9 @@ public class ChatService {
                 c.getId(),
                 c.getTipo().name(),
                 c.getTipo() == ChatConversacion.Tipo.canal ? c.getNombre() : null,
-                ultimo == null ? "" : ultimo.getCuerpo(),
+                ultimo == null ? ""
+                        : (ultimo.getCuerpo().isBlank() && ultimo.getAdjuntoId() != null
+                                ? "[ADJUNTO]" : ultimo.getCuerpo()),
                 ultimo == null ? "" : FormatoUtil.fechaHora(ultimo.getCreatedAt()),
                 noLeidos(c.getId(), miVista),
                 esAdmin,
@@ -275,7 +292,34 @@ public class ChatService {
                 m.getRemitente(),
                 nombres.getOrDefault(m.getRemitente(), m.getRemitente()),
                 m.getCuerpo(),
-                FormatoUtil.fechaHora(m.getCreatedAt()));
+                FormatoUtil.fechaHora(m.getCreatedAt()),
+                toAdjuntoDto(m.getAdjuntoId()));
+    }
+
+    private ChatAdjuntoDto toAdjuntoDto(Long adjuntoId) {
+        if (adjuntoId == null) {
+            return null;
+        }
+        return adjuntoRepository.findById(adjuntoId)
+                .map(a -> new ChatAdjuntoDto(
+                        a.getId(),
+                        a.getConversacionId(),
+                        a.getSubidoPor(),
+                        a.getNombreOriginal(),
+                        a.getCategoria(),
+                        a.getTipo(),
+                        a.getTamano(),
+                        a.getCreatedAt() == null ? "" : FormatoUtil.fechaHora(a.getCreatedAt()),
+                        "/api/v1/chat/adjuntos/" + a.getId()))
+                .orElse(null);
+    }
+
+    private String sanearCuerpo(String cuerpo) {
+        if (cuerpo == null) {
+            return "";
+        }
+        String texto = cuerpo.replaceAll("[\\p{Cntrl}&&[^\\n\\t]]", "").trim();
+        return texto.length() > MAX_CUERPO ? texto.substring(0, MAX_CUERPO) : texto;
     }
 
     private List<String> distinctDe(List<String> lista) {

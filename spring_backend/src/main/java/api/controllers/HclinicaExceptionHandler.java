@@ -13,10 +13,9 @@ import java.util.Map;
 public class HclinicaExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<Map<String, String>> handleConflicto(ResponseStatusException ex) {
-        if (ex.getStatusCode().value() == HttpStatus.CONFLICT.value()
-                && ex.getReason() != null && !ex.getReason().isBlank()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
+    public ResponseEntity<Map<String, String>> handleResponseStatus(ResponseStatusException ex) {
+        if (ex.getReason() != null && !ex.getReason().isBlank()) {
+            return ResponseEntity.status(ex.getStatusCode())
                     .body(Map.of("message", ex.getReason()));
         }
         throw ex;

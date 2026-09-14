@@ -67,8 +67,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-                if (accessor.getSessionAttributes() != null && accessor.getUser() == null
+                if (accessor.getSessionAttributes() != null
                         && accessor.getSessionAttributes().containsKey("usuario")) {
+                    // El principal del socket es el Authentication de Spring
+                    // Security (nombre = toString de la entidad), inutilizable para
+                    // resolver el remitente. Se normaliza siempre con el usuario
+                    // validado por JWT en el handshake (attributes.put("usuario")).
                     Usuario usuario = (Usuario) accessor.getSessionAttributes().get("usuario");
                     accessor.setUser(new UsuarioPrincipal(usuario));
                     return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());

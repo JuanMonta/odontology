@@ -25,6 +25,21 @@ export interface ChatMensaje {
   remitenteNombre: string;
   cuerpo: string;
   fechaHora: string;
+  adjunto: ChatAdjunto | null;
+}
+
+export type ChatAdjuntoCategoria = 'imagen' | 'documento' | 'solicitud' | 'audio';
+
+export interface ChatAdjunto {
+  id: number;
+  conversacionId: number;
+  subidoPor: string;
+  nombre: string;
+  categoria: ChatAdjuntoCategoria;
+  tipo: string;
+  tamano: number;
+  fechaHora: string;
+  url: string;
 }
 
 export interface ChatCanalDraft {

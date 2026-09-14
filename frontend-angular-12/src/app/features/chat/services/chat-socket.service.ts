@@ -88,13 +88,17 @@ export class ChatSocketService implements OnDestroy {
     });
   }
 
-  enviar(conversacionId: number, cuerpo: string): void {
+  enviar(conversacionId: number, cuerpo: string, adjuntoId?: number): void {
     if (!this.client.active) {
       return;
     }
+    const payload: Record<string, number | string> = { conversacionId, cuerpo };
+    if (adjuntoId != null) {
+      payload.adjuntoId = adjuntoId;
+    }
     this.client.publish({
       destination: '/app/chat.enviar',
-      body: JSON.stringify({ conversacionId, cuerpo })
+      body: JSON.stringify(payload)
     });
   }
 

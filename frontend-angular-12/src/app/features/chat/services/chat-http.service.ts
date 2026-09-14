@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE } from '../../../core/config/api.config';
 import {
+  ChatAdjunto,
   ChatCanalDraft,
   ChatConversacion,
   ChatMensaje,
@@ -69,5 +70,16 @@ export class ChatHttpService {
 
   usuariosActivos(): Observable<ChatParticipante[]> {
     return this.http.get<ChatParticipante[]>(`${API_BASE}/chat/usuarios-activos`);
+  }
+
+  subirAdjunto(conversacionId: number, file: File): Observable<ChatAdjunto> {
+    const body = new FormData();
+    body.append('conversacionId', String(conversacionId));
+    body.append('file', file);
+    return this.http.post<ChatAdjunto>(`${API_BASE}/chat/adjuntos`, body);
+  }
+
+  descargarAdjunto(adjuntoId: number): Observable<Blob> {
+    return this.http.get(`${API_BASE}/chat/adjuntos/${adjuntoId}`, { responseType: 'blob' });
   }
 }

@@ -9,6 +9,8 @@ app:
     # Secreto HS256 para firmar los tokens de sesión del chat. En producción
     # sobreescribir vía variable de entorno JWT_SECRET (mínimo 16 caracteres).
     secret: ${JWT_SECRET:SAS_ODONTOLOGIA_CLINICA_2026_JWT_HS256_SECRETO_LARGO}
+  # Directorio raíz de adjuntos del chat (fuera del webroot; nunca servido estático).
+  uploads-dir: ${APP_UPLOADS_DIR:uploads}
 
 spring:
   application:
@@ -28,10 +30,17 @@ spring:
   datasource:
     # Base de datos canónica: la crea database/schema.sql (ejecutar una vez con
     # `mysql -u root -p < database/schema.sql` desde la raíz del proyecto).
-    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:saas_clinica_odontologica}
+    # characterEncoding=UTF-8: los emojis (utf8mb4) entran y salen intactos.
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:saas_clinica_odontologica}?useUnicode=true&characterEncoding=UTF-8
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
+
+  servlet:
+    multipart:
+      # Adjuntos del chat: tope global coherente con las categorías del servicio.
+      max-file-size: 15MB
+      max-request-size: 16MB
 
   jpa:
     # El DDL lo posee database/schema.sql (ENUM, JSON, columna generada y
