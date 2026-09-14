@@ -30,7 +30,7 @@
 /* ============ Rotulado (RECESIÓN / MOVILIDAD / VESTIBULAR / LINGUAL) ============ */
 .odo-label {
   font-family: var(--font-flap);
-  font-size: 10px;
+  font-size: 0.66em;
   font-weight: 600;
   letter-spacing: 0.14em;
   fill: var(--steel-400);
@@ -53,10 +53,11 @@
   background: transparent;
   color: var(--flap-ink);
   font-family: var(--font-flap);
-  font-size: 11px;
+  font-size: 0.8em;
   font-weight: 600;
   text-align: center;
   padding: 0;
+  line-height: normal;
   outline: none;
   caret-color: var(--amber);
 }
@@ -176,7 +177,7 @@ g:not(.perio--off):hover .perio-box {
 /* ============ Números de pieza ============ */
 .num {
   font-family: var(--font-flap);
-  font-size: 11px;
+  font-size: 0.74em;
   letter-spacing: 0.02em;
   text-anchor: middle;
   fill: var(--steel-300);
