@@ -105,6 +105,7 @@ body {
 
 button {
   font-family: inherit;
+  font-size: inherit;
 }
 
 h1, h2, h3, h4 {
