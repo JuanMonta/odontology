@@ -61,32 +61,33 @@
     </div>
   </header>
 
-  <!-- Sello de la hoja: tratamiento iniciado -->
-  <div *ngIf="sellada" class="hc-seal" role="status">
-    <svg class="hc-seal-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="4.5" y="10.5" width="15" height="9.5" rx="2" />
-      <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
-    </svg>
-    <div class="hc-seal-txt">
-      <span class="hc-seal-t">TRATAMIENTO INICIADO · HOJA SELLADA</span>
-      <span class="hc-seal-s">La identidad y las secciones 1-5, 7 y 8 quedaron bloqueadas al registrar la primera sesión. El odontograma se edita en su pestaña dedicada; planes, diagnóstico CIE y las sesiones nuevas siguen editables aquí.</span>
+  <!-- Cabecera fija: sello de hoja sellada + navegación por secciones -->
+  <div class="hc-nav">
+    <div *ngIf="sellada" class="hc-seal" role="status">
+      <svg class="hc-seal-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4.5" y="10.5" width="15" height="9.5" rx="2" />
+        <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
+      </svg>
+      <div class="hc-seal-txt">
+        <span class="hc-seal-t">TRATAMIENTO INICIADO · HOJA SELLADA</span>
+        <span class="hc-seal-s">La identidad y las secciones 1-5, 7 y 8 quedaron bloqueadas al registrar la primera sesión. El odontograma se edita en su pestaña dedicada; planes, diagnóstico CIE y las sesiones nuevas siguen editables aquí.</span>
+      </div>
     </div>
-  </div>
 
-  <!-- Navegación por secciones 1-12 -->
-  <nav class="rail" aria-label="Secciones del formulario 033">
-    <button
-      *ngFor="let s of secciones"
-      class="rail-btn"
-      [class.is-active]="seccion === s.n"
-      type="button"
-      [attr.aria-current]="seccion === s.n ? 'step' : null"
-      (click)="cambiarSeccion(s.n)"
-    >
-      <span class="rail-n">{{ s.n }}</span>
-      <span class="rail-t">{{ s.titulo }}</span>
-    </button>
-  </nav>
+    <nav class="rail" aria-label="Secciones del formulario 033">
+      <button
+        *ngFor="let s of secciones"
+        class="rail-btn"
+        [class.is-active]="seccion === s.n"
+        type="button"
+        [attr.aria-current]="seccion === s.n ? 'step' : null"
+        (click)="cambiarSeccion(s.n)"
+      >
+        <span class="rail-n">{{ s.n }}</span>
+        <span class="rail-t">{{ s.titulo }}</span>
+      </button>
+    </nav>
+  </div>
 
   <div class="hc-body" *ngIf="!cargando; else hcLoading">
 

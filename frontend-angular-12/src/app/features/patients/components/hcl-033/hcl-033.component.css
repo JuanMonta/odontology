@@ -185,6 +185,22 @@
   border-color: var(--amber);
 }
 
+/* ============ Cabecera fija (sello + rail de secciones) ============ */
+.hc-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(11, 13, 15, 0.86);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 24px -16px rgba(0, 0, 0, 0.5);
+}
+
 /* ============ Sello de la hoja ============ */
 .hc-seal {
   display: grid;
@@ -326,15 +342,6 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 6px;
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  padding: 8px;
-  background: rgba(11, 13, 15, 0.82);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius-md);
-  box-shadow: 0 10px 24px -16px rgba(0, 0, 0, 0.5);
 }
 
 .rail-btn {
@@ -1140,6 +1147,7 @@
   .hc-head,
   .hc-hojas,
   .hc-prog,
+  .hc-nav,
   .hc-seal,
   .rail,
   .sec,
