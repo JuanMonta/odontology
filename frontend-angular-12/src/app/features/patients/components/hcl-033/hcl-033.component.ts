@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Subscription, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Patient, Tooth } from '../../../../core/models/patient.model';
@@ -16,7 +16,7 @@ import {
   grupoEtarioKey,
   hclCompleta
 } from '../../../../core/models/hcl.model';
-import type { GrupoEtarioKey, HclHigieneSextante } from '../../../../core/models/hcl.model';
+import type { GrupoEtarioKey, HclDiagnosticoCie, HclHigieneSextante, HclIndicesCpo } from '../../../../core/models/hcl.model';
 import { HclHttpService } from '../../services/hcl-http.service';
 import { Form033PdfService } from '../../services/form033-pdf.service';
 import { AuthStore } from '../../../../core/auth/auth.store';
@@ -49,11 +49,12 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   Math = Math;
   @Input() patient: Patient | null = null;
   @Input() teeth: Tooth[] = [];
+  @Input() seccion = 1;
   @Output() toothChange = new EventEmitter<Tooth[]>();
+  @Output() sectionChange = new EventEmitter<number>();
 
   hc: Hcl = crearHclVacia('');
   hojas: HojaResumen[] = [];
-  seccion = 1;
   cargando = false;
   guardando = false;
   estado: EstadoGuardado = 'idle';
@@ -108,6 +109,114 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
   sesionTieneDatos(s: HclSesion): boolean {
     const procs = s.procedimientosCodigos?.length || (s.procedimientos && s.procedimientos.trim().length > 0);
     return !!(s.fecha || s.diagnosticos || procs || s.prescripciones || s.proximaCita || s.codigo);
+  }
+
+  // ============ Detección de cambios sin guardar — guía empresarial ============
+  private eq(a: unknown, b: unknown): boolean {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+
+  get hayCambiosSinGuardar(): boolean {
+    if (!this.snapshot) { return this.tieneContenido(this.hc); }
+    return JSON.stringify(this.snapshot) !== JSON.stringify(hclCompleta(this.hc.pacienteId ?? this.patient?.id ?? '', this.hc));
+  }
+
+  /** Secciones con contenido pendiente de guardar (para modal y rail). */
+  get dirtySecciones(): Seccion033[] {
+    return this.secciones.filter(s => this.seccionSucia(s.n));
+  }
+
+  campoSucio(...keys: string[]): boolean {
+    if (!this.snapshot) {
+      return keys.some(k => {
+        const v = (this.hc as unknown as Record<string, unknown>)[k];
+        if (v == null || v === '') { return false; }
+        if (Array.isArray(v)) { return v.length > 0 && JSON.stringify(v) !== JSON.stringify([]); }
+        if (typeof v === 'object') { return JSON.stringify(v) !== JSON.stringify(null) && JSON.stringify(v) !== '{}'; }
+        return true;
+      });
+    }
+    return keys.some(k => !this.eq((this.snapshot as unknown as Record<string, unknown>)[k], (this.hc as unknown as Record<string, unknown>)[k]));
+  }
+
+  seccionSucia(n: number): boolean {
+    if (!this.snapshot) { return this.tieneContenido(this.hc) && this.seccionContieneDatos(n); }
+    const a = this.snapshot;
+    const b = this.hc;
+    switch (n) {
+      case 1: return !this.eq(a.motivoConsulta, b.motivoConsulta) || !this.eq(a.establecimiento, b.establecimiento) || !this.eq(a.sexo, b.sexo) || !this.eq(a.programado, b.programado);
+      case 2: return !this.eq(a.problemaActual, b.problemaActual);
+      case 3: return !this.eq(a.alergiaAntibiotico, b.alergiaAntibiotico) || !this.eq(a.alergiaAnestesia, b.alergiaAnestesia) || !this.eq(a.hemorragias, b.hemorragias) || !this.eq(a.vihSida, b.vihSida) || !this.eq(a.tuberculosis, b.tuberculosis) || !this.eq(a.asma, b.asma) || !this.eq(a.diabetes, b.diabetes) || !this.eq(a.hipertension, b.hipertension) || !this.eq(a.enfCardiaca, b.enfCardiaca) || !this.eq(a.otroAntecedente, b.otroAntecedente) || !this.eq(a.otroAntecedenteTexto, b.otroAntecedenteTexto) || !this.eq(a.parentesco, b.parentesco);
+      case 4: return !this.eq(a.presionArterial, b.presionArterial) || !this.eq(a.frecuenciaCardiaca, b.frecuenciaCardiaca) || !this.eq(a.temperatura, b.temperatura) || !this.eq(a.frecuenciaRespiratoria, b.frecuenciaRespiratoria);
+      case 5: return !this.eq(a.examenRegiones, b.examenRegiones);
+      case 6: return false;
+      case 7: return !this.eq(a.higieneSextantes, b.higieneSextantes) || !this.eq(a.enfermedadPeriodontal, b.enfermedadPeriodontal) || !this.eq(a.malOclusion, b.malOclusion) || !this.eq(a.fluorosis, b.fluorosis);
+      case 8: return !this.eq(a.indicesCpo, b.indicesCpo);
+      case 10: return !this.eq(a.planBiometria, b.planBiometria) || !this.eq(a.planRayosX, b.planRayosX) || !this.eq(a.planQuimicaSanguinea, b.planQuimicaSanguinea) || !this.eq(a.planOtros, b.planOtros) || !this.eq(a.planOtrosTexto, b.planOtrosTexto) || !this.eq(a.planTerapeutico, b.planTerapeutico) || !this.eq(a.planEducacional, b.planEducacional);
+      case 11: return !this.eq(a.diagnosticosCie, b.diagnosticosCie) || !this.eq(a.fechaApertura, b.fechaApertura) || !this.eq(a.fechaControl, b.fechaControl) || !this.eq(a.profesionalNombre, b.profesionalNombre) || !this.eq(a.profesionalCodigo, b.profesionalCodigo) || !this.eq(a.profesionalFirma, b.profesionalFirma);
+      case 12: return !this.eq(a.sesiones, b.sesiones);
+      default: return false;
+    }
+  }
+
+  private seccionContieneDatos(n: number): boolean {
+    const b = this.hc;
+    switch (n) {
+      case 1: return !!(b.motivoConsulta || b.establecimiento);
+      case 2: return !!b.problemaActual;
+      case 3: return !!(b.otroAntecedenteTexto || b.parentesco || this.algunaAntecedente());
+      case 4: return !!(b.presionArterial || b.frecuenciaCardiaca || b.temperatura || b.frecuenciaRespiratoria);
+      case 5: return (b.examenRegiones ?? []).some(r => !!r.descripcion);
+      case 7: return (b.higieneSextantes ?? []).some(h => h.d1_evaluado || h.d2_evaluado || h.d3_evaluado || h.placa != null || h.calculo != null || h.gingivitis != null) || !!b.enfermedadPeriodontal || !!b.malOclusion || !!b.fluorosis;
+      case 8: return !!b.indicesCpo && (b.indicesCpo.c_perma != null || b.indicesCpo.p_perma != null || b.indicesCpo.o_perma != null || b.indicesCpo.c_deci != null || b.indicesCpo.e_deci != null || b.indicesCpo.o_deci != null);
+      case 10: return !!(b.planBiometria || b.planRayosX || b.planQuimicaSanguinea || b.planOtros || b.planOtrosTexto || b.planTerapeutico || b.planEducacional);
+      case 11: return (b.diagnosticosCie ?? []).some(d => !!d.codigo) || !!b.fechaApertura || !!b.fechaControl || !!b.profesionalNombre;
+      case 12: return (b.sesiones ?? []).some(s => this.sesionTieneDatos(s));
+      default: return false;
+    }
+  }
+
+  sesionSucia(idx: number): boolean {
+    if (!this.snapshot) { return !!this.hc.sesiones[idx] && this.sesionTieneDatos(this.hc.sesiones[idx]); }
+    return !this.eq(this.snapshot.sesiones[idx], this.hc.sesiones[idx]);
+  }
+
+  sesionCampoSucio(idx: number, key: keyof HclSesion): boolean {
+    if (!this.snapshot) {
+      const v = this.hc.sesiones[idx]?.[key];
+      if (v == null) { return false; }
+      if (Array.isArray(v)) { return v.length > 0; }
+      return String(v).trim() !== '';
+    }
+    return !this.eq(this.snapshot.sesiones[idx]?.[key], this.hc.sesiones[idx]?.[key]);
+  }
+
+  regionSucia(i: number): boolean {
+    if (!this.snapshot) { return !!this.hc.examenRegiones[i]?.descripcion?.trim() || !!this.hc.examenRegiones[i]?.marcado; }
+    return !this.eq(this.snapshot.examenRegiones[i], this.hc.examenRegiones[i]);
+  }
+
+  higieneFilaSucia(i: number): boolean {
+    if (!this.snapshot) {
+      const h = this.hc.higieneSextantes[i];
+      return !!(h?.d1_evaluado || h?.d2_evaluado || h?.d3_evaluado || h?.placa != null || h?.calculo != null || h?.gingivitis != null);
+    }
+    return !this.eq(this.snapshot.higieneSextantes[i], this.hc.higieneSextantes[i]);
+  }
+
+  cpoSucio(key: keyof HclIndicesCpo): boolean {
+    if (!this.snapshot) { return this.hc.indicesCpo?.[key] != null; }
+    return !this.eq(this.snapshot.indicesCpo?.[key], this.hc.indicesCpo?.[key]);
+  }
+
+  cieSucia(i: number, key: keyof HclDiagnosticoCie): boolean {
+    if (!this.snapshot) { return !!String(this.hc.diagnosticosCie[i]?.[key] ?? '').trim(); }
+    return !this.eq(this.snapshot.diagnosticosCie[i]?.[key], this.hc.diagnosticosCie[i]?.[key]);
+  }
+
+  irASeccionSucia(n: number): void {
+    this.cambiarSeccion(n);
+    this.cerrarModal();
   }
 
   get hojasSelector(): HojaResumen[] {
@@ -175,6 +284,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     s.procedimientosCodigos = [...lista];
     s.procedimientos = this.serializarProcedimientos(lista);
     this.procInput = '';
+    this.cdr.markForCheck();
   }
 
   quitarProcedimiento(s: HclSesion, codigo: string): void {
@@ -182,6 +292,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     s.procedimientosCodigos = lista;
     s.procedimientos = this.serializarProcedimientos(lista);
     this.procInput = '';
+    this.cdr.markForCheck();
   }
 
   private normalizarCodigoProcedimiento(texto: string): string {
@@ -222,8 +333,8 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     );
   }
 
-  ngOnChanges(): void {
-    if (this.patient) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['patient'] && this.patient) {
       this.cargar();
     }
   }
@@ -270,7 +381,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     if (!this.patient || n === this.hc.hoja || this.cargando || this.guardando) {
       return;
     }
-    if (this.tieneContenido(this.hc) && this.estado !== 'ok') {
+    if (this.hayCambiosSinGuardar) {
       this.abrirModal({ accion: 'abrir', hoja: n });
       return;
     }
@@ -304,7 +415,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
     if (!this.patient || this.cargando || this.guardando) {
       return;
     }
-    if (this.tieneContenido(this.hc) && this.estado !== 'ok') {
+    if (this.hayCambiosSinGuardar) {
       this.abrirModal({ accion: 'nueva', hoja: this.hc.hoja + 1 });
       return;
     }
@@ -510,6 +621,7 @@ export class Hcl033Component implements OnInit, OnChanges, OnDestroy {
 
   cambiarSeccion(n: number): void {
     this.seccion = n;
+    this.sectionChange.emit(n);
   }
 
   antVal(key: AntecedenteKey): boolean {

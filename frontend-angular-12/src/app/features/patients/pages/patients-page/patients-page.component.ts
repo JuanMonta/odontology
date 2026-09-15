@@ -61,18 +61,19 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Restaura la selección al volver desde el detalle (/pacientes/:id): la
-    // página se recrea y su estado local ya no existe, pero la sesión sí lo
-    // recuerda (PatientsSelectionService).
-    combineLatest([this.service.patients$, this.selection.selectedId$])
+    // Restaura la selección al volver desde el detalle (/pacientes/:id)
+    combineLatest([this.service.patients$, this.selection.state$])
       .pipe(takeUntil(this.destroy$))
-      .subscribe(([list, id]) => {
-        if (this.selected || !id) {
-          return;
-        }
-        const found = list.find(p => p.id === id);
-        if (found) {
-          this.selected = found;
+      .subscribe(([list, state]) => {
+        if (this.selected && state.selectedId === this.selected.id) { return; }
+        if (state.selectedId && !this.selected) {
+          const found = list.find(p => p.id === state.selectedId);
+          if (found) {
+            this.selected = found;
+            this.cd.markForCheck();
+          }
+        } else if (!state.selectedId && this.selected) {
+          this.selected = null;
           this.cd.markForCheck();
         }
       });
@@ -111,7 +112,7 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
   startCreate(): void {
     this.creating = true;
     this.selected = null;
-    this.selection.select(null);
+    this.selection.clearSelection();
   }
 
   onSaved(patient: Patient): void {
@@ -123,11 +124,15 @@ export class PatientsPageComponent implements OnInit, OnDestroy {
 
   cancelCreate(): void {
     this.creating = false;
+    this.selection.clearSelection();
+    this.cd.markForCheck();
   }
 
   onClosePanel(): void {
     this.selected = null;
-    this.selection.select(null);
+    this.creating = false;
+    this.selection.clearSelection();
+    this.cd.markForCheck();
   }
 
   toggleAlerts(): void {

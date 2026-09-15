@@ -195,6 +195,32 @@
   background: var(--amber);
 }
 
+.ws-tab--back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 2px;
+  padding-right: 14px;
+  color: var(--steel-300);
+  font-size: 0.68em;
+  letter-spacing: 0.14em;
+}
+.ws-tab--back:hover {
+  color: var(--amber);
+}
+.ws-tab--back .icon-chev {
+  width: 12px;
+  height: 12px;
+}
+
+.ws-tabs-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 8px 6px 8px 0;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
 .ws-scroll {
   flex: 1;
   min-height: 0;

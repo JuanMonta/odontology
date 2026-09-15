@@ -8,7 +8,7 @@
     <span class="col col-debt" role="columnheader">DEUDA</span>
   </div>
 
-  <div class="dir-list">
+  <div class="dir-list" #dirList (scroll)="onScroll($event)">
     <ng-container *ngIf="patients.length; else empty">
       <div
         *ngFor="let p of visiblePatients; trackBy: trackById"
