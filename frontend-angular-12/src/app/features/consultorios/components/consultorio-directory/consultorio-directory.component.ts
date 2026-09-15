@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Consultorio } from '../../../../core/models/consultorio.model';
 import { PaginatedListComponent } from '../../../../shared/components/pagination/paginated-list.component';
 
@@ -8,10 +8,11 @@ import { PaginatedListComponent } from '../../../../shared/components/pagination
   styleUrls: ['./consultorio-directory.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ConsultorioDirectoryComponent extends PaginatedListComponent {
+export class ConsultorioDirectoryComponent extends PaginatedListComponent implements AfterViewInit {
   @Input() consultorios: Consultorio[] = [];
   @Input() selectedId: string | null = null;
   @Output() select = new EventEmitter<Consultorio>();
+  @ViewChild('dirList') dirListRef?: ElementRef<HTMLDivElement>;
 
   protected get totalItems(): number {
     return this.consultorios.length;
@@ -35,5 +36,11 @@ export class ConsultorioDirectoryComponent extends PaginatedListComponent {
 
   hasTurno(c: Consultorio): boolean {
     return c.staff.some(s => s.state === 'turno');
+  }
+
+  ngAfterViewInit(): void {
+    if (this.persistKey) {
+      this.bindScroll(this.dirListRef?.nativeElement ?? null);
+    }
   }
 }

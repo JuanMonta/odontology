@@ -12,6 +12,7 @@ import { UsuariosHttpService } from '../../services/usuarios-http.service';
 import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
 import { AuthStore } from '../../../../core/auth/auth.store';
 import { Odontologo } from '../../../../core/models/odontologo.model';
+import { readListState, saveListState } from '../../../../shared/components/pagination/list-state';
 
 type StatusFilter = UsuarioStatus | 'all';
 
@@ -31,8 +32,8 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
 
   creating = false;
 
-  private readonly search$ = new BehaviorSubject<string>('');
-  private readonly status$ = new BehaviorSubject<StatusFilter>('all');
+  readonly search$ = new BehaviorSubject<string>('');
+  readonly status$ = new BehaviorSubject<StatusFilter>('all');
   readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly destroy$ = new Subject<void>();
 
@@ -43,6 +44,11 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
     private router: Router,
     private odontologos: OdontologosHttpService
   ) {
+    const _s = readListState('usuarios');
+    const _sq = _s?.query ?? '';
+    const _sf = _s?.filter ?? 'all';
+    this.search$.next(_sq);
+    this.status$.next(_sf as StatusFilter);
     this.usuarios$ = combineLatest([this.service.usuarios$, this.search$, this.status$]).pipe(
       map(([list, q, filter]) => {
         const query = q.trim().toUpperCase();
@@ -86,10 +92,14 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
 
   onSearch(ev: Event): void {
     this.search$.next((ev.target as HTMLInputElement).value);
+    const _st = readListState('usuarios') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('usuarios', { ..._st, query: (ev.target as HTMLInputElement).value });
   }
 
   onFilter(ev: Event): void {
     this.status$.next((ev.target as HTMLSelectElement).value as StatusFilter);
+    const _st = readListState('usuarios') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('usuarios', { ..._st, filter: (ev.target as HTMLSelectElement).value });
   }
 
   onSelect(usuario: Usuario): void {

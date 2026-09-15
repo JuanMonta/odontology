@@ -7,25 +7,27 @@
     <span class="col col-status">ESTADO</span>
   </div>
 
-  <div class="dir-list" *ngIf="usuarios.length; else empty">
-    <button
-      *ngFor="let u of visibleUsuarios"
-      class="dir-row"
-      [class.is-selected]="u.id === selectedId"
-      [class.is-inactive]="u.status === 'inactivo'"
-      [class.is-suspended]="u.status === 'suspendido'"
-      type="button"
-      (click)="select.emit(u)"
-    >
-      <span class="col col-code">{{ u.code }}</span>
-      <span class="col col-user">{{ u.username }}</span>
-      <span class="col col-name">{{ u.name }}</span>
-      <span class="col col-role">{{ u.role }}</span>
-      <span class="col col-status">
-        <ui-lamp [tone]="u.status === 'activo' ? 'on' : (u.status === 'suspendido' ? 'warn' : 'off')"></ui-lamp>
-        <span class="status-text" [class.status-text--warn]="u.status === 'suspendido'">{{ u.status }}</span>
-      </span>
-    </button>
+  <div class="dir-list" #dirList>
+    <ng-container *ngIf="usuarios.length; else empty">
+      <button
+        *ngFor="let u of visibleUsuarios"
+        class="dir-row"
+        [class.is-selected]="u.id === selectedId"
+        [class.is-inactive]="u.status === 'inactivo'"
+        [class.is-suspended]="u.status === 'suspendido'"
+        type="button"
+        (click)="select.emit(u)"
+      >
+        <span class="col col-code">{{ u.code }}</span>
+        <span class="col col-user">{{ u.username }}</span>
+        <span class="col col-name">{{ u.name }}</span>
+        <span class="col col-role">{{ u.role }}</span>
+        <span class="col col-status">
+          <ui-lamp [tone]="u.status === 'activo' ? 'on' : (u.status === 'suspendido' ? 'warn' : 'off')"></ui-lamp>
+          <span class="status-text" [class.status-text--warn]="u.status === 'suspendido'">{{ u.status }}</span>
+        </span>
+      </button>
+    </ng-container>
   </div>
 
   <ng-template #empty>

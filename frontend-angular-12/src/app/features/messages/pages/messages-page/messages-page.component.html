@@ -29,6 +29,7 @@
         <input
           class="search-input"
           type="search"
+          [value]="(search$ | async) ?? ''"
           placeholder="BUSCAR MENSAJE · ASUNTO / REMITENTE / PARA"
           aria-label="Buscar mensaje"
           (input)="onSearch($any($event.target).value)"
@@ -38,6 +39,7 @@
         <span class="filter-label">PRIORIDAD</span>
         <select
           class="filter-select"
+          [value]="(status$ | async) ?? 'all'"
           aria-label="Filtrar por prioridad"
           (change)="onFilter($any($event.target).value)"
         >
@@ -53,6 +55,7 @@
   <div class="page-body">
     <section class="directory" aria-label="Bandeja de mensajes">
       <app-message-directory
+        [persistKey]="'mensajes'"
         [messages]="(messages$ | async) ?? []"
         [selectedId]="selectedId"
         (select)="onSelect($event)"

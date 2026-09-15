@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Treatment } from '../../../../core/models/treatment.model';
 import { PaginatedListComponent } from '../../../../shared/components/pagination/paginated-list.component';
 import { formatMoney } from '../../../../core/utils/format';
@@ -9,10 +9,11 @@ import { formatMoney } from '../../../../core/utils/format';
   styleUrls: ['./treatment-directory.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreatmentDirectoryComponent extends PaginatedListComponent {
+export class TreatmentDirectoryComponent extends PaginatedListComponent implements AfterViewInit {
   @Input() treatments: Treatment[] = [];
   @Input() selectedId: string | null = null;
   @Output() select = new EventEmitter<Treatment>();
+  @ViewChild('dirList') dirListRef?: ElementRef<HTMLDivElement>;
 
   protected get totalItems(): number {
     return this.treatments.length;
@@ -24,5 +25,11 @@ export class TreatmentDirectoryComponent extends PaginatedListComponent {
 
   money(price: number): string {
     return formatMoney(price);
+  }
+
+  ngAfterViewInit(): void {
+    if (this.persistKey) {
+      this.bindScroll(this.dirListRef?.nativeElement ?? null);
+    }
   }
 }

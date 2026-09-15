@@ -9,6 +9,7 @@ import {
 } from '../../../../core/models/treatment.model';
 import { CategoriasHttpService, Categoria } from '../../services/categorias-http.service';
 import { TreatmentsHttpService } from '../../services/treatments-http.service';
+import { readListState, saveListState } from '../../../../shared/components/pagination/list-state';
 
 type CategoryFilter = string | 'all';
 
@@ -26,8 +27,8 @@ export class TreatmentsPageComponent implements OnInit, OnDestroy {
   selectedId: string | null = null;
   creating = false;
 
-  private readonly search$ = new BehaviorSubject<string>('');
-  private readonly category$ = new BehaviorSubject<CategoryFilter>('all');
+  readonly search$ = new BehaviorSubject<string>('');
+  readonly category$ = new BehaviorSubject<CategoryFilter>('all');
   private readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly destroy$ = new Subject<void>();
 
@@ -37,6 +38,11 @@ export class TreatmentsPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {
+    const _s = readListState('tratamientos');
+    const _sq = _s?.query ?? '';
+    const _sf = _s?.filter ?? 'all';
+    this.search$.next(_sq);
+    this.category$.next(_sf);
     this.categories$ = categoriasService.categorias$.pipe(
       map(list => list.filter(c => c.activo))
     );
@@ -74,10 +80,14 @@ export class TreatmentsPageComponent implements OnInit, OnDestroy {
 
   onSearch(q: Event): void {
     this.search$.next((q.target as HTMLInputElement).value);
+    const _st = readListState('tratamientos') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('tratamientos', { ..._st, query: (q.target as HTMLInputElement).value });
   }
 
   onCategory(cat: Event): void {
     this.category$.next((cat.target as HTMLSelectElement).value);
+    const _st = readListState('tratamientos') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('tratamientos', { ..._st, filter: (cat.target as HTMLSelectElement).value });
   }
 
   onSelect(treatment: Treatment): void {

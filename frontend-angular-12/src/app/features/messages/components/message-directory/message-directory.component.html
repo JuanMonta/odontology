@@ -7,35 +7,37 @@
     <span class="col col-time">HORA</span>
   </div>
 
-  <div class="dir-list" *ngIf="messages.length; else empty">
-    <button
-      *ngFor="let m of visibleMessages"
-      class="dir-row"
-      [class.is-selected]="m.id === selectedId"
-      [class.is-unread]="m.status === 'unread'"
-      type="button"
-      (click)="select.emit(m)"
-    >
-      <span class="col col-flag">
-        <span
-          class="lamp"
-          [class.lamp--urgente]="m.prioridad === 'urgente'"
-          [class.lamp--importante]="m.prioridad === 'importante'"
-          [class.lamp--informacion]="m.prioridad === 'informacion'"
-          [class.lamp--live]="m.status === 'unread'"
-          aria-hidden="true"
-        ></span>
-      </span>
-      <span class="col col-subject">
-        <span class="prio-chip" [class.prio--urgente]="m.prioridad === 'urgente'" [class.prio--importante]="m.prioridad === 'importante'">
-          {{ prioridadLabel(m.prioridad) }}
+  <div class="dir-list" #dirList>
+    <ng-container *ngIf="messages.length; else empty">
+      <button
+        *ngFor="let m of visibleMessages"
+        class="dir-row"
+        [class.is-selected]="m.id === selectedId"
+        [class.is-unread]="m.status === 'unread'"
+        type="button"
+        (click)="select.emit(m)"
+      >
+        <span class="col col-flag">
+          <span
+            class="lamp"
+            [class.lamp--urgente]="m.prioridad === 'urgente'"
+            [class.lamp--importante]="m.prioridad === 'importante'"
+            [class.lamp--informacion]="m.prioridad === 'informacion'"
+            [class.lamp--live]="m.status === 'unread'"
+            aria-hidden="true"
+          ></span>
         </span>
-        <span class="subject-text">{{ m.subject }}</span>
-      </span>
-      <span class="col col-para">{{ destinoLabel(m.destino) }}</span>
-      <span class="col col-date">{{ m.date }}</span>
-      <span class="col col-time">{{ m.time }}</span>
-    </button>
+        <span class="col col-subject">
+          <span class="prio-chip" [class.prio--urgente]="m.prioridad === 'urgente'" [class.prio--importante]="m.prioridad === 'importante'">
+            {{ prioridadLabel(m.prioridad) }}
+          </span>
+          <span class="subject-text">{{ m.subject }}</span>
+        </span>
+        <span class="col col-para">{{ destinoLabel(m.destino) }}</span>
+        <span class="col col-date">{{ m.date }}</span>
+        <span class="col col-time">{{ m.time }}</span>
+      </button>
+    </ng-container>
   </div>
 
   <ng-template #empty>

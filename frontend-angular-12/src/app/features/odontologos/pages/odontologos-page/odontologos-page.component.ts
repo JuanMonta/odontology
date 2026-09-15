@@ -8,6 +8,7 @@ import {
   OdontologoStatus
 } from '../../../../core/models/odontologo.model';
 import { OdontologosHttpService } from '../../services/odontologos-http.service';
+import { readListState, saveListState } from '../../../../shared/components/pagination/list-state';
 
 type StatusFilter = OdontologoStatus | 'all';
 
@@ -23,8 +24,8 @@ export class OdontologosPageComponent implements OnInit, OnDestroy {
 
   creating = false;
 
-  private readonly search$ = new BehaviorSubject<string>('');
-  private readonly status$ = new BehaviorSubject<StatusFilter>('all');
+  readonly search$ = new BehaviorSubject<string>('');
+  readonly status$ = new BehaviorSubject<StatusFilter>('all');
   readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly destroy$ = new Subject<void>();
 
@@ -33,6 +34,11 @@ export class OdontologosPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {
+    const _s = readListState('odontologos');
+    const _sq = _s?.query ?? '';
+    const _sf = _s?.filter ?? 'all';
+    this.search$.next(_sq);
+    this.status$.next(_sf as StatusFilter);
     this.odontologos$ = combineLatest([this.service.odontologos$, this.search$, this.status$]).pipe(
       map(([list, q, filter]) => {
         const query = q.trim().toUpperCase();
@@ -68,10 +74,14 @@ export class OdontologosPageComponent implements OnInit, OnDestroy {
 
   onSearch(ev: Event): void {
     this.search$.next((ev.target as HTMLInputElement).value);
+    const _st = readListState('odontologos') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('odontologos', { ..._st, query: (ev.target as HTMLInputElement).value });
   }
 
   onFilter(ev: Event): void {
     this.status$.next((ev.target as HTMLSelectElement).value as StatusFilter);
+    const _st = readListState('odontologos') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('odontologos', { ..._st, filter: (ev.target as HTMLSelectElement).value });
   }
 
   onSelect(odontologo: Odontologo): void {

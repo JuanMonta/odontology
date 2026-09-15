@@ -5,25 +5,27 @@
     <span class="col col-status">ESTADO</span>
   </div>
 
-  <div class="dir-list" *ngIf="especialidades.length; else empty">
-    <button
-      *ngFor="let e of visibleEspecialidades"
-      class="dir-row"
-      [class.is-selected]="e.id === selectedId"
-      [class.is-inactive]="!e.activo"
-      type="button"
-      (click)="select.emit(e)"
-    >
-      <span class="col col-code">{{ e.code }}</span>
-      <span class="col col-name">
-        {{ e.nombre }}
-        <span class="col-name-license">ÁREA DE TRATAMIENTO</span>
-      </span>
-      <span class="col col-status">
-        <ui-lamp [tone]="e.activo ? 'on' : 'off'"></ui-lamp>
-        <span class="status-text" [class.status-text--away]="!e.activo">{{ e.activo ? 'activa' : 'inactiva' }}</span>
-      </span>
-    </button>
+  <div class="dir-list" #dirList>
+    <ng-container *ngIf="especialidades.length; else empty">
+      <button
+        *ngFor="let e of visibleEspecialidades"
+        class="dir-row"
+        [class.is-selected]="e.id === selectedId"
+        [class.is-inactive]="!e.activo"
+        type="button"
+        (click)="select.emit(e)"
+      >
+        <span class="col col-code">{{ e.code }}</span>
+        <span class="col col-name">
+          {{ e.nombre }}
+          <span class="col-name-license">ÁREA DE TRATAMIENTO</span>
+        </span>
+        <span class="col col-status">
+          <ui-lamp [tone]="e.activo ? 'on' : 'off'"></ui-lamp>
+          <span class="status-text" [class.status-text--away]="!e.activo">{{ e.activo ? 'activa' : 'inactiva' }}</span>
+        </span>
+      </button>
+    </ng-container>
   </div>
 
   <ng-template #empty>

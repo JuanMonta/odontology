@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { ClinicMessage, MessageDraft } from '../../../../core/models/message.model';
 import { MessagesHttpService } from '../../services/messages-http.service';
+import { readListState, saveListState } from '../../../../shared/components/pagination/list-state';
 
 type StatusFilter = 'all' | 'unread' | 'urgente' | 'importante';
 
@@ -20,8 +21,8 @@ export class MessagesPageComponent implements OnInit, OnDestroy {
   selectedId: string | null = null;
   creating = false;
 
-  private readonly search$ = new BehaviorSubject<string>('');
-  private readonly status$ = new BehaviorSubject<StatusFilter>('all');
+  readonly search$ = new BehaviorSubject<string>('');
+  readonly status$ = new BehaviorSubject<StatusFilter>('all');
   private readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly destroy$ = new Subject<void>();
 
@@ -30,6 +31,11 @@ export class MessagesPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {
+    const _s = readListState('mensajes');
+    const _sq = _s?.query ?? '';
+    const _sf = _s?.filter ?? 'all';
+    this.search$.next(_sq);
+    this.status$.next(_sf as StatusFilter);
     this.messages$ = combineLatest([this.service.messages$, this.search$, this.status$]).pipe(
       map(([list, q, filter]) => {
         const query = q.trim().toUpperCase();
@@ -68,10 +74,14 @@ export class MessagesPageComponent implements OnInit, OnDestroy {
 
   onSearch(q: string): void {
     this.search$.next(q);
+    const _st = readListState('mensajes') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('mensajes', { ..._st, query: q });
   }
 
   onFilter(f: StatusFilter): void {
     this.status$.next(f);
+    const _st = readListState('mensajes') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('mensajes', { ..._st, filter: f });
   }
 
   onSelect(message: ClinicMessage): void {

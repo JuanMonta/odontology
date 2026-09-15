@@ -18,6 +18,7 @@
         <input
           class="search-input"
           type="search"
+          [value]="(search$ | async) ?? ''"
           placeholder="BUSCAR TURNO · NOMBRE / CÓDIGO"
           aria-label="Buscar turno"
           (input)="onSearch($event)"
@@ -27,6 +28,7 @@
         <span class="filter-label">ESTADO</span>
         <select
           class="filter-select"
+          [value]="activoFilterValue"
           aria-label="Filtrar por estado"
           (change)="onFilter($event)"
         >
@@ -41,6 +43,7 @@
   <div class="page-body">
     <section class="directory" aria-label="Turnos laborales">
       <app-turno-directory
+        [persistKey]="'turnos'"
         [turnos]="(turnos$ | async) ?? []"
         [selectedId]="(selectedId$ | async) ?? null"
         (select)="onSelect($event)"
