@@ -312,7 +312,7 @@ export function hclCompleta(pacienteId: string, hc: Partial<Hcl> | null): Hcl {
       sesion: s.sesion,
       fecha: s.fecha ?? '',
       diagnosticos: s.diagnosticos ?? '',
-      procedimientosCodigos: s.procedimientosCodigos ?? [],
+      procedimientosCodigos: s.procedimientosCodigos ? [...s.procedimientosCodigos] : [],
       procedimientos: s.procedimientos ?? '',
       prescripciones: s.prescripciones ?? '',
       proximaCita: s.proximaCita ?? '',

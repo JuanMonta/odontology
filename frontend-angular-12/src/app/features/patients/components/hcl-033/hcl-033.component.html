@@ -6,7 +6,7 @@
       <span class="hc-title">HISTORIA CLÍNICA</span>
     </div>
     <div class="hc-head-meta" *ngIf="patient">
-      <span class="hc-meta hc-meta--edit"><span class="hc-meta-lbl">ESTABLECIMIENTO <span class="fld-chars" [class.fld-chars--warn]="(hc.establecimiento?.length||0) >= 80" [class.fld-chars--full]="(hc.establecimiento?.length||0) >= 100">{{(hc.establecimiento?.length||0)}}/100</span></span><input class="fld-input hc-meta-input" type="text" [(ngModel)]="hc.establecimiento" [readonly]="sellada" maxlength="100" placeholder="NOMBRE DEL ESTABLECIMIENTO" autocomplete="off" [attr.aria-readonly]="sellada" /></span>
+      <span class="hc-meta hc-meta--edit" [class.fld--dirty]="campoSucio('establecimiento')"><span class="hc-meta-lbl">ESTABLECIMIENTO <span class="fld-chars" [class.fld-chars--warn]="(hc.establecimiento?.length||0) >= 80" [class.fld-chars--full]="(hc.establecimiento?.length||0) >= 100">{{(hc.establecimiento?.length||0)}}/100</span></span><input class="fld-input hc-meta-input" type="text" [(ngModel)]="hc.establecimiento" [readonly]="sellada" maxlength="100" placeholder="NOMBRE DEL ESTABLECIMIENTO" autocomplete="off" [attr.aria-readonly]="sellada" /></span>
       <div class="hc-head-data">
         <span class="hc-meta"><span class="hc-meta-lbl">PACIENTE</span><span class="hc-meta-val">{{ patient.name }}</span></span>
         <span class="hc-meta"><span class="hc-meta-lbl">Nº HISTORIA</span><span class="hc-meta-val">{{ patient.id }}</span></span>
@@ -79,8 +79,10 @@
         *ngFor="let s of secciones"
         class="rail-btn"
         [class.is-active]="seccion === s.n"
+        [class.is-dirty]="seccionSucia(s.n)"
         type="button"
         [attr.aria-current]="seccion === s.n ? 'step' : null"
+        [attr.aria-label]="s.titulo + (seccionSucia(s.n) ? ' · CAMBIOS SIN GUARDAR' : '')"
         (click)="cambiarSeccion(s.n)"
       >
         <span class="rail-n">{{ s.n }}</span>
@@ -92,12 +94,12 @@
   <div class="hc-body" *ngIf="!cargando; else hcLoading">
 
     <!-- 1 · MOTIVO DE CONSULTA -->
-    <section class="sec" *ngIf="seccion === 1">
+    <section class="sec" *ngIf="seccion === 1" [class.sec--dirty]="seccionSucia(1)">
       <span class="sec-num">1</span>
       <h3 class="sec-title">MOTIVO DE CONSULTA <span *ngIf="sellada" class="sec-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>SELLADA</span></h3>
       <p class="sec-hint">ANOTAR LA CAUSA DEL PROBLEMA EN LA VERSIÓN DEL INFORMANTE</p>
       <fieldset class="sec-fields" [disabled]="sellada">
-        <label class="fld">
+        <label class="fld" [class.fld--dirty]="campoSucio('motivoConsulta')">
           <span class="fld-label">1. MOTIVO DE CONSULTA <span class="fld-chars" [class.fld-chars--warn]="(hc.motivoConsulta?.length||0) >= 120" [class.fld-chars--full]="(hc.motivoConsulta?.length||0) >= 150">{{(hc.motivoConsulta?.length||0)}}/150</span></span>
           <textarea class="fld-input fld-textarea" rows="2" [(ngModel)]="hc.motivoConsulta" maxlength="150" placeholder="DESCRIBA BREVEMENTE EL MOTIVO PRINCIPAL DE LA CONSULTA…"></textarea>
         </label>
@@ -105,12 +107,12 @@
     </section>
 
     <!-- 2 · ENFERMEDAD O PROBLEMA ACTUAL -->
-    <section class="sec" *ngIf="seccion === 2">
+    <section class="sec" *ngIf="seccion === 2" [class.sec--dirty]="seccionSucia(2)">
       <span class="sec-num">2</span>
       <h3 class="sec-title">ENFERMEDAD O PROBLEMA ACTUAL <span *ngIf="sellada" class="sec-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>SELLADA</span></h3>
       <p class="sec-hint">REGISTRAR: CRONOLOGÍA · LOCALIZACIÓN · CARACTERÍSTICAS · INTENSIDAD · CAUSA APARENTE · SÍNTOMAS ASOCIADOS · EVOLUCIÓN · ESTADO ACTUAL</p>
       <fieldset class="sec-fields" [disabled]="sellada">
-        <label class="fld">
+        <label class="fld" [class.fld--dirty]="campoSucio('problemaActual')">
           <span class="fld-label">2. PROBLEMA ACTUAL <span class="fld-chars" [class.fld-chars--warn]="(hc.problemaActual?.length||0) >= 400" [class.fld-chars--full]="(hc.problemaActual?.length||0) >= 500">{{(hc.problemaActual?.length||0)}}/500</span></span>
           <textarea class="fld-input fld-textarea" rows="5" [(ngModel)]="hc.problemaActual" maxlength="500" placeholder="DESCRIBA SÍNTOMAS, EVOLUCIÓN Y TRATAMIENTOS PREVIOS…"></textarea>
         </label>
@@ -118,7 +120,7 @@
     </section>
 
     <!-- 3 · ANTECEDENTES PERSONALES Y FAMILIARES -->
-    <section class="sec" *ngIf="seccion === 3">
+    <section class="sec" *ngIf="seccion === 3" [class.sec--dirty]="seccionSucia(3)">
       <span class="sec-num">3</span>
       <h3 class="sec-title">ANTECEDENTES PERSONALES Y FAMILIARES <span *ngIf="sellada" class="sec-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>SELLADA</span></h3>
       <fieldset class="sec-fields" [disabled]="sellada">
@@ -127,6 +129,7 @@
             *ngFor="let a of antecedentes"
             class="chk"
             [class.is-active]="antVal(a.key)"
+            [class.fld--dirty]="campoSucio(a.key)"
             type="button"
             [attr.aria-pressed]="antVal(a.key)"
             (click)="toggleAnt(a.key)"
@@ -135,11 +138,11 @@
             <span class="chk-lbl">{{ a.label }}</span>
           </button>
         </div>
-        <div *ngIf="hc.otroAntecedente" class="fld">
+        <div *ngIf="hc.otroAntecedente" class="fld" [class.fld--dirty]="campoSucio('otroAntecedenteTexto')">
           <span class="fld-label">DESCRIBE EL ANTECEDENTE <span class="fld-chars" [class.fld-chars--warn]="(hc.otroAntecedenteTexto?.length||0) >= 200" [class.fld-chars--full]="(hc.otroAntecedenteTexto?.length||0) >= 255">{{(hc.otroAntecedenteTexto?.length||0)}}/255</span></span>
           <input class="fld-input" type="text" [(ngModel)]="hc.otroAntecedenteTexto" maxlength="255" placeholder="Especificar antecedente" autocomplete="off" />
         </div>
-        <div *ngIf="algunaAntecedente()" class="fld">
+        <div *ngIf="algunaAntecedente()" class="fld" [class.fld--dirty]="campoSucio('parentesco')">
           <span class="fld-label">PARENTESCO (HASTA 3ER GRADO DE CONSANGUINIDAD / 1RO DE AFINIDAD) <span class="fld-chars" [class.fld-chars--warn]="(hc.parentesco?.length||0) >= 96" [class.fld-chars--full]="(hc.parentesco?.length||0) >= 120">{{(hc.parentesco?.length||0)}}/120</span></span>
           <input class="fld-input" type="text" [(ngModel)]="hc.parentesco" maxlength="120" placeholder="Especificar parentesco del informante…" autocomplete="off" />
         </div>
@@ -147,24 +150,24 @@
     </section>
 
     <!-- 4 · SIGNOS VITALES -->
-    <section class="sec" *ngIf="seccion === 4">
+    <section class="sec" *ngIf="seccion === 4" [class.sec--dirty]="seccionSucia(4)">
       <span class="sec-num">4</span>
       <h3 class="sec-title">SIGNOS VITALES <span *ngIf="sellada" class="sec-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>SELLADA</span></h3>
       <fieldset class="sec-fields" [disabled]="sellada">
         <div class="grid-4">
-          <label class="fld">
+          <label class="fld" [class.fld--dirty]="campoSucio('presionArterial')">
             <span class="fld-label">PRESIÓN ARTERIAL <span class="fld-chars" [class.fld-chars--full]="(hc.presionArterial?.length||0) >= 7">{{(hc.presionArterial?.length||0)}}/7</span></span>
             <input class="fld-input" type="text" [(ngModel)]="hc.presionArterial" maxlength="7" placeholder="120/80" autocomplete="off" />
           </label>
-          <label class="fld">
+          <label class="fld" [class.fld--dirty]="campoSucio('frecuenciaCardiaca')">
             <span class="fld-label">F. CARDÍACA / MIN</span>
             <input class="fld-input" type="number" min="0" max="999" [(ngModel)]="hc.frecuenciaCardiaca" placeholder="72" />
           </label>
-          <label class="fld">
+          <label class="fld" [class.fld--dirty]="campoSucio('temperatura')">
             <span class="fld-label">TEMPERATURA °C <span class="fld-chars" [class.fld-chars--full]="(hc.temperatura?.length||0) >= 4">{{(hc.temperatura?.length||0)}}/4</span></span>
             <input class="fld-input" type="text" [(ngModel)]="hc.temperatura" maxlength="4" placeholder="36.5" autocomplete="off" />
           </label>
-          <label class="fld">
+          <label class="fld" [class.fld--dirty]="campoSucio('frecuenciaRespiratoria')">
             <span class="fld-label">F. RESPIRAT. / MIN</span>
             <input class="fld-input" type="number" min="0" max="999" [(ngModel)]="hc.frecuenciaRespiratoria" placeholder="16" />
           </label>
@@ -173,13 +176,13 @@
     </section>
 
     <!-- 5 · EXAMEN DEL SISTEMA ESTOMATOGNÁTICO -->
-    <section class="sec" *ngIf="seccion === 5">
+    <section class="sec" *ngIf="seccion === 5" [class.sec--dirty]="seccionSucia(5)">
       <span class="sec-num">5</span>
       <h3 class="sec-title">EXAMEN DEL SISTEMA ESTOMATOGNÁTICO <span *ngIf="sellada" class="sec-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>SELLADA</span></h3>
       <p class="sec-hint">MARCAR CON X LA REGIÓN CON PATOLOGÍA · DESCRIBIR LA PATOLOGÍA OBSERVADA</p>
       <fieldset class="sec-fields" [disabled]="sellada">
         <div class="region-list">
-          <div class="region-row" *ngFor="let r of regiones; let i = index">
+          <div class="region-row" *ngFor="let r of regiones; let i = index" [class.fld--dirty]="regionSucia(i)">
             <button class="region-chk"
               [class.is-active]="hc.examenRegiones[i].marcado"
               type="button"
@@ -207,7 +210,7 @@
     </section>
 
     <!-- 7 · INDICADORES DE SALUD BUCAL -->
-    <section class="sec" *ngIf="seccion === 7">
+    <section class="sec" *ngIf="seccion === 7" [class.sec--dirty]="seccionSucia(7)">
       <span class="sec-num">7</span>
       <h3 class="sec-title">INDICADORES DE SALUD BUCAL <span *ngIf="sellada" class="sec-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>SELLADA</span></h3>
       <fieldset class="sec-fields" [disabled]="sellada">
@@ -226,7 +229,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let h of hc.higieneSextantes; let i = index">
+                <tr *ngFor="let h of hc.higieneSextantes; let i = index" [class.fld--dirty]="higieneFilaSucia(i)">
                   <td class="ihos-tooth"><label><input type="checkbox" [(ngModel)]="hc.higieneSextantes[i].d1_evaluado" [attr.aria-label]="'Pieza ' + dientesPorSextante[i][0] + ' evaluada'" /> {{ dientesPorSextante[i][0] }}</label></td>
                   <td class="ihos-tooth"><label><input type="checkbox" [(ngModel)]="hc.higieneSextantes[i].d2_evaluado" [attr.aria-label]="'Pieza ' + dientesPorSextante[i][1] + ' evaluada'" /> {{ dientesPorSextante[i][1] }}</label></td>
                   <td class="ihos-tooth"><label><input type="checkbox" [(ngModel)]="hc.higieneSextantes[i].d3_evaluado" [attr.aria-label]="'Pieza ' + dientesPorSextante[i][2] + ' evaluada'" /> {{ dientesPorSextante[i][2] }}</label></td>
@@ -269,7 +272,7 @@
           </div>
         </div>
 
-        <div class="sec-block">
+        <div class="sec-block" [class.fld--dirty]="campoSucio('enfermedadPeriodontal')">
           <span class="sec-block-t">ENFERMEDAD PERIODONTAL</span>
           <span class="sec-block-s">LEVE: BOLSA 3-4mm · MODERADA: 4-6mm + MOVILIDAD I · AVANZADA: >6mm + MOVILIDAD II-III</span>
           <div class="seg" role="group" aria-label="Enfermedad periodontal">
@@ -279,7 +282,7 @@
           </div>
         </div>
 
-        <div class="sec-block">
+        <div class="sec-block" [class.fld--dirty]="campoSucio('malOclusion')">
           <span class="sec-block-t">MAL OCLUSIÓN</span>
           <div class="seg" role="group" aria-label="Mal oclusión">
             <button class="seg-btn" [class.is-active]="hc.malOclusion === 'ANGLE_I'" type="button" role="radio" [attr.aria-checked]="hc.malOclusion === 'ANGLE_I'" (click)="hc.malOclusion = 'ANGLE_I'">ANGLE I</button>
@@ -288,7 +291,7 @@
           </div>
         </div>
 
-        <div class="sec-block">
+        <div class="sec-block" [class.fld--dirty]="campoSucio('fluorosis')">
           <span class="sec-block-t">FLUOROSIS</span>
           <div class="seg" role="group" aria-label="Fluorosis">
             <button class="seg-btn" [class.is-active]="hc.fluorosis === 'LEVE'" type="button" role="radio" [attr.aria-checked]="hc.fluorosis === 'LEVE'" (click)="hc.fluorosis = 'LEVE'">LEVE</button>
@@ -300,7 +303,7 @@
     </section>
 
     <!-- 8 · ÍNDICES CPO-ceo -->
-    <section class="sec" *ngIf="seccion === 8">
+    <section class="sec" *ngIf="seccion === 8" [class.sec--dirty]="seccionSucia(8)">
       <span class="sec-num">8</span>
       <h3 class="sec-title">ÍNDICES CPO-ceo <span *ngIf="sellada" class="sec-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>SELLADA</span></h3>
       <fieldset class="sec-fields" [disabled]="sellada">
@@ -318,16 +321,16 @@
             <tbody>
               <tr>
                 <th scope="row" class="idx-sext">D</th>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.c_perma" aria-label="Caries permanentes" /></td>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.p_perma" aria-label="Perdidos permanentes" /></td>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.o_perma" aria-label="Obturados permanentes" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.c_perma" aria-label="Caries permanentes" [class.fld--dirty]="cpoSucio('c_perma')" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.p_perma" aria-label="Perdidos permanentes" [class.fld--dirty]="cpoSucio('p_perma')" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.o_perma" aria-label="Obturados permanentes" [class.fld--dirty]="cpoSucio('o_perma')" /></td>
                 <td class="cpo-total-cell">{{ cpoTotales().perma }}</td>
               </tr>
               <tr>
                 <th scope="row" class="idx-sext">d</th>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.c_deci" aria-label="Caries deciduos" /></td>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.e_deci" aria-label="Extraídos deciduos" /></td>
-                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.o_deci" aria-label="Obturados deciduos" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.c_deci" aria-label="Caries deciduos" [class.fld--dirty]="cpoSucio('c_deci')" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.e_deci" aria-label="Extraídos deciduos" [class.fld--dirty]="cpoSucio('e_deci')" /></td>
+                <td><input class="fld-input fld-input--num" type="number" min="0" max="99" [(ngModel)]="hc.indicesCpo.o_deci" aria-label="Obturados deciduos" [class.fld--dirty]="cpoSucio('o_deci')" /></td>
                 <td class="cpo-total-cell">{{ cpoTotales().deci }}</td>
               </tr>
             </tbody>
@@ -337,39 +340,39 @@
     </section>
 
     <!-- 10 · PLANES DE DIAGNÓSTICO, TERAPÉUTICO Y EDUCACIONAL -->
-    <section class="sec" *ngIf="seccion === 10">
+    <section class="sec" *ngIf="seccion === 10" [class.sec--dirty]="seccionSucia(10)">
       <span class="sec-num">10</span>
       <h3 class="sec-title">PLANES DE DIAGNÓSTICO, TERAPÉUTICO Y EDUCACIONAL</h3>
       <div class="grid-2" role="group" aria-label="Planes">
-        <button class="chk" [class.is-active]="hc.planBiometria" type="button" [attr.aria-pressed]="hc.planBiometria" (click)="hc.planBiometria = !hc.planBiometria">
+        <button class="chk" [class.is-active]="hc.planBiometria" [class.fld--dirty]="campoSucio('planBiometria')" type="button" [attr.aria-pressed]="hc.planBiometria" (click)="hc.planBiometria = !hc.planBiometria">
           <span class="chk-box" aria-hidden="true">{{ hc.planBiometria ? '×' : '' }}</span><span class="chk-lbl">BIOMETRÍA</span>
         </button>
-        <button class="chk" [class.is-active]="hc.planRayosX" type="button" [attr.aria-pressed]="hc.planRayosX" (click)="hc.planRayosX = !hc.planRayosX">
+        <button class="chk" [class.is-active]="hc.planRayosX" [class.fld--dirty]="campoSucio('planRayosX')" type="button" [attr.aria-pressed]="hc.planRayosX" (click)="hc.planRayosX = !hc.planRayosX">
           <span class="chk-box" aria-hidden="true">{{ hc.planRayosX ? '×' : '' }}</span><span class="chk-lbl">RAYOS-X</span>
         </button>
-        <button class="chk" [class.is-active]="hc.planQuimicaSanguinea" type="button" [attr.aria-pressed]="hc.planQuimicaSanguinea" (click)="hc.planQuimicaSanguinea = !hc.planQuimicaSanguinea">
+        <button class="chk" [class.is-active]="hc.planQuimicaSanguinea" [class.fld--dirty]="campoSucio('planQuimicaSanguinea')" type="button" [attr.aria-pressed]="hc.planQuimicaSanguinea" (click)="hc.planQuimicaSanguinea = !hc.planQuimicaSanguinea">
           <span class="chk-box" aria-hidden="true">{{ hc.planQuimicaSanguinea ? '×' : '' }}</span><span class="chk-lbl">QUÍMICA SANGUÍNEA</span>
         </button>
-        <button class="chk" [class.is-active]="hc.planOtros" type="button" [attr.aria-pressed]="hc.planOtros" (click)="hc.planOtros = !hc.planOtros">
+        <button class="chk" [class.is-active]="hc.planOtros" [class.fld--dirty]="campoSucio('planOtros')" type="button" [attr.aria-pressed]="hc.planOtros" (click)="hc.planOtros = !hc.planOtros">
           <span class="chk-box" aria-hidden="true">{{ hc.planOtros ? '×' : '' }}</span><span class="chk-lbl">OTROS</span>
         </button>
       </div>
-      <div *ngIf="hc.planOtros" class="fld">
+      <div *ngIf="hc.planOtros" class="fld" [class.fld--dirty]="campoSucio('planOtrosTexto')">
         <span class="fld-label">ESPECIFICA OTRO PLAN <span class="fld-chars" [class.fld-chars--warn]="(hc.planOtrosTexto?.length||0) >= 560" [class.fld-chars--full]="(hc.planOtrosTexto?.length||0) >= 700">{{(hc.planOtrosTexto?.length||0)}}/700</span></span>
         <input class="fld-input" type="text" [(ngModel)]="hc.planOtrosTexto" maxlength="700" placeholder="Especificar plan" autocomplete="off" />
       </div>
-      <label class="fld">
+      <label class="fld" [class.fld--dirty]="campoSucio('planTerapeutico')">
         <span class="fld-label">PLAN TERAPÉUTICO <span class="fld-chars" [class.fld-chars--warn]="(hc.planTerapeutico?.length||0) >= 560" [class.fld-chars--full]="(hc.planTerapeutico?.length||0) >= 700">{{(hc.planTerapeutico?.length||0)}}/700</span></span>
         <textarea class="fld-input fld-textarea" rows="3" [(ngModel)]="hc.planTerapeutico" maxlength="700" placeholder="PROFILAXIS, SELLANTE, RESTAURACIONES, TRATAMIENTO PERIODONTAL…"></textarea>
       </label>
-      <label class="fld">
+      <label class="fld" [class.fld--dirty]="campoSucio('planEducacional')">
         <span class="fld-label">PLAN EDUCACIONAL <span class="fld-chars" [class.fld-chars--warn]="(hc.planEducacional?.length||0) >= 560" [class.fld-chars--full]="(hc.planEducacional?.length||0) >= 700">{{(hc.planEducacional?.length||0)}}/700</span></span>
         <textarea class="fld-input fld-textarea" rows="3" [(ngModel)]="hc.planEducacional" maxlength="700" placeholder="TÉCNICA DE CEPILLADO, DIETA, CONTROL DE PLACA…"></textarea>
       </label>
     </section>
 
     <!-- 11 · DIAGNÓSTICO CIE -->
-    <section class="sec" *ngIf="seccion === 11">
+    <section class="sec" *ngIf="seccion === 11" [class.sec--dirty]="seccionSucia(11)">
       <span class="sec-num">11</span>
       <h3 class="sec-title">DIAGNÓSTICO CIE</h3>
       <div class="table-wrap">
@@ -383,33 +386,33 @@
           </thead>
           <tbody>
             <tr *ngFor="let d of hc.diagnosticosCie; let i = index">
-              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].codigo" maxlength="6" placeholder="K02.9" autocomplete="off" /></td>
-              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].presuntivo" maxlength="100" placeholder="DIAGNÓSTICO PRESUNTIVO" autocomplete="off" /></td>
-              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].definitivo" maxlength="100" placeholder="DIAGNÓSTICO DEFINITIVO" autocomplete="off" /></td>
+              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].codigo" maxlength="6" placeholder="K02.9" autocomplete="off" [class.fld--dirty]="cieSucia(i, 'codigo')" /></td>
+              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].presuntivo" maxlength="100" placeholder="DIAGNÓSTICO PRESUNTIVO" autocomplete="off" [class.fld--dirty]="cieSucia(i, 'presuntivo')" /></td>
+              <td><input class="fld-input" type="text" [(ngModel)]="hc.diagnosticosCie[i].definitivo" maxlength="100" placeholder="DIAGNÓSTICO DEFINITIVO" autocomplete="off" [class.fld--dirty]="cieSucia(i, 'definitivo')" /></td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="grid-3">
-        <label class="fld">
+        <label class="fld" [class.fld--dirty]="campoSucio('fechaApertura')">
           <span class="fld-label">FECHA DE APERTURA</span>
           <input class="fld-input" type="date" [(ngModel)]="hc.fechaApertura" [readonly]="sellada" autocomplete="off" [attr.aria-readonly]="sellada" />
         </label>
-        <label class="fld">
+        <label class="fld" [class.fld--dirty]="campoSucio('fechaControl')">
           <span class="fld-label">FECHA DE CONTROL</span>
           <input class="fld-input" type="date" [(ngModel)]="hc.fechaControl" autocomplete="off" />
         </label>
-        <label class="fld">
+        <label class="fld" [class.fld--dirty]="campoSucio('profesionalNombre')">
           <span class="fld-label">PROFESIONAL <span class="fld-chars" [class.fld-chars--warn]="(hc.profesionalNombre?.length||0) >= 80" [class.fld-chars--full]="(hc.profesionalNombre?.length||0) >= 100">{{(hc.profesionalNombre?.length||0)}}/100</span></span>
           <input class="fld-input" type="text" [(ngModel)]="hc.profesionalNombre" maxlength="100" placeholder="NOMBRE DEL ODONTÓLOGO" autocomplete="off" />
         </label>
       </div>
       <div class="grid-3">
-        <label class="fld">
+        <label class="fld" [class.fld--dirty]="campoSucio('profesionalCodigo')">
           <span class="fld-label">CÓDIGO <span class="fld-chars" [class.fld-chars--warn]="(hc.profesionalCodigo?.length||0) >= 12" [class.fld-chars--full]="(hc.profesionalCodigo?.length||0) >= 15">{{(hc.profesionalCodigo?.length||0)}}/15</span></span>
           <input class="fld-input" type="text" [(ngModel)]="hc.profesionalCodigo" maxlength="15" placeholder="CÓDIGO MSP" autocomplete="off" />
         </label>
-        <label class="fld">
+        <label class="fld" [class.fld--dirty]="campoSucio('profesionalFirma')">
           <span class="fld-label">FIRMA <span class="fld-chars" [class.fld-chars--warn]="(hc.profesionalFirma?.length||0) >= 96" [class.fld-chars--full]="(hc.profesionalFirma?.length||0) >= 120">{{(hc.profesionalFirma?.length||0)}}/120</span></span>
           <input class="fld-input" type="text" [(ngModel)]="hc.profesionalFirma" maxlength="120" placeholder="FIRMA / RÚBRICA" autocomplete="off" />
         </label>
@@ -421,27 +424,27 @@
     </section>
 
     <!-- 12 · TRATAMIENTO -->
-    <section class="sec" *ngIf="seccion === 12">
+    <section class="sec" *ngIf="seccion === 12" [class.sec--dirty]="seccionSucia(12)">
       <span class="sec-num">12</span>
       <h3 class="sec-title">TRATAMIENTO</h3>
       <div class="ses-list">
-        <div class="ses" [class.is-locked]="sesionBloqueada(s.sesion)" *ngFor="let s of hc.sesiones">
+        <div class="ses" [class.is-locked]="sesionBloqueada(s.sesion)" *ngFor="let s of hc.sesiones; let i = index">
           <div class="ses-head">
             <span class="ses-badge" aria-hidden="true">{{ s.sesion < 10 ? '0' + s.sesion : s.sesion }}</span>
             <span class="ses-tag">SESIÓN</span>
             <span *ngIf="sesionBloqueada(s.sesion)" class="ses-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>REGISTRADA</span>
-            <label class="fld ses-date">
+            <label class="fld ses-date" [class.fld--dirty]="sesionCampoSucio(i, 'fecha')">
               <span class="fld-label">FECHA <span class="fld-chars" [class.fld-chars--full]="(s.fecha?.length||0) >= 10">{{(s.fecha?.length||0)}}/10</span></span>
               <input class="fld-input" type="text" [(ngModel)]="s.fecha" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off" [disabled]="sesionBloqueada(s.sesion)" />
             </label>
           </div>
           <fieldset class="ses-fields" [disabled]="sesionBloqueada(s.sesion)">
             <div class="ses-grid">
-              <label class="fld">
+              <label class="fld" [class.fld--dirty]="sesionCampoSucio(i, 'diagnosticos')">
                 <span class="fld-label">DIAGNÓSTICOS Y COMPLICACIONES <span class="fld-chars" [class.fld-chars--warn]="(s.diagnosticos?.length||0) >= 160" [class.fld-chars--full]="(s.diagnosticos?.length||0) >= 200">{{(s.diagnosticos?.length||0)}}/200</span></span>
                 <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="s.diagnosticos" maxlength="200" placeholder="DIAGNÓSTICO Y/O COMPLICACIÓN DE LA SESIÓN" autocomplete="off"></textarea>
               </label>
-              <label class="fld ses-wide">
+              <label class="fld ses-wide" [class.fld--dirty]="sesionCampoSucio(i, 'procedimientosCodigos')">
                 <span class="fld-label">PROCEDIMIENTOS <span class="fld-chars" [class.fld-chars--warn]="(s.procedimientosCodigos?.length||0) >= 5">{{s.procedimientosCodigos?.length || 0}} SELECC.</span></span>
                 <div class="proc-picker">
                   <input class="fld-input fld-input--proc" type="text" list="proc-odontologicos"
@@ -451,20 +454,20 @@
                   <div class="proc-chips" *ngIf="s.procedimientosCodigos?.length">
                     <span class="proc-chip" *ngFor="let c of s.procedimientosCodigos">
                       <span class="proc-chip-code">{{ c }}</span><span class="proc-chip-desc">{{ descripcionProcedimiento(c) }}</span>
-                      <button class="proc-chip-x" type="button" [attr.aria-label]="'Quitar ' + c" (click)="quitarProcedimiento(s, c)">×</button>
+                      <button *ngIf="!sesionBloqueada(s.sesion)" class="proc-chip-x" type="button" [attr.aria-label]="'Quitar ' + c" (click)="quitarProcedimiento(s, c)">×</button>
                     </span>
                   </div>
                 </div>
               </label>
-              <label class="fld ses-wide">
+              <label class="fld ses-wide" [class.fld--dirty]="sesionCampoSucio(i, 'prescripciones')">
                 <span class="fld-label">PRESCRIPCIONES — INDICACIONES, INSUMOS, FÁRMACOS (DOSIS, TIEMPO, VÍA) <span class="fld-chars" [class.fld-chars--warn]="(s.prescripciones?.length||0) >= 320" [class.fld-chars--full]="(s.prescripciones?.length||0) >= 400">{{(s.prescripciones?.length||0)}}/400</span></span>
                 <textarea class="fld-input fld-textarea fld-textarea--sm" rows="2" [(ngModel)]="s.prescripciones" maxlength="400" placeholder="MEDICACIÓN / RECETAS" autocomplete="off"></textarea>
               </label>
-              <label class="fld">
+              <label class="fld" [class.fld--dirty]="sesionCampoSucio(i, 'proximaCita')">
                 <span class="fld-label">PRÓXIMA CITA / ALTA <span class="fld-chars" [class.fld-chars--warn]="(s.proximaCita?.length||0) >= 16" [class.fld-chars--full]="(s.proximaCita?.length||0) >= 20">{{(s.proximaCita?.length||0)}}/20</span></span>
                 <input class="fld-input" type="text" [(ngModel)]="s.proximaCita" maxlength="20" placeholder="FECHA PRÓXIMA CITA O «ALTA»" autocomplete="off" />
               </label>
-              <label class="fld">
+              <label class="fld" [class.fld--dirty]="sesionCampoSucio(i, 'codigo')">
                 <span class="fld-label">CÓDIGO Y FIRMA <span class="fld-chars" [class.fld-chars--warn]="(s.codigo?.length||0) >= 12" [class.fld-chars--full]="(s.codigo?.length||0) >= 15">{{(s.codigo?.length||0)}}/15</span></span>
                 <input class="fld-input" type="text" [(ngModel)]="s.codigo" maxlength="15" placeholder="CÓDIGO DEL ODONTÓLOGO" autocomplete="off" />
               </label>
@@ -481,6 +484,20 @@
         <option *ngFor="let p of procedimientosOdontologicos" [value]="p.codigo + ' · ' + p.descripcion"></option>
       </datalist>
     </section>
+
+    <!-- Banner persistente — opción B: siempre visible si hay cambios -->
+    <div *ngIf="hayCambiosSinGuardar && !cargando" class="hc-pending" role="status" aria-live="polite">
+      <div class="hc-pending-main">
+        <span class="hc-pending-dot" aria-hidden="true"></span>
+        <span class="hc-pending-t">CAMBIOS PENDIENTES</span>
+        <span class="hc-pending-count">{{ dirtySecciones.length }} SECCIÓN{{ dirtySecciones.length > 1 ? 'ES' : '' }}</span>
+      </div>
+      <div class="hc-pending-list">
+        <button *ngFor="let ds of dirtySecciones" class="hc-pending-chip" type="button" (click)="cambiarSeccion(ds.n)">{{ ds.n }} · {{ ds.titulo }}</button>
+        <span *ngIf="!dirtySecciones.length" class="hc-pending-hint">Hay cambios en la hoja actual</span>
+      </div>
+      <button class="hc-pending-save" type="button" (click)="intentarGuardar()" [disabled]="guardando">{{ guardando ? 'GUARDANDO…' : 'GUARDAR AHORA' }}</button>
+    </div>
 
     <!-- Pie: imprimir + guardar -->
     <footer class="hc-foot">
@@ -667,6 +684,16 @@
       <span class="hc-modal-s" aria-live="polite">
         La hoja actual tiene datos que aún no se guardan. Para {{ modal?.accion === 'nueva' ? 'abrir una nueva hoja' : 'cambiar de hoja' }} primero guarda tu trabajo, o descarta los cambios y continúa.
       </span>
+      <div *ngIf="dirtySecciones.length" class="hc-modal-dirty" role="region" aria-label="Secciones con cambios pendientes">
+        <span class="hc-modal-dirty-title">PENDIENTE EN {{ dirtySecciones.length }} SECCIÓN{{ dirtySecciones.length > 1 ? 'ES' : '' }}</span>
+        <span class="hc-modal-dirty-hint">Toca una sección para revisarla antes de decidir.</span>
+        <div class="hc-modal-dirty-list">
+          <button *ngFor="let ds of dirtySecciones" class="hc-modal-dirty-chip" type="button" (click)="irASeccionSucia(ds.n)">
+            <span class="hc-modal-dirty-chip-dot" aria-hidden="true"></span>
+            {{ ds.n }} · {{ ds.titulo }}
+          </button>
+        </div>
+      </div>
       <div class="hc-modal-actions">
         <button class="hc-modal-btn hc-modal-btn--ghost" type="button" (click)="modalCancelar()">CANCELAR</button>
         <button class="hc-modal-btn hc-modal-btn--danger" type="button" (click)="modalDescartar()">DESCARTAR CAMBIOS</button>
