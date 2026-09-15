@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { Especialidad, EspecialidadDraft } from '../../../../core/models/especialidad.model';
 import { EspecialidadesHttpService } from '../../services/especialidades-http.service';
+import { readListState, saveListState } from '../../../../shared/components/pagination/list-state';
 
 @Component({
   selector: 'app-especialidades-page',
@@ -17,8 +18,8 @@ export class EspecialidadesPageComponent implements OnInit, OnDestroy {
 
   creating = false;
 
-  private readonly search$ = new BehaviorSubject<string>('');
-  private readonly activo$ = new BehaviorSubject<'all' | boolean>('all');
+  readonly search$ = new BehaviorSubject<string>('');
+  readonly activo$ = new BehaviorSubject<'all' | boolean>('all');
   readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly destroy$ = new Subject<void>();
 
@@ -27,6 +28,11 @@ export class EspecialidadesPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {
+    const _s = readListState('especialidades');
+    const _sq = _s?.query ?? '';
+    const _sf = _s?.filter ?? 'all';
+    this.search$.next(_sq);
+    this.activo$.next(_sf === 'all' ? 'all' : _sf === 'true');
     this.especialidades$ = combineLatest([this.service.especialidades$, this.search$, this.activo$]).pipe(
       map(([list, q, filter]) => {
         const query = q.trim().toUpperCase();
@@ -58,13 +64,22 @@ export class EspecialidadesPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get activoFilterValue(): string {
+    const v = this.activo$.value;
+    return v === true ? 'true' : v === false ? 'false' : 'all';
+  }
+
   onSearch(ev: Event): void {
     this.search$.next((ev.target as HTMLInputElement).value);
+    const _st = readListState('especialidades') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('especialidades', { ..._st, query: (ev.target as HTMLInputElement).value });
   }
 
   onFilter(ev: Event): void {
     const v = (ev.target as HTMLSelectElement).value;
     this.activo$.next(v === 'all' ? 'all' : v === 'true');
+    const _st = readListState('especialidades') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('especialidades', { ..._st, filter: (ev.target as HTMLSelectElement).value });
   }
 
   onSelect(especialidad: Especialidad): void {

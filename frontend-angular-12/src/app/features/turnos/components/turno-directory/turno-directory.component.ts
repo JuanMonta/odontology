@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Turno } from '../../../../core/models/turno.model';
 import { PaginatedListComponent } from '../../../../shared/components/pagination/paginated-list.component';
 
@@ -8,10 +8,11 @@ import { PaginatedListComponent } from '../../../../shared/components/pagination
   styleUrls: ['./turno-directory.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TurnoDirectoryComponent extends PaginatedListComponent {
+export class TurnoDirectoryComponent extends PaginatedListComponent implements AfterViewInit {
   @Input() turnos: Turno[] = [];
   @Input() selectedId: string | null = null;
   @Output() select = new EventEmitter<Turno>();
+  @ViewChild('dirList') dirListRef?: ElementRef<HTMLDivElement>;
 
   protected get totalItems(): number {
     return this.turnos.length;
@@ -27,5 +28,11 @@ export class TurnoDirectoryComponent extends PaginatedListComponent {
 
   descanso(t: Turno): string {
     return t.descansoInicio && t.descansoFin ? `${t.descansoInicio} – ${t.descansoFin}` : '—';
+  }
+
+  ngAfterViewInit(): void {
+    if (this.persistKey) {
+      this.bindScroll(this.dirListRef?.nativeElement ?? null);
+    }
   }
 }

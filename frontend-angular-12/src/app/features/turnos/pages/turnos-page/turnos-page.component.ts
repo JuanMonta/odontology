@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { Turno, TurnoDraft } from '../../../../core/models/turno.model';
 import { TurnosHttpService } from '../../services/turnos-http.service';
+import { readListState, saveListState } from '../../../../shared/components/pagination/list-state';
 
 @Component({
   selector: 'app-turnos-page',
@@ -17,8 +18,8 @@ export class TurnosPageComponent implements OnInit, OnDestroy {
 
   creating = false;
 
-  private readonly search$ = new BehaviorSubject<string>('');
-  private readonly activo$ = new BehaviorSubject<'all' | boolean>('all');
+  readonly search$ = new BehaviorSubject<string>('');
+  readonly activo$ = new BehaviorSubject<'all' | boolean>('all');
   readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly destroy$ = new Subject<void>();
 
@@ -27,6 +28,11 @@ export class TurnosPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {
+    const _s = readListState('turnos');
+    const _sq = _s?.query ?? '';
+    const _sf = _s?.filter ?? 'all';
+    this.search$.next(_sq);
+    this.activo$.next(_sf === 'all' ? 'all' : _sf === 'true');
     this.turnos$ = combineLatest([this.service.turnos$, this.search$, this.activo$]).pipe(
       map(([list, q, filter]) => {
         const query = q.trim().toUpperCase();
@@ -58,13 +64,22 @@ export class TurnosPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get activoFilterValue(): string {
+    const v = this.activo$.value;
+    return v === true ? 'true' : v === false ? 'false' : 'all';
+  }
+
   onSearch(ev: Event): void {
     this.search$.next((ev.target as HTMLInputElement).value);
+    const _st = readListState('turnos') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('turnos', { ..._st, query: (ev.target as HTMLInputElement).value });
   }
 
   onFilter(ev: Event): void {
     const v = (ev.target as HTMLSelectElement).value;
     this.activo$.next(v === 'all' ? 'all' : v === 'true');
+    const _st = readListState('turnos') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('turnos', { ..._st, filter: (ev.target as HTMLSelectElement).value });
   }
 
   onSelect(turno: Turno): void {

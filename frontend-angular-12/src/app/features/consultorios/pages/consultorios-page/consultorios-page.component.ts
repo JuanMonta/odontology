@@ -14,6 +14,7 @@ import { Odontologo } from '../../../../core/models/odontologo.model';
 import { ConsultoriosHttpService } from '../../services/consultorios-http.service';
 import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
 import { TurnosHttpService } from '../../../turnos/services/turnos-http.service';
+import { readListState, saveListState } from '../../../../shared/components/pagination/list-state';
 
 type StatusFilter = ConsultorioStatus | 'all';
 
@@ -32,8 +33,8 @@ export class ConsultoriosPageComponent implements OnInit, OnDestroy {
 
   creating = false;
 
-  private readonly search$ = new BehaviorSubject<string>('');
-  private readonly status$ = new BehaviorSubject<StatusFilter>('all');
+  readonly search$ = new BehaviorSubject<string>('');
+  readonly status$ = new BehaviorSubject<StatusFilter>('all');
   readonly selectedId$ = new BehaviorSubject<string | null>(null);
   private readonly now$ = timer(0, 30_000).pipe(map(() => new Date()));
   private readonly destroy$ = new Subject<void>();
@@ -45,6 +46,11 @@ export class ConsultoriosPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {
+    const _s = readListState('consultorios');
+    const _sq = _s?.query ?? '';
+    const _sf = _s?.filter ?? 'all';
+    this.search$.next(_sq);
+    this.status$.next(_sf as StatusFilter);
     const withStaff$ = combineLatest([
       this.service.consultorios$,
       this.odontologos.odontologos$,
@@ -87,10 +93,14 @@ export class ConsultoriosPageComponent implements OnInit, OnDestroy {
 
   onSearch(ev: Event): void {
     this.search$.next((ev.target as HTMLInputElement).value);
+    const _st = readListState('consultorios') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('consultorios', { ..._st, query: (ev.target as HTMLInputElement).value });
   }
 
   onFilter(ev: Event): void {
     this.status$.next((ev.target as HTMLSelectElement).value as StatusFilter);
+    const _st = readListState('consultorios') ?? { page: 1, pageSize: 10, scrollTop: 0 };
+    saveListState('consultorios', { ..._st, filter: (ev.target as HTMLSelectElement).value });
   }
 
   onSelect(consultorio: Consultorio): void {

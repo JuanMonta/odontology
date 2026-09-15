@@ -30,6 +30,7 @@
         <input
           class="search-input"
           type="search"
+          [value]="(search$ | async) ?? ''"
           placeholder="BUSCAR SALA · NOMBRE / CÓDIGO / PERSONAL EN TURNO"
           aria-label="Buscar consultorio"
           (input)="onSearch($event)"
@@ -39,6 +40,7 @@
         <span class="filter-label">ESTADO</span>
         <select
           class="filter-select"
+          [value]="(status$ | async) ?? 'all'"
           aria-label="Filtrar por estado"
           (change)="onFilter($event)"
         >
@@ -54,6 +56,7 @@
   <div class="page-body">
     <section class="directory" aria-label="Mapeo de consultorios">
       <app-consultorio-directory
+        [persistKey]="'consultorios'"
         [consultorios]="(consultorios$ | async) ?? []"
         [selectedId]="(selectedId$ | async) ?? null"
         (select)="onSelect($event)"

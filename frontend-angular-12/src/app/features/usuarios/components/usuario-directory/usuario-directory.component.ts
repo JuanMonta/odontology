@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Usuario } from '../../../../core/models/usuario.model';
 import { PaginatedListComponent } from '../../../../shared/components/pagination/paginated-list.component';
 
@@ -8,10 +8,11 @@ import { PaginatedListComponent } from '../../../../shared/components/pagination
   styleUrls: ['./usuario-directory.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UsuarioDirectoryComponent extends PaginatedListComponent {
+export class UsuarioDirectoryComponent extends PaginatedListComponent implements AfterViewInit {
   @Input() usuarios: Usuario[] = [];
   @Input() selectedId: string | null = null;
   @Output() select = new EventEmitter<Usuario>();
+  @ViewChild('dirList') dirListRef?: ElementRef<HTMLDivElement>;
 
   protected get totalItems(): number {
     return this.usuarios.length;
@@ -19,5 +20,11 @@ export class UsuarioDirectoryComponent extends PaginatedListComponent {
 
   get visibleUsuarios(): Usuario[] {
     return this.slice(this.usuarios) as Usuario[];
+  }
+
+  ngAfterViewInit(): void {
+    if (this.persistKey) {
+      this.bindScroll(this.dirListRef?.nativeElement ?? null);
+    }
   }
 }

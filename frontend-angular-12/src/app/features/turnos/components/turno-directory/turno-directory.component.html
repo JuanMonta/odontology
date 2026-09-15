@@ -7,27 +7,29 @@
     <span class="col col-status">ESTADO</span>
   </div>
 
-  <div class="dir-list" *ngIf="turnos.length; else empty">
-    <button
-      *ngFor="let t of visibleTurnos"
-      class="dir-row"
-      [class.is-selected]="t.id === selectedId"
-      [class.is-inactive]="!t.activo"
-      type="button"
-      (click)="select.emit(t)"
-    >
-      <span class="col col-code">{{ t.code }}</span>
-      <span class="col col-name">
-        {{ t.nombre }}
-        <span class="col-name-license">TURNO LABORAL</span>
-      </span>
-      <span class="col col-jornada">{{ jornada(t) }}</span>
-      <span class="col col-descanso">{{ descanso(t) }}</span>
-      <span class="col col-status">
-        <ui-lamp [tone]="t.activo ? 'on' : 'off'"></ui-lamp>
-        <span class="status-text" [class.status-text--away]="!t.activo">{{ t.activo ? 'activo' : 'inactivo' }}</span>
-      </span>
-    </button>
+  <div class="dir-list" #dirList>
+    <ng-container *ngIf="turnos.length; else empty">
+      <button
+        *ngFor="let t of visibleTurnos"
+        class="dir-row"
+        [class.is-selected]="t.id === selectedId"
+        [class.is-inactive]="!t.activo"
+        type="button"
+        (click)="select.emit(t)"
+      >
+        <span class="col col-code">{{ t.code }}</span>
+        <span class="col col-name">
+          {{ t.nombre }}
+          <span class="col-name-license">TURNO LABORAL</span>
+        </span>
+        <span class="col col-jornada">{{ jornada(t) }}</span>
+        <span class="col col-descanso">{{ descanso(t) }}</span>
+        <span class="col col-status">
+          <ui-lamp [tone]="t.activo ? 'on' : 'off'"></ui-lamp>
+          <span class="status-text" [class.status-text--away]="!t.activo">{{ t.activo ? 'activo' : 'inactivo' }}</span>
+        </span>
+      </button>
+    </ng-container>
   </div>
 
   <ng-template #empty>

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ClinicMessage } from '../../../../core/models/message.model';
 import { MESSAGE_PRIORITIES } from '../../services/messages-http.service';
 import { PaginatedListComponent } from '../../../../shared/components/pagination/paginated-list.component';
@@ -9,10 +9,11 @@ import { PaginatedListComponent } from '../../../../shared/components/pagination
   styleUrls: ['./message-directory.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MessageDirectoryComponent extends PaginatedListComponent {
+export class MessageDirectoryComponent extends PaginatedListComponent implements AfterViewInit {
   @Input() messages: ClinicMessage[] = [];
   @Input() selectedId: string | null = null;
   @Output() select = new EventEmitter<ClinicMessage>();
+  @ViewChild('dirList') dirListRef?: ElementRef<HTMLDivElement>;
 
   protected get totalItems(): number {
     return this.messages.length;
@@ -28,5 +29,11 @@ export class MessageDirectoryComponent extends PaginatedListComponent {
 
   prioridadLabel(id: string): string {
     return MESSAGE_PRIORITIES.find(p => p.id === id)?.label ?? id;
+  }
+
+  ngAfterViewInit(): void {
+    if (this.persistKey) {
+      this.bindScroll(this.dirListRef?.nativeElement ?? null);
+    }
   }
 }

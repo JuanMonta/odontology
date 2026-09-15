@@ -7,28 +7,30 @@
     <span class="col col-status">ESTADO</span>
   </div>
 
-  <div class="dir-list" *ngIf="odontologos.length; else empty">
-    <button
-      *ngFor="let o of visibleOdontologos"
-      class="dir-row"
-      [class.is-selected]="o.id === selectedId"
-      [class.is-inactive]="o.status === 'inactivo'"
-      [class.is-away]="o.status === 'ausente'"
-      type="button"
-      (click)="select.emit(o)"
-    >
-      <span class="col col-code">{{ o.code }}</span>
-      <span class="col col-name">
-        {{ o.name }}
-        <span class="col-name-license">{{ o.license }}</span>
-      </span>
-      <span class="col col-specialty">{{ o.specialty }}</span>
-      <span class="col col-consultorio">{{ o.consultorio }}</span>
-      <span class="col col-status">
-        <ui-lamp [tone]="o.status === 'activo' ? 'on' : (o.status === 'ausente' ? 'warn' : 'off')"></ui-lamp>
-        <span class="status-text" [class.status-text--away]="o.status === 'ausente'">{{ o.status }}</span>
-      </span>
-    </button>
+  <div class="dir-list" #dirList>
+    <ng-container *ngIf="odontologos.length; else empty">
+      <button
+        *ngFor="let o of visibleOdontologos"
+        class="dir-row"
+        [class.is-selected]="o.id === selectedId"
+        [class.is-inactive]="o.status === 'inactivo'"
+        [class.is-away]="o.status === 'ausente'"
+        type="button"
+        (click)="select.emit(o)"
+      >
+        <span class="col col-code">{{ o.code }}</span>
+        <span class="col col-name">
+          {{ o.name }}
+          <span class="col-name-license">{{ o.license }}</span>
+        </span>
+        <span class="col col-specialty">{{ o.specialty }}</span>
+        <span class="col col-consultorio">{{ o.consultorio }}</span>
+        <span class="col col-status">
+          <ui-lamp [tone]="o.status === 'activo' ? 'on' : (o.status === 'ausente' ? 'warn' : 'off')"></ui-lamp>
+          <span class="status-text" [class.status-text--away]="o.status === 'ausente'">{{ o.status }}</span>
+        </span>
+      </button>
+    </ng-container>
   </div>
 
   <ng-template #empty>

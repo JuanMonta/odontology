@@ -8,24 +8,26 @@
     <span class="col col-status">ESTADO</span>
   </div>
 
-  <div class="dir-list" *ngIf="treatments.length; else empty">
-    <button
-      *ngFor="let t of visibleTreatments"
-      class="dir-row"
-      [class.is-selected]="t.id === selectedId"
-      type="button"
-      (click)="select.emit(t)"
-    >
-      <span class="col col-code">{{ t.code }}</span>
-      <span class="col col-name">{{ t.name }}</span>
-      <span class="col col-cat">{{ t.category }}</span>
-      <span class="col col-dur">{{ t.durationMin }} MIN</span>
-      <span class="col col-price">{{ money(t.price) }}</span>
-      <span class="col col-status">
-        <ui-lamp [tone]="t.active ? 'on' : 'off'"></ui-lamp>
-        <span class="status-text">{{ t.active ? 'ACTIVO' : 'INACTIVO' }}</span>
-      </span>
-    </button>
+  <div class="dir-list" #dirList>
+    <ng-container *ngIf="treatments.length; else empty">
+      <button
+        *ngFor="let t of visibleTreatments"
+        class="dir-row"
+        [class.is-selected]="t.id === selectedId"
+        type="button"
+        (click)="select.emit(t)"
+      >
+        <span class="col col-code">{{ t.code }}</span>
+        <span class="col col-name">{{ t.name }}</span>
+        <span class="col col-cat">{{ t.category }}</span>
+        <span class="col col-dur">{{ t.durationMin }} MIN</span>
+        <span class="col col-price">{{ money(t.price) }}</span>
+        <span class="col col-status">
+          <ui-lamp [tone]="t.active ? 'on' : 'off'"></ui-lamp>
+          <span class="status-text">{{ t.active ? 'ACTIVO' : 'INACTIVO' }}</span>
+        </span>
+      </button>
+    </ng-container>
   </div>
 
   <ng-template #empty>
