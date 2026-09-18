@@ -22,6 +22,30 @@
       />
     </ui-field>
 
+    <ui-field label="EMAIL CORPORATIVO (OPCIONAL)">
+      <input
+        class="field-input"
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        placeholder="mrivera@clinica.local"
+        autocomplete="off"
+      />
+    </ui-field>
+
+    <ui-field label="CONTRASEÑA INICIAL (OPCIONAL)" *ngIf="!usuario">
+      <input
+        class="field-input"
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        placeholder="VACÍA = CLAVE POR DEFECTO"
+        autocomplete="new-password"
+      />
+      <ui-pass-checklist *ngIf="password" [password]="password"></ui-pass-checklist>
+      <span class="field-hint">EL PRIMER INGRESO EXIGIRÁ REDEFINIRLA.</span>
+    </ui-field>
+
     <ui-field label="ROL">
       <div class="cat-row">
         <select class="field-select cat-select" [(ngModel)]="role" name="role" aria-label="Rol del usuario">
@@ -48,10 +72,50 @@
     </ui-field>
 
     <ui-field label="FICHA PROFESIONAL (OPCIONAL)">
-      <select class="field-select" [(ngModel)]="odontologoCodigo" name="odontologoCodigo" aria-label="Ficha profesional vinculada">
-        <option [ngValue]="null">— SIN VINCULAR —</option>
-        <option *ngFor="let o of odontologos" [ngValue]="o.code">{{ o.code }} · {{ o.name }}</option>
-      </select>
+      <div class="cat-row">
+        <select class="field-select cat-select" [(ngModel)]="odontologoCodigo" name="odontologoCodigo" aria-label="Ficha profesional vinculada">
+          <option [ngValue]="null">— SIN VINCULAR —</option>
+          <option *ngFor="let o of odontologos" [ngValue]="o.code">{{ o.code }} · {{ o.name }}</option>
+        </select>
+        <ui-cat-act *ngIf="!usuario && puedeCrearFicha" icon="plus" [open]="creandoFicha" (click)="toggleFicha()">NUEVA FICHA</ui-cat-act>
+      </div>
+
+      <ui-cat-card
+        *ngIf="!usuario && creandoFicha"
+        title="NUEVA FICHA PROFESIONAL"
+        (save)="onSubmit()"
+        (cancel)="creandoFicha = false"
+      >
+        <input
+          class="field-input cat-input"
+          type="text"
+          [(ngModel)]="fichaNombre"
+          name="fichaNombre"
+          placeholder="NOMBRE DEL PROFESIONAL"
+          aria-label="Nombre del profesional"
+          autocomplete="off"
+        />
+        <select class="field-select cat-input" [(ngModel)]="fichaEspecialidad" name="fichaEspecialidad" aria-label="Especialidad de la ficha">
+          <option value="" disabled>ESPECIALIDAD…</option>
+          <option *ngFor="let e of especialidades" [ngValue]="e.nombre">{{ e.nombre }}</option>
+        </select>
+        <input
+          class="field-input cat-input"
+          type="text"
+          [(ngModel)]="fichaLicencia"
+          name="fichaLicencia"
+          placeholder="LICENCIA (COP…)"
+          aria-label="Licencia del profesional"
+          autocomplete="off"
+        />
+        <select class="field-select cat-input" [(ngModel)]="fichaTurno" name="fichaTurno" aria-label="Turno de la ficha">
+          <option value="" disabled>TURNO…</option>
+          <option *ngFor="let t of turnos" [ngValue]="t.nombre">{{ t.nombre }}</option>
+        </select>
+        <select class="field-select cat-input" [(ngModel)]="fichaConsultorio" name="fichaConsultorio" aria-label="Consultorio de la ficha">
+          <option *ngFor="let c of consultorios" [ngValue]="c.codigo">{{ c.codigo }} · {{ c.nombre }}</option>
+        </select>
+      </ui-cat-card>
     </ui-field>
 
     <ui-field label="ESTADO">
@@ -80,7 +144,8 @@
     </ui-field>
   </div>
 
-  <p class="form-error" *ngIf="error" role="alert">USUARIO Y NOMBRE SON OBLIGATORIOS</p>
+  <p class="form-error" *ngIf="error" role="alert">{{ errorMsg }}</p>
+  <p class="form-error" *ngIf="serverError" role="alert">{{ serverError }}</p>
 
   <div class="form-actions">
     <ui-button variant="ghost" (click)="cancel.emit()">CANCELAR</ui-button>

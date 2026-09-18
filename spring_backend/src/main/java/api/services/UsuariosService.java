@@ -63,6 +63,10 @@ public class UsuariosService {
     public UsuarioDto add(UsuarioDraftDto draft) {
         String rol = validarRol(draft.role());
         String estado = validarEstado(draft.status());
+        // Promoción contenida: crear una cuenta super-admin exige serlo.
+        if (esSuperAdminPorNombre(rol) && !callerEsSuperAdmin()) {
+            throw conflicto("SOLO UN SUPER-ADMINISTRADOR PUEDE CREAR CUENTAS SUPER-ADMIN");
+        }
         String hash = hashPassword(draft.password());
         Usuario usuario = Usuario.builder()
                 .codigo(codigoService.nextCodigo("USR", "USR-%03d"))
@@ -73,6 +77,10 @@ public class UsuariosService {
                 .estado(estado)
                 .telefono("—")
                 .odontologoCodigo(validarOdontologo(draft.odontologoCodigo()))
+                .email(normalizarEmail(draft.email()))
+                // Alta empresarial: la clave inicial la define otro (admin o
+                // por defecto), así que el primer ingreso exige redefinirla.
+                .debeCambiarClave(true)
                 .build();
         return toDto(usuarioRepository.save(usuario));
     }
@@ -83,6 +91,17 @@ public class UsuariosService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + dto.code()));
         String rolNuevo = validarRol(dto.role());
         String estadoNuevo = validarEstado(dto.status());
+        // Nunca auto-degradarse: ni el rol ni el estado propios.
+        if (esCuentaPropia(usuario.getCodigo())
+                && (!rolNuevo.equals(usuario.getRol()) || !estadoNuevo.equals(usuario.getEstado()))) {
+            throw conflicto("NO PUEDES CAMBIAR TU PROPIO ROL O ESTADO");
+        }
+        // Contención super-admin: solo un super-admin toca cuentas super-admin
+        // (promocionar a ese rol incluido).
+        if ((esSuperAdminPorNombre(usuario.getRol()) || esSuperAdminPorNombre(rolNuevo))
+                && !callerEsSuperAdmin()) {
+            throw conflicto("SOLO UN SUPER-ADMINISTRADOR PUEDE GESTIONAR CUENTAS SUPER-ADMIN");
+        }
         // Regla último super-admin: ni democión ni suspensión que deje cero.
         if ("activo".equals(usuario.getEstado()) && "activo".equals(estadoNuevo)
                 && esSuperAdminPorNombre(usuario.getRol()) && !esSuperAdminPorNombre(rolNuevo)
@@ -99,6 +118,7 @@ public class UsuariosService {
         usuario.setEstado(estadoNuevo);
         usuario.setTelefono(dto.phone());
         usuario.setOdontologoCodigo(validarOdontologo(dto.odontologoCodigo()));
+        usuario.setEmail(normalizarEmail(dto.email()));
         return toDto(usuarioRepository.save(usuario));
     }
 
@@ -106,6 +126,13 @@ public class UsuariosService {
     public UsuarioDto toggleStatus(String code) {
         Usuario usuario = usuarioRepository.findById(code)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + code));
+        // Nadie se suspende ni se reactiva a sí mismo (evita el auto-bloqueo).
+        if (esCuentaPropia(usuario.getCodigo())) {
+            throw conflicto("NO PUEDES SUSPENDER NI REACTIVAR TU PROPIA CUENTA");
+        }
+        if (esSuperAdminPorNombre(usuario.getRol()) && !callerEsSuperAdmin()) {
+            throw conflicto("SOLO UN SUPER-ADMINISTRADOR PUEDE GESTIONAR CUENTAS SUPER-ADMIN");
+        }
         String siguiente = "activo".equals(usuario.getEstado()) ? "suspendido" : "activo";
         if ("activo".equals(usuario.getEstado()) && esSuperAdminPorNombre(usuario.getRol())
                 && contarSuperAdminsActivos() <= 1) {
@@ -252,6 +279,17 @@ public class UsuariosService {
         if (pedido.contains("SUPER_ADMIN") && !rolTieneSuperAdmin(code) && !callerEsSuperAdmin()) {
             throw conflicto("SOLO UN SUPER-ADMINISTRADOR PUEDE CONCEDER SUPER_ADMIN");
         }
+        // Poseer-para-conceder: solo se revisa lo AÑADIDO (quitar o mantener
+        // lo existente siempre se permite) para no romper ediciones parciales.
+        if (!callerEsSuperAdmin()) {
+            Set<String> actuales = new LinkedHashSet<>(rolPermisoRepository.findPermisosByRol(code));
+            Set<String> propios = permisosDelLlamante();
+            for (String p : pedido) {
+                if (!actuales.contains(p) && !propios.contains(p)) {
+                    throw conflicto("NO PUEDES CONCEDER PERMISOS QUE NO POSEES: " + p);
+                }
+            }
+        }
         boolean pierdeSuper = rolTieneSuperAdmin(code) && !pedido.contains("SUPER_ADMIN");
         if (pierdeSuper && coberturaSuperAdminSin(code) <= 0) {
             throw conflicto("NO SE PUEDE REVOCAR: ES EL ÚLTIMO SUPER-ADMINISTRADOR EFECTIVO");
@@ -316,6 +354,55 @@ public class UsuariosService {
                 && usuarioRepository.countByRolAndEstado(rol.getNombre(), "activo") > 0) {
             throw conflicto("NO SE PUEDE DESACTIVAR: DEJARÍA SIN SUPER-ADMINISTRADOR AL SISTEMA");
         }
+    }
+
+    /** ¿El código es la cuenta del llamante autenticado? */
+    public boolean esCuentaPropia(String codigo) {
+        if (codigo == null) {
+            return false;
+        }
+        String ejecutor = codigoDelLlamante();
+        return codigo.equals(ejecutor);
+    }
+
+    /** ¿La cuenta indicada tiene un rol con SUPER_ADMIN? */
+    public boolean esCuentaSuperAdmin(String codigo) {
+        return usuarioRepository.findById(codigo)
+                .map(u -> esSuperAdminPorNombre(u.getRol()))
+                .orElse(false);
+    }
+
+    /** ¿El llamante autenticado es super-admin? (expone el guard interno). */
+    public boolean llamanteEsSuperAdmin() {
+        return callerEsSuperAdmin();
+    }
+
+    private Set<String> permisosDelLlamante() {
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication() == null
+                    ? null
+                    : SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof Usuario u) {
+                return new LinkedHashSet<>(permisosDeRol(u.getRol()));
+            }
+        } catch (Exception ignored) {
+            // Sin contexto (tests, seed): conjunto vacío.
+        }
+        return Set.of();
+    }
+
+    private String codigoDelLlamante() {
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication() == null
+                    ? null
+                    : SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof Usuario u) {
+                return u.getCodigo();
+            }
+        } catch (Exception ignored) {
+            // Sin contexto (tests, seed): no hay llamante.
+        }
+        return null;
     }
 
     private boolean callerEsSuperAdmin() {
@@ -426,7 +513,21 @@ public class UsuariosService {
                 u.getEstado(),
                 FormatoUtil.fechaHora(u.getUltimoAcceso()),
                 u.getTelefono(),
-                u.getOdontologoCodigo());
+                u.getOdontologoCodigo(),
+                u.getEmail(),
+                Boolean.TRUE.equals(u.getDebeCambiarClave()));
+    }
+
+    /** Correo opcional; se normaliza a minúsculas y se valida el formato. */
+    static String normalizarEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return null;
+        }
+        String limpio = email.trim().toLowerCase();
+        if (!limpio.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            throw new IllegalArgumentException("EMAIL NO VÁLIDO: " + email);
+        }
+        return limpio;
     }
 
     /** Ficha profesional vinculada (opcional): debe existir en el roster. */

@@ -9,5 +9,7 @@ public record UsuarioDto(
         String status,
         String lastAccess,
         String phone,
-        String odontologoCodigo) {
+        String odontologoCodigo,
+        String email,
+        Boolean debeCambiarClave) {
 }

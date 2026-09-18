@@ -4,8 +4,10 @@
   personal valida su acceso. OWN-WORLD: matte black flaps, letras pintadas, acero
   cepillado y lámparas ámbar; la lámpara verde de la nota demo indica "servidor en
   línea". STORY: el usuario llega a recepción, presenta sus credenciales e INGRESA
-  hacia el tablero principal. FIRST VIEWPORT: caja centrada de acceso con brand,
-  título flap y formulario. FORM: split-flap concourse board (challenger).
+  hacia el tablero principal. Modos sobre el mismo tablero: login, recuperación de
+  clave (código de un solo uso) y cambio forzado (clave temporal del admin).
+  FIRST VIEWPORT: caja centrada de acceso con brand, título flap y formulario.
+  FORM: split-flap concourse board (challenger).
 -->
 <div class="stage">
   <div class="board">
@@ -18,43 +20,196 @@
     </header>
 
     <div class="board-body">
-      <div>
-        <span class="kicker">CONTROL DE ACCESO</span>
-        <h1 class="title">ACCESO DEL PERSONAL</h1>
+      <!-- ══════════ MODO LOGIN ══════════ -->
+      <div *ngIf="modo === 'login'">
+        <div>
+          <span class="kicker">CONTROL DE ACCESO</span>
+          <h1 class="title">ACCESO DEL PERSONAL</h1>
+        </div>
+
+        <form class="form" (ngSubmit)="onSubmit()" novalidate>
+          <label class="field">
+            <span class="field-label">USUARIO</span>
+            <input
+              class="field-input"
+              type="text"
+              name="username"
+              [(ngModel)]="username"
+              autocomplete="username"
+              placeholder="CÓDIGO DEL PERSONAL"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field-label">CONTRASEÑA</span>
+            <input
+              class="field-input"
+              type="password"
+              name="password"
+              [(ngModel)]="password"
+              autocomplete="current-password"
+              placeholder="CLAVE DE ACCESO"
+            />
+          </label>
+
+          <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+          <p *ngIf="okMsg" class="notice notice--ok" role="status">{{ okMsg }}</p>
+
+          <button class="btn-enter" type="submit" [disabled]="loading">
+            <span class="lamp" aria-hidden="true"></span>
+            <span>{{ loading ? 'INGRESANDO…' : 'INGRESAR' }}</span>
+          </button>
+
+          <button class="form-link" type="button" (click)="abrirRecuperar()" [disabled]="loading">
+            ¿OLVIDASTE TU CLAVE?
+          </button>
+        </form>
       </div>
 
-      <form class="form" (ngSubmit)="onSubmit()" novalidate>
-        <label class="field">
-          <span class="field-label">USUARIO</span>
-          <input
-            class="field-input"
-            type="text"
-            name="username"
-            [(ngModel)]="username"
-            autocomplete="username"
-            placeholder="CÓDIGO DEL PERSONAL"
-          />
-        </label>
+      <!-- ══════════ MODO RECUPERACIÓN (código de un solo uso) ══════════ -->
+      <div *ngIf="modo === 'recuperar'">
+        <div>
+          <span class="kicker">RECUPERACIÓN DE CLAVE</span>
+          <h1 class="title">CLAVE OLVIDADA</h1>
+          <p class="lead">INGRESA EL CÓDIGO QUE TE ENTREGÓ LA RECEPCIÓN / ADMIN Y DEFINE TU NUEVA CLAVE.</p>
+        </div>
 
-        <label class="field">
-          <span class="field-label">CONTRASEÑA</span>
-          <input
-            class="field-input"
-            type="password"
-            name="password"
-            [(ngModel)]="password"
-            autocomplete="current-password"
-            placeholder="CLAVE DE ACCESO"
-          />
-        </label>
+        <form class="form" (ngSubmit)="onRecuperarSubmit()" novalidate>
+          <label class="field">
+            <span class="field-label">USUARIO</span>
+            <input
+              class="field-input"
+              type="text"
+              name="rec-username"
+              [(ngModel)]="recUsername"
+              autocomplete="username"
+              placeholder="CÓDIGO DEL PERSONAL"
+            />
+          </label>
 
-        <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+          <label class="field">
+            <span class="field-label">CÓDIGO DE RECUPERACIÓN</span>
+            <input
+              class="field-input code-input"
+              type="text"
+              name="rec-codigo"
+              [(ngModel)]="recCodigo"
+              autocomplete="one-time-code"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="6 DÍGITOS"
+            />
+          </label>
 
-        <button class="btn-enter" type="submit" [disabled]="loading">
-          <span class="lamp" aria-hidden="true"></span>
-          <span>{{ loading ? 'INGRESANDO…' : 'INGRESAR' }}</span>
-        </button>
-      </form>
+          <label class="field">
+            <span class="field-label">NUEVA CONTRASEÑA</span>
+            <input
+              class="field-input"
+              type="password"
+              name="rec-nueva"
+              [(ngModel)]="recNueva"
+              autocomplete="new-password"
+              placeholder="MÍNIMO 8 CARACTERES"
+            />
+          </label>
+
+          <ui-pass-checklist [password]="recNueva"></ui-pass-checklist>
+
+          <label class="field">
+            <span class="field-label">CONFIRMAR NUEVA CONTRASEÑA</span>
+            <input
+              class="field-input"
+              type="password"
+              name="rec-confirma"
+              [(ngModel)]="recConfirmar"
+              autocomplete="new-password"
+              placeholder="REPITE LA NUEVA CLAVE"
+            />
+          </label>
+
+          <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+          <p class="notice" role="note">
+            EL CÓDIGO VENCE EN 15 MINUTOS Y SIRVE UNA SOLA VEZ.
+          </p>
+
+          <button class="btn-enter" type="submit" [disabled]="loading">
+            <span class="lamp" aria-hidden="true"></span>
+            <span>{{ loading ? 'VALIDANDO…' : 'RESTABLECER CLAVE' }}</span>
+          </button>
+
+          <button class="form-link" type="button" (click)="volverAlAcceso()" [disabled]="loading">
+            VOLVER AL ACCESO
+          </button>
+        </form>
+      </div>
+
+      <!-- ══════════ MODO CAMBIO FORZADO (reset por admin) ══════════ -->
+      <div *ngIf="modo === 'forzado'">
+        <div>
+          <span class="kicker">CLAVE TEMPORAL DETECTADA</span>
+          <h1 class="title">CAMBIAR CLAVE OBLIGATORIO</h1>
+          <p class="lead">EL ADMIN RESETEÓ TU CUENTA. DEFINE UNA NUEVA CONTRASEÑA PARA CONTINUAR.</p>
+        </div>
+
+        <form class="form" (ngSubmit)="onForzadoSubmit()" novalidate>
+          <label class="field">
+            <span class="field-label">USUARIO</span>
+            <input
+              class="field-input"
+              type="text"
+              name="forzado-username"
+              [(ngModel)]="forzadoUsername"
+              autocomplete="username"
+              readonly
+            />
+          </label>
+
+          <label class="field">
+            <span class="field-label">CLAVE TEMPORAL</span>
+            <input
+              class="field-input"
+              type="password"
+              name="forzado-actual"
+              [(ngModel)]="forzadoActual"
+              autocomplete="current-password"
+              placeholder="LA ENTREGADA POR EL ADMIN"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field-label">NUEVA CONTRASEÑA</span>
+            <input
+              class="field-input"
+              type="password"
+              name="forzado-nueva"
+              [(ngModel)]="forzadoNueva"
+              autocomplete="new-password"
+              placeholder="MÍNIMO 8 CARACTERES"
+            />
+          </label>
+
+          <ui-pass-checklist [password]="forzadoNueva"></ui-pass-checklist>
+
+          <label class="field">
+            <span class="field-label">CONFIRMAR NUEVA CONTRASEÑA</span>
+            <input
+              class="field-input"
+              type="password"
+              name="forzado-confirma"
+              [(ngModel)]="forzadoConfirmar"
+              autocomplete="new-password"
+              placeholder="REPITE LA NUEVA CLAVE"
+            />
+          </label>
+
+          <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+
+          <button class="btn-enter" type="submit" [disabled]="loading">
+            <span class="lamp" aria-hidden="true"></span>
+            <span>{{ loading ? 'GUARDANDO…' : 'CAMBIAR CLAVE E INGRESAR' }}</span>
+          </button>
+        </form>
+      </div>
 
       <footer class="demo">
         <span class="demo-lamp" aria-hidden="true"></span>

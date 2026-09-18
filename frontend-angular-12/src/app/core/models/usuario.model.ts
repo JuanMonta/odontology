@@ -36,6 +36,8 @@ export interface Usuario {
   lastAccess: string;   // "06 AGO 2026 · 14:32"
   phone: string;        // "+51 987 654 321"
   odontologoCodigo?: string | null; // ficha profesional vinculada (ODO-001)
+  email?: string | null;            // correo corporativo opcional
+  debeCambiarClave?: boolean;       // force password change on next login (reset por admin)
 }
 
 export interface UsuarioDraft {
@@ -44,4 +46,11 @@ export interface UsuarioDraft {
   role: UsuarioRol;
   status: UsuarioStatus;
   odontologoCodigo?: string | null;
+  email?: string | null;
+  password?: string | null; // solo alta: vacía = clave por defecto + cambio obligatorio
+}
+
+export interface UsuarioConFichaDraft {
+  usuario: UsuarioDraft;
+  ficha: import('./odontologo.model').OdontologoDraft;
 }

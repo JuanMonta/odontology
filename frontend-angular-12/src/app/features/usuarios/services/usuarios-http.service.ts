@@ -136,4 +136,21 @@ export class UsuariosHttpService {
       this.subjects.next(this.subjects.getValue().map(u => (u.id === updated.id ? updated : u)));
     });
   }
+
+  /** Emite el código de un solo uso (Opción 2); el texto claro vuelve al admin. */
+  generarCodigoRecuperacion(code: string): Observable<{ codigo: string; expiraEnMinutos: number }> {
+    return this.http.post<{ codigo: string; expiraEnMinutos: number }>(
+      `${API_BASE}/usuarios/${code}/generar-codigo-recuperacion`, null);
+  }
+
+  /** Reset por admin (Opción 1): clave temporal + cambio obligatorio al ingresar. */
+  resetearClave(code: string): Observable<{ password: string; message: string }> {
+    return this.http.post<{ password: string; message: string }>(
+      `${API_BASE}/usuarios/${code}/resetear-clave`, null).pipe(
+        tap(() => {
+          this.subjects.next(this.subjects.getValue().map(u =>
+            u.code === code ? { ...u, debeCambiarClave: true } : u));
+        })
+      );
+  }
 }

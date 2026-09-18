@@ -5,11 +5,15 @@ import { map, takeUntil } from 'rxjs/operators';
 import {
   CatalogoItem,
   Usuario,
+  UsuarioConFichaDraft,
   UsuarioDraft,
   UsuarioStatus
 } from '../../../../core/models/usuario.model';
 import { UsuariosHttpService } from '../../services/usuarios-http.service';
 import { OdontologosHttpService } from '../../../odontologos/services/odontologos-http.service';
+import { EspecialidadesHttpService } from '../../../especialidades/services/especialidades-http.service';
+import { TurnosHttpService } from '../../../turnos/services/turnos-http.service';
+import { ConsultoriosHttpService } from '../../../consultorios/services/consultorios-http.service';
 import { AuthStore } from '../../../../core/auth/auth.store';
 import { Odontologo } from '../../../../core/models/odontologo.model';
 import { readListState, saveListState } from '../../../../shared/components/pagination/list-state';
@@ -29,8 +33,12 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
   estados$: Observable<CatalogoItem[]>;
   esAdmin$: Observable<boolean>;
   odontologos$: Observable<Odontologo[]>;
+  especialidades$: Observable<CatalogoItem[]>;
+  turnos$: Observable<CatalogoItem[]>;
+  consultorios$: Observable<CatalogoItem[]>;
 
   creating = false;
+  serverError: string | null = null;
 
   readonly search$ = new BehaviorSubject<string>('');
   readonly status$ = new BehaviorSubject<StatusFilter>('all');
@@ -42,7 +50,10 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
     private auth: AuthStore,
     private route: ActivatedRoute,
     private router: Router,
-    private odontologos: OdontologosHttpService
+    private odontologos: OdontologosHttpService,
+    private especialidadesSvc: EspecialidadesHttpService,
+    private turnosSvc: TurnosHttpService,
+    private consultoriosSvc: ConsultoriosHttpService
   ) {
     const _s = readListState('usuarios');
     const _sq = _s?.query ?? '';
@@ -71,6 +82,15 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
     this.estados$ = this.service.estados$;
     this.esAdmin$ = this.auth.esAdmin();
     this.odontologos$ = this.odontologos.odontologos$;
+    this.especialidades$ = this.especialidadesSvc.activas$.pipe(
+      map(list => list.map(e => ({ codigo: e.code, nombre: e.nombre })))
+    );
+    this.turnos$ = this.turnosSvc.activos$.pipe(
+      map(list => list.map(t => ({ codigo: t.code, nombre: t.nombre })))
+    );
+    this.consultorios$ = this.consultoriosSvc.consultorios$.pipe(
+      map(list => list.map(c => ({ codigo: c.code, nombre: c.name })))
+    );
   }
 
   puede(permiso: string): boolean {
@@ -110,9 +130,11 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
   startCreate(): void {
     this.creating = true;
     this.selectedId$.next(null);
+    this.serverError = null;
   }
 
   onSaved(draft: UsuarioDraft): void {
+    this.serverError = null;
     const selectedId = this.selectedId$.getValue();
     if (selectedId) {
       const current = this.service.snapshot().find(u => u.id === selectedId);
@@ -128,8 +150,31 @@ export class UsuariosPageComponent implements OnInit, OnDestroy {
     this.router.navigate([], { queryParams: {} });
   }
 
+  /** Alta unificada cuenta + ficha: primero la ficha, luego la cuenta vinculada. */
+  onSavedConFicha(draft: UsuarioConFichaDraft): void {
+    this.serverError = null;
+    this.odontologos.addOdontologo(draft.ficha).subscribe({
+      next: ficha => {
+        this.service.addUsuario({ ...draft.usuario, odontologoCodigo: ficha.code }).subscribe({
+          next: created => {
+            this.selectedId$.next(created.id);
+            this.creating = false;
+            this.router.navigate([], { queryParams: {} });
+          },
+          error: () => {
+            this.serverError = 'CUENTA NO CREADA — REVISA LOS DATOS E INTENTA DE NUEVO';
+          }
+        });
+      },
+      error: (err: { error?: { message?: string } }) => {
+        this.serverError = err?.error?.message ?? 'NO SE PUDO CREAR LA FICHA PROFESIONAL';
+      }
+    });
+  }
+
   cancelCreate(): void {
     this.creating = false;
+    this.serverError = null;
   }
 
   onClosePanel(): void {
