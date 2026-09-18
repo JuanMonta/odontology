@@ -3,15 +3,24 @@
     <div class="page-head-row">
       <div class="page-head-left">
         <h2 class="page-title">REPORTES FINANCIEROS</h2>
-        <span class="page-sub">FASE 1 · PRODUCCIÓN · FLUJO DE CAJA · CARTERA DE DEUDORES</span>
+        <span class="page-sub">FASE 1 · VALOR DE SERVICIOS · FLUJO DE CAJA · CARTERA DE DEUDORES</span>
       </div>
       <div class="page-head-actions">
         <button class="btn-ghost" type="button" (click)="imprimir()" [disabled]="!resultado">
-          <span class="btn-print" aria-hidden="true"></span>
+          <svg class="btn-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 5.5V2h8v3.5"></path>
+            <path d="M4 11H2.5v-4A1.5 1.5 0 0 1 4 5.5h8a1.5 1.5 0 0 1 1.5 1.5v4H12"></path>
+            <rect x="4" y="10.5" width="8" height="3.5" rx="0.8"></rect>
+          </svg>
           IMPRIMIR
         </button>
         <button class="btn-ghost" type="button" *ngIf="puede('REP_EXPORTAR')" (click)="csv()" [disabled]="!resultado">
-          <span class="btn-csv" aria-hidden="true"></span>
+          <svg class="btn-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2.5" y="2" width="11" height="12" rx="1.5"></rect>
+            <path d="M2.5 5.5h11"></path>
+            <path d="M8 7.8v3.9"></path>
+            <path d="M6.3 10l1.7 1.7L9.7 10"></path>
+          </svg>
           EXPORTAR CSV
         </button>
       </div>
@@ -63,8 +72,8 @@
     </div>
 
     <ng-container *ngIf="resultado && !error && !cargando">
-      <!-- PRODUCCIÓN -->
-      <section class="report-card" *ngIf="esProduccion && produccion" aria-label="Reporte de producción">
+      <!-- VALOR DE SERVICIOS -->
+      <section class="report-card" *ngIf="esProduccion && produccion" aria-label="Reporte de valor de servicios">
         <div class="report-head">
           <div>
             <h3 class="report-title">{{ option.label }}</h3>

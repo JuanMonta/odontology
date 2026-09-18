@@ -30,9 +30,9 @@ interface TipoReporteOption {
 }
 
 const TIPOS: TipoReporteOption[] = [
-  { id: 'produccion-tratamiento', label: 'PRODUCCIÓN POR TRATAMIENTO', corta: 'Producción por tratamiento' },
-  { id: 'produccion-odontologo', label: 'PRODUCCIÓN POR ODONTÓLOGO', corta: 'Producción por odontólogo' },
-  { id: 'produccion-consultorio', label: 'PRODUCCIÓN POR CONSULTORIO', corta: 'Producción por consultorio' },
+  { id: 'produccion-tratamiento', label: 'VALOR DE SERVICIOS POR TRATAMIENTO', corta: 'Valor de servicios por tratamiento' },
+  { id: 'produccion-odontologo', label: 'VALOR DE SERVICIOS POR ODONTÓLOGO', corta: 'Valor de servicios por odontólogo' },
+  { id: 'produccion-consultorio', label: 'VALOR DE SERVICIOS POR CONSULTORIO', corta: 'Valor de servicios por consultorio' },
   { id: 'flujo-caja', label: 'FLUJO DE CAJA', corta: 'Flujo de caja' },
   { id: 'cartera', label: 'CARTERA / DEUDORES', corta: 'Cartera de deudores' },
   { id: 'citas-consultorio', label: 'CITAS POR CONSULTORIO', corta: 'Citas por consultorio' },
