@@ -1,0 +1,13 @@
+<div class="passcheck" role="status" aria-label="Requisitos de clave segura">
+  <span class="passcheck-kicker">CLAVE SEGURA · VERIFICACIÓN EN VIVO</span>
+  <ul class="passcheck-list">
+    <li *ngFor="let r of rules" class="passcheck-rule" [class.is-ok]="r.ok">
+      <span class="passcheck-dot" aria-hidden="true">
+        <svg *ngIf="r.ok" class="passcheck-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 8.5l3.2 3.2L13 5"></path>
+        </svg>
+      </span>
+      <span class="passcheck-label">{{ r.label }}</span>
+    </li>
+  </ul>
+</div>

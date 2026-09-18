@@ -115,6 +115,67 @@
   gap: 16px;
 }
 
+.lead {
+  font-family: var(--font-flap);
+  font-size: 0.68em;
+  letter-spacing: 0.1em;
+  line-height: 1.55;
+  color: var(--steel-500);
+  margin-top: 10px;
+}
+
+/* Código de recuperación: letras bien separadas, lectura por voz sin errores. */
+.code-input {
+  font-size: 1.1em;
+  letter-spacing: 0.5em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.form-link {
+  align-self: center;
+  margin-top: 2px;
+  padding: 6px 10px;
+  font-family: var(--font-flap);
+  font-size: 0.68em;
+  letter-spacing: 0.16em;
+  color: var(--steel-400);
+  background: none;
+  border: none;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  transition: color 0.18s var(--ease-out), border-color 0.18s var(--ease-out);
+}
+
+.form-link:hover:not(:disabled) {
+  color: var(--amber);
+  border-bottom-color: var(--amber-line);
+}
+
+.form-link:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.notice {
+  font-family: var(--font-flap);
+  font-size: 0.68em;
+  letter-spacing: 0.1em;
+  line-height: 1.45;
+  color: var(--steel-400);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.notice--ok {
+  color: var(--green);
+  border-color: rgba(86, 181, 127, 0.35);
+  background: rgba(86, 181, 127, 0.08);
+  animation: error-in 0.22s var(--ease-out);
+}
+
 .field {
   display: flex;
   flex-direction: column;

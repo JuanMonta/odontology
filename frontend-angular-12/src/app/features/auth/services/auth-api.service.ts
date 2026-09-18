@@ -27,4 +27,16 @@ export class AuthApiService {
   me(): Observable<Usuario> {
     return this.http.get<Usuario>(`${API_BASE}/auth/me`);
   }
+
+  /** Canje self-service del código de un solo uso por una clave nueva. */
+  reestablecerClave(username: string, codigo: string, nuevaClave: string): Observable<void> {
+    return this.http.post<void>(
+      `${API_BASE}/auth/reestablecer-clave`, { username, codigo, nuevaClave });
+  }
+
+  /** Cambio de clave verificando la actual (cambio forzado / voluntario). */
+  cambiarClave(username: string, claveActual: string, nuevaClave: string): Observable<void> {
+    return this.http.post<void>(
+      `${API_BASE}/auth/cambiar-clave`, { username, claveActual, nuevaClave });
+  }
 }

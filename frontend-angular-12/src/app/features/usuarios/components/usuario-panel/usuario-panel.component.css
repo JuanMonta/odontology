@@ -4,3 +4,121 @@
   flex: 1;
   min-height: 0;
 }
+
+.self-note {
+  font-family: var(--font-flap);
+  font-size: 0.62em;
+  letter-spacing: 0.14em;
+  line-height: 1.6;
+  color: var(--steel-400);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Overlay de resultado (código de recuperación / clave temporal)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.rc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  animation: rc-in 0.18s var(--ease-out);
+}
+
+.rc-card {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 26px 28px 22px;
+  background: linear-gradient(180deg, #1c2229 0%, #14181d 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 18px 36px -14px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: rc-in 0.22s var(--ease-out);
+}
+
+.rc-kicker {
+  font-family: var(--font-flap);
+  font-size: 0.62em;
+  letter-spacing: 0.22em;
+  color: var(--amber);
+}
+
+.rc-kicker--error {
+  color: #cf5a54;
+}
+
+.rc-title {
+  font-family: var(--font-flap);
+  font-size: 0.7em;
+  line-height: 1.6;
+  letter-spacing: 0.12em;
+  color: var(--steel-400);
+}
+
+.rc-title--error {
+  color: #f0a8a2;
+}
+
+.rc-valor {
+  display: flex;
+  justify-content: center;
+}
+
+.rc-code {
+  display: inline-block;
+  font-family: var(--font-flap);
+  font-size: 1.45em;
+  letter-spacing: 0.35em;
+  color: var(--amber);
+  text-align: center;
+  padding: 14px 22px;
+  background: rgba(255, 176, 32, 0.08);
+  border: 1px solid rgba(255, 176, 32, 0.32);
+  border-radius: var(--radius-sm);
+  word-break: break-all;
+  animation: rc-pulse 1.8s var(--flip-ease) infinite;
+}
+
+.rc-code--temporal {
+  letter-spacing: 0.16em;
+  font-size: 1.1em;
+  background: rgba(255, 176, 32, 0.06);
+}
+
+.rc-hint {
+  font-family: var(--font-flap);
+  font-size: 0.66em;
+  letter-spacing: 0.14em;
+  line-height: 1.55;
+  color: var(--steel-500);
+}
+
+.rc-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+@keyframes rc-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rc-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.88; }
+}

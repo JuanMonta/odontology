@@ -78,22 +78,28 @@ export class AuthStore {
       localStorage.setItem(
         USER_KEY,
         JSON.stringify({
+          id: me?.id ?? null,
           code: me?.code ?? res.code,
           username: me?.username ?? res.username,
           name: me?.name ?? res.name,
           role: me?.role ?? res.role,
-          odontologoCodigo: me?.odontologoCodigo ?? null
+          odontologoCodigo: me?.odontologoCodigo ?? null,
+          email: me?.email ?? null,
+          debeCambiarClave: me?.debeCambiarClave ?? false
         })
       );
     } catch {
       localStorage.setItem(
         USER_KEY,
         JSON.stringify({
+          id: null,
           code: res.code,
           username: res.username,
           name: res.name,
           role: res.role,
-          odontologoCodigo: null
+          odontologoCodigo: null,
+          email: null,
+          debeCambiarClave: false
         })
       );
     }
@@ -131,7 +137,9 @@ export class AuthStore {
         status: 'activo',
         lastAccess: '',
         phone: '',
-        odontologoCodigo: parsed.odontologoCodigo ?? null
+        odontologoCodigo: parsed.odontologoCodigo ?? null,
+        email: parsed.email ?? null,
+        debeCambiarClave: parsed.debeCambiarClave ?? false
       };
     } catch {
       return null;

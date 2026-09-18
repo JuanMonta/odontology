@@ -9,6 +9,7 @@ import { UiPanelComponent } from './ui-panel/ui-panel.component';
 import { UiFieldComponent } from './ui-field/ui-field.component';
 import { UiCatActComponent } from './ui-cat-act/ui-cat-act.component';
 import { UiCatCardComponent } from './ui-cat-card/ui-cat-card.component';
+import { UiPassChecklistComponent } from './ui-pass-checklist/ui-pass-checklist.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { UiCatCardComponent } from './ui-cat-card/ui-cat-card.component';
     UiPanelComponent,
     UiFieldComponent,
     UiCatActComponent,
-    UiCatCardComponent
+    UiCatCardComponent,
+    UiPassChecklistComponent
   ],
   imports: [CommonModule],
   exports: [
@@ -32,7 +34,8 @@ import { UiCatCardComponent } from './ui-cat-card/ui-cat-card.component';
     UiPanelComponent,
     UiFieldComponent,
     UiCatActComponent,
-    UiCatCardComponent
+    UiCatCardComponent,
+    UiPassChecklistComponent
   ]
 })
 export class SharedModule { }

@@ -42,7 +42,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/v1/auth/login", "/api/v1/health", "/error").permitAll()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/reestablecer-clave",
+                                "/api/v1/auth/cambiar-clave", "/api/v1/health", "/error").permitAll()
                         .requestMatchers("/ws/**").authenticated()
                         // ── RBAC · matriz rol_permiso (JwtAuthFilter carga authorities
                         //    frescas por petición; el front solo refleja, nunca autoriza).
@@ -66,6 +67,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/usuarios/*").hasAuthority("USU_EDITAR")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/usuarios/*/toggle-status")
                         .hasAuthority("USU_SUSPENDER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/*/generar-codigo-recuperacion",
+                                "/api/v1/usuarios/*/resetear-clave").hasAuthority("USU_EDITAR")
                         // Configuración
                         .requestMatchers(HttpMethod.GET, "/api/v1/configuracion").hasAuthority("CFG_VER")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/configuracion").hasAuthority("CFG_EDITAR")

@@ -2,11 +2,14 @@ package api.controllers;
 
 import api.dto.CatalogoDto;
 import api.dto.CatalogoDraftDto;
+import api.dto.CodigoRecuperacionDto;
+import api.dto.PasswordTemporalDto;
 import api.dto.PermisoDto;
 import api.dto.RolDto;
 import api.dto.RolPermisosDto;
 import api.dto.UsuarioDto;
 import api.dto.UsuarioDraftDto;
+import api.services.RecuperacionClaveService;
 import api.services.UsuariosService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -29,6 +33,7 @@ import java.util.List;
 public class UsuariosController {
 
     private final UsuariosService usuariosService;
+    private final RecuperacionClaveService recuperacionClaveService;
 
     @GetMapping
     public List<UsuarioDto> list() {
@@ -104,5 +109,25 @@ public class UsuariosController {
     @PostMapping("/estados")
     public CatalogoDto crearEstado(@RequestBody CatalogoDraftDto draft) {
         return usuariosService.crearEstado(draft);
+    }
+
+    /** Emite el código de un solo uso (Opción 2); el admin lo entrega al usuario. */
+    @PostMapping("/{code}/generar-codigo-recuperacion")
+    public CodigoRecuperacionDto generarCodigoRecuperacion(@PathVariable String code) {
+        try {
+            return recuperacionClaveService.generarCodigo(code);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    /** Reset por admin (Opción 1): clave temporal + cambio obligatorio al ingresar. */
+    @PostMapping("/{code}/resetear-clave")
+    public PasswordTemporalDto resetearClave(@PathVariable String code) {
+        try {
+            return recuperacionClaveService.resetearClave(code);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 }

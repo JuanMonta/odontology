@@ -18,7 +18,7 @@ export class PaginationComponent {
   @Input() total = 0;
   @Input() page = 1;
   @Input() pageSize = 10;
-  @Input() pageSizes: number[] = [10, 20, 50];
+  @Input() pageSizes: number[] = [10, 20, 50, 100];
   @Input() label = 'REGISTROS';
   @Input() compact = false;
   @Output() pageChange = new EventEmitter<number>();

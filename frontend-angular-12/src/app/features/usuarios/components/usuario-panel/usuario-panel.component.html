@@ -11,7 +11,13 @@
     [estados]="estados"
     [esAdmin]="esAdmin"
     [odontologos]="odontologos"
+    [especialidades]="especialidades"
+    [turnos]="turnos"
+    [consultorios]="consultorios"
+    [puedeCrearFicha]="puedeCrearFicha"
+    [serverError]="serverError"
     (saved)="onSaved($event)"
+    (savedConFicha)="onSavedConFicha($event)"
     (cancel)="creating ? cancel.emit() : cancelEdit()"
     (crearRol)="crearRol.emit($event)"
     (crearEstado)="crearEstado.emit($event)"
@@ -51,6 +57,14 @@
       <span class="meta-label">TELÉFONO</span>
       <span class="meta-value">{{ usuario.phone }}</span>
     </div>
+    <div class="meta-row">
+      <span class="meta-label">EMAIL</span>
+      <span class="meta-value">{{ usuario.email || '—' }}</span>
+    </div>
+    <div class="meta-row" *ngIf="usuario.debeCambiarClave">
+      <span class="meta-label">CLAVE</span>
+      <span class="meta-value meta-value--warn">CAMBIO OBLIGATORIO PENDIENTE</span>
+    </div>
   </div>
 
   <div class="section">
@@ -61,10 +75,41 @@
     </div>
   </div>
 
+  <div class="self-note" *ngIf="esCuentaPropia()">ESTA ES TU CUENTA — LAS ACCIONES SOBRE OTROS USUARIOS ESTÁN OCULTAS AQUÍ</div>
+
   <div panelActions class="panel-actions">
     <ui-button *ngIf="puedeEditar" (click)="startEdit()">EDITAR CUENTA</ui-button>
-    <ui-button variant="ghost" *ngIf="puedeSuspender" (click)="toggle.emit(usuario!.id)">
+    <ui-button variant="ghost" *ngIf="puedeEditar && !esCuentaPropia()" (click)="generarCodigo()" [disabled]="operando">
+      CÓDIGO DE RECUPERACIÓN
+    </ui-button>
+    <ui-button variant="ghost" *ngIf="puedeEditar && !esCuentaPropia()" (click)="resetearClave()" [disabled]="operando">
+      RESETEAR CLAVE
+    </ui-button>
+    <ui-button variant="ghost" *ngIf="puedeSuspender && !esCuentaPropia()" (click)="toggle.emit(usuario!.id)">
       {{ usuario.status === 'activo' ? 'SUSPENDER' : 'REACTIVAR' }}
     </ui-button>
   </div>
 </ui-panel>
+
+<!-- ══════════ Modal de resultado (código / clave temporal) ══════════ -->
+<div class="rc-modal" *ngIf="resCodigo || resTemporal || resError">
+  <div class="rc-card">
+    <span class="rc-kicker" *ngIf="resCodigo || resTemporal">
+      {{ resCodigo ? 'CÓDIGO DE RECUPERACIÓN (OPCIÓN 2)' : 'CLAVE TEMPORAL DEL RESET (OPCIÓN 1)' }}
+    </span>
+    <span class="rc-kicker rc-kicker--error" *ngIf="resError">ERROR</span>
+    <p class="rc-title" *ngIf="resCodigo">ENTREGA ESTE CÓDIGO AL USUARIO. VENCE EN {{ resMinutos }} MINUTOS Y SIRVE UNA SOLA VEZ.</p>
+    <p class="rc-title" *ngIf="resTemporal">ENTREGA ESTA CLAVE TEMPORAL AL USUARIO. DEBERÁ CAMBIARLA EN EL PRÓXIMO INGRESO.</p>
+    <p class="rc-title rc-title--error" *ngIf="resError">{{ resError }}</p>
+
+    <div class="rc-valor" *ngIf="resCodigo || resTemporal">
+      <code class="rc-code" [class.rc-code--temporal]="!!resTemporal">{{ resCodigo ?? resTemporal }}</code>
+    </div>
+
+    <p class="rc-hint" *ngIf="resMensaje">{{ resMensaje }}</p>
+    <div class="rc-actions">
+      <ui-button *ngIf="resCodigo || resTemporal" (click)="copiarResultado()">COPIAR</ui-button>
+      <ui-button variant="ghost" (click)="cerrarResultado()">ENTENDIDO</ui-button>
+    </div>
+  </div>
+</div>

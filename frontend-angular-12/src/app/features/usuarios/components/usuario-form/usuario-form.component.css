@@ -1,3 +1,14 @@
 /* El patrón de creación inline (cat-row, cat-act, cat-card, btn-plus,
    btn-pencil, cat-input) vive en shared: ui-cat-act, ui-cat-card y
    shared/styles/cat-inline.css. Este archivo queda para estilos propios. */
+
+.field-hint {
+  font-family: var(--font-flap);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.1em;
+  color: var(--steel-500);
+}
+
+ui-pass-checklist {
+  margin-top: 8px;
+}
