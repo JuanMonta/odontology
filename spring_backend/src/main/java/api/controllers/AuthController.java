@@ -9,6 +9,7 @@ import api.entities.Usuario;
 import api.services.AuthService;
 import api.services.RecuperacionClaveService;
 import api.services.UsuariosService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -29,12 +31,19 @@ public class AuthController {
     private final RecuperacionClaveService recuperacionClaveService;
 
     @PostMapping("/login")
-    public AuthResponseDto login(@RequestBody AuthLoginDto login) {
+    public AuthResponseDto login(@RequestBody AuthLoginDto login, HttpServletRequest request) {
         try {
-            return authService.login(login);
+            return authService.login(login, request);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
+    }
+
+    /** Cierra la sesión activa en el servidor (el token deja de ser válido). */
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(HttpServletRequest request) {
+        authService.logout(request.getHeader("Authorization"));
     }
 
     @GetMapping("/me")

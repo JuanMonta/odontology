@@ -1,11 +1,24 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { AuthApiService } from '../services/auth-api.service';
 import { APP_ROUTES } from '../../../core/config/app-routes';
 import { UiPassChecklistComponent } from '../../../shared/ui/ui-pass-checklist/ui-pass-checklist.component';
 
 type AccesoModo = 'login' | 'recuperar' | 'forzado';
+
+/** Formatea un timestamp ISO a "DD/MM/YYYY HH:MM" local (aviso de sesión reemplazada). */
+function formatearFecha(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) {
+    return iso;
+  }
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${dd}/${mm}/${d.getFullYear()} ${hh}:${min}`;
+}
 
 /**
  * Acceso del personal. Tres modos sobre el mismo tablero:
@@ -31,6 +44,9 @@ export class LoginPageComponent implements OnInit {
   error: string | null = null;
   okMsg: string | null = null;
 
+  /** Aviso de que esta estación fue reemplazada por otro equipo (sesión única). */
+  avisoReemplazo: string | null = null;
+
   recUsername = '';
   recCodigo = '';
   recNueva = '';
@@ -45,12 +61,22 @@ export class LoginPageComponent implements OnInit {
     private auth: AuthStore,
     private authApi: AuthApiService,
     private router: Router,
+    private route: ActivatedRoute,
     private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) {
       this.router.navigate([APP_ROUTES.dashboard]);
+      return;
+    }
+    const q = this.route.snapshot.queryParamMap;
+    if (q.get('motivo') === 'reemplazada') {
+      const cuando = q.get('cuando');
+      this.avisoReemplazo =
+        'TU SESIÓN SE CERRÓ PORQUE INICIASTE SESIÓN EN OTRO EQUIPO' +
+        (cuando ? ` EL ${formatearFecha(cuando)}` : '');
+      this.cdr.markForCheck();
     }
   }
 

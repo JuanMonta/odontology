@@ -176,6 +176,13 @@
   animation: error-in 0.22s var(--ease-out);
 }
 
+.notice--reemplazo {
+  color: var(--amber);
+  border-color: rgba(255, 176, 32, 0.4);
+  background: rgba(255, 176, 32, 0.08);
+  animation: error-in 0.22s var(--ease-out);
+}
+
 .field {
   display: flex;
   flex-direction: column;

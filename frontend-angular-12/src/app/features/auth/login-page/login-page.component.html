@@ -20,6 +20,10 @@
     </header>
 
     <div class="board-body">
+      <p *ngIf="avisoReemplazo" class="notice notice--reemplazo" role="alert">
+        {{ avisoReemplazo }}
+      </p>
+
       <!-- ══════════ MODO LOGIN ══════════ -->
       <div *ngIf="modo === 'login'">
         <div>

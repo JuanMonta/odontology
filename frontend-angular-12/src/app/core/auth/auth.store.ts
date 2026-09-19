@@ -112,6 +112,15 @@ export class AuthStore {
     this.user$.next(null);
   }
 
+  /** Salida completa: invalida la sesión en el servidor y limpia el cliente. */
+  salir(): void {
+    const t = this.token;
+    if (t) {
+      this.authApi.logout().toPromise().catch(() => undefined);
+    }
+    this.logout();
+  }
+
   refrescar(usuario: Usuario): void {
     localStorage.setItem(USER_KEY, JSON.stringify(usuario));
     this.user$.next(usuario);

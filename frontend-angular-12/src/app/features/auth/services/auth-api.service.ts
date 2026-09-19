@@ -28,6 +28,11 @@ export class AuthApiService {
     return this.http.get<Usuario>(`${API_BASE}/auth/me`);
   }
 
+  /** Cierra la sesión activa en el servidor (el JWT deja de ser válido). */
+  logout(): Observable<void> {
+    return this.http.post<void>(`${API_BASE}/auth/logout`, {});
+  }
+
   /** Canje self-service del código de un solo uso por una clave nueva. */
   reestablecerClave(username: string, codigo: string, nuevaClave: string): Observable<void> {
     return this.http.post<void>(
