@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Emisor/validador de JWT HS256 sin dependencias externas.
@@ -32,16 +33,21 @@ public final class JwtUtil {
     }
 
     public String create(String subject, String name, String rol, long ttlMillis) {
-        return create(subject, name, rol, "", ttlMillis);
+        return create(subject, name, rol, "", ttlMillis, UUID.randomUUID().toString());
     }
 
     public String create(String subject, String name, String rol, String perms, long ttlMillis) {
+        return create(subject, name, rol, perms, ttlMillis, UUID.randomUUID().toString());
+    }
+
+    public String create(String subject, String name, String rol, String perms, long ttlMillis, String jti) {
         long now = Instant.now().getEpochSecond();
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", subject);
         claims.put("name", name);
         claims.put("rol", rol);
         claims.put("perms", perms == null ? "" : perms);
+        claims.put("jti", jti == null ? "" : jti);
         claims.put("iat", now);
         claims.put("exp", now + ttlMillis / 1000);
         String payload = Base64.getUrlEncoder().withoutPadding()

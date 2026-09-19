@@ -3,6 +3,7 @@ package api.config;
 import api.entities.Usuario;
 import api.repositories.UsuarioRepository;
 import api.security.JwtUtil;
+import api.services.SesionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
@@ -46,6 +47,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtUtil jwtUtil;
     private final UsuarioRepository usuarioRepository;
+    private final SesionService sesionService;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -93,9 +95,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     return false;
                 }
                 try {
-                    String codigo = (String) jwtUtil.parse(token).get("sub");
+                    Map<String, Object> claims = jwtUtil.parse(token);
+                    String codigo = (String) claims.get("sub");
+                    String jti = (String) claims.get("jti");
                     Usuario usuario = usuarioRepository.findById(codigo).orElse(null);
-                    if (usuario == null || !"activo".equals(usuario.getEstado())) {
+                    boolean sesionVigente = jti != null && !jti.isBlank()
+                            && sesionService.esValida(codigo, jti);
+                    if (usuario == null || !"activo".equals(usuario.getEstado()) || !sesionVigente) {
                         return false;
                     }
                     attributes.put("usuario", usuario);

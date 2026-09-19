@@ -202,7 +202,7 @@ export class MainLayoutComponent {
 
   onLogout(): void {
     this.close();
-    this.auth.logout();
+    this.auth.salir();
     // Recarga completa: descarta las cachés de los servicios singleton y cierra el WebSocket.
     window.location.assign(APP_ROUTES.login);
   }

@@ -25,6 +25,7 @@ import { ReauthService } from './reauth.service';
 @Injectable()
 export class AuthErrorInterceptor implements HttpInterceptor {
   private readonly promptAbierto = new Set<string>();
+  private redirigidoPorReemplazo = false;
 
   constructor(
     private readonly auth: AuthStore,
@@ -38,14 +39,36 @@ export class AuthErrorInterceptor implements HttpInterceptor {
       catchError((err: HttpErrorResponse) => {
         const esApi = req.url.startsWith(API_BASE);
         const esLogin = req.url.includes('/auth/login');
+        const esLogout = req.url.includes('/auth/logout');
         const sesionActiva = this.auth.isLoggedIn();
         const enLogin = this.router.url.startsWith(APP_ROUTES.login);
-        if (err.status === 401 && esApi && !esLogin && sesionActiva && !enLogin) {
+        if (err.status === 401 && esApi && !esLogin && !esLogout && sesionActiva && !enLogin) {
+          if (this.esSesionReemplazada(err)) {
+            return this.bouncePorReemplazo(err);
+          }
           return this.relogin(req, err);
         }
         return throwError(err);
       })
     );
+  }
+
+  /** La sesión vigente pasó a otra estación: no hay prompt de reingreso (sería
+   *  un bucle); se limpia la sesión y se vuelve al login con el aviso. */
+  private esSesionReemplazada(err: HttpErrorResponse): boolean {
+    if (this.redirigidoPorReemplazo) {
+      return false;
+    }
+    return !!(err.error && typeof err.error === 'object' && (err.error as { error?: string }).error === 'SESION_REEMPLAZADA');
+  }
+
+  private bouncePorReemplazo(err: HttpErrorResponse): Observable<HttpEvent<unknown>> {
+    this.redirigidoPorReemplazo = true;
+    this.auth.logout();
+    const cuando = (err.error as { reemplazadaEn?: string })?.reemplazadaEn ?? '';
+    const q = cuando ? `&cuando=${encodeURIComponent(cuando)}` : '';
+    window.location.assign(`${APP_ROUTES.login}?motivo=reemplazada${q}`);
+    return throwError(err);
   }
 
   private relogin(req: HttpRequest<unknown>, err: HttpErrorResponse): Observable<HttpEvent<unknown>> {
