@@ -20,6 +20,7 @@ import {
 } from '../../../../core/models/chat.model';
 import { ChatHttpService } from '../../services/chat-http.service';
 import { ChatSocketService } from '../../services/chat-socket.service';
+import { ImageCompressorService } from '../../services/image-compressor.service';
 
 type PresenciaEstacion = 'online' | 'mixta' | 'offline';
 
@@ -80,6 +81,7 @@ nuevoMensaje = '';
     private readonly chat: ChatHttpService,
     private readonly socket: ChatSocketService,
     private readonly auth: AuthStore,
+    private readonly compresor: ImageCompressorService,
     private readonly cdr: ChangeDetectorRef
   ) {
     this.miCodigo = this.auth.usuario?.code ?? '';
@@ -399,20 +401,25 @@ nuevoMensaje = '';
     if (!file || !this.activa || this.subiendoAdjunto) {
       return;
     }
+    const convId = this.activa.id;
     this.subiendoAdjunto = true;
     this.adjuntoError = null;
     this.cdr.markForCheck();
-    this.chat.subirAdjunto(this.activa.id, file).subscribe({
-      next: adjunto => {
-        this.subiendoAdjunto = false;
-        this.pendiente = adjunto;
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.subiendoAdjunto = false;
-        this.adjuntoError = 'NO SE PUDO SUBIR EL ARCHIVO';
-        this.cdr.markForCheck();
-      }
+    // Compresión ANTES de subir: las imágenes se escalan/re-codifican en el
+    // navegador (calidad 0.82, máx. 1600px) y llegan al backend ya livianas.
+    this.compresor.comprimir(file).then(archivo => {
+      this.chat.subirAdjunto(convId, archivo).subscribe({
+        next: adjunto => {
+          this.subiendoAdjunto = false;
+          this.pendiente = adjunto;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.subiendoAdjunto = false;
+          this.adjuntoError = 'NO SE PUDO SUBIR EL ARCHIVO';
+          this.cdr.markForCheck();
+        }
+      });
     });
   }
 
