@@ -1,5 +1,43 @@
 /**
- * Base URL del backend REST de la clínica (Spring Boot, server.port=8000).
- * En producción se puede sobreescribir vía /assets/config o variable de entorno.
+ * Base URL del backend REST de la clínica (Spring Boot).
+ * Descubrimiento 4 canales: 1) memoria (localStorage saas_api_base) ->
+ * 2) matriz 8001-8010 + 8100-8900 step 100 en 192.68.1.2 (+ localhost para simular) ->
+ * 3) QR (GET /api/v1/server/qr) -> 4) manual (diálogo IP:puerto).
+ * El valor se resuelve en runtime; API_BASE es solo el default para build.
  */
-export const API_BASE = 'http://localhost:8000/api/v1';
+const STORAGE_KEY = 'saas_api_base';
+const DEFAULT_BASE = 'http://localhost:8000/api/v1';
+
+function readStored(): string | null {
+  try { return localStorage.getItem(STORAGE_KEY); } catch { return null; }
+}
+
+// `let` (no `const`): los imports son live bindings, asi que al reasignarlo
+// durante el arranque (APP_INITIALIZER) todos los servicios que lo usan en sus
+// metodos pasan a apuntar al puerto real del servidor.
+export let API_BASE: string = (() => {
+  try {
+    const qp = new URLSearchParams(window.location.search).get('apiBase');
+    if (qp) { localStorage.setItem(STORAGE_KEY, qp); return qp; }
+  } catch {}
+  return readStored() || DEFAULT_BASE;
+})();
+
+/** Re-lee la base persistida y actualiza el live binding. */
+export function refrescarApiBase(): string {
+  const v = readStored();
+  if (v) { API_BASE = v; }
+  return API_BASE;
+}
+
+export function getApiBase(): string {
+  try {
+    const v = localStorage.getItem(STORAGE_KEY);
+    return v || API_BASE;
+  } catch { return API_BASE; }
+}
+export function setApiBase(base: string): void {
+  try { localStorage.setItem(STORAGE_KEY, base); } catch {}
+}
+export const MATRIZ_PUERTOS = [8001,8002,8003,8004,8005,8006,8007,8008,8009,8010,8100,8200,8300,8400,8500,8600,8700,8800,8900];
+export const IP_SIMULADA = '192.68.1.2';

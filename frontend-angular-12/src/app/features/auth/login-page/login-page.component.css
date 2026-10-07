@@ -64,6 +64,11 @@
   min-width: 0;
 }
 
+/* Empuja el indicador de conexion al extremo derecho del tablero */
+.board-head app-backend-status {
+  margin-left: auto;
+}
+
 .brand-name {
   font-family: var(--font-flap);
   font-weight: 500;

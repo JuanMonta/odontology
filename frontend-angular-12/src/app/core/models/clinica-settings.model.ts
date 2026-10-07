@@ -1,4 +1,4 @@
-export type ConfigSection = 'clinica' | 'agenda' | 'sistema' | 'roles';
+export type ConfigSection = 'clinica' | 'agenda' | 'sistema' | 'roles' | 'respaldo';
 
 export interface ClinicaSettings {
   nombre: string;

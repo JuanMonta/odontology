@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/reestablecer-clave",
-                                "/api/v1/auth/cambiar-clave", "/api/v1/health", "/error").permitAll()
+                                "/api/v1/auth/cambiar-clave", "/api/v1/health", "/api/v1/server/info", "/api/v1/server/qr", "/error").permitAll()
                         .requestMatchers("/ws/**").authenticated()
                         // ── RBAC · matriz rol_permiso (JwtAuthFilter carga authorities
                         //    frescas por petición; el front solo refleja, nunca autoriza).
@@ -69,6 +69,8 @@ public class SecurityConfig {
                         .hasAuthority("USU_SUSPENDER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/*/generar-codigo-recuperacion",
                                 "/api/v1/usuarios/*/resetear-clave").hasAuthority("USU_EDITAR")
+                        // Respaldos — solo SUPER_ADMIN (ver RespaldoController)
+                        .requestMatchers("/api/v1/respaldos/**").hasAuthority("SUPER_ADMIN")
                         // Configuración
                         .requestMatchers(HttpMethod.GET, "/api/v1/configuracion").hasAuthority("CFG_VER")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/configuracion").hasAuthority("CFG_EDITAR")
@@ -167,7 +169,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://127.0.0.1:4200", "http://192.68.1.2:4200", "http://192.68.1.2:8001", "http://192.68.1.2:8002", "http://192.68.1.2:8003", "http://192.68.1.2:8004", "http://192.68.1.2:8005", "http://192.68.1.2:8006", "http://192.68.1.2:8007", "http://192.68.1.2:8008", "http://192.68.1.2:8009", "http://192.68.1.2:8010"));
+        config.setAllowedOriginPatterns(List.of("http://192.68.1.2:*", "http://localhost:*", "http://127.0.0.1:*", "capacitor://*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

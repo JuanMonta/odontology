@@ -28,7 +28,15 @@ export class ConfiguracionPageComponent implements OnDestroy {
   }
 
   seccionesVisibles(): ConfigSectionMeta[] {
-    return this.sections.filter(s => s.id !== 'roles' || this.auth.tienePermiso('ROLES_GESTIONAR'));
+    return this.sections.filter(s => {
+      if (s.id === 'roles') return this.auth.tienePermiso('ROLES_GESTIONAR');
+      if (s.id === 'respaldo') return this.auth.esSuperAdmin();
+      return true;
+    });
+  }
+
+  esSuperAdmin(): boolean {
+    return this.auth.esSuperAdmin();
   }
 
   ngOnDestroy(): void {
