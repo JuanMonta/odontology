@@ -8,6 +8,7 @@ import api.entities.Tratamiento;
 import api.repositories.CategoriaRepository;
 import api.repositories.TratamientoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +59,17 @@ public class CategoriasService {
                 .nombre(nombre)
                 .activo(true)
                 .build();
-        CategoriaDto creada = toDto(categoriaRepository.save(categoria));
+        CategoriaDto creada;
+    try {
+        // saveAndFlush: fuerza el INSERT dentro del try para capturar la violacion
+        // de unicidad. Con save() el flush se difiere al commit y escapa al catch.
+        creada = toDto(categoriaRepository.saveAndFlush(categoria));
+    } catch (DataIntegrityViolationException e) {
+        // Carrera: varias peticiones pasaron el findByNombre() y la constraint
+        // uq_categorias_tratamientos_nombre decide cual gana. Se traduce a 409,
+        // no a 500, para que el cliente pueda mostrar "ya existe".
+        throw conflicto("LA CATEGORÍA YA EXISTE: " + nombre);
+    }
         snapshots.registrar(CatalogSnapshotService.ENTIDAD_CATEGORIA, creada.code(),
                 CatalogSnapshotService.ACCION_CREAR, null, nombre, null);
         return creada;
@@ -79,7 +90,13 @@ public class CategoriasService {
         String anterior = categoria.getNombre();
         categoria.setNombre(nombre);
         categoria.setActivo(dto.activo());
-        CategoriaDto actualizada = toDto(categoriaRepository.save(categoria));
+        CategoriaDto actualizada;
+        try {
+            // Misma carrera que en add(): la constraint decide, y se traduce a 409
+            actualizada = toDto(categoriaRepository.saveAndFlush(categoria));
+        } catch (DataIntegrityViolationException e) {
+            throw conflicto("LA CATEGORÍA YA EXISTE: " + nombre);
+        }
         if (!anterior.equals(nombre)) {
             snapshots.registrar(CatalogSnapshotService.ENTIDAD_CATEGORIA, categoria.getCodigo(),
                     CatalogSnapshotService.ACCION_RENOMBRAR, anterior, nombre, null);

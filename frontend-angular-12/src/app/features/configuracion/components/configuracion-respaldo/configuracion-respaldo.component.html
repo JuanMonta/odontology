@@ -1,0 +1,65 @@
+<div class="respaldo">
+  <div class="respaldo-head">
+    <div class="respaldo-kicker">SEGURIDAD · SOLO SUPERADMIN</div>
+    <h3 class="respaldo-title">RESPALDO DE BASE DE DATOS</h3>
+    <p class="respaldo-desc">
+      Genera un dump consistente (<code>mariadb-dump --single-transaction</code>) con el usuario
+      <code>saas_backup</code> (solo-lectura). El archivo se guarda en el servidor
+      (<code>app.backup.output-dir</code>) y queda listo para descargar. El script
+      <code>database/scripts/respaldar_db_cifrado.bat</code> queda como plan B sin app.
+    </p>
+  </div>
+
+  <div class="respaldo-form">
+    <ui-field label="USUARIO DE RESPALDO" sub="por defecto saas_backup · tomado de application-local.yaml si se deja vacío">
+      <input class="field-input" type="text" [(ngModel)]="backupUser" name="backupUser" placeholder="saas_backup" autocomplete="off" />
+    </ui-field>
+    <ui-field label="CLAVE DE RESPALDO" sub="si se deja vacía usa DB_BACKUP_PASSWORD del servidor">
+      <input class="field-input" type="password" [(ngModel)]="backupPass" name="backupPass" placeholder="••••••••" autocomplete="off" />
+    </ui-field>
+  </div>
+
+  <div class="respaldo-actions">
+    <ui-button (click)="generar()" [disabled]="cargando">
+      {{ cargando ? 'GENERANDO…' : 'GENERAR RESPALDO AHORA' }}
+    </ui-button>
+    <span class="respaldo-hint">Solo superadmin · usa saas_backup (no toca datos)</span>
+  </div>
+
+  <!-- Estado asíncrono: el worker no bloquea la BD ni el hilo HTTP -->
+  <div class="respaldo-progress" *ngIf="cargando && job" role="status" aria-live="polite">
+    <div class="progress-bar"><div class="progress-fill" [style.width.%]="progreso"></div></div>
+    <div class="progress-msg">{{ mensaje }} — {{ progreso }}%</div>
+    <div class="progress-hint">El respaldo corre en segundo plano (no bloquea la BD). No cierres esta sección.</div>
+  </div>
+
+  <div class="respaldo-result" *ngIf="job && job.estado === 'COMPLETADO'" role="status">
+    <div class="result-ok">
+      <span class="result-lamp" aria-hidden="true"></span>
+      {{ job.mensaje }} — {{ job.archivo }} ({{ job.bytes | number }} bytes)
+    </div>
+    <div class="result-meta">
+      <span>bind-address: {{ job.bindAddress || '—' }}</span>
+      <span *ngIf="job.advertencia" class="result-warn">{{ job.advertencia }}</span>
+    </div>
+    <ui-button (click)="descargar()">DESCARGAR .SQL</ui-button>
+  </div>
+
+  <div class="respaldo-result is-failed" *ngIf="job && job.estado === 'FALLADO'" role="alert">
+    <div class="result-warn">FALLO: {{ job.error || job.mensaje }}</div>
+  </div>
+
+  <p class="form-error" *ngIf="error" role="alert">{{ error }}</p>
+
+  <div class="respaldo-qr">
+    <div class="qr-head">
+      <span class="qr-kicker">CONEXIÓN LAN · QR</span>
+      <span class="qr-hint">Escanea con tablet/móvil para conectar esta estación sin teclear IP</span>
+    </div>
+    <img [src]="qrSrc" alt="QR del servidor" width="160" height="160" (error)="qrSrc = ''" *ngIf="qrSrc" />
+    <span class="qr-url" *ngIf="qrSrc">{{ qrSrc }}</span>
+    <ui-button *ngIf="!qrSrc" (click)="cargarQr()">MOSTRAR QR</ui-button>
+  </div>
+
+  <app-conexion-manual></app-conexion-manual>
+</div>

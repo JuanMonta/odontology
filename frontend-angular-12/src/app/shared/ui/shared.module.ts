@@ -10,6 +10,7 @@ import { UiFieldComponent } from './ui-field/ui-field.component';
 import { UiCatActComponent } from './ui-cat-act/ui-cat-act.component';
 import { UiCatCardComponent } from './ui-cat-card/ui-cat-card.component';
 import { UiPassChecklistComponent } from './ui-pass-checklist/ui-pass-checklist.component';
+import { BackendStatusComponent } from '../components/backend-status/backend-status.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,10 @@ import { UiPassChecklistComponent } from './ui-pass-checklist/ui-pass-checklist.
     UiFieldComponent,
     UiCatActComponent,
     UiCatCardComponent,
-    UiPassChecklistComponent
+    UiPassChecklistComponent,
+    // Declarado AQUI (no en MainLayoutModule) para que el login pueda mostrar el
+    // estado de conexion antes de autenticarse; AuthModule ya importa SharedModule.
+    BackendStatusComponent
   ],
   imports: [CommonModule],
   exports: [
@@ -35,7 +39,8 @@ import { UiPassChecklistComponent } from './ui-pass-checklist/ui-pass-checklist.
     UiFieldComponent,
     UiCatActComponent,
     UiCatCardComponent,
-    UiPassChecklistComponent
+    UiPassChecklistComponent,
+    BackendStatusComponent
   ]
 })
 export class SharedModule { }

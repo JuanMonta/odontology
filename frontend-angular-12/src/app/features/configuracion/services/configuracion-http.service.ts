@@ -10,7 +10,8 @@ export const CONFIG_SECTIONS: ConfigSectionMeta[] = [
   { id: 'clinica', label: 'DATOS DEL CONSULTORIO', sub: 'IDENTIDAD Y CONTACTO' },
   { id: 'agenda', label: 'AGENDA Y HORARIOS', sub: 'JORNADA Y TURNOS' },
   { id: 'sistema', label: 'SISTEMA Y NOTIFICACIONES', sub: 'PREFERENCIAS DEL MÓDULO' },
-  { id: 'roles', label: 'ROLES DE ACCESO', sub: 'CATÁLOGO DE ROLES' }
+  { id: 'roles', label: 'ROLES DE ACCESO', sub: 'CATÁLOGO DE ROLES' },
+  { id: 'respaldo', label: 'RESPALDO DE BD', sub: 'SEGURIDAD · SOLO SUPERADMIN' }
 ];
 
 /**

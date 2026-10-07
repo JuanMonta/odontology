@@ -7,14 +7,19 @@ import { ConfiguracionPageComponent } from './pages/configuracion-page/configura
 import { ConfiguracionSectionsComponent } from './components/configuracion-sections/configuracion-sections.component';
 import { ConfiguracionPanelComponent } from './components/configuracion-panel/configuracion-panel.component';
 import { ConfiguracionRolesComponent } from './components/configuracion-roles/configuracion-roles.component';
+import { ConfiguracionRespaldoComponent } from './components/configuracion-respaldo/configuracion-respaldo.component';
+import { ConexionManualComponent } from '../../shared/components/conexion-manual/conexion-manual.component';
 
 @NgModule({
   declarations: [
     ConfiguracionPageComponent,
     ConfiguracionSectionsComponent,
     ConfiguracionPanelComponent,
-    ConfiguracionRolesComponent
+    ConfiguracionRolesComponent,
+    ConfiguracionRespaldoComponent,
+    ConexionManualComponent
   ],
+  // ConexionManualComponent is declared in AppModule (global), not here
   imports: [CommonModule, FormsModule, ConfiguracionRoutingModule, SharedModule],
   exports: [ConfiguracionPageComponent]
 })

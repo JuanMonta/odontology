@@ -1,0 +1,30 @@
+<div class="conexion-manual">
+  <div class="cm-kicker">CONEXIÓN AL SERVIDOR · 4 CANALES</div>
+  <h3 class="cm-title">CONECTAR ESTACIÓN AL SERVIDOR</h3>
+  <p class="cm-desc">
+    Canales: 1) memoria (último que funcionó) → 2) matriz 8001-8010 + 8100-8900 → 3) QR → 4) manual.
+    Si ningún canal automático funciona, ingresa IP y puerto del servidor.
+  </p>
+
+  <div class="cm-qr" *ngIf="qrUrl">
+    <img [src]="qrUrl" alt="QR del servidor" width="180" height="180" />
+    <span class="cm-qr-hint">Escanea con tu tablet/móvil para conectar</span>
+  </div>
+
+  <div class="cm-form">
+    <ui-field label="IP DEL SERVIDOR" sub="por defecto 192.68.1.2 (simulada)">
+      <input class="field-input" [(ngModel)]="ip" name="ip" placeholder="192.68.1.2" />
+    </ui-field>
+    <ui-field label="PUERTO" sub="8001-8010 o 8100-8900">
+      <input class="field-input" [(ngModel)]="puerto" name="puerto" placeholder="8001" />
+    </ui-field>
+  </div>
+  <div class="cm-preview">Vista previa: <code>{{ apiPreview }}</code></div>
+
+  <div class="cm-actions">
+    <ui-button (click)="probar()" [disabled]="probando">{{ probando ? 'PROBANDO…' : 'PROBAR CONEXIÓN' }}</ui-button>
+    <ui-button (click)="escanearMatriz()" [disabled]="probando">ESCANEAR MATRIZ</ui-button>
+    <ui-button (click)="guardar()" [disabled]="probando">GUARDAR Y RECARGAR</ui-button>
+  </div>
+  <p class="cm-msg" *ngIf="mensaje" role="status">{{ mensaje }}</p>
+</div>

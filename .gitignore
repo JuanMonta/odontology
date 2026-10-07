@@ -19,6 +19,8 @@ AGENTS.md
 /frontend-angular-12/tmp/
 /frontend-angular-12/.angular/
 /frontend-angular-12/coverage/
+# Perfiles de navegador de las estaciones (.chrome-estacion-N)
+.chrome-estacion-*
 /frontend-angular-12/.env
 /frontend-angular-12/.env.*
 !/frontend-angular-12/.env.example
@@ -30,10 +32,16 @@ AGENTS.md
 /spring_backend/logs/
 /spring_backend/run_backend.bat
 /spring_backend/src/main/resources/application-local.yaml
+/spring_backend/backups/
+# Respaldos generados en la raiz: BACKUP_DIR=./backups es relativo al CWD del jar
+/backups/
 
 # ---------- Tools ----------
 /database
 /tools
+*.bat
+*.ps1
+*.cs
 
 # ---------- Tests ----------
 /test-results

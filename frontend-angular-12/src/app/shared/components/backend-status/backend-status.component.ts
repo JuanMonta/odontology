@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import {
   BackendStatus,
   BackendStatusService
-} from '../../../../core/services/backend-status.service';
+} from '../../../core/services/backend-status.service';
 
 @Component({
   selector: 'app-backend-status',

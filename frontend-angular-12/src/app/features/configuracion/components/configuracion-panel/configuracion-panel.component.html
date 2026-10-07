@@ -5,8 +5,9 @@
   [showClose]="false"
 >
   <app-configuracion-roles *ngIf="section === 'roles'"></app-configuracion-roles>
+  <app-configuracion-respaldo *ngIf="section === 'respaldo'"></app-configuracion-respaldo>
 
-  <form class="form" *ngIf="section !== 'roles'" (ngSubmit)="onSubmit()" novalidate>
+  <form class="form" *ngIf="section !== 'roles' && section !== 'respaldo'" (ngSubmit)="onSubmit()" novalidate>
     <!-- DATOS DEL CONSULTORIO -->
     <div class="form-grid" *ngIf="section === 'clinica'">
       <ui-field label="NOMBRE DEL CONSULTORIO" [required]="true" [full]="true">
@@ -195,7 +196,7 @@
     <p class="form-error" *ngIf="error" role="alert">NOMBRE Y RUC SON OBLIGATORIOS</p>
   </form>
 
-  <div panelActions class="panel-actions" *ngIf="section !== 'roles'">
+  <div panelActions class="panel-actions" *ngIf="section !== 'roles' && section !== 'respaldo'">
     <ui-button (click)="onSubmit()">GUARDAR CAMBIOS</ui-button>
   </div>
 </ui-panel>
