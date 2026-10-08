@@ -35,7 +35,7 @@
   font-family: var(--font-ui);
   font-size: var(--fs-label);
   letter-spacing: 0;
-  color: var(--steel-500);
+  color: var(--steel-400);
 }
 
 .fld-chars--warn {

@@ -480,7 +480,9 @@
 }
 
 .fld-chars {
-  font-size: 0.94em;
+  /* Hereda 0.66em (--fs-micro) del .fld-label; 1.12em lo lleva a 0.74em,
+     el valor de --fs-caption, token que styles.css reserva para contadores. */
+  font-size: 1.12em;
   font-weight: 500;
   letter-spacing: 0;
   color: var(--steel-400);

@@ -6,7 +6,23 @@
  * El valor se resuelve en runtime; API_BASE es solo el default para build.
  */
 const STORAGE_KEY = 'saas_api_base';
-const DEFAULT_BASE = 'http://localhost:8000/api/v1';
+
+/**
+ * Puertos que sondea el descubrimiento (canal 2 de ServerDiscoveryService) y
+ * que ademas consume el selector de conexion manual. Unica fuente de verdad:
+ * no debe repetirse en otros archivos ni salirse de esta lista.
+ */
+export const MATRIZ_PUERTOS = [
+  8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010,
+  8100, 8200, 8300, 8400, 8500, 8600, 8700, 8800, 8900
+];
+
+/**
+ * Fallback del build: solo se usa cuando el descubrimiento aun no corrio y no
+ * hay `saas_api_base` persistida. Se deriva del primer puerto de la matriz para
+ * que no pueda divergir de lo que la app realmente sondea.
+ */
+const DEFAULT_BASE = `http://localhost:${MATRIZ_PUERTOS[0]}/api/v1`;
 
 function readStored(): string | null {
   try { return localStorage.getItem(STORAGE_KEY); } catch { return null; }
@@ -39,5 +55,4 @@ export function getApiBase(): string {
 export function setApiBase(base: string): void {
   try { localStorage.setItem(STORAGE_KEY, base); } catch {}
 }
-export const MATRIZ_PUERTOS = [8001,8002,8003,8004,8005,8006,8007,8008,8009,8010,8100,8200,8300,8400,8500,8600,8700,8800,8900];
 export const IP_SIMULADA = '192.68.1.2';
