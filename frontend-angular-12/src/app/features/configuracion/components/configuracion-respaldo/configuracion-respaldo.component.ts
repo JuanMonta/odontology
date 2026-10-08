@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
-import { RespaldoService, RespaldoJob } from '../../services/respaldo.service';
+import { RespaldoService, RespaldoJob, RespaldoRequest } from '../../services/respaldo.service';
+import { getApiBase } from '../../../../core/config/api.config';
 
 @Component({
   selector: 'app-configuracion-respaldo',
@@ -20,9 +21,10 @@ export class ConfiguracionRespaldoComponent implements OnDestroy {
   constructor(private respaldo: RespaldoService, private cdr: ChangeDetectorRef) {}
 
   cargarQr(): void {
-    // QR único "Analibio" — URL LAN del servidor para escaneo móvil
-    const base = (localStorage.getItem('saas_api_base') || 'http://192.68.1.2:8001/api/v1');
-    this.qrSrc = `${base.replace(/\/api\/v1\/?$/,'')}/api/v1/server/qr`;
+    // QR único "Analibio" — URL LAN del servidor para escaneo móvil. La base ya
+    // la fijó el descubrimiento en runtime (puerto dinámico).
+    const base = getApiBase();
+    this.qrSrc = `${base.replace(/\/api\/v1\/?$/, '')}/api/v1/server/qr`;
   }
 
   ngOnDestroy(): void { this.limpiarPoll(); }
@@ -32,7 +34,7 @@ export class ConfiguracionRespaldoComponent implements OnDestroy {
     this.error = null;
     this.job = null;
     this.cdr.markForCheck();
-    const body: any = {};
+    const body: RespaldoRequest = {};
     if (this.backupUser.trim()) body.username = this.backupUser.trim();
     if (this.backupPass) body.password = this.backupPass;
     this.respaldo.crear(body).subscribe({

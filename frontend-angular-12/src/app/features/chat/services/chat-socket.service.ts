@@ -3,10 +3,14 @@ import { Client, IMessage } from '@stomp/stompjs';
 import * as SockJS from 'sockjs-client';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { AuthStore } from '../../../core/auth/auth.store';
+import { getApiBase } from '../../../core/config/api.config';
 import { ClinicMessage } from '../../../core/models/message.model';
 import { ChatMensaje, ChatPresencia } from '../../../core/models/chat.model';
 
-const WS_BASE = 'http://localhost:8000/ws';
+/** Deriva `http://host:puerto/ws` de la base REST ya descubierta en runtime. */
+function wsBase(): string {
+  return getApiBase().replace(/\/api\/v1\/?$/, '') + '/ws';
+}
 
 interface TypingEvent {
   codigo: string;
@@ -61,7 +65,7 @@ export class ChatSocketService implements OnDestroy {
     if (this.clients > 1 || this.client.active || !this.auth.token) {
       return;
     }
-    this.client.webSocketFactory = () => new SockJS(`${WS_BASE}?token=${encodeURIComponent(this.auth.token!)}`);
+    this.client.webSocketFactory = () => new SockJS(`${wsBase()}?token=${encodeURIComponent(this.auth.token!)}`);
     this.client.onConnect = () => {
       this.connected$.next(true);
       this.client.subscribe('/topic/presencia', (msg: IMessage) => {

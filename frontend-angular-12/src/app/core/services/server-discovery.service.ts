@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { refrescarApiBase } from '../config/api.config';
+import { refrescarApiBase, MATRIZ_PUERTOS, IP_SIMULADA } from '../config/api.config';
 
 const STORAGE_KEY = 'saas_api_base';
-const DEFAULT_IP = '192.68.1.2';
-export const MATRIZ_PUERTOS = [8001,8002,8003,8004,8005,8006,8007,8008,8009,8010,8100,8200,8300,8400,8500,8600,8700,8800,8900];
 
 @Injectable({ providedIn: 'root' })
 export class ServerDiscoveryService {
@@ -47,7 +45,7 @@ export class ServerDiscoveryService {
     }
     // Luego la IP LAN del servidor
     for (const port of MATRIZ_PUERTOS) {
-      const cand = `http://${DEFAULT_IP}:${port}/api/v1`;
+      const cand = `http://${IP_SIMULADA}:${port}/api/v1`;
       if (await this.probar(cand)) return this.usar(cand);
     }
     // Canal 3 y 4 requieren interacción (QR scan / input manual) -> el caller muestra el diálogo
@@ -112,7 +110,7 @@ export class ServerDiscoveryService {
     }
     for (const port of MATRIZ_PUERTOS) {
       if (!sobraTiempo()) return null;
-      const cand = `http://${DEFAULT_IP}:${port}/api/v1`;
+      const cand = `http://${IP_SIMULADA}:${port}/api/v1`;
       if (await this.probar(cand, 900)) return cand;
     }
     return null;
@@ -134,7 +132,7 @@ export class ServerDiscoveryService {
   }
 
   qrUrl(base?: string): string {
-    const b = base || this.apiBase || `http://${DEFAULT_IP}:8001/api/v1`;
+    const b = base || this.apiBase || `http://${IP_SIMULADA}:${MATRIZ_PUERTOS[0]}/api/v1`;
     return `${b}/server/qr`;
   }
 }
