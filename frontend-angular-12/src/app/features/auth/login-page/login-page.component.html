@@ -42,7 +42,10 @@
               type="text"
               name="username"
               [(ngModel)]="username"
-              autocomplete="username"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
               placeholder="CÓDIGO DEL PERSONAL"
             />
           </label>
@@ -54,7 +57,8 @@
               type="password"
               name="password"
               [(ngModel)]="password"
-              autocomplete="current-password"
+              autocomplete="new-password"
+              spellcheck="false"
               placeholder="CLAVE DE ACCESO"
             />
           </label>
@@ -89,7 +93,10 @@
               type="text"
               name="rec-username"
               [(ngModel)]="recUsername"
-              autocomplete="username"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
               placeholder="CÓDIGO DEL PERSONAL"
             />
           </label>

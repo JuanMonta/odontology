@@ -10,6 +10,7 @@ import { JwtInterceptor } from './core/auth/jwt.interceptor';
 import { AuthErrorInterceptor } from './core/auth/auth-error.interceptor';
 import { ReauthModalComponent } from './core/auth/reauth-modal/reauth-modal.component';
 import { ServerDiscoveryService } from './core/services/server-discovery.service';
+import { DesktopGuardService } from './core/services/desktop-guard.service';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,15 @@ import { ServerDiscoveryService } from './core/services/server-discovery.service
       provide: APP_INITIALIZER,
       useFactory: (descubrimiento: ServerDiscoveryService) => () => descubrimiento.inicializar(),
       deps: [ServerDiscoveryService],
+      multi: true
+    },
+    // Apaga los comportamientos de navegador (menu contextual, zoom, arrastre de
+    // archivos) antes de que se pinte la primera vista, para que la estacion se
+    // sienta como una aplicacion de escritorio y no como una pestana mas.
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (guard: DesktopGuardService) => () => guard.instalar(),
+      deps: [DesktopGuardService],
       multi: true
     }
   ],
