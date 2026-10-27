@@ -9,7 +9,7 @@
   gap: 16px;
   width: 100%;
   padding: 10px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(var(--veil-rgb), 0.06);
   flex-shrink: 0;
 }
 
@@ -39,8 +39,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(var(--veil-rgb), 0.04);
+  border: 1px solid rgba(var(--veil-rgb), 0.08);
   border-radius: 4px;
   font-family: var(--font-flap);
   font-size: var(--fs-label);
@@ -50,8 +50,8 @@
 }
 
 .pager-btn:hover:not(:disabled) {
-  background: rgba(255, 176, 32, 0.1);
-  border-color: rgba(255, 176, 32, 0.35);
+  background: rgba(var(--accent-rgb), 0.1);
+  border-color: rgba(var(--accent-rgb), 0.35);
   color: var(--flap-ink);
 }
 
@@ -83,8 +83,8 @@
 }
 
 .pager-size select {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(var(--veil-rgb), 0.05);
+  border: 1px solid rgba(var(--veil-rgb), 0.1);
   border-radius: 4px;
   color: var(--steel-200);
   font-family: var(--font-flap);

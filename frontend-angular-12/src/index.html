@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="carta">
 
 <head>
   <meta charset="utf-8">
@@ -17,9 +17,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Oswald:wght@300;400;500;600&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   >
+  <script>
+    (function () {
+      var tema = 'carta';
+      try {
+        var guardado = localStorage.getItem('saas.clinica.tema');
+        if (guardado === 'carta' || guardado === 'clinica' || guardado === 'concourse') {
+          tema = guardado;
+        }
+      } catch (e) {
+        // almacenamiento no disponible: tema por defecto
+      }
+      document.documentElement.setAttribute('data-theme', tema);
+    })();
+  </script>
 </head>
 
 <body>

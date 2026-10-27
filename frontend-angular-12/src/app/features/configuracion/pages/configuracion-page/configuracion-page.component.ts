@@ -21,7 +21,10 @@ export class ConfiguracionPageComponent implements OnDestroy {
   private readonly savedFlag = new BehaviorSubject<boolean>(false);
   private savedReset: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private service: ConfiguracionHttpService, private auth: AuthStore) {
+  constructor(
+    private service: ConfiguracionHttpService,
+    private auth: AuthStore
+  ) {
     this.settings$ = this.service.settings$;
     this.activeSection$ = this.activeSection.asObservable();
     this.saved$ = this.savedFlag.asObservable();

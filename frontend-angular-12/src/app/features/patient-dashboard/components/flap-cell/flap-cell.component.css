@@ -27,7 +27,7 @@
   right: 0;
   height: 50%;
   overflow: hidden;
-  background: linear-gradient(180deg, #1c2128 0%, #151a20 52%, #101419 100%);
+  background: linear-gradient(180deg, var(--t-plate-3) 0%, var(--t-plate-2) 52%, var(--t-plate-0) 100%);
 }
 
 .half-top { top: 0; border-radius: 3px 3px 0 0; }
@@ -86,7 +86,7 @@
 
 .overlay-top {
   top: 0;
-  background: linear-gradient(180deg, #232932 0%, #1b2129 55%, #141920 100%);
+  background: linear-gradient(180deg, var(--t-plate-4) 0%, var(--t-plate-3) 55%, var(--t-plate-2) 100%);
   transform: rotateX(90deg);
   transform-origin: bottom;
   border-radius: 3px 3px 0 0;
@@ -94,7 +94,7 @@
 
 .overlay-bottom {
   bottom: 0;
-  background: linear-gradient(180deg, #1a2027 0%, #13181d 55%, #0e1216 100%);
+  background: linear-gradient(180deg, var(--t-plate-3) 0%, var(--t-plate-2) 55%, var(--t-plate-0) 100%);
   transform: rotateX(-90deg);
   transform-origin: top;
   border-radius: 0 0 3px 3px;

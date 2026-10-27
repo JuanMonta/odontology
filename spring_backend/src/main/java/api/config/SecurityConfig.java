@@ -1,5 +1,6 @@
 package api.config;
 
+import api.security.ClientGateFilter;
 import api.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import jakarta.servlet.http.HttpServletResponse;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,6 +41,22 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final ClientGateFilter clientGateFilter;
+
+    /**
+     * El portero de clientes se agrega a la cadena de seguridad, no como filtro
+     * de servlet suelto: aqui corre ANTES de JwtAuthFilter y, sobre todo, antes
+     * de los endpoints permitAll (login/health), que de otro modo quedarian
+     * abiertos a un navegador comun. El registro automatico de Spring Boot se
+     * desactiva para no ejecutarlo dos veces.
+     */
+    @Bean
+    public org.springframework.boot.web.servlet.FilterRegistrationBean<ClientGateFilter> registroPortero() {
+        org.springframework.boot.web.servlet.FilterRegistrationBean<ClientGateFilter> registro =
+                new org.springframework.boot.web.servlet.FilterRegistrationBean<>(clientGateFilter);
+        registro.setEnabled(false);
+        return registro;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,6 +65,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/favicon.ico").permitAll()
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/reestablecer-clave",
                                 "/api/v1/auth/cambiar-clave", "/api/v1/health", "/api/v1/server/info", "/api/v1/server/qr", "/error").permitAll()
                         .requestMatchers("/ws/**").authenticated()
@@ -162,7 +186,8 @@ public class SecurityConfig {
                     response.getWriter().write(
                             "{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Sesion invalida o expirada\"}");
                 }))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(clientGateFilter, JwtAuthFilter.class);
         return http.build();
     }
 
@@ -170,7 +195,16 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:4200", "http://127.0.0.1:4200", "http://192.68.1.2:4200", "http://192.68.1.2:8001", "http://192.68.1.2:8002", "http://192.68.1.2:8003", "http://192.68.1.2:8004", "http://192.68.1.2:8005", "http://192.68.1.2:8006", "http://192.68.1.2:8007", "http://192.68.1.2:8008", "http://192.68.1.2:8009", "http://192.68.1.2:8010"));
-        config.setAllowedOriginPatterns(List.of("http://192.68.1.2:*", "http://localhost:*", "http://127.0.0.1:*", "capacitor://*"));
+        // Ademas de localhost y la IP simulada, se aceptan las IP reales de este
+        // equipo: una estacion en la LAN abre http://<ip-lan>:4200 y su Origin
+        // debe estar permitido o el navegador bloquea hasta /health, y la app
+        // muestra SIN CONEXION aunque el backend este arriba.
+        List<String> patronesOrigen = new ArrayList<>(List.of(
+                "http://192.68.1.2:*", "http://localhost:*", "http://127.0.0.1:*", "capacitor://*"));
+        for (String ip : ipsLocales()) {
+            patronesOrigen.add("http://" + ip + ":*");
+        }
+        config.setAllowedOriginPatterns(patronesOrigen);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -178,5 +212,25 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
+    }
+
+    /** IPv4 de las interfaces activas de este equipo (sin loopback ni link-local). */
+    private static List<String> ipsLocales() {
+        List<String> ips = new ArrayList<>();
+        try {
+            for (NetworkInterface nic : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                if (!nic.isUp() || nic.isLoopback()) {
+                    continue;
+                }
+                for (InetAddress dir : Collections.list(nic.getInetAddresses())) {
+                    if (dir instanceof Inet4Address && !dir.isLoopbackAddress() && !dir.isLinkLocalAddress()) {
+                        ips.add(dir.getHostAddress());
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            // Sin interfaces legibles se sigue con localhost + IP simulada
+        }
+        return ips;
     }
 }

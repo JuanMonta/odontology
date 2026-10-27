@@ -52,7 +52,7 @@
   font-size: var(--fs-label);
   color: var(--flap-ink);
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   transition: border-color 0.18s var(--ease-out);
 }
@@ -82,7 +82,7 @@
   letter-spacing: 0.14em;
   color: var(--steel-400);
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: color 0.18s var(--ease-out), border-color 0.18s var(--ease-out), background 0.18s var(--ease-out);
@@ -94,8 +94,8 @@
 
 .seg-btn.is-active {
   color: var(--flap-ink);
-  background: rgba(255, 176, 32, 0.1);
-  border-color: rgba(255, 176, 32, 0.45);
+  background: rgba(var(--accent-rgb), 0.1);
+  border-color: rgba(var(--accent-rgb), 0.45);
 }
 
 .form-error {
@@ -135,14 +135,14 @@
   letter-spacing: 0.14em;
   color: var(--steel-300);
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(var(--veil-rgb), 0.16);
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
 .btn-ghost:hover {
   color: var(--flap-ink);
-  border-color: rgba(255, 176, 32, 0.5);
+  border-color: rgba(var(--accent-rgb), 0.5);
 }
 
 @media (max-width: 480px) {

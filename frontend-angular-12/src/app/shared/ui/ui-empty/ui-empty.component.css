@@ -14,7 +14,7 @@
   align-items: center;
   gap: 6px;
   padding: 18px 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.14);
+  border: 1px dashed rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   font-family: var(--font-flap);
   text-align: center;
@@ -48,8 +48,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #262d35 0%, #181d23 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, var(--t-plate-4) 0%, var(--t-plate-2) 100%);
+  border: 1px solid rgba(var(--veil-rgb), 0.12);
   border-radius: var(--radius-sm);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }

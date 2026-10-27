@@ -1,29 +1,225 @@
 /* ============================================================
-   SAS Odontología — Panel del consultorio (split-flap concourse)
-   Global tokens. Componentes heredan estos valores.
+   SAS Odontología — sistema de temas
+   ------------------------------------------------------------
+   Capa 1: tokens semánticos (--t-*). Una sola fuente de verdad.
+   Capa 2: tema activo. `data-theme="carta"` (defecto) o
+           `data-theme="concourse"`, escrito en <html>.
+   Capa 3: alias heredados (--steel-*, --flap-*, --amber...), que
+           apuntan a la capa 1 para que los componentes existentes
+           sigan funcionando sin tocarlos.
+
+   Para añadir un tema: duplicar un bloque `:root[data-theme="..."]`
+   con los tokens de la capa 1 y, si necesita cambios estructurales,
+   un archivo en src/themes/. Nada más.
    ============================================================ */
 
+/* ---------- Capa 1: tokens semánticos ----------
+   Valores por defecto = tema "carta" (clínico, claro). */
 :root {
-  /* Board — matte black flap faces */
-  --flap-black: #0b0d0f;
-  --flap-black-2: #14171b;
-  --flap-raised: #1c2026;
-  --flap-ink: #f1f3f5;
-  --flap-dim: #868e97;
-  --flap-seam: rgba(0, 0, 0, 0.72);
+  /* Superficies */
+  --t-bg: #e9f1ee;
+  --t-bg-deep: #dcebe6;
+  --t-surface: #ffffff;
+  --t-surface-2: #f4f9f7;
+  --t-surface-3: #e8f2ef;
+  --t-overlay: rgba(16, 35, 58, 0.42);
 
-  /* Brushed steel chrome */
-  --steel-950: #191d21;
-  --steel-900: #20252a;
-  --steel-800: #272d34;
-  --steel-700: #31383f;
-  --steel-600: #454d56;
-  --steel-500: #8b949e;
-  --steel-400: #9aa3ad;
-  --steel-300: #a8b0b8;
-  --steel-200: #d2d6db;
-  --steel-100: #e9ebee;
-  --steel-brushed: linear-gradient(
+  /* Escala de placas para los componentes migrados a tokens:
+     0 = fondo más hundido · 1 = tarjeta · 6 = borde/control elevado. */
+  --t-plate-0: #e9f1ee;
+  --t-plate-1: #ffffff;
+  --t-plate-2: #f5faf8;
+  --t-plate-3: #eef6f3;
+  --t-plate-4: #e4f0eb;
+  --t-plate-5: #d9eae4;
+  --t-plate-6: #c6ddd6;
+
+  /* Verde menta: bandas de sección y chips suaves, como el papel clínico
+     con la franja de disponibilidad resaltada. */
+  --t-mint: #dff0eb;
+  --t-mint-band: #f2f8f6;
+  --t-line: #d3e4de;
+
+  /* Shell: barra superior y rail de navegación. */
+  --t-topbar: #ffffff;
+  --t-shell: #10233a;
+
+  /* Tripletes RGB: permiten conservar la transparencia original
+     en rgba(var(--x-rgb), α) y cambiar solo el color con el tema. */
+  --veil-rgb: 16, 35, 58;
+  --accent-rgb: 15, 118, 110;
+  --ok-rgb: 15, 118, 110;
+  --err-rgb: 180, 35, 24;
+  --scrim-rgb: 16, 35, 58;
+
+  /* Texto */
+  --t-text: #10233a;
+  --t-text-2: #24384d;
+  --t-text-3: #3e5468;
+  --t-text-muted: #5c6b7a;
+  --t-text-faint: #6e7d8c;
+
+  /* Bordes */
+  --t-border-strong: #accac1;
+  --t-seam: rgba(16, 35, 58, 0.12);
+
+  /* Acento */
+  --t-accent: #0f766e;
+  --t-accent-bright: #12a08f;
+  --t-accent-ink: #ffffff;
+  --t-accent-soft: rgba(15, 118, 110, 0.1);
+  --t-accent-line: rgba(15, 118, 110, 0.42);
+
+  /* Estados */
+  --t-ok: #0f766e;
+  --t-ok-soft: rgba(15, 118, 110, 0.1);
+  --t-info: #1d4ed8;
+  --t-info-soft: rgba(29, 78, 216, 0.09);
+  --t-warn: #b45309;
+  --t-warn-soft: rgba(180, 83, 9, 0.1);
+  --t-danger: #b42318;
+  --t-danger-soft: rgba(180, 35, 24, 0.09);
+
+  /* Metales (chrome del shell) */
+  --t-brushed: linear-gradient(180deg, #0f766e 0%, #0b5a54 100%);
+  --t-brushed-dark: linear-gradient(90deg, #10233a 0%, #17334f 100%);
+
+  /* Type */
+  --font-flap: 'Barlow Semi Condensed', 'Segoe UI', system-ui, sans-serif;
+  --font-ui: 'Barlow', 'Segoe UI', system-ui, sans-serif;
+
+  /* Shape */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 9px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --flip-ease: cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* ---------- Capa 2: tema "clínica" (azul de recepción) ----------
+   Mismo mundo que "carta" — papel claro y densidad de historia clínica —
+   con la paleta de recepción: blanco, azul de marca y franjas celestes.
+   Comparte la capa estructural de `src/themes/carta.css`. */
+:root[data-theme='clinica'] {
+  --t-bg: #cfe2f9;
+  --t-bg-deep: #bcd4f2;
+  --t-surface: #ffffff;
+  --t-surface-2: #eef5fe;
+  --t-surface-3: #dbe9fb;
+  --t-overlay: rgba(12, 30, 60, 0.42);
+
+  --t-plate-0: #cfe2f9;
+  --t-plate-1: #ffffff;
+  --t-plate-2: #f4f9ff;
+  --t-plate-3: #e3eefd;
+  --t-plate-4: #dbeafb;
+  --t-plate-5: #cddff7;
+  --t-plate-6: #aec8e8;
+
+  /* Franja celeste: reemplaza a la menta de "carta". */
+  --t-mint: #d3e5fd;
+  --t-mint-band: #e3eefd;
+  --t-line: #bad2f0;
+
+  /* Shell azul: rail profundo y barra superior con velo celeste. */
+  --t-topbar: #e7f0fe;
+  --t-shell: #123a86;
+
+  --veil-rgb: 12, 30, 60;
+  --accent-rgb: 29, 95, 216;
+  --ok-rgb: 15, 118, 110;
+  --err-rgb: 180, 35, 24;
+  --scrim-rgb: 12, 30, 60;
+
+  --t-text: #0b1e38;
+  --t-text-2: #1f3552;
+  --t-text-3: #3a5274;
+  --t-text-muted: #5a6f8c;
+  --t-text-faint: #78899f;
+
+  --t-border-strong: #a6c0e2;
+  --t-seam: rgba(12, 30, 60, 0.12);
+
+  --t-accent: #1d5fd8;
+  --t-accent-bright: #2e7bf6;
+  --t-accent-ink: #ffffff;
+  --t-accent-soft: rgba(29, 95, 216, 0.1);
+  --t-accent-line: rgba(29, 95, 216, 0.42);
+
+  /* Estados: el verde sigue siendo "atendido" y el ámbar "retraso". */
+  --t-ok: #0f766e;
+  --t-ok-soft: rgba(15, 118, 110, 0.1);
+  --t-info: #0369a1;
+  --t-info-soft: rgba(3, 105, 161, 0.09);
+  --t-warn: #b45309;
+  --t-warn-soft: rgba(180, 83, 9, 0.1);
+  --t-danger: #b42318;
+  --t-danger-soft: rgba(180, 35, 24, 0.09);
+
+  --t-brushed: linear-gradient(180deg, #1d5fd8 0%, #1649a8 100%);
+  --t-brushed-dark: linear-gradient(90deg, #0b1e38 0%, #16304f 100%);
+}
+
+/* ---------- Capa 2: tema "concourse" (tablero split-flap) ----------
+   Valores originales, intactos: el tema alterno conserva el diseño
+   actual carácter por carácter. */
+:root[data-theme='concourse'] {
+  --t-bg: #191d21;
+  --t-bg-deep: #0b0d0f;
+  --t-surface: #20252a;
+  --t-surface-2: #272d34;
+  --t-surface-3: #31383f;
+  --t-overlay: rgba(0, 0, 0, 0.55);
+
+  /* Placas: valores originales del tablero, sin cambios. */
+  --t-plate-0: #0c0f12;
+  --t-plate-1: #14181d;
+  --t-plate-2: #181d23;
+  --t-plate-3: #1c2229;
+  --t-plate-4: #232930;
+  --t-plate-5: #333c46;
+  --t-plate-6: #4f5b67;
+
+  --veil-rgb: 255, 255, 255;
+  --accent-rgb: 255, 176, 32;
+  --ok-rgb: 86, 181, 127;
+  --err-rgb: 207, 90, 84;
+  --scrim-rgb: 0, 0, 0;
+
+  /* Tokens propios de "carta": en el tablero conservan el gris acero. */
+  --t-mint: #1c2229;
+  --t-mint-band: #20252a;
+  --t-line: #31383f;
+  --t-accent-bright: #ffb020;
+  --t-topbar: #20252a;
+  --t-shell: #0b0d0f;
+
+  --t-text: #f1f3f5;
+  --t-text-2: #d2d6db;
+  --t-text-3: #a8b0b8;
+  --t-text-muted: #8b949e;
+  --t-text-faint: #9aa3ad;
+
+  --t-border-strong: #454d56;
+  --t-seam: rgba(0, 0, 0, 0.72);
+
+  --t-accent: #ffb020;
+  --t-accent-ink: #0b0d0f;
+  --t-accent-soft: rgba(255, 176, 32, 0.16);
+  --t-accent-line: rgba(255, 176, 32, 0.45);
+
+  --t-ok: #56b57f;
+  --t-ok-soft: rgba(86, 181, 127, 0.12);
+  --t-info: #8b949e;
+  --t-info-soft: rgba(139, 148, 158, 0.12);
+  --t-warn: #ffb020;
+  --t-warn-soft: rgba(255, 176, 32, 0.12);
+  --t-danger: #cf5a54;
+  --t-danger-soft: rgba(207, 90, 84, 0.12);
+
+  --t-brushed: linear-gradient(
     105deg,
     #d9dce0 0%,
     #b6bcc3 18%,
@@ -33,7 +229,7 @@
     #9ea6af 84%,
     #cfd4d9 100%
   );
-  --steel-brushed-dark: linear-gradient(
+  --t-brushed-dark: linear-gradient(
     105deg,
     #3a4149 0%,
     #2a3037 22%,
@@ -43,17 +239,45 @@
     #1f252b 100%
   );
 
-  /* Signals */
-  --amber: #ffb020;
-  --amber-soft: rgba(255, 176, 32, 0.16);
-  --amber-line: rgba(255, 176, 32, 0.45);
-  --red-dim: #cf5a54;
-  --red-dim-soft: rgba(207, 90, 84, 0.12);
-  --green: #56b57f;
-
-  /* Type */
   --font-flap: 'Oswald', 'Arial Narrow', 'Segoe UI', sans-serif;
   --font-ui: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* ---------- Capa 3: alias heredados ----------
+   Los componentes usan estos nombres desde antes del sistema de
+   temas. Se resuelven contra la capa 1, así que un tema nuevo los
+   cambia todos de una vez. No añadir valores aquí. */
+:root {
+  --flap-black: var(--t-bg-deep);
+  --flap-black-2: var(--t-bg-deep);
+  --flap-raised: var(--t-surface-2);
+  --flap-ink: var(--t-text);
+  --flap-dim: var(--t-text-muted);
+  --flap-seam: var(--t-seam);
+
+  --steel-950: var(--t-bg);
+  --steel-900: var(--t-surface);
+  --steel-800: var(--t-surface-2);
+  --steel-700: var(--t-surface-3);
+  --steel-600: var(--t-border-strong);
+  --steel-500: var(--t-text-muted);
+  --steel-400: var(--t-text-faint);
+  --steel-300: var(--t-text-3);
+  --steel-200: var(--t-text-2);
+  --steel-100: var(--t-text);
+  --steel-brushed: var(--t-brushed);
+  --steel-brushed-dark: var(--t-brushed-dark);
+
+  --amber: var(--t-accent);
+  --amber-soft: var(--t-accent-soft);
+  --amber-line: var(--t-accent-line);
+  --red-dim: var(--t-danger);
+  --red-dim-soft: var(--t-danger-soft);
+  --green: var(--t-ok);
 
   /* Type scale — única fuente de tamaños. Los componentes heredan estos
      tokens; el ajuste por usuario multiplica la base sin tocarlos. */
@@ -65,15 +289,6 @@
   --fs-caption: 0.74em;   /* ayudas, subtítulos, contadores */
   --fs-micro: 0.66em;     /* códigos y metadatos mínimos */
   --fs-metric: 1.3em;     /* valores numéricos destacados */
-
-  /* Shape */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-
-  /* Motion */
-  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --flip-ease: cubic-bezier(0.4, 0, 0.6, 1);
 }
 
 *,
@@ -358,4 +573,50 @@ p {
     size: A4;
     margin: 14mm;
   }
+}
+
+/* ============================================================
+   Cambio de tema: el tema entrante se revela con un círculo que
+   se expande desde el control pulsado. El servicio escribe
+   --tema-x / --tema-y / --tema-r y lanza la View Transition.
+   ============================================================ */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-image-pair(root) {
+  isolation: auto;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+  animation: tema-revelar 1240ms cubic-bezier(0.45, 0.05, 0.25, 1) both;
+}
+
+@keyframes tema-revelar {
+  from {
+    clip-path: circle(0px at var(--tema-x, 50%) var(--tema-y, 0px));
+  }
+  to {
+    clip-path: circle(var(--tema-r, 150vmax) at var(--tema-x, 50%) var(--tema-y, 0px));
+  }
+}
+
+/* Sin View Transitions: fundido corto de colores, sin desplazamientos. */
+html.tema-fundido,
+html.tema-fundido * {
+  transition:
+    background-color 380ms var(--ease-out),
+    border-color 380ms var(--ease-out),
+    color 380ms var(--ease-out),
+    fill 380ms var(--ease-out),
+    stroke 380ms var(--ease-out),
+    box-shadow 380ms var(--ease-out) !important;
 }

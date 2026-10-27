@@ -58,7 +58,7 @@
   gap: 12px;
   padding: 14px;
   background: var(--flap-black-2);
-  border: 1px solid rgba(255, 176, 32, 0.3);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
   border-radius: var(--radius-sm);
 }
 
@@ -68,7 +68,7 @@
   letter-spacing: 0.14em;
   color: var(--amber);
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(255, 176, 32, 0.18);
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.18);
 }
 
 .evo-grid {
@@ -97,7 +97,7 @@
   letter-spacing: 0.06em;
   color: var(--flap-ink);
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
 }
 
@@ -148,14 +148,14 @@
   letter-spacing: 0.14em;
   color: var(--steel-300);
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(var(--veil-rgb), 0.16);
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
 .evo-btn-ghost:hover {
   color: var(--flap-ink);
-  border-color: rgba(255, 176, 32, 0.5);
+  border-color: rgba(var(--accent-rgb), 0.5);
 }
 
 .evo-select {
@@ -185,7 +185,7 @@
 .evo-list {
   display: flex;
   flex-direction: column;
-  border-top: 1px solid rgba(255, 255, 255, 0.055);
+  border-top: 1px solid rgba(var(--veil-rgb), 0.055);
 }
 
 .evo-row {
@@ -194,7 +194,7 @@
   gap: 14px;
   align-items: start;
   padding: 12px 2px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  border-bottom: 1px solid rgba(var(--veil-rgb), 0.055);
 }
 
 .evo-date {

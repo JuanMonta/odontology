@@ -3,8 +3,8 @@
   align-items: baseline;
   gap: 12px;
   padding: 10px 14px;
-  background: rgba(255, 176, 32, 0.06);
-  border: 1px solid rgba(255, 176, 32, 0.25);
+  background: rgba(var(--accent-rgb), 0.06);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
   border-radius: var(--radius-sm);
 }
 
@@ -36,7 +36,7 @@
   letter-spacing: 0.14em;
   color: var(--steel-400);
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: color 0.18s var(--ease-out), border-color 0.18s var(--ease-out), background 0.18s var(--ease-out);
@@ -48,8 +48,8 @@
 
 .seg-btn.is-active {
   color: var(--flap-ink);
-  background: rgba(255, 176, 32, 0.1);
-  border-color: rgba(255, 176, 32, 0.45);
+  background: rgba(var(--accent-rgb), 0.1);
+  border-color: rgba(var(--accent-rgb), 0.45);
 }
 
 /* ============ Consultorios: chips y botón agregar ============ */
@@ -74,7 +74,7 @@
   gap: 9px;
   padding: 10px 12px;
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: border-color 0.18s var(--ease-out), background 0.18s var(--ease-out);
@@ -82,11 +82,11 @@
 
 .equip-chip.is-on {
   border-color: var(--amber-line);
-  background: rgba(255, 176, 32, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
 }
 
 .equip-chip:hover {
-  border-color: rgba(255, 176, 32, 0.45);
+  border-color: rgba(var(--accent-rgb), 0.45);
 }
 
 .equip-input {
@@ -106,7 +106,7 @@
 
 .equip-chip.is-on .equip-lamp {
   background: var(--amber);
-  box-shadow: 0 0 7px 1px rgba(255, 176, 32, 0.45);
+  box-shadow: 0 0 7px 1px rgba(var(--accent-rgb), 0.45);
 }
 
 .equip-name {
@@ -154,7 +154,7 @@
 }
 
 .equip-chip.is-disabled:hover {
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(var(--veil-rgb), 0.14);
 }
 
 .equip-add {
@@ -167,14 +167,14 @@
   letter-spacing: 0.12em;
   color: var(--amber);
   background: transparent;
-  border: 1px dashed rgba(255, 176, 32, 0.55);
+  border: 1px dashed rgba(var(--accent-rgb), 0.55);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background 0.18s var(--ease-out), border-color 0.18s var(--ease-out);
 }
 
 .equip-add:hover {
-  background: rgba(255, 176, 32, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
   border-color: var(--amber-line);
 }
 
@@ -198,7 +198,7 @@
 .picker-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(10, 13, 18, 0.66);
+  background: rgba(var(--scrim-rgb), 0.66);
   backdrop-filter: blur(3px);
   animation: picker-backdrop-in 0.18s var(--ease-out);
 }
@@ -216,7 +216,7 @@
   display: flex;
   flex-direction: column;
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-md);
   outline: none;
   overflow: hidden;
@@ -266,7 +266,7 @@
 
 .picker-close:hover {
   color: var(--flap-ink);
-  border-color: rgba(255, 176, 32, 0.45);
+  border-color: rgba(var(--accent-rgb), 0.45);
 }
 
 .icon-x {
@@ -297,7 +297,7 @@
   font-size: 0.82em;
   color: var(--flap-ink);
   background: var(--steel-800);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   transition: border-color 0.18s var(--ease-out);
 }
@@ -338,7 +338,7 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 14px 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(var(--veil-rgb), 0.08);
 }
 
 @media (max-width: 480px) {

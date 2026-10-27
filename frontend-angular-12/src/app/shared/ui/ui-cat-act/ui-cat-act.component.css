@@ -9,7 +9,7 @@
   letter-spacing: 0.1em;
   color: var(--amber);
   background: transparent;
-  border: 1px dashed rgba(255, 176, 32, 0.55);
+  border: 1px dashed rgba(var(--accent-rgb), 0.55);
   border-radius: var(--radius-sm);
   cursor: pointer;
   white-space: nowrap;
@@ -17,13 +17,13 @@
 }
 
 .cat-act:hover {
-  background: rgba(255, 176, 32, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
   border-color: var(--amber-line);
   color: var(--flap-ink);
 }
 
 .cat-act.is-open {
-  background: rgba(255, 176, 32, 0.12);
+  background: rgba(var(--accent-rgb), 0.12);
   border-color: var(--amber-line);
   border-style: solid;
 }
