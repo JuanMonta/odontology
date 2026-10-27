@@ -41,7 +41,7 @@
   letter-spacing: 0.1em;
   color: var(--steel-200);
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: color 0.18s var(--ease-out), border-color 0.18s var(--ease-out);
@@ -53,8 +53,8 @@
 
 .day.is-on {
   color: var(--flap-ink);
-  border-color: rgba(255, 176, 32, 0.55);
-  background: rgba(255, 176, 32, 0.07);
+  border-color: rgba(var(--accent-rgb), 0.55);
+  background: rgba(var(--accent-rgb), 0.07);
 }
 
 .day-lamp {
@@ -66,7 +66,7 @@
 
 .day.is-on .day-lamp {
   background: var(--amber);
-  box-shadow: 0 0 6px 1px rgba(255, 176, 32, 0.45);
+  box-shadow: 0 0 6px 1px rgba(var(--accent-rgb), 0.45);
 }
 
 /* ============ Toggles ============ */
@@ -106,7 +106,7 @@
   gap: 14px;
   padding: 14px 16px;
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(var(--veil-rgb), 0.08);
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
@@ -122,7 +122,7 @@
 
 .toggle-lamp.is-on {
   background: var(--green);
-  box-shadow: 0 0 8px 1px rgba(86, 181, 127, 0.5);
+  box-shadow: 0 0 8px 1px rgba(var(--ok-rgb), 0.5);
 }
 
 .toggle-info {
@@ -166,9 +166,10 @@
   font-family: var(--font-flap);
   font-size: var(--fs-label);
   letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--steel-300);
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: color 0.18s var(--ease-out), border-color 0.18s var(--ease-out), background 0.18s var(--ease-out);
@@ -176,11 +177,12 @@
 
 .seg-btn.is-active {
   color: var(--flap-ink);
-  background: rgba(255, 176, 32, 0.1);
-  border-color: rgba(255, 176, 32, 0.45);
+  background: rgba(var(--accent-rgb), 0.1);
+  border-color: rgba(var(--accent-rgb), 0.45);
 }
 
-.tamano-block {
+.tamano-block,
+.tema-block {
   display: flex;
   flex-direction: column;
   gap: 10px;

@@ -121,7 +121,7 @@
   letter-spacing: 0.1em;
   color: var(--flap-ink);
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(var(--veil-rgb), 0.12);
   border-radius: var(--radius-sm);
   transition: border-color 0.18s var(--ease-out);
 }
@@ -157,7 +157,7 @@
   letter-spacing: 0.12em;
   color: var(--steel-200);
   background: var(--steel-900);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(var(--veil-rgb), 0.12);
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
@@ -185,8 +185,8 @@
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(120% 100% at 50% 0%, #1c2229 0%, #14181d 55%, #0c0f12 100%);
-  border: 1px solid rgba(255, 255, 255, 0.055);
+    radial-gradient(120% 100% at 50% 0%, var(--t-plate-3) 0%, var(--t-plate-1) 55%, var(--t-plate-0) 100%);
+  border: 1px solid rgba(var(--veil-rgb), 0.055);
   border-radius: var(--radius-md);
   box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.7);
   overflow: hidden;

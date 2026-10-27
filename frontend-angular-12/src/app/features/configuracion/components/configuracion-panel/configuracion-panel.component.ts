@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Observable } from 'rxjs';
 import { ClinicaSettings, ConfigSection } from '../../../../core/models/clinica-settings.model';
 import { CONFIG_SECTIONS } from '../../services/configuracion-http.service';
 import { AjusteVisualService, TamanoTexto } from '../../../../core/services/ajuste-visual.service';
+import { Tema, TemaMeta, ThemeService } from '../../../../core/services/theme.service';
 
 export const WEEKDAYS: string[] = ['LU', 'MA', 'MI', 'JU', 'VI', 'SA'];
 
@@ -24,10 +26,24 @@ export class ConfiguracionPanelComponent implements OnChanges {
     { id: 'muy-grande', label: 'MUY GRANDE' }
   ];
 
-  constructor(public readonly ajusteVisual: AjusteVisualService) {}
+  readonly temas: TemaMeta[];
+  readonly temaActual$: Observable<Tema>;
+
+  constructor(
+    public readonly ajusteVisual: AjusteVisualService,
+    private readonly temasService: ThemeService
+  ) {
+    this.temas = this.temasService.temas;
+    this.temaActual$ = this.temasService.temaActual$;
+  }
 
   fijarTamano(t: TamanoTexto): void {
     this.ajusteVisual.fijar(t);
+  }
+
+  fijarTema(t: Tema, evento?: MouseEvent): void {
+    const origen = evento ? { x: evento.clientX, y: evento.clientY } : undefined;
+    this.temasService.fijar(t, origen);
   }
 
   nombre = '';

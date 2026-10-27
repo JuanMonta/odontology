@@ -11,6 +11,7 @@ import { AuthErrorInterceptor } from './core/auth/auth-error.interceptor';
 import { ReauthModalComponent } from './core/auth/reauth-modal/reauth-modal.component';
 import { ServerDiscoveryService } from './core/services/server-discovery.service';
 import { DesktopGuardService } from './core/services/desktop-guard.service';
+import { ThemeService } from './core/services/theme.service';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,15 @@ import { DesktopGuardService } from './core/services/desktop-guard.service';
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthErrorInterceptor, multi: true },
+    // Tema visual: instancia el servicio al arrancar para que lea el tema del
+    // operador en cuanto inicia sesion. El atributo data-theme ya viene puesto
+    // por el script de index.html, asi que aqui no hay destello.
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (tema: ThemeService) => () => tema.iniciar(),
+      deps: [ThemeService],
+      multi: true
+    },
     // Resuelve la base del backend ANTES de arrancar la app: sin esto los
     // servicios usarian el puerto por defecto (8000) en vez del de la matriz.
     {

@@ -21,9 +21,9 @@
   height: auto;
   overflow: visible;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)),
+    linear-gradient(rgba(var(--veil-rgb), 0.02), rgba(var(--veil-rgb), 0.02)),
     var(--flap-black-2);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--veil-rgb), 0.07);
   border-radius: var(--radius-sm);
 }
 
@@ -63,7 +63,7 @@
 }
 
 .perio-input:focus {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--veil-rgb), 0.08);
 }
 
 g:not(.perio--off) .perio-box {
@@ -192,7 +192,7 @@ g:not(.perio--off):hover .perio-box {
   gap: 8px;
   padding: 10px 12px;
   background: var(--flap-black-2);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--veil-rgb), 0.07);
   border-radius: var(--radius-sm);
 }
 
@@ -213,7 +213,7 @@ g:not(.perio--off):hover .perio-box {
   padding: 5px 10px;
   color: var(--steel-300);
   background: var(--flap-black);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(var(--veil-rgb), 0.12);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: border-color 0.15s var(--ease-out), color 0.15s var(--ease-out), background 0.15s var(--ease-out);
@@ -226,7 +226,7 @@ g:not(.perio--off):hover .perio-box {
 
 .odo-face.is-on {
   border-color: var(--face-c);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(var(--veil-rgb), 0.06);
   color: var(--face-c);
 }
 
@@ -252,14 +252,14 @@ g:not(.perio--off):hover .perio-box {
   gap: 6px;
   padding: 10px 8px 9px;
   background: var(--flap-black-2);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--veil-rgb), 0.07);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: border-color 0.15s var(--ease-out), background 0.15s var(--ease-out);
 }
 
 .odo-tool:hover {
-  border-color: rgba(255, 176, 32, 0.45);
+  border-color: rgba(var(--accent-rgb), 0.45);
 }
 
 .odo-tool.is-active {
@@ -324,7 +324,7 @@ g:not(.perio--off):hover .perio-box {
   letter-spacing: 0.16em;
   color: var(--steel-300);
   background: var(--flap-black-2);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(var(--veil-rgb), 0.12);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: border-color 0.15s var(--ease-out), color 0.15s var(--ease-out), background 0.15s var(--ease-out);
@@ -355,7 +355,7 @@ g:not(.perio--off):hover .perio-box {
 .odo-zbtn:focus-visible,
 .odo-close:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.35);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.35);
 }
 
 .odo-tool:focus-visible,
@@ -379,7 +379,7 @@ g:not(.perio--off):hover .perio-box {
 .odonto-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(7, 8, 10, 0.78);
+  background: rgba(var(--scrim-rgb), 0.78);
   backdrop-filter: blur(3px);
   animation: odo-backdrop-in 0.18s var(--ease-out);
 }
@@ -400,9 +400,9 @@ g:not(.perio--off):hover .perio-box {
   width: min(92vw, 1600px);
   max-height: calc(100vh - 48px);
   background:
-    linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)),
+    linear-gradient(rgba(var(--veil-rgb), 0.02), rgba(var(--veil-rgb), 0.02)),
     var(--flap-black-2);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(var(--veil-rgb), 0.09);
   border-radius: var(--radius-md);
   box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   outline: none;
@@ -427,7 +427,7 @@ g:not(.perio--off):hover .perio-box {
   gap: 16px;
   padding: 12px 16px;
   background: var(--steel-950);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(var(--veil-rgb), 0.07);
   border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
@@ -451,7 +451,7 @@ g:not(.perio--off):hover .perio-box {
   letter-spacing: 0.18em;
   color: var(--steel-300);
   background: var(--steel-950);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(var(--veil-rgb), 0.07);
   text-align: center;
 }
 
@@ -475,7 +475,7 @@ g:not(.perio--off):hover .perio-box {
   justify-content: center;
   color: var(--steel-200);
   background: var(--flap-black);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: border-color 0.15s var(--ease-out), color 0.15s var(--ease-out), background 0.15s var(--ease-out);
@@ -508,7 +508,7 @@ g:not(.perio--off):hover .perio-box {
   justify-content: center;
   color: var(--steel-300);
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(var(--veil-rgb), 0.14);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: border-color 0.15s var(--ease-out), color 0.15s var(--ease-out);
@@ -533,7 +533,7 @@ g:not(.perio--off):hover .perio-box {
   flex-direction: column;
   gap: 12px;
   padding: 12px 16px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid rgba(var(--veil-rgb), 0.07);
 }
 
 .odonto-modal-foot .odo-tools {

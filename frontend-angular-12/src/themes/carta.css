@@ -1,0 +1,873 @@
+/* ============================================================
+   Capa estructural de los temas claros: "carta" y "clinica".
+   ------------------------------------------------------------
+   Solo cubre lo que los tokens no pueden: materiales, gradientes,
+   solapas que deben volverse texto plano y estados con color.
+   Las reglas de los componentes describen el tema concourse; este
+   archivo es la capa que lo reescribe. No se toca ningun
+   componente. Los selectores van prefijados con :root:is(...) para
+   ganarle a las reglas de componente que empatan en especificidad
+   y para servirlos a los dos temas claros.
+   ============================================================ */
+
+:root:is([data-theme='carta'], [data-theme='clinica']) body {
+  color: var(--t-text-2);
+  background: var(--t-bg);
+  font-family:var(--font-ui);
+  -webkit-font-smoothing:antialiased;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) ::selection {
+  background: var(--t-accent);
+  color: var(--t-accent-ink);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) :focus-visible {
+  outline:2px solid var(--t-accent);
+  outline-offset:2px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) ::-webkit-scrollbar-thumb {
+  background: var(--t-border-strong);
+  border:2px solid var(--t-bg);
+  border-radius:6px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) h1,
+:root:is([data-theme='carta'], [data-theme='clinica']) h2,
+:root:is([data-theme='carta'], [data-theme='clinica']) h3,
+:root:is([data-theme='carta'], [data-theme='clinica']) h4 {
+  font-weight:600;
+  letter-spacing:-.005em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .shell {
+  background: var(--t-bg);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .drawer {
+  background: var(--t-shell);
+  border-right:0;
+  box-shadow:18px 0 40px -28px rgba(var(--veil-rgb), 0.55);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .drawer-head {
+  border-bottom:1px solid #ffffff1f;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .brand-mark,
+:root:is([data-theme='carta'], [data-theme='clinica']) .empty-mark {
+  background: var(--t-accent);
+  border:1px solid #ffffff2e;
+  box-shadow:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .brand-cell,
+:root:is([data-theme='carta'], [data-theme='clinica']) .brand-mark-cell {
+  color: #fff;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .brand-name {
+  color: #fff;
+  letter-spacing:.04em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .brand-sub {
+  color: var(--t-text-muted);
+  letter-spacing:.12em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-kicker {
+  color: var(--t-text-muted);
+  letter-spacing:.16em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-item {
+  color: var(--t-border-strong);
+  letter-spacing:.04em;
+  font-size:.9em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-item:hover {
+  background: #ffffff12;
+  color: #fff;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-item--active {
+  background: var(--t-accent);
+  color: #fff;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-lamp {
+  background: var(--t-text-3);
+  box-shadow:none;
+  border-radius:1px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-item--active .nav-lamp {
+  background: #fff;
+  box-shadow:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-badge {
+  background: #fff;
+  color: var(--t-text);
+  border-radius:3px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .drawer-foot {
+  border-top:1px solid #ffffff1f;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .user-avatar {
+  background: var(--t-accent);
+  color: #fff;
+  border-radius:2px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .user-name {
+  color: #fff;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .user-role {
+  color: var(--t-text-muted);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .logout {
+  color: var(--t-border-strong);
+  border-color:#ffffff38;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .logout:hover {
+  color: #ffb4a8;
+  border-color:#ff8a7c99;
+  background: #ffffff0f;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .drawer-close {
+  color: var(--t-border-strong);
+  border-color:#ffffff38;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .drawer-close:hover {
+  color: #fff;
+  border-color:#ffffff80;
+  background: #ffffff14;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .backdrop {
+  background: var(--t-overlay);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .topbar {
+  background: var(--t-topbar);
+  border-bottom:1px solid var(--t-line);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .topbar-title {
+  color: var(--t-text);
+  letter-spacing:.02em;
+  font-size:1.28em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .topbar-date {
+  color: var(--t-text-muted);
+  letter-spacing:.1em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .burger {
+  border-color:var(--t-border-strong);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .burger:hover {
+  border-color:var(--t-accent);
+  background: var(--t-accent-soft);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .burger-bar,
+:root:is([data-theme='carta'], [data-theme='clinica']) .burger-bar:after,
+:root:is([data-theme='carta'], [data-theme='clinica']) .burger-bar:before {
+  background: var(--t-text-3);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn-ghost {
+  letter-spacing:.06em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast {
+  background: var(--t-surface);
+  border:1px solid var(--t-line);
+  border-left:3px solid var(--t-accent);
+  box-shadow:0 14px 34px -18px rgba(var(--veil-rgb), 0.45);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast--urgente {
+  border-left-color:var(--t-danger);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast--importante {
+  border-left-color:var(--t-warn);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast--importante .toast-lamp,
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast-lamp {
+  background: var(--t-warn);
+  box-shadow:none;
+  border-radius:1px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast--urgente .toast-lamp {
+  background: var(--t-danger);
+  box-shadow:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast-kicker {
+  color: var(--t-text-muted);
+  letter-spacing:.14em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast-subject {
+  color: var(--t-text);
+  letter-spacing:.02em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast-close,
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast-from {
+  color: var(--t-text-muted);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .toast-close:hover {
+  color: var(--t-text);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .stage {
+  background: linear-gradient(180deg,var(--t-bg),var(--t-bg-deep));
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board {
+  box-shadow:0 26px 60px -34px rgba(var(--veil-rgb), 0.5);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-head {
+  background: var(--t-surface-2);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .kicker {
+  color: var(--t-accent);
+  letter-spacing:.16em;
+  font-weight:600;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .title {
+  color: var(--t-text);
+  letter-spacing:.01em;
+  font-size:1.42em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .demo,
+:root:is([data-theme='carta'], [data-theme='clinica']) .lead {
+  color: var(--t-text-muted);
+  letter-spacing:.03em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .field-label {
+  color: var(--t-text-3);
+  letter-spacing:.08em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .field-input {
+  background: var(--t-surface);
+  color: var(--t-text);
+  border:1px solid var(--t-border-strong);
+  box-shadow:none;
+  letter-spacing:.02em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .field-input:focus {
+  border-color:var(--t-accent);
+  box-shadow:0 0 0 3px var(--t-accent-soft);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn-enter {
+  color: var(--t-accent-ink);
+  background: var(--t-accent);
+  border-color:var(--t-accent);
+  letter-spacing:.06em;
+  box-shadow:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn-enter:hover:not(:disabled) {
+  filter:brightness(1.06);
+  box-shadow:0 8px 20px -10px rgba(var(--accent-rgb), 0.6);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp {
+  background: #fff;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn-enter:disabled .lamp {
+  background: #ffffff80;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .form-link {
+  color: var(--t-text-muted);
+  border-bottom-color:var(--t-border-strong);
+  letter-spacing:.06em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .form-link:hover:not(:disabled) {
+  color: var(--t-accent);
+  border-bottom-color:var(--t-accent);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .notice {
+  color: var(--t-text-3);
+  background: var(--t-surface-2);
+  border:1px solid var(--t-line);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .notice--ok {
+  color: var(--t-ok);
+  background: var(--t-ok-soft);
+  border-color:rgba(var(--accent-rgb), 0.35);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .notice--reemplazo {
+  color: var(--t-warn);
+  background: var(--t-warn-soft);
+  border-color:#b4530959;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .error {
+  color: var(--t-danger);
+  background: var(--t-danger-soft);
+  border:1px solid #b4231852;
+  letter-spacing:.02em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .demo {
+  border-top:1px solid var(--t-surface-3);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .demo-lamp {
+  background: var(--t-ok);
+  box-shadow:none;
+  border-radius:1px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .demo-cred {
+  color: var(--t-text-2);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board {
+  background: var(--t-surface);
+  border:1px solid var(--t-line);
+  border-radius:var(--radius-md);
+  box-shadow:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board:after,
+:root:is([data-theme='carta'], [data-theme='clinica']) .board:before {
+  display:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-head {
+  border-bottom:1px solid var(--t-line);
+  padding-bottom:14px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-kicker {
+  color: var(--t-text);
+  letter-spacing:.03em;
+  font-size:1.34em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-date {
+  color: var(--t-text-muted);
+  letter-spacing:.14em;
+  font-size:.72em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-columns {
+  border-bottom:1px solid var(--t-line);
+  padding-top:10px;
+  padding-bottom:9px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .col {
+  color: var(--t-text-muted);
+  letter-spacing:.16em;
+  font-size:.76em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .patient-name {
+  color: var(--t-text);
+  letter-spacing:0;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row {
+  border-bottom:1px solid var(--t-surface-2);
+  position:relative;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row:before {
+  content:"";
+  position:absolute;
+  left:0;
+  top:8px;
+  bottom:8px;
+  width:3px;
+  border-radius:2px;
+  background: var(--t-border-strong);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--done:before {
+  background: var(--t-ok);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--arrived:before,
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--live:before {
+  background: var(--t-info);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--delayed:before {
+  background: var(--t-warn);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--cancelled:before,
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--no-show:before {
+  background: var(--t-danger);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--live {
+  background: var(--t-accent-soft);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--cancelled .patient-name,
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--no-show .patient-name {
+  color: var(--t-text-muted);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp[data-status],
+:root:is([data-theme='carta'], [data-theme='clinica']) .status .lamp {
+  box-shadow:none;
+  border-radius:1px;
+  width:6px;
+  height:6px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp[data-status=on-time] {
+  background: var(--t-border-strong);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp[data-status=arrived] {
+  background: var(--t-info);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp[data-status=boarding] {
+  background: var(--t-accent);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp[data-status=delayed] {
+  background: var(--t-warn);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp[data-status=no-show] {
+  background: var(--t-danger);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp[data-status=cancelled] {
+  background: #d1968f;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp[data-status=done] {
+  background: var(--t-ok);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .status-label {
+  letter-spacing:.12em;
+  font-size:.76em;
+  color: var(--t-text-3);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--delayed .status-label {
+  color: var(--t-warn);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--cancelled .status-label,
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--no-show .status-label {
+  color: var(--t-danger);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--live .status {
+  background: var(--t-accent-soft);
+  padding:3px 8px;
+  border-radius:var(--radius-sm);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .row--live .status-label {
+  color: var(--t-accent);
+  font-weight:600;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .cancel-btn,
+:root:is([data-theme='carta'], [data-theme='clinica']) .checkin-btn,
+:root:is([data-theme='carta'], [data-theme='clinica']) .done-btn,
+:root:is([data-theme='carta'], [data-theme='clinica']) .noshow-btn {
+  background: var(--t-surface);
+  border:1px solid var(--t-border-strong);
+  color: var(--t-text-2);
+  letter-spacing:.08em;
+  border-radius:var(--radius-sm);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .done-btn {
+  background: var(--t-accent);
+  border-color:var(--t-accent);
+  color: var(--t-accent-ink);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .checkin-btn:hover,
+:root:is([data-theme='carta'], [data-theme='clinica']) .noshow-btn:hover {
+  border-color:var(--t-accent);
+  color: var(--t-accent);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .cancel-btn:hover {
+  border-color:var(--t-danger);
+  color: var(--t-danger);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .flap-cell {
+  width:auto;
+  height:auto;
+  margin:0 .01em;
+  perspective:none;
+  border-radius:0;
+  font-size:.95em;
+  font-weight:600;
+  letter-spacing:.02em;
+  color: var(--t-text);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .flap-cell .half {
+  position:static;
+  height:auto;
+  overflow:visible;
+  background: none;
+  border-radius:0;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .flap-cell .half-bottom {
+  display:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .flap-cell .half .plate {
+  position:static;
+  height:auto;
+  display:inline;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .flap-cell .overlay,
+:root:is([data-theme='carta'], [data-theme='clinica']) .flap-cell .seam {
+  display:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .flap-text--painted {
+  color: var(--t-text-2);
+  font-family:var(--font-ui);
+  font-weight:500;
+  letter-spacing:0;
+  text-transform:none;
+  font-size:.94em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .flap-clock,
+:root:is([data-theme='carta'], [data-theme='clinica']) app-flap-clock {
+  filter:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .clock {
+  background: #0000!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .clock .flap-cell {
+  color: var(--t-text);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn {
+  color: var(--t-accent-ink);
+  background: var(--t-accent);
+  border-color:var(--t-accent);
+  letter-spacing:.06em;
+  box-shadow:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn:hover {
+  filter:brightness(1.06);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn-lg:hover {
+  box-shadow:0 8px 20px -10px rgba(var(--accent-rgb), 0.55);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn-ghost {
+  color: var(--t-text-2);
+  background: var(--t-surface);
+  border-color:var(--t-border-strong);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn-ghost:hover {
+  color: var(--t-accent);
+  border-color:var(--t-accent);
+  background: var(--t-accent-soft);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .panel-head {
+  border-bottom:1px solid var(--t-line);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .panel-kicker {
+  color: var(--t-accent);
+  letter-spacing:.18em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .panel-title {
+  color: var(--t-text);
+  letter-spacing:.02em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .icon-btn {
+  color: var(--t-text-muted);
+  border-color:var(--t-border-strong);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .icon-btn:hover {
+  color: var(--t-accent);
+  border-color:var(--t-accent);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .chip {
+  background: var(--t-surface);
+  border-color:var(--t-line);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .chip:hover {
+  border-color:var(--t-accent);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .chip-lamp {
+  background: var(--t-accent);
+  box-shadow:none;
+  border-radius:1px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .chip-name {
+  color: var(--t-text);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .chip-sub {
+  color: var(--t-text-muted);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp--on {
+  background: var(--t-accent);
+  box-shadow:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp--warn {
+  background: var(--t-danger);
+  box-shadow:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp--break {
+  background: var(--t-warn-soft);
+  border-color:var(--t-warn);
+  box-shadow:none;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .lamp {
+  border-radius:1px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .stat {
+  background: var(--t-surface);
+  border-color:var(--t-line);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .stat-value {
+  color: var(--t-text);
+  letter-spacing:.01em;
+  font-variant-numeric:tabular-nums;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .stat-label {
+  color: var(--t-text-muted);
+  letter-spacing:.12em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .empty {
+  border-color:var(--t-border-strong);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .empty-mark {
+  background: var(--t-surface-3);
+  border-color:var(--t-line);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .empty-cell {
+  color: var(--t-text-muted);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .empty-text {
+  color: var(--t-text-3);
+  letter-spacing:.04em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .empty-hint {
+  color: var(--t-text-muted);
+  letter-spacing:.02em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .empty-lamp {
+  background: var(--t-border-strong);
+  border-radius:1px;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .field-input,
+:root:is([data-theme='carta'], [data-theme='clinica']) .field-select {
+  color: var(--t-text);
+  background: var(--t-surface);
+  border:1px solid var(--t-border-strong);
+  letter-spacing:.01em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .field-input::placeholder {
+  color: var(--t-text-muted);
+  letter-spacing:.02em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .field-input:focus,
+:root:is([data-theme='carta'], [data-theme='clinica']) .field-select:focus {
+  border-color:var(--t-accent);
+  box-shadow:0 0 0 3px var(--t-accent-soft);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .panel-meta {
+  border-bottom-color:var(--t-surface-3);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .panel-actions {
+  border-top-color:var(--t-surface-3);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .meta-label {
+  color: var(--t-text-muted);
+  letter-spacing:.14em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .meta-value {
+  color: var(--t-text-2);
+  letter-spacing:.04em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .meta-value--free {
+  color: var(--t-text-muted);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .section-label {
+  color: var(--t-text-muted);
+  letter-spacing:.14em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .form-error {
+  color: var(--t-danger);
+  letter-spacing:.02em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .form-hint {
+  color: var(--t-text-muted);
+  letter-spacing:.02em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .directory,
+:root:is([data-theme='carta'], [data-theme='clinica']) .page-body>*,
+:root:is([data-theme='carta'], [data-theme='clinica']) .panel {
+  border-color:var(--t-line);
+}
+
+/* ============================================================
+   Refinamientos de la carta clínica
+   ============================================================ */
+
+/* Login: la marca vive en el encabezado blanco, no en el rail navy. */
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-head {
+  background: transparent;
+  border-bottom: 1px solid var(--t-line);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-head .brand-name {
+  color: var(--t-text);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-head .brand-sub {
+  color: var(--t-text-muted);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn-enter .lamp {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Rail: jerarquía por opacidad, no por peso. */
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-item {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-item:hover,
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-item--active {
+  color: #ffffff;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .nav-item--active {
+  background: var(--t-accent);
+}
+
+/* Tablero de la agenda: encabezado de carta, sin banda gris. */
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-head {
+  background: transparent;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .board-kicker {
+  letter-spacing: 0.06em;
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .clock,
+:root:is([data-theme='carta'], [data-theme='clinica']) .clock * {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Franja menta: el encabezado de cada panel se lee como la banda
+   de disponibilidad de una hoja clínica, no como chrome de app.
+   ============================================================ */
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .panel-head {
+  background: var(--t-mint-band);
+  border-bottom: 1px solid var(--t-line);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .panel-count.has-items {
+  background: var(--t-mint);
+  border-color: var(--t-line);
+  color: var(--t-accent);
+}
+
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn:hover,
+:root:is([data-theme='carta'], [data-theme='clinica']) .btn-enter:hover:not(:disabled) {
+  background: var(--t-accent-bright);
+}

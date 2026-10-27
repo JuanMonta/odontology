@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es" data-theme="carta">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Servidor - SaaS Clinica Odontologica</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+
+  /* Pagina informativa del servidor: diseno ESTATICO independiente del
+     frontend Angular (no importa tokens ni variables de estilo de la app).
+     Su lenguaje visual por defecto es el tema "carta clinica", el mismo que
+     arranca la aplicacion, para coherencia grafica. A diferencia del portero
+     web (mismo origen que la app), esta pagina vive en otro origen
+     (puerto API), no puede leer saas.clinica.tema del navegador: siempre
+     se muestra en carta. */
+  :root, :root[data-theme='carta'] {
+    --p-bg: #e9f1ee; --p-bg-deep: #dcebe6; --p-panel: #ffffff;
+    --p-band: #f2f8f6; --p-line: #d3e4de;
+    --p-text: #10233a; --p-muted: #5c6b7a; --p-faint: #6e7d8c;
+    --p-accent: #0f766e; --p-ok: #0f766e; --p-ok-bg: #dff0eb;
+    --p-bad: #b42318; --p-bad-bg: #fde8e6;
+    --p-note-bg: #eef4fd; --p-note-line: #1d5fd8; --p-note-text: #1f3552;
+    --p-btn-bg: #f2f8f6; --p-btn-hover: #e8f2ef;
+  }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 28px;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 20% 0%, var(--p-bg) 0%, var(--p-bg-deep) 100%);
+    color: var(--p-text);
+  }
+  main {
+    width: min(660px, 100%); background: var(--p-panel);
+    border: 1px solid var(--p-line); border-top: 4px solid var(--p-accent);
+    border-radius: 14px; padding: 30px 32px 26px;
+    box-shadow: 0 18px 40px rgba(16, 35, 58, .10);
+  }
+  .marca { font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--p-muted); font-weight: 600; }
+  h1 { margin: 14px 0 6px; font-size: 26px; letter-spacing: -.01em; }
+  .estado { display: inline-flex; align-items: center; gap: 9px; margin-top: 4px;
+    padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; }
+  .estado.ok { background: var(--p-ok-bg); color: var(--p-ok); }
+  .estado.mal { background: var(--p-bad-bg); color: var(--p-bad); }
+  .punto { width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+  p { margin: 16px 0 0; font-size: 15px; line-height: 1.55; color: var(--p-muted); }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 10px 18px; margin: 22px 0 0;
+    padding: 16px 18px; background: var(--p-band);
+    border: 1px solid var(--p-line); border-radius: 10px; font-size: 13px; }
+  dt { color: var(--p-muted); text-transform: uppercase; letter-spacing: .06em;
+    font-size: 11px; align-self: center; }
+  dd { margin: 0; font-weight: 600; color: var(--p-text);
+    font-variant-numeric: tabular-nums; word-break: break-all; }
+
+  /* Campo de la API: valor + ojito + copiar (estilo "campo de password"). */
+  .api { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .api code { font-family: Consolas, "SF Mono", Menlo, monospace; font-size: 13px;
+    font-weight: 600; color: var(--p-text); }
+  .icon-btn { display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; padding: 0; border: 1px solid var(--p-line);
+    border-radius: 7px; background: var(--p-btn-bg); color: var(--p-muted);
+    cursor: pointer; transition: background .15s, color .15s; }
+  .icon-btn:hover { background: var(--p-btn-hover); color: var(--p-text); }
+  .icon-btn svg { width: 15px; height: 15px; display: block; }
+  .icon-btn.ok { color: var(--p-ok); border-color: var(--p-ok); }
+  .copiado { font-size: 11px; color: var(--p-ok); font-weight: 700;
+    letter-spacing: .05em; text-transform: uppercase; opacity: 0;
+    transition: opacity .2s; }
+  .copiado.ver { opacity: 1; }
+
+  .aviso { margin-top: 22px; padding: 14px 16px; border-left: 3px solid var(--p-note-line);
+    background: var(--p-note-bg); border-radius: 0 8px 8px 0;
+    font-size: 13.5px; line-height: 1.5; color: var(--p-note-text); }
+  footer { margin-top: 22px; font-size: 12px; color: var(--p-faint);
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<main>
+  <div class="marca">SaaS Clinica Odontologica</div>
+  <h1 id="titulo">Servidor activo</h1>
+  <div id="estado" class="estado ok"><span class="punto"></span><span id="estado-texto">En ejecucion</span></div>
+  <p id="detalle">El servicio de la clinica esta en linea. Las estaciones de trabajo pueden iniciar sesion.</p>
+  <dl>
+    <dt>Servicio</dt><dd id="servicio">-</dd>
+    <dt>API de red</dt>
+    <dd>
+      <div class="api">
+        <code id="api-url" data-full="">-</code>
+        <button type="button" class="icon-btn" id="btn-ojo" aria-label="Mostrar u ocultar la direccion" aria-pressed="true"></button>
+        <button type="button" class="icon-btn" id="btn-copiar" aria-label="Copiar la direccion de la API"></button>
+        <span class="copiado" id="aviso-copia" role="status"></span>
+      </div>
+    </dd>
+    <dt>Verificado</dt><dd id="hora">-</dd>
+  </dl>
+  <div class="aviso">
+    Esta direccion es informativa. La aplicacion <strong>no se abre desde un navegador web</strong>:
+    use el acceso directo <strong>SaaS Clinica - Estacion</strong> instalado en el equipo de trabajo.
+  </div>
+  <footer><span>SaaS Clinica Odontologica</span><span>Se actualiza solo cada 10 s</span></footer>
+</main>
+<script>
+(function () {
+  var OCULTO = true;
+
+  var campo = document.getElementById('api-url');
+  var btnOjo = document.getElementById('btn-ojo');
+  var btnCopiar = document.getElementById('btn-copiar');
+  var avisoCopia = document.getElementById('aviso-copia');
+  var completo = '';
+
+  var iconoOjo = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  var iconoOjoCerrado = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+  var iconoCopiar = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+  var iconoCheck = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+  function enmascarar(url) {
+    try {
+      var u = new URL(url);
+      if (/^\d{1,3}(\.\d{1,3}){3}$/.test(u.hostname)) {
+        var host = u.hostname.split('.').map(function (o) {
+          return new Array(o.length + 1).join('*');
+        }).join('.');
+        return u.protocol + '//' + host + (u.port ? ':' + u.port : '') + u.pathname + u.search;
+      }
+    } catch (e) {}
+    return url;
+  }
+
+  function pintaApi() {
+    if (!completo) return;
+    campo.setAttribute('data-full', completo);
+    campo.textContent = OCULTO ? enmascarar(completo) : completo;
+  }
+
+  if (btnOjo) {
+    btnOjo.innerHTML = iconoOjo;
+    btnOjo.title = 'Mostrar la direccion completa';
+    btnOjo.addEventListener('click', function () {
+      OCULTO = !OCULTO;
+      btnOjo.innerHTML = OCULTO ? iconoOjo : iconoOjoCerrado;
+      btnOjo.setAttribute('aria-pressed', OCULTO ? 'true' : 'false');
+      btnOjo.title = OCULTO ? 'Mostrar la direccion completa' : 'Ocultar la direccion';
+      pintaApi();
+    });
+  }
+
+  function feedbackCopia(ok) {
+    btnCopiar.innerHTML = ok ? iconoCheck : iconoCopiar;
+    btnCopiar.classList.toggle('ok', ok);
+    avisoCopia.textContent = ok ? 'Copiada' : 'No se pudo copiar';
+    avisoCopia.classList.add('ver');
+    setTimeout(function () { avisoCopia.classList.remove('ver'); }, 1800);
+    setTimeout(function () {
+      btnCopiar.innerHTML = iconoCopiar;
+      btnCopiar.classList.remove('ok');
+    }, 1800);
+  }
+
+  function copiarPortapapeles(txt) {
+    var hecho = function () { feedbackCopia(true); };
+    var fallo = function () {
+      /* Fallback: la Clipboard API no existe en paginas http (no seguras). */
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (ok) { hecho(); return; }
+      } catch (e) {}
+      feedbackCopia(false);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(hecho, fallo);
+    } else {
+      fallo();
+    }
+  }
+
+  if (btnCopiar) {
+    btnCopiar.innerHTML = iconoCopiar;
+    btnCopiar.addEventListener('click', function () {
+      if (completo) copiarPortapapeles(completo);
+    });
+  }
+
+  /* Direccion real en la red: server/info (lanIp/ip que inyecta el launcher);
+     si no responde, la direccion con la que esta pagina fue servida. */
+  function urlDeRespaldo() { return location.origin + '/api/v1'; }
+  fetch('/api/v1/server/info', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (info) { completo = (info && info.apiBase) || urlDeRespaldo(); pintaApi(); })
+    .catch(function () { completo = urlDeRespaldo(); pintaApi(); });
+  setTimeout(function () { if (!completo) { completo = urlDeRespaldo(); pintaApi(); } }, 2500);
+
+  function pintar(activo, datos) {
+    var estado = document.getElementById('estado');
+    estado.className = 'estado ' + (activo ? 'ok' : 'mal');
+    document.getElementById('estado-texto').textContent = activo ? 'En ejecucion' : 'Sin conexion';
+    document.getElementById('titulo').textContent = activo ? 'Servidor activo' : 'Servidor sin respuesta';
+    document.getElementById('detalle').textContent = activo
+      ? 'El servicio de la clinica esta en linea. Las estaciones de trabajo pueden iniciar sesion.'
+      : 'No se pudo confirmar el estado del servicio. Avisa al administrador del servidor.';
+    document.getElementById('servicio').textContent = (datos && datos.service) || '-';
+    document.getElementById('hora').textContent = new Date().toLocaleString('es-CO');
+  }
+
+  function actualizar() {
+    fetch('/api/v1/health', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { pintar(!!d, d); })
+      .catch(function () { pintar(false, null); });
+  }
+  actualizar();
+  setInterval(actualizar, 10000);
+})();
+</script>
+</body>
+</html>

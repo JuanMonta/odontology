@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.Map;
 
 /**
@@ -31,6 +34,10 @@ public class ServerInfoController {
 
     @Value("${server.port:8000}")
     private int serverPort;
+
+    /** IP LAN real, inyectada por el launcher (--app.lan-ip). Si falta, se calcula. */
+    @Value("${app.lan-ip:}")
+    private String lanIpConfigurada;
 
     @GetMapping("/info")
     public Map<String, Object> info() {
@@ -68,13 +75,64 @@ public class ServerInfoController {
         }
     }
 
+    /**
+     * IP LAN del servidor. Orden de prioridad:
+     * 1) {@code app.lan-ip} (la calcula el launcher con Get-IpLan, que elige la
+     *    interfaz de la ruta por defecto — la verdadera de la red local);
+     * 2) heuristica sobre las interfaces: solo direcciones de red local
+     *    (192.168/10./172.16-31), sin loopback, link-local ni CGNAT/Tailscale
+     *    (100.64-127.x) y saltando adaptadores virtuales (WSL/Hyper-V/VirtualBox
+     *    VMware/Tailscale);
+     * 3) 192.68.1.2, la IP simulada de pruebas multi-estacion.
+     */
     private String resolverLanIp() {
+        if (lanIpConfigurada != null && !lanIpConfigurada.isBlank()) {
+            return lanIpConfigurada.trim();
+        }
         try {
-            // Intenta IP LAN real, fallback a 192.68.1.2 (simulada por defecto para pruebas)
-            String ip = InetAddress.getLocalHost().getHostAddress();
-            if (ip != null && !ip.startsWith("127.") && !ip.startsWith("169.")) return ip;
+            Enumeration<NetworkInterface> nifs = NetworkInterface.getNetworkInterfaces();
+            while (nifs.hasMoreElements()) {
+                NetworkInterface nif = nifs.nextElement();
+                try {
+                    if (!nif.isUp() || nif.isLoopback()) continue;
+                    String nombre = (nif.getDisplayName() + " " + nif.getName()).toLowerCase();
+                    if (nombre.contains("vethernet") || nombre.contains("wsl")
+                            || nombre.contains("virtualbox") || nombre.contains("vmware")
+                            || nombre.contains("hyper-v") || nombre.contains("tailscale")
+                            || nombre.contains("loopback")) continue;
+                    Enumeration<InetAddress> addrs = nif.getInetAddresses();
+                    while (addrs.hasMoreElements()) {
+                        InetAddress a = addrs.nextElement();
+                        if (!(a instanceof Inet4Address)) continue;
+                        if (a.isLoopbackAddress() || a.isLinkLocalAddress() || a.isAnyLocalAddress()) continue;
+                        String ip = a.getHostAddress();
+                        if (esCgnat(ip)) continue;             // 100.64-127.x (Tailscale/CGNAT)
+                        if (esRedLocal(ip)) return ip;
+                    }
+                } catch (Exception ignored) { /* interfaz rara: se salta */ }
+            }
         } catch (Exception ignored) {}
         // Para simulación multi-estación en la misma PC, usa la IP simulada pedida
         return "192.68.1.2";
+    }
+
+    private boolean esRedLocal(String ip) {
+        return ip.startsWith("192.168.") || ip.startsWith("10.")
+                || (ip.startsWith("172.") && esRango172(ip));
+    }
+
+    private boolean esRango172(String ip) {
+        try {
+            int segundo = Integer.parseInt(ip.split("\\.")[1]);
+            return segundo >= 16 && segundo <= 31;
+        } catch (Exception e) { return false; }
+    }
+
+    private boolean esCgnat(String ip) {
+        try {
+            String[] p = ip.split("\\.");
+            int segundo = Integer.parseInt(p[1]);
+            return "100".equals(p[0]) && segundo >= 64 && segundo <= 127;
+        } catch (Exception e) { return false; }
     }
 }

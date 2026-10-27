@@ -6,7 +6,7 @@
   position: relative;
   padding: 22px 20px 18px;
   background:
-    radial-gradient(120% 140% at 50% -10%, #1c2229 0%, #12161b 45%, #0c0f12 100%);
+    radial-gradient(120% 140% at 50% -10%, var(--t-plate-3) 0%, var(--t-plate-2) 45%, var(--t-plate-0) 100%);
   border-radius: var(--radius-md);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
@@ -34,7 +34,7 @@
   justify-content: space-between;
   gap: 20px;
   padding: 4px 4px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(var(--veil-rgb), 0.07);
   margin-bottom: 12px;
 }
 
@@ -102,7 +102,7 @@
   gap: 14px;
   align-items: center;
   padding: 11px 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.055);
+  border-top: 1px solid rgba(var(--veil-rgb), 0.055);
   transition: background 0.18s var(--ease-out);
 }
 
@@ -111,7 +111,7 @@
 }
 
 .row:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(var(--veil-rgb), 0.03);
 }
 
 /* Status lamp */
@@ -133,12 +133,12 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #2a323b;
+  background: var(--t-plate-4);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .lamp[data-status='on-time'] {
-  background: #4f5b67;
+  background: var(--t-plate-6);
 }
 
 .lamp[data-status='arrived'] {
@@ -148,13 +148,13 @@
 
 .lamp[data-status='boarding'] {
   background: var(--amber);
-  box-shadow: 0 0 10px 1px rgba(255, 176, 32, 0.55);
+  box-shadow: 0 0 10px 1px rgba(var(--accent-rgb), 0.55);
   animation: lamp-breathe 1.8s var(--ease-out) infinite;
 }
 
 .lamp[data-status='delayed'] {
   background: var(--amber);
-  box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.4);
+  box-shadow: 0 0 8px 1px rgba(var(--accent-rgb), 0.4);
 }
 
 .lamp[data-status='no-show'] {
@@ -167,7 +167,7 @@
 
 .lamp[data-status='done'] {
   background: var(--green);
-  box-shadow: 0 0 8px 1px rgba(86, 181, 127, 0.35);
+  box-shadow: 0 0 8px 1px rgba(var(--ok-rgb), 0.35);
 }
 
 @keyframes lamp-breathe {
@@ -302,7 +302,7 @@
   }
 
   .checkin-btn.is-waiting:disabled {
-    background: #4f5b67;
+    background: var(--t-plate-6);
     color: var(--steel-100);
   }
 
@@ -314,7 +314,7 @@
     letter-spacing: 0.14em;
     color: var(--steel-200);
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(var(--veil-rgb), 0.16);
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: background 0.18s var(--ease-out), color 0.18s var(--ease-out), transform 0.18s var(--ease-out);
@@ -323,12 +323,12 @@
   .noshow-btn:hover {
     background: rgba(214, 69, 69, 0.16);
     border-color: var(--red-dim);
-    color: var(--red, #e05a5a);
+    color: var(--red, var(--t-danger));
     transform: translateY(-1px);
   }
 
   .cancel-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--veil-rgb), 0.08);
     color: #fff;
     transform: translateY(-1px);
   }

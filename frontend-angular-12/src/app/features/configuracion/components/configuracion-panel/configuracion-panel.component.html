@@ -191,6 +191,27 @@
           >{{ t.label }}</button>
         </div>
       </div>
+
+      <div class="tema-block field--full">
+        <span class="toggle-info">
+          <span class="toggle-label">TEMA VISUAL</span>
+          <span class="toggle-hint">PREFERENCIA PERSONAL DEL OPERADOR · SE APLICA AL INSTANTE</span>
+        </span>
+        <div class="seg" role="radiogroup" aria-label="Tema visual">
+          <ng-container *ngIf="temaActual$ | async as temaActual">
+            <button
+              *ngFor="let t of temas"
+              class="seg-btn"
+              [class.is-active]="temaActual === t.id"
+              type="button"
+              role="radio"
+              [attr.aria-checked]="temaActual === t.id"
+              [title]="t.descripcion"
+              (click)="fijarTema(t.id, $event)"
+            >{{ t.nombre }}</button>
+          </ng-container>
+        </div>
+      </div>
     </div>
 
     <p class="form-error" *ngIf="error" role="alert">NOMBRE Y RUC SON OBLIGATORIOS</p>

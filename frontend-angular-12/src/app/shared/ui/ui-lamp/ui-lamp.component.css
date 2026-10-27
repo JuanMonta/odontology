@@ -12,18 +12,18 @@
 
 .lamp--on {
   background: var(--amber);
-  box-shadow: 0 0 8px 1px rgba(255, 176, 32, 0.45);
+  box-shadow: 0 0 8px 1px rgba(var(--accent-rgb), 0.45);
 }
 
 .lamp--warn {
   background: var(--red-dim);
-  box-shadow: 0 0 8px 1px rgba(207, 90, 84, 0.45);
+  box-shadow: 0 0 8px 1px rgba(var(--err-rgb), 0.45);
 }
 
 .lamp--break {
   background: var(--amber-soft);
   border: 1px solid var(--amber-line);
-  box-shadow: 0 0 6px 0 rgba(255, 176, 32, 0.25);
+  box-shadow: 0 0 6px 0 rgba(var(--accent-rgb), 0.25);
 }
 
 .lamp--sm {
@@ -37,9 +37,9 @@
 
 @keyframes lamp-breathe {
   0%, 100% {
-    box-shadow: 0 0 4px 0 rgba(255, 176, 32, 0.35);
+    box-shadow: 0 0 4px 0 rgba(var(--accent-rgb), 0.35);
   }
   50% {
-    box-shadow: 0 0 10px 2px rgba(255, 176, 32, 0.55);
+    box-shadow: 0 0 10px 2px rgba(var(--accent-rgb), 0.55);
   }
 }
