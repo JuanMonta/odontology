@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -31,8 +32,20 @@ public class PacientesController {
     private final PacientesService pacientesService;
 
     @GetMapping
-    public List<PacienteDto> list() {
-        return pacientesService.list();
+    public Object list(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "estado", required = false) String estado,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size) {
+
+        if (page == null && size == null) {
+            // Contrato historico: array plano. El frontend actual no envia
+            // parametros, asi que sigue recibiendo exactamente lo mismo.
+            return pacientesService.list(q, estado);
+        }
+        return pacientesService.pagina(q, estado,
+                page == null ? 0 : page,
+                size == null ? 50 : size);
     }
 
     @GetMapping("/{id}")

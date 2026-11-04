@@ -1,5 +1,12 @@
 server:
   port: 8000
+  # Compresion gzip en Tomcat: el JSON de listas (pacientes, agenda, reportes)
+  # baja ~70-80%. Brotli no viene nativo en Tomcat; gzip es el estandar sin
+  # dependencias extra. El cliente (Angular/HttpClient) ya envia Accept-Encoding.
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain,text/css,application/javascript,text/javascript
+    min-response-size: 1024
   error:
     # Expone el mensaje de las excepciones (ej. sello de la HC) en el body JSON.
     include-message: always
@@ -53,16 +60,25 @@ spring:
       max-request-size: 16MB
 
   jpa:
+    # Sin Open Session in View: la sesion Hibernate vive solo dentro del
+    # @Transactional del servicio. Es seguro aqui porque el modelo es plano
+    # (ninguna asociacion @OneToMany/@ManyToOne/@OneToOne/ManyToMany ni LAZY),
+    # todos los controllers son @RestController y devuelven DTOs, y no hay
+    # vistas Thymeleaf. Evita retener una conexion del pool mientras se
+    # serializa el JSON de la respuesta.
+    open-in-view: false
     # El DDL lo posee database/schema.sql (ENUM, JSON, columna generada y
     # semillas). Hibernate NO crea ni altera tablas: 'none'.
     hibernate:
       ddl-auto: none
-    # Esto imprimirá las consultas SQL en la consola, vital para debuggear el Nivel Senior
-    show-sql: true
+    # En produccion NO se imprime SQL: cada query a stdout cuesta I/O y ensucia
+    # los logs del servidor empaquetado. Para depurar, activar el perfil 'local'
+    # (application-local.yaml), que vuelve a poner show-sql y format_sql en true.
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MariaDBDialect
-        format_sql: true
+        format_sql: false
 
   # Configuración para integración con Ollama local (Spring AI)
   ai:
