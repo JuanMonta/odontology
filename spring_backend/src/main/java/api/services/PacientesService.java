@@ -8,6 +8,7 @@ import api.dto.HclDto;
 import api.dto.PacienteDetailDto;
 import api.dto.PacienteDto;
 import api.dto.PacienteDraftDto;
+import api.dto.PaginaDto;
 import api.dto.PatientAlertDto;
 import api.dto.PatientAppointmentDto;
 import api.dto.ToothConditionDto;
@@ -53,12 +54,18 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import jakarta.persistence.criteria.Predicate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -70,6 +77,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -84,6 +92,9 @@ public class PacientesService {
 
     private static final CondicionDentalConverter CONDICION_CONVERTER = new CondicionDentalConverter();
     private static final PatientAppointmentEstadoConverter CITA_ESTADO_CONVERTER = new PatientAppointmentEstadoConverter();
+
+    /** Tope de registros por pagina: evita que un cliente pida la tabla entera. */
+    private static final int PAGINA_MAX_REGISTROS = 200;
 
     /** FDI permanentes: 11-18, 21-28, 31-38, 41-48. */
     private static final List<Integer> DIENTES = List.of(
@@ -129,10 +140,95 @@ public class PacientesService {
 
     @Transactional(readOnly = true)
     public List<PacienteDto> list() {
-        return vistaRepository.findAll().stream()
-                .sorted(Comparator.comparing(VistaPaciente::getId))
+        return list(null, null);
+    }
+
+    /**
+     * Listado completo con filtros opcionales. Mantiene el contrato historico
+     * (array plano) para no romper al frontend actual.
+     *
+     * @param q      texto libre: nombre completo, cedula o telefono
+     * @param estado {@code active} / {@code inactive}; null = todos
+     */
+    @Transactional(readOnly = true)
+    public List<PacienteDto> list(String q, String estado) {
+        String termino = normalizarTexto(q);
+        Paciente.Estado filtroEstado = parseEstado(estado);
+
+        if (termino == null && filtroEstado == null) {
+            // Camino rapido historico: sin filtros no hace falta construir criteria.
+            return vistaRepository.findAll().stream()
+                    .sorted(Comparator.comparing(VistaPaciente::getId))
+                    .map(this::toDto)
+                    .toList();
+        }
+
+        return vistaRepository.findAll(filtro(termino, filtroEstado), ordenPorId()).stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+    /**
+     * Pagina real sobre la vista ({@code LIMIT/OFFSET} generado por Spring Data).
+     * El tamano se acota a {@value #PAGINA_MAX_REGISTROS} para que un cliente no
+     * pueda pedir la tabla entera disfrazada de pagina.
+     */
+    @Transactional(readOnly = true)
+    public PaginaDto<PacienteDto> pagina(String q, String estado, int page, int size) {
+        int paginaSolicitada = Math.max(0, page);
+        int tamanoSolicitado = Math.min(Math.max(1, size), PAGINA_MAX_REGISTROS);
+
+        Page<VistaPaciente> resultado = vistaRepository.findAll(
+                filtro(normalizarTexto(q), parseEstado(estado)),
+                PageRequest.of(paginaSolicitada, tamanoSolicitado, ordenPorId()));
+
+        return PaginaDto.of(resultado.map(this::toDto));
+    }
+
+    private static Sort ordenPorId() {
+        return Sort.by(Sort.Direction.ASC, "id");
+    }
+
+    /**
+     * Filtro dinamico sobre la vista. {@code nombre} ya viene concatenado por
+     * MariaDB, asi que una sola comparacion cubre nombres + apellidos.
+     */
+    private Specification<VistaPaciente> filtro(String termino, Paciente.Estado estado) {
+        return (root, query, cb) -> {
+            List<Predicate> condiciones = new ArrayList<>();
+            if (estado != null) {
+                condiciones.add(cb.equal(root.get("estado"), estado));
+            }
+            if (termino != null) {
+                String patron = "%" + termino.toLowerCase(Locale.ROOT) + "%";
+                condiciones.add(cb.or(
+                        cb.like(cb.lower(root.get("nombre")), patron),
+                        cb.like(cb.lower(root.get("cedula")), patron),
+                        cb.like(cb.lower(root.get("telefono")), patron)));
+            }
+            return cb.and(condiciones.toArray(new Predicate[0]));
+        };
+    }
+
+    private static String normalizarTexto(String valor) {
+        if (valor == null) {
+            return null;
+        }
+        String limpio = valor.trim();
+        return limpio.isEmpty() ? null : limpio;
+    }
+
+    private static Paciente.Estado parseEstado(String valor) {
+        String limpio = normalizarTexto(valor);
+        if (limpio == null) {
+            return null;
+        }
+        try {
+            return Paciente.Estado.valueOf(limpio.toLowerCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Estado invalido: '" + valor + "'. Valores permitidos: active, inactive");
+        }
     }
 
     @Transactional(readOnly = true)
