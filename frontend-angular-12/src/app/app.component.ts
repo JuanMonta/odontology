@@ -1,15 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AjusteVisualService } from './core/services/ajuste-visual.service';
 import { BackendStatusService } from './core/services/backend-status.service';
 import { ServerDiscoveryService } from './core/services/server-discovery.service';
 
-const INTERVALO_REINTENTO_MS = 15000;
+const INTERVALO_REINTENTO_MS = 5000;
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'sas-odontology';

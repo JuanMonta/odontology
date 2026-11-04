@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Patient, PatientAppointment } from '../../../../core/models/patient.model';
 import { Odontologo } from '../../../../core/models/odontologo.model';
@@ -13,7 +13,8 @@ import { OdontologosHttpService } from '../../../odontologos/services/odontologo
 @Component({
   selector: 'app-evolucion-clinica',
   templateUrl: './evolucion-clinica.component.html',
-  styleUrls: ['./evolucion-clinica.component.css']
+  styleUrls: ['./evolucion-clinica.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EvolucionClinicaComponent implements OnInit, OnChanges, OnDestroy {
   @Input() patient: Patient | null = null;
