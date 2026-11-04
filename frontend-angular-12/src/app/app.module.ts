@@ -9,6 +9,7 @@ import { MainLayoutModule } from './layouts/main-layout/main-layout.module';
 import { JwtInterceptor } from './core/auth/jwt.interceptor';
 import { AuthErrorInterceptor } from './core/auth/auth-error.interceptor';
 import { ReauthModalComponent } from './core/auth/reauth-modal/reauth-modal.component';
+import { ReconexionInterceptor } from './core/services/reconexion.interceptor';
 import { ServerDiscoveryService } from './core/services/server-discovery.service';
 import { DesktopGuardService } from './core/services/desktop-guard.service';
 import { ThemeService } from './core/services/theme.service';
@@ -26,6 +27,10 @@ import { ThemeService } from './core/services/theme.service';
     MainLayoutModule
   ],
   providers: [
+    // Primero en la cadena: ante un corte de red (status 0) busca el servidor en
+    // la subred, reescribe la URL y reintenta UNA vez. Va antes de Jwt/AuthError
+    // para que el reintento vuelva a pasar por ellos (token nuevo, 401, etc.).
+    { provide: HTTP_INTERCEPTORS, useClass: ReconexionInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthErrorInterceptor, multi: true },
     // Tema visual: instancia el servicio al arrancar para que lea el tema del

@@ -25,7 +25,9 @@ export class BackendStatusComponent implements OnInit {
       case 'online':
         return 'SERVIDOR EN LÍNEA';
       case 'offline':
-        return 'SIN CONEXIÓN';
+        // La app reintenta sola cada 5 s (y el interceptor reintenta el guardado
+        // en curso), asi que el estado real es "buscando al servidor".
+        return 'RECONECTANDO';
       default:
         return 'VERIFICANDO';
     }

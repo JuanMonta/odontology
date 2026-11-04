@@ -27,9 +27,17 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "/assets",
+                "ignore": [
+                  "fonts/**"
+                ]
+              }
             ],
             "styles": [
+              "src/styles/fonts.css",
               "src/styles.css",
               "src/themes/carta.css"
             ],
@@ -99,9 +107,17 @@
             "karmaConfig": "karma.conf.js",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "/assets",
+                "ignore": [
+                  "fonts/**"
+                ]
+              }
             ],
             "styles": [
+              "src/styles/fonts.css",
               "src/styles.css",
               "src/themes/carta.css"
             ],

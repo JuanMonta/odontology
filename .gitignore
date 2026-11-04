@@ -8,6 +8,8 @@ skills-lock.json
 PRODUCT.md
 AGENTS.md
 DESIGN.md
+EMPAQUETADO.md
+README.md
 /graphify-out/
 
 # ---------- Frontend Angular ----------
@@ -40,9 +42,12 @@ DESIGN.md
 # ---------- Tools ----------
 /database
 /tools
+/distribucion
+/empaquetado
 *.bat
 *.ps1
 *.cs
+*.exe
 
 # ---------- Tests ----------
 /test-results

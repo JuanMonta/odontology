@@ -49,10 +49,26 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final UsuarioRepository usuarioRepository;
     private final SesionService sesionService;
 
+    /**
+     * Origenes aceptados en el handshake de SockJS.
+     *
+     * <p>En desarrollo la pagina se sirve en {@code http://localhost:4200}, pero
+     * la estacion empaquetada sirve la aplicacion desde
+     * {@code http://127.0.0.1:<puerto libre>} (matriz 4200-4900). Por eso no se
+     * puede fijar un puerto unico: se aceptan patrones de cualquier puerto local.
+     *
+     * <p>Esto no abre un hueco: {@code ClientGateFilter} sigue exigiendo la marca
+     * de escritorio en {@code /ws/**} y el handshake exige un JWT vigente.
+     */
+    private static final List<String> ORIGENES_PERMITIDOS = List.of(
+            "http://localhost:*",
+            "http://127.0.0.1:*",
+            "http://[::1]:*");
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:4200")
+                .setAllowedOriginPatterns(ORIGENES_PERMITIDOS.toArray(new String[0]))
                 .addInterceptors(handshakeInterceptor())
                 .withSockJS();
     }
@@ -127,7 +143,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         }
     }
 
+    /** Patrones de origen que acepta el handshake (ver {@link #ORIGENES_PERMITIDOS}). */
     public List<String> allowedOrigins() {
-        return List.of("http://localhost:4200");
+        return ORIGENES_PERMITIDOS;
     }
 }

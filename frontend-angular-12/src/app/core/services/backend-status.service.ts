@@ -10,7 +10,7 @@ import {
   pairwise,
   filter
 } from 'rxjs/operators';
-import { API_BASE } from '../config/api.config';
+import { getApiBase } from '../config/api.config';
 
 export type BackendStatus = 'checking' | 'online' | 'offline';
 
@@ -21,8 +21,14 @@ export type BackendStatus = 'checking' | 'online' | 'offline';
  */
 @Injectable({ providedIn: 'root' })
 export class BackendStatusService {
-  private static readonly POLL_INTERVAL_MS = 8000;
-  private static readonly TIMEOUT_MS = 3500;
+  /**
+   * Sondeo frecuente a proposito: cuando el servidor cambia de IP, cada sondeo
+   * tarda el timeout TCP de Windows (~20 s) en fallar. Con 4 s y timeout de
+   * 3 s la app pasa a "RECONECTANDO" enseguida y `AppComponent` lanza el
+   * barrido de subred antes de que el usuario llegue a pulsar Guardar.
+   */
+  private static readonly POLL_INTERVAL_MS = 4000;
+  private static readonly TIMEOUT_MS = 3000;
 
   private readonly statusSubject = new BehaviorSubject<BackendStatus>('checking');
 
@@ -62,8 +68,10 @@ export class BackendStatusService {
   }
 
   private probe(): Observable<BackendStatus> {
+    // getApiBase() en cada sondeo: si el descubrimiento reubico el servidor
+    // (IP nueva), el latido apunta alla sin reiniciar la app.
     return this.http
-      .get<{ status: string }>(`${API_BASE}/health`)
+      .get<{ status: string }>(`${getApiBase()}/health`)
       .pipe(
         timeout(BackendStatusService.TIMEOUT_MS),
         map(body => (body?.status === 'UP' ? 'online' : 'offline')),
